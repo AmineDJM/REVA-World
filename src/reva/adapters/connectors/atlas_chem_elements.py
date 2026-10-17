@@ -57,6 +57,7 @@ from reva.adapters.connectors.atlas_chem_common import (
     canon,
     code_digest,
     err,
+    kg_decimal,
     load_kg,
     parse_periodic_table,
     quantity,
@@ -413,6 +414,8 @@ def nuclide_id(text: str, z: int, symbol: str) -> tuple[int, str] | None:
     """(A, isomer suffix) of an AMDC/CIAAW nuclide symbol on the page of element ``symbol``; None if it names
     another element (never guessed)."""
     t = text.strip()
+    if z == 1 and t in ("2D", "3T"):  # deuterium / tritium: IUPAC-accepted symbols for 2H and 3H (NIST tables)
+        return int(t[0]), ""
     m = re.match(r"^([0-9]{1,3})" + re.escape(symbol) + r"([a-z][0-9]?)?$", t)
     if not m:
         return None
@@ -473,7 +476,7 @@ def _parse_compositions(rec: Mapping[str, Any], page: ElementPage, refs: Mapping
         ab_col = next((v for k, v in cols.items() if k.startswith("Abundance")), None)
         if not iso:
             continue
-        for k, (i, j, s, mk) in enumerate(iso):
+        for k, (_i, _j, s, _mk) in enumerate(iso):
             nid = nuclide_id(s, page.z, page.symbol)
             if nid is None:
                 page.warnings.append(f"Z={page.z}: isotope {s!r} not of this element")
@@ -669,7 +672,10 @@ def element_rows(
                     retrieved_at,
                 )
             )
-        for cells, name, geo in ((p.crustal, "crustal_abundance", "earth_crust"), (p.oceanic, "oceanic_abundance", "earth_oceans")):
+        for cells, name, geo in (
+            (p.crustal, "crustal_abundance", "earth_crust"),
+            (p.oceanic, "oceanic_abundance", "earth_oceans"),
+        ):
             for c in cells:
                 pa = parse_abundance(c)
                 rows.append(
@@ -690,7 +696,13 @@ def element_rows(
 
 
 def _sel(c: Cell) -> dict[str, Any]:
-    return {"file": "element.json", "section": c.section, "information": c.info_index, "item": c.item_index, "reference": c.ref.number}
+    return {
+        "file": "element.json",
+        "section": c.section,
+        "information": c.info_index,
+        "item": c.item_index,
+        "reference": c.ref.number,
+    }
 
 
 def nuclide_rows(pages: Sequence[ElementPage], *, retrieved_at: datetime) -> list[dict[str, Any]]:
@@ -707,22 +719,78 @@ def nuclide_rows(pages: Sequence[ElementPage], *, retrieved_at: datetime) -> lis
                         f["uncertainty"] = pu[1]
                     if pu[2]:
                         f["estimated"] = True
-                    rows.append(_row("nuclides", f"atomic_mass|nuclide={nid}|provider=amdc", NOT_GEOGRAPHIC, atlas_decimal(pu[0]), None, "u", f, p.raw_sha256, _sel(mass), retrieved_at))
+                    rows.append(
+                        _row(
+                            "nuclides",
+                            f"atomic_mass|nuclide={nid}|provider=amdc",
+                            NOT_GEOGRAPHIC,
+                            atlas_decimal(pu[0]),
+                            None,
+                            "u",
+                            f,
+                            p.raw_sha256,
+                            _sel(mass),
+                            retrieved_at,
+                        )
+                    )
             hl = nu.amdc.get("Half Life and Uncertainty")
             if hl is not None and hl.text.strip():
                 ph = parse_half_life(hl.text)
                 f = {"nuclide": nu.key, **hl.ref.flags(), "verbatim": hl.text}
                 if ph is None:
-                    rows.append(_row("nuclides", f"half_life|nuclide={nid}", NOT_GEOGRAPHIC, None, hl.text.strip(), "as published", f, p.raw_sha256, _sel(hl), retrieved_at))
+                    rows.append(
+                        _row(
+                            "nuclides",
+                            f"half_life|nuclide={nid}",
+                            NOT_GEOGRAPHIC,
+                            None,
+                            hl.text.strip(),
+                            "as published",
+                            f,
+                            p.raw_sha256,
+                            _sel(hl),
+                            retrieved_at,
+                        )
+                    )
                 else:
                     fam, v, unc = ph
-                    f.update(computed_by="reva", conversion=f"unit scale to {fam}" + ("" if fam == "s" else " (multiples of NUBASE's year; not converted to seconds)"))
+                    f.update(
+                        computed_by="reva",
+                        conversion=f"unit scale to {fam}"
+                        + ("" if fam == "s" else " (multiples of NUBASE's year; not converted to seconds)"),
+                    )
                     if unc:
                         f["uncertainty_verbatim"] = unc
-                    rows.append(_row("nuclides", f"half_life|nuclide={nid}|unit={fam}", NOT_GEOGRAPHIC, atlas_decimal(v), None, fam, f, p.raw_sha256, _sel(hl), retrieved_at))
+                    rows.append(
+                        _row(
+                            "nuclides",
+                            f"half_life|nuclide={nid}|unit={fam}",
+                            NOT_GEOGRAPHIC,
+                            atlas_decimal(v),
+                            None,
+                            fam,
+                            f,
+                            p.raw_sha256,
+                            _sel(hl),
+                            retrieved_at,
+                        )
+                    )
             dy = nu.amdc.get("Discovery Year")
             if dy is not None and re.match(r"^[0-9]{4}$", dy.text.strip()):
-                rows.append(_row("nuclides", f"discovery_year|nuclide={nid}", NOT_GEOGRAPHIC, dy.text.strip(), None, "year", {"nuclide": nu.key, **dy.ref.flags()}, p.raw_sha256, _sel(dy), retrieved_at))
+                rows.append(
+                    _row(
+                        "nuclides",
+                        f"discovery_year|nuclide={nid}",
+                        NOT_GEOGRAPHIC,
+                        dy.text.strip(),
+                        None,
+                        "year",
+                        {"nuclide": nu.key, **dy.ref.flags()},
+                        p.raw_sha256,
+                        _sel(dy),
+                        retrieved_at,
+                    )
+                )
             for ref, _mc, ab in nu.compositions:
                 if ab is None or not ab.text.strip():
                     continue
@@ -775,7 +843,18 @@ def kg_build(
     ents: list[Any] = []
     stmts: list[Any] = []
 
-    def st(sid: str, subj: str, pid: str, raw: str, refs: Sequence[Mapping[str, Any]], *, obj: str | None = None, value: Mapping[str, Any] | None = None, quals: Mapping[str, Any] | None = None, pit: KgTime | None = None) -> None:
+    def st(
+        sid: str,
+        subj: str,
+        pid: str,
+        raw: str,
+        refs: Sequence[Mapping[str, Any]],
+        *,
+        obj: str | None = None,
+        value: Mapping[str, Any] | None = None,
+        quals: Mapping[str, Any] | None = None,
+        pit: KgTime | None = None,
+    ) -> None:
         stmts.append(
             KgStatement(
                 subject_qid=subj,
@@ -798,7 +877,9 @@ def kg_build(
                 qid=e.key,
                 kind="chemical_element",
                 labels={"en": e.name},
-                descriptions={"en": f"chemical element, atomic number {e.z}, symbol {e.symbol} (PubChem periodic table)"},
+                descriptions={
+                    "en": f"chemical element, atomic number {e.z}, symbol {e.symbol} (PubChem periodic table)"
+                },
                 aliases={"en": [e.symbol]},
                 source_revision=rev,
             )
@@ -807,11 +888,27 @@ def kg_build(
         ref = [_ref_entry(PERIODIC_TABLE_URL, retrieved_at, sel)]
         for col, pid in PT_TEXT.items():
             if e.cells[col].strip():
-                st(f"el:{e.z}:{col}", e.key, pid, pt_sha, ref, value=string_value(e.cells[col].strip()), quals={"column": col})
+                st(
+                    f"el:{e.z}:{col}",
+                    e.key,
+                    pid,
+                    pt_sha,
+                    ref,
+                    value=string_value(e.cells[col].strip()),
+                    quals={"column": col},
+                )
         for col, (pid, unit) in PT_NUMERIC.items():
             v = to_decimal(e.cells[col])
             if v is not None:
-                st(f"el:{e.z}:{col}", e.key, pid, pt_sha, ref, value=quantity(v, unit), quals={"column": col, "verbatim": e.cells[col]})
+                st(
+                    f"el:{e.z}:{col}",
+                    e.key,
+                    pid,
+                    pt_sha,
+                    ref,
+                    value=quantity(v, unit),
+                    quals={"column": col, "verbatim": e.cells[col]},
+                )
         yd = e.cells["YearDiscovered"].strip()
         if yd:
             st(
@@ -828,35 +925,53 @@ def kg_build(
         el = f"element:{p.z}"
         url = element_url(p.z)
         for c in p.atomic_weights:
-            st(f"el:{p.z}:aw:{c.ref.key}:{c.info_index}:{c.item_index}", el, "pubchem:atomic_weight", p.raw_sha256, [_ref_entry(url, retrieved_at, _sel(c), c.ref)], value=string_value(c.text.strip()), quals={"provided_by": c.ref.source_name, "unit": "u"}) if False else None  # noqa: E501 (string form kept below)
-            pu = parse_uncertain(c.text)
-            iv = parse_interval(c.text) if pu is None else None
+            rr = [_ref_entry(url, retrieved_at, _sel(c), c.ref)]
+            sid_aw = f"el:{p.z}:aw:{c.ref.key}:{c.info_index}:{c.item_index}"
             q: dict[str, Any] = {"provided_by": c.ref.source_name, "verbatim": c.text}
+            pu = parse_uncertain(c.text)
             if pu is not None:
-                val = quantity(pu[0], "u")
                 if pu[1]:
                     q["uncertainty"] = pu[1]
-            elif iv is not None:
-                # an interval is not a point value: amount is not invented; bounds kept as the source gives them
-                q["interval"] = [str(iv[0]), str(iv[1])]
-                q["interval_note"] = "standard atomic weight given as an interval; no single value stated"
-                continue_interval = True
-                val = None
-                if continue_interval:
-                    st(f"el:{p.z}:aw:{c.ref.key}:{c.info_index}:{c.item_index}:interval", el, "pubchem:history_text", p.raw_sha256, (), value=None) if False else None
-            else:
-                val = None
-            if val is None:
-                continue
-            st(f"el:{p.z}:aw:{c.ref.key}:{c.info_index}:{c.item_index}", el, "pubchem:atomic_weight", p.raw_sha256, [_ref_entry(url, retrieved_at, _sel(c), c.ref)], value=val, quals=q)
-        for cells, pid, tag in ((p.crustal, "pubchem:crustal_abundance", "crust"), (p.oceanic, "pubchem:oceanic_abundance", "ocean")):
+                st(sid_aw, el, "pubchem:atomic_weight", p.raw_sha256, rr, value=quantity(pu[0], "u"), quals=q)
+            elif (iv := parse_interval(c.text)) is not None:
+                # an interval is not a point value: no amount is invented; the source's bounds are kept verbatim
+                q["interval"] = [kg_decimal(iv[0]), kg_decimal(iv[1])]
+                st(
+                    sid_aw,
+                    el,
+                    "pubchem:atomic_weight_interval",
+                    p.raw_sha256,
+                    rr,
+                    value=string_value(c.text.strip()),
+                    quals=q,
+                )
+        for cells, pid, tag in (
+            (p.crustal, "pubchem:crustal_abundance", "crust"),
+            (p.oceanic, "pubchem:oceanic_abundance", "ocean"),
+        ):
             for c in cells:
                 pa = parse_abundance(c)
                 if pa is None:
                     continue
-                st(f"el:{p.z}:{tag}:{c.ref.key}:{c.info_index}:{c.item_index}", el, pid, p.raw_sha256, [_ref_entry(url, retrieved_at, _sel(c), c.ref)], value=quantity(pa[0], pa[1]), quals={"provided_by": c.ref.source_name, "verbatim": c.text})
+                st(
+                    f"el:{p.z}:{tag}:{c.ref.key}:{c.info_index}:{c.item_index}",
+                    el,
+                    pid,
+                    p.raw_sha256,
+                    [_ref_entry(url, retrieved_at, _sel(c), c.ref)],
+                    value=quantity(pa[0], pa[1]),
+                    quals={"provided_by": c.ref.source_name, "verbatim": c.text},
+                )
         for c in p.history:
-            st(f"el:{p.z}:hist:{c.ref.key}:{c.info_index}:{c.item_index}", el, "pubchem:history_text", p.raw_sha256, [_ref_entry(url, retrieved_at, _sel(c), c.ref)], value=text_value(c.text.strip()), quals={"provided_by": c.ref.source_name})
+            st(
+                f"el:{p.z}:hist:{c.ref.key}:{c.info_index}:{c.item_index}",
+                el,
+                "pubchem:history_text",
+                p.raw_sha256,
+                [_ref_entry(url, retrieved_at, _sel(c), c.ref)],
+                value=text_value(c.text.strip()),
+                quals={"provided_by": c.ref.source_name},
+            )
         for nu in p.nuclides.values():
             nk = nu.key
             sym = f"{nu.a}{p.symbol}{nu.isomer}"
@@ -865,16 +980,38 @@ def kg_build(
                     qid=nk,
                     kind="isotope",
                     labels={"en": f"{p.symbol}-{nu.a}{nu.isomer}"},
-                    descriptions={"en": f"nuclide {sym} (Z={nu.z}, A={nu.a}{', isomeric state ' + nu.isomer if nu.isomer else ''}), as listed on the PubChem element page"},
+                    descriptions={
+                        "en": f"nuclide {sym} (Z={nu.z}, A={nu.a}{', isomeric state ' + nu.isomer if nu.isomer else ''}), as listed on the PubChem element page"
+                    },
                     aliases={"en": [sym]},
                     source_revision="sha256:" + p.raw_sha256[:16],
                 )
             )
             sid = f"el:{p.z}:nu:{nu.a}{nu.isomer}"
             first = nu.amdc.get("Nuclide")
-            r0 = [_ref_entry(url, retrieved_at, _sel(first) if first else {"file": "element.json"}, first.ref if first else None)]
-            st(f"{sid}:isotope_of", nk, "pubchem:isotope_of", p.raw_sha256, r0, obj=el, quals={"symbol_verbatim": nu.symbol_text})
-            st(f"{sid}:A", nk, "pubchem:mass_number", p.raw_sha256, r0, value=quantity(Decimal(nu.a)), quals={"from": "nuclide symbol"})
+            r0 = [
+                _ref_entry(
+                    url, retrieved_at, _sel(first) if first else {"file": "element.json"}, first.ref if first else None
+                )
+            ]
+            st(
+                f"{sid}:isotope_of",
+                nk,
+                "pubchem:isotope_of",
+                p.raw_sha256,
+                r0,
+                obj=el,
+                quals={"symbol_verbatim": nu.symbol_text},
+            )
+            st(
+                f"{sid}:A",
+                nk,
+                "pubchem:mass_number",
+                p.raw_sha256,
+                r0,
+                value=quantity(Decimal(nu.a)),
+                quals={"from": "nuclide symbol"},
+            )
             mass = nu.amdc.get("Atomic Mass and Uncertainty [u]")
             if mass is not None and (pu := parse_uncertain(mass.text)) is not None:
                 q = {"provided_by": mass.ref.source_name, "verbatim": mass.text}
@@ -882,38 +1019,111 @@ def kg_build(
                     q["uncertainty"] = pu[1]
                 if pu[2]:
                     q["estimated"] = True
-                st(f"{sid}:mass:amdc", nk, "pubchem:nuclide_mass", p.raw_sha256, [_ref_entry(url, retrieved_at, _sel(mass), mass.ref)], value=quantity(pu[0], "u"), quals=q)
+                st(
+                    f"{sid}:mass:amdc",
+                    nk,
+                    "pubchem:nuclide_mass",
+                    p.raw_sha256,
+                    [_ref_entry(url, retrieved_at, _sel(mass), mass.ref)],
+                    value=quantity(pu[0], "u"),
+                    quals=q,
+                )
             hl = nu.amdc.get("Half Life and Uncertainty")
             if hl is not None and hl.text.strip():
                 rr = [_ref_entry(url, retrieved_at, _sel(hl), hl.ref)]
-                st(f"{sid}:half_life", nk, "pubchem:half_life", p.raw_sha256, rr, value=string_value(hl.text.strip()), quals={"provided_by": hl.ref.source_name})
+                st(
+                    f"{sid}:half_life",
+                    nk,
+                    "pubchem:half_life",
+                    p.raw_sha256,
+                    rr,
+                    value=string_value(hl.text.strip()),
+                    quals={"provided_by": hl.ref.source_name},
+                )
                 ph = parse_half_life(hl.text)
                 if ph is not None:
                     fam, v, unc = ph
                     pid = "pubchem:half_life_seconds" if fam == "s" else "pubchem:half_life_years"
-                    q = {"provided_by": hl.ref.source_name, "verbatim": hl.text, "computed_by": "reva", "conversion": f"unit scale to {fam}"}
+                    q = {
+                        "provided_by": hl.ref.source_name,
+                        "verbatim": hl.text,
+                        "computed_by": "reva",
+                        "conversion": f"unit scale to {fam}",
+                    }
                     if unc:
                         q["uncertainty_verbatim"] = unc
                     st(f"{sid}:half_life_{fam}", nk, pid, p.raw_sha256, rr, value=quantity(v, fam), quals=q)
             dy = nu.amdc.get("Discovery Year")
             if dy is not None and re.match(r"^[0-9]{4}$", dy.text.strip()):
                 y = dy.text.strip()
-                st(f"{sid}:discovered", nk, "pubchem:nuclide_discovery_year", p.raw_sha256, [_ref_entry(url, retrieved_at, _sel(dy), dy.ref)], value={"type": "time", "time": f"{y}", "precision": 9}, pit=KgTime(y, 9), quals={"provided_by": dy.ref.source_name})
+                st(
+                    f"{sid}:discovered",
+                    nk,
+                    "pubchem:nuclide_discovery_year",
+                    p.raw_sha256,
+                    [_ref_entry(url, retrieved_at, _sel(dy), dy.ref)],
+                    value={"type": "time", "time": f"{y}", "precision": 9},
+                    pit=KgTime(y, 9),
+                    quals={"provided_by": dy.ref.source_name},
+                )
             dm = nu.amdc.get("Decay Modes, Intensities and Uncertainties [%]")
             if dm is not None:
                 for k, mode in enumerate(decay_modes(dm.text)):
-                    st(f"{sid}:decay:{k}", nk, "pubchem:decay_mode", p.raw_sha256, [_ref_entry(url, retrieved_at, _sel(dm), dm.ref)], value=string_value(mode), quals={"provided_by": dm.ref.source_name, "position": k, "mode": re.split(r"[=≈<>~ ]", mode, maxsplit=1)[0]})
+                    st(
+                        f"{sid}:decay:{k}",
+                        nk,
+                        "pubchem:decay_mode",
+                        p.raw_sha256,
+                        [_ref_entry(url, retrieved_at, _sel(dm), dm.ref)],
+                        value=string_value(mode),
+                        quals={
+                            "provided_by": dm.ref.source_name,
+                            "position": k,
+                            "mode": re.split(r"[=≈<>~ ]", mode, maxsplit=1)[0],
+                        },
+                    )
             for ref, mc, ab in nu.compositions:
                 if mc is not None and (pu := parse_uncertain(mc.text)) is not None:
                     q = {"provided_by": ref.source_name, "verbatim": mc.text}
                     if pu[1]:
                         q["uncertainty"] = pu[1]
-                    st(f"{sid}:mass:{ref.key}", nk, "pubchem:nuclide_mass", p.raw_sha256, [_ref_entry(url, retrieved_at, _sel(mc), ref)], value=quantity(pu[0], "u"), quals=q)
+                    st(
+                        f"{sid}:mass:{ref.key}",
+                        nk,
+                        "pubchem:nuclide_mass",
+                        p.raw_sha256,
+                        [_ref_entry(url, retrieved_at, _sel(mc), ref)],
+                        value=quantity(pu[0], "u"),
+                        quals=q,
+                    )
+                if ab is not None and parse_uncertain(ab.text) is None and (ia := parse_interval(ab.text)) is not None:
+                    q = {
+                        "provided_by": ref.source_name,
+                        "verbatim": ab.text,
+                        "interval": [kg_decimal(ia[0]), kg_decimal(ia[1])],
+                    }
+                    st(
+                        f"{sid}:abundance:{ref.key}",
+                        nk,
+                        "pubchem:isotopic_abundance_interval",
+                        p.raw_sha256,
+                        [_ref_entry(url, retrieved_at, _sel(ab), ref)],
+                        value=string_value(ab.text.strip()),
+                        quals=q,
+                    )
                 if ab is not None and (pa := parse_uncertain(ab.text)) is not None:
                     q = {"provided_by": ref.source_name, "verbatim": ab.text}
                     if pa[1]:
                         q["uncertainty"] = pa[1]
-                    st(f"{sid}:abundance:{ref.key}", nk, "pubchem:isotopic_abundance", p.raw_sha256, [_ref_entry(url, retrieved_at, _sel(ab), ref)], value=quantity(pa[0], "mole fraction"), quals=q)
+                    st(
+                        f"{sid}:abundance:{ref.key}",
+                        nk,
+                        "pubchem:isotopic_abundance",
+                        p.raw_sha256,
+                        [_ref_entry(url, retrieved_at, _sel(ab), ref)],
+                        value=quantity(pa[0], "mole fraction"),
+                        quals=q,
+                    )
     return ents, stmts
 
 

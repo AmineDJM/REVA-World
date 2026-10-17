@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-14",
+  "format": "jsonl",
+  "entity": "topics",
+  "record_count": 6,
+  "content_length": 7738,
+  "files": [
+    {
+      "url": "s3://openalex/data/jsonl/topics/updated_date=2026-10-14/part_0000.gz",
+      "meta": {
+        "content_length": 7738,
+        "record_count": 6
+      }
+    }
+  ]
+}

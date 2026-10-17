@@ -82,7 +82,8 @@ KIND_BY_PREFIX: dict[str, str] = {
 }
 
 _OBO_IRI = re.compile(r"^https?://purl\.obolibrary\.org/obo/([A-Za-z][A-Za-z0-9]*)_([A-Za-z0-9_.-]+)$")
-_HGNC_IRI = re.compile(r"^https?://identifiers\.org/hgnc/([0-9]+)$")
+_IDORG_IRI = re.compile(r"^https?://identifiers\.org/(hgnc|ncbigene)/([0-9]+)$")
+_IDORG_PREFIX = {"hgnc": "HGNC", "ncbigene": "NCBIGene"}
 _CURIE = re.compile(r"^([A-Za-z][A-Za-z0-9_.-]*):([A-Za-z0-9_.:-]+)$")
 
 
@@ -106,14 +107,14 @@ def digest(*objs: Any, files: Sequence[Path] = (PREDICATES_FILE,)) -> str:
 
 # ============================================================================================== identifiers
 def curie(ref: str) -> str | None:
-    """CURIE of an identifier as published (OBO PURL, identifiers.org HGNC IRI or CURIE); ``None`` otherwise."""
+    """CURIE of an identifier as published (OBO PURL, identifiers.org HGNC / NCBI Gene IRI or CURIE); else ``None``."""
     ref = ref.strip()
     m = _OBO_IRI.match(ref)
     if m:
         return f"{m.group(1)}:{m.group(2)}"
-    m = _HGNC_IRI.match(ref)
+    m = _IDORG_IRI.match(ref)
     if m:
-        return f"HGNC:{m.group(1)}"
+        return f"{_IDORG_PREFIX[m.group(1)]}:{m.group(2)}"
     m = _CURIE.match(ref)
     if m and not ref.startswith(("http:", "https:")):
         return ref
@@ -335,11 +336,8 @@ class RelationIndex:
     def is_causal(self, rid: str) -> bool:
         if CAUSAL_ROOT in self.closure(rid) or self.resolve(rid) == CAUSAL_ROOT:
             return True
-        r = self.relations.get(rid) or self.relations.get(self.resolve(rid))
-        texts = [rid.replace("_", " "), self.name(rid)]
-        if r is not None and r.definition:
-            texts.append(r.definition)
-        low = " ".join(texts).lower()
+        # label markers only (a definition's wording is not read: RO's hierarchy is the classification)
+        low = " ".join((rid.replace("_", " "), self.name(rid))).lower()
         return any(m in low for m in CAUSAL_MARKERS)
 
     def definition(self, rid: str) -> tuple[str, dict[str, Any]] | None:
@@ -363,9 +361,13 @@ class RelationIndex:
             r = self.relations.get(key)
             if r is None or not r.definition:
                 continue
-            src = {**self.documents.get(r.document, {"title": r.document}), "paragraph": f"[Typedef] id: {r.id}"}
-            src["document_key"] = r.document
-            src["extraction"] = "obo_typedef_def" if r.document.endswith(".obo") else "obograph_property_definition"
+            obo = r.document.endswith(".obo")
+            src = {
+                **self.documents.get(r.document, {"title": r.document}),
+                "paragraph": f"[Typedef] id: {r.id}" if obo else f"property node {r.id}: meta.definition.val",
+                "document_key": r.document,
+                "extraction": "obo_typedef_def" if obo else "obograph_property_definition",
+            }
             if key in (rid, self.resolve(rid)):
                 return f'"{r.definition}"', src
             return (

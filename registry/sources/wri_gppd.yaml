@@ -1,0 +1,24 @@
+# V4 (agent V4ENERGY): WRI Global Power Plant Database v1.3.0 (GitHub output_database).
+# Connector src/reva/adapters/connectors/atlas_gppd.py (KG facilities gppd:<gppd_idnr>, no atlas table).
+source_key: wri.gppd
+title: Global Power Plant Database v1.3.0 (WRI) — ~35,000 power plants, capacity, fuel, owner, generation
+provider_url: https://github.com/wri/global-power-plant-database
+lineage_family: wri_gppd
+rights:
+  licence: "CC BY 4.0"
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: >-
+    Global Energy Observatory, Google, KTH Royal Institute of Technology in Stockholm, Enipedia, World Resources
+    Institute. 2021. Global Power Plant Database v1.3.0. World Resources Institute.
+  terms_quote: >-
+    The latest database release (v1.3.0) is available in CSV format here under a Creative Commons-Attribution 4.0
+    (CC BY 4.0) license.
+metadata:
+  allowed_hosts: [raw.githubusercontent.com]
+  files:
+    csv: https://raw.githubusercontent.com/wri/global-power-plant-database/master/output_database/global_power_plant_database.csv
+    version: https://raw.githubusercontent.com/wri/global-power-plant-database/master/output_database/DATABASE_VERSION
+    readme: https://raw.githubusercontent.com/wri/global-power-plant-database/master/README.md
+  authentication: none
+  cadence: "not maintained since early 2022 (last version 1.3.0)"
+  not_used: "estimated_generation_gwh_2013..2017 (WRI model output, not reports)"

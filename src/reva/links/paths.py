@@ -102,6 +102,10 @@ class Edge:
     causal: bool = False
     stmt: Stmt | None = None
     link: Link | None = None
+    #: V4 relation family of this traversal direction (statement edges whose property is mapped), else None
+    family: str | None = None
+    #: family of the opposite traversal (v -> u), used when a search walks this edge backwards from the target
+    rev_family: str | None = None
 
     @property
     def kind_key(self) -> str:
@@ -137,6 +141,8 @@ class PathQuery:
     #: objects of these properties (languages, continents, eras) may end a path but are never passed through
     non_transit_props: frozenset[str] = frozenset()
     max_constrained_steps: int = MAX_CONSTRAINED_STEPS
+    #: V4: only statement hops whose family reading (in traversal direction) is one of these
+    families: frozenset[str] | None = None
 
     def __post_init__(self) -> None:
         if not 1 <= self.max_hops <= MAX_HOPS_LIMIT:
@@ -199,6 +205,7 @@ class PathQuery:
             "via_any": sorted(self.via_any),
             "via_all": sorted(self.via_all),
             "non_transit_props": sorted(self.non_transit_props),
+            "families": sorted(self.families) if self.families is not None else None,
         }
 
 
@@ -252,14 +259,49 @@ class PathGraph:
             return False
         self._seen.add(key)
         t = s.temporal
+        fwd_fam, back_fam = self._families(s.pid) if et.family else (None, None)
         self.adj[s.subject].append(
-            Edge(s.subject, s.object, "statement", s.pid, True, t, et.path_cost, et.causal, stmt=s)
+            Edge(
+                s.subject,
+                s.object,
+                "statement",
+                s.pid,
+                True,
+                t,
+                et.path_cost,
+                et.causal,
+                stmt=s,
+                family=fwd_fam,
+                rev_family=back_fam,
+            )
         )
         self.adj[s.object].append(
-            Edge(s.object, s.subject, "statement", s.pid, False, t, et.path_cost, et.causal, stmt=s)
+            Edge(
+                s.object,
+                s.subject,
+                "statement",
+                s.pid,
+                False,
+                t,
+                et.path_cost,
+                et.causal,
+                stmt=s,
+                family=back_fam,
+                rev_family=fwd_fam,
+            )
         )
         self._degree = None
         return True
+
+    def _families(self, pid: str) -> tuple[str | None, str | None]:
+        from reva.kg.families import FamilyError, load_registry
+
+        try:
+            reg = load_registry()
+        except FamilyError:  # pragma: no cover - the taxonomy already degraded without families
+            return None, None
+        f, b = reg.edge_family(pid, "out"), reg.edge_family(pid, "in")
+        return (f.family if f else None), (b.family if b else None)
 
     def add_link(self, lk: Link) -> bool:
         if not lk.evidence:  # Link refuses this already; defence in depth
@@ -312,15 +354,23 @@ class PathGraph:
         return p
 
     # -- filtering ----------------------------------------------------------------------------------
-    def edge_allowed(self, e: Edge, q: PathQuery) -> bool:
+    def edge_allowed(self, e: Edge, q: PathQuery, *, reverse: bool = False) -> bool:
+        """``reverse``: the edge is walked backwards (search from the target), so a family filter applies to
+        the reading v -> u in path order."""
         ks = q.kind_set
         if ks is not None and e.kind_key not in ks:
             return False
         if e.kind_key in q.exclude_set:
             return False
-        if e.kind == "statement" and e.type_id in self.hubs.excluded_properties:
-            if ks is None or e.kind_key not in ks:
-                return False
+        fams = q.families
+        fam = e.rev_family if reverse else e.family
+        if fams is not None and (e.kind != "statement" or fam not in fams):
+            return False
+        named = (ks is not None and e.kind_key in ks) or (fams is not None and fam in fams)
+        if e.kind == "statement" and e.type_id in self.hubs.excluded_properties and not named:
+            return False
+        if e.kind == "statement" and e.type_id in self.taxonomy.opt_in_properties and not named:
+            return False
         if e.link is not None and not q.include_blocked_hubs and any(v in self.hubs.blocked for v in e.link.via):
             return False  # a derived link *through* a blocked hub is the hub path in disguise
         return temporal_allows(e.temporal, q)
@@ -377,6 +427,7 @@ class Hop:
             "alternatives": self.alternatives,
             "text": self.text,
             "label": self.label,
+            "family": e.family,
         }
         if e.link is not None:
             d["via"] = list(e.link.via)
@@ -528,7 +579,7 @@ def _bfs(
         if n in (q.source, q.target) and n != start:
             continue  # endpoints are never intermediate
         for e in graph.adj.get(n, ()):
-            if e.v in dist or not graph.edge_allowed(e, q):
+            if e.v in dist or not graph.edge_allowed(e, q, reverse=start == q.target and restrict is None):
                 continue
             if restrict is not None:
                 r = restrict.get(e.v)
@@ -568,9 +619,11 @@ def find_paths(graph: PathGraph, q: PathQuery, *, deadline: float | None = None)
     if graph.skipped.get("stored_links_cap_reached"):
         res.cut("stored links (kg.link_row) around the reached nodes capped: some derived links were not loaded")
     for n in (q.source, q.target):
-        if n not in graph:
+        # an endpoint whose only edges the query never allows (opt-in classification edges, other families)
+        # has no traversable statement for this query
+        if n not in graph or not any(graph.edge_allowed(e, q, reverse=n == q.target) for e in graph.adj[n]):
             # known entity (labelled) without any traversable statement vs an id the graph has never seen
-            res.reason = "no_traversable_statements" if n in graph.labels else "unknown_node"
+            res.reason = "no_traversable_statements" if (n in graph.labels or n in graph) else "unknown_node"
             res.labels = {n: graph.labels.get(n, {}) for n in (q.source, q.target)}
             return res
     budget = [q.max_expansions]
@@ -1001,6 +1054,8 @@ def graph_from_db(
     hb = hubs or load_hubs()
     nb = KgNeighbourhood(conn, origin=origin, deadline=deadline)
     props = sorted(tax.edge_types)
+    if q.families is not None:  # V4: read only the properties of the families asked for
+        props = sorted({p for p, et in tax.edge_types.items() if _family_pid_allowed(p, q.families)})
     a = math.ceil(q.max_hops / 2)
     b = q.max_hops - a
     blocked = set() if q.include_blocked_hubs else set(hb.blocked)
@@ -1022,6 +1077,16 @@ def graph_from_db(
         _add_stored_links(conn, g, reached, origin)
     g.add_labels(nb.labels(set(g.adj) | reached))
     return g
+
+
+def _family_pid_allowed(pid: str, families: frozenset[str]) -> bool:
+    from reva.kg.families import FamilyError, load_registry
+
+    try:
+        reg = load_registry()
+    except FamilyError:  # pragma: no cover
+        return False
+    return any((ef := reg.edge_family(pid, d)) is not None and ef.family in families for d in ("out", "in"))
 
 
 #: stored links read around the reached nodes of one path query (SEC-1 bound)

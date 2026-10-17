@@ -1,0 +1,31 @@
+# V4BIO mappings of the tree-of-life / molecular-biology predicates (registry/kg/predicates_bio.yaml) to the
+# universal relation families. Only entity-valued predicates are mapped. Identity bridges (bio:wikidata_item,
+# bio:same_taxon_via_wikidata, ncbi:paired_assembly) are deliberately unmapped: they say that two identifiers name
+# the same thing (evidence: one Wikidata item / one NCBI record holds both), not a relation between two things.
+version: 1
+agent: V4BIO
+note: >-
+  Taxonomic parent edges read as is_a (species is_a genus is_a family ...), as the brief asks: the source's
+  classification, not REVA's. gene -> protein is "encodes" (produces / produced_by), never causal. Gene-disease
+  associations are loaded by V4HEALTH as associated_with (never causal).
+mappings:
+  - {property: "gbif:parent", family: is_a, subtype: parent_taxon, source: gbif.backbone,
+     subject_kinds: [taxon], object_kinds: [taxon]}
+  - {property: "col:parent", family: is_a, subtype: parent_taxon, source: col.checklistbank,
+     subject_kinds: [taxon], object_kinds: [taxon]}
+  - {property: "hgnc:located_on_chromosome", family: located_in, subtype: located_on_chromosome,
+     source: hgnc.complete_set, subject_kinds: [gene], object_kinds: [chromosome]}
+  - {property: "hgnc:encodes", family: produces, subtype: encodes, source: hgnc.complete_set,
+     subject_kinds: [gene], object_kinds: [protein]}
+  - {property: "hgnc:in_taxon", family: context, subtype: in_taxon, source: hgnc.complete_set,
+     subject_kinds: [gene], object_kinds: [taxon]}
+  - {property: "uniprot:encoded_by", family: produced_by, subtype: encoded_by, source: uniprot.rest,
+     subject_kinds: [protein], object_kinds: [gene]}
+  - {property: "uniprot:in_taxon", family: context, subtype: in_taxon, source: uniprot.rest,
+     subject_kinds: [protein], object_kinds: [taxon]}
+  - {property: "ensembl:assembly_of", family: context, subtype: genome_assembly_of, source: ensembl.rest,
+     subject_kinds: [genome_assembly], object_kinds: [taxon]}
+  - {property: "ensembl:has_chromosome", family: has_part, subtype: karyotype_chromosome, source: ensembl.rest,
+     subject_kinds: [genome_assembly], object_kinds: [chromosome]}
+  - {property: "ncbi:assembly_of", family: context, subtype: genome_assembly_of, source: ncbi.datasets,
+     subject_kinds: [genome_assembly], object_kinds: [taxon]}

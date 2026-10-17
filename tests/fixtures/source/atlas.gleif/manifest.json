@@ -1,0 +1,198 @@
+[
+  {
+    "request_fingerprint": "3966e4d929fdd009db3895c8c17fc96c9783c7d368be04ea374aec5ce7d1e8fb",
+    "url": "https://api.gleif.org/api/v1/countries?page%5Bsize%5D=300",
+    "file": "3966e4d929fdd009.json",
+    "sha256": "dfbe787e1835ea22fe6b7b2972ce238ae25b66693c4298f7476fa7e50fd859a8",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:39:22+00:00",
+    "licence": "CC0-1.0",
+    "note": "EXCERPT: 4 real country entries (FR, LU, XK, BV) of the live list; meta.pagination total/to set to the excerpt size",
+    "excerpt_of_sha256": "c0d9f69af4f1758ee688844b1c56fee9dd51e0fcf88004553b3f08ef0292e3eb"
+  },
+  {
+    "request_fingerprint": "5788b53f159fedc02560235f89b58c3b0ddf8e1b3cfcc09d6c25d91621a84303",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=FR&filter%5Bentity.category%5D=BRANCH&page%5Bsize%5D=1",
+    "file": "5788b53f159fedc0.json",
+    "sha256": "651f304f268142ad12e81bf81e0e21854b2cf3d4c73ddaf0d3bb6527484f8492",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:39:36+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count FR:branch, page size 1)"
+  },
+  {
+    "request_fingerprint": "5cc344da57b65d87a9c2a30705edb5b6e2f5a1e4327b914f1a28cc71b1666a96",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=FR&filter%5Bentity.category%5D=FUND&page%5Bsize%5D=1",
+    "file": "5cc344da57b65d87.json",
+    "sha256": "258892a9f952c4d5f04eabf6a06d3016f74f33c22d6a00fa9dc297aa23bcf15b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:39:33+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count FR:fund, page size 1)"
+  },
+  {
+    "request_fingerprint": "c831020a8c9fd360effa8abfca40a6b5256591c5a9e619eda377ed407ab8a1a2",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=FR&filter%5Bentity.category%5D=GENERAL&page%5Bsize%5D=1",
+    "file": "c831020a8c9fd360.json",
+    "sha256": "fae6e3525ea525dc8100a8ec68d5b9c775ec41066c731b28a6a82b3be1cf8032",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:39:31+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count FR:general, page size 1)"
+  },
+  {
+    "request_fingerprint": "84ed742da97df5338c94da9b5248584384c6c46b921d4a64e0ecd5510f742f8b",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=FR&filter%5Bregistration.status%5D=ISSUED&page%5Bsize%5D=1",
+    "file": "84ed742da97df533.json",
+    "sha256": "56ad0f8d511a2fd08427e865687c3871e8aee514103ba0109305419dfe72cea6",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:39:28+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count FR:issued, page size 1)"
+  },
+  {
+    "request_fingerprint": "ac140809bcc33f52748415e3db23064f29cd524c281d7d8cfc6c0318a6237556",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=FR&page%5Bsize%5D=1",
+    "file": "ac140809bcc33f52.json",
+    "sha256": "01efd269cb013582183d70899607c7f3fec45f3b933d65e6f3c6f34d7cd18fbd",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:39:25+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count FR:all, page size 1)"
+  },
+  {
+    "request_fingerprint": "2d38e63b40dc578061301d81c5f74cec824dbfc42ae06650ef2032a7a15aa725",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=LU&filter%5Bentity.category%5D=BRANCH&page%5Bsize%5D=1",
+    "file": "2d38e63b40dc5780.json",
+    "sha256": "cf6e8c46d9e169338f200a90413a78e4fec76cd319c41e19607a261bb5e13b4f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:39:51+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count LU:branch, page size 1)"
+  },
+  {
+    "request_fingerprint": "6bf86e5fd3b1a375d7bd0761f69899e94f5fc42762482d3d6113b0244a5138f8",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=LU&filter%5Bentity.category%5D=FUND&page%5Bsize%5D=1",
+    "file": "6bf86e5fd3b1a375.json",
+    "sha256": "3fffd99bfeb2bf84a943154b7f90134106ac594042f5c4e4e7a8a2f6a732986b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:39:48+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count LU:fund, page size 1)"
+  },
+  {
+    "request_fingerprint": "96fb7dda05bbf0bd96e0755a70e3a9d2654b657e8dbd9b607e5f8ae5aa8a2baf",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=LU&filter%5Bentity.category%5D=GENERAL&page%5Bsize%5D=1",
+    "file": "96fb7dda05bbf0bd.json",
+    "sha256": "9b5c6337e1b4208f6f192c960e0e3ba37720f652e5d8b910dd9d371fc78dd2b4",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:39:45+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count LU:general, page size 1)"
+  },
+  {
+    "request_fingerprint": "f5529f733b2da4fd256d11c328173c2d6e942cbb285db30613f2bba4cb3cf559",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=LU&filter%5Bregistration.status%5D=ISSUED&page%5Bsize%5D=1",
+    "file": "f5529f733b2da4fd.json",
+    "sha256": "2543b403204e7f5388b41b5ac7c34dca0b7455a0558255bd7f4762dad48e6307",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:39:42+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count LU:issued, page size 1)"
+  },
+  {
+    "request_fingerprint": "eaf6888bc01409bad57d8851a6f3106fc7ceff592a0081bf23cbb9f9823f29c1",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=LU&page%5Bsize%5D=1",
+    "file": "eaf6888bc01409ba.json",
+    "sha256": "6780c10ea58c45e44bbd16c1a16eb0b1f0a37d70b551eec5ab56873bc5db1356",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:39:39+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count LU:all, page size 1)"
+  },
+  {
+    "request_fingerprint": "d4ec158963d9e540ad0424fd4f5293dbf4c0804d7c6234fc2b76546ad3f133a5",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=XK&filter%5Bentity.category%5D=FUND&page%5Bsize%5D=1",
+    "file": "d4ec158963d9e540.json",
+    "sha256": "540b25fdfe7ae927d1624be87ea53c3184d57f2f46193ad8ea78e743940af318",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:40:02+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count XK:fund, page size 1)"
+  },
+  {
+    "request_fingerprint": "b620c283f37fcdc97a4ee599263ffa92be4f5f4a4da39f39f49fb3e7b36e740f",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=XK&filter%5Bentity.category%5D=GENERAL&page%5Bsize%5D=1",
+    "file": "b620c283f37fcdc9.json",
+    "sha256": "e841d5d16a943a0faf9ae0f8edbc4e4c0205ada01f6d9adf8a0f2b6e08085a76",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:39:59+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count XK:general, page size 1)"
+  },
+  {
+    "request_fingerprint": "d2daddcb026647b06f50b28ac18d74adbcd409fc8889b8753fe579c7d7407903",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=XK&filter%5Bregistration.status%5D=ISSUED&page%5Bsize%5D=1",
+    "file": "d2daddcb026647b0.json",
+    "sha256": "99a8885b6ffd1583564365882c74bb0a23f8aa15d24d1b3c3b065521d02e0152",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:39:57+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count XK:issued, page size 1)"
+  },
+  {
+    "request_fingerprint": "b54c5b8683692fa6ee1d5274b7feb58862fa48f8d1bff48cf1f4a5b1b69047a9",
+    "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalAddress.country%5D=XK&page%5Bsize%5D=1",
+    "file": "b54c5b8683692fa6.json",
+    "sha256": "5060243597d0c101cfef843f8a264417fd79da8b49dc8faf565dc9a0453fd67d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-17T13:39:54+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live response (count XK:all, page size 1)"
+  }
+]

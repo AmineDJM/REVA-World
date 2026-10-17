@@ -1,0 +1,186 @@
+# Seed list of the chemistry layer (owner: V4CHEM): the ChEBI entities REVA loads (with their is_a ancestors and the
+# targets of their ChEBI relations) and resolves to PubChem compounds. Chosen for what the rest of REVA references:
+# hydrocarbons and petroleum fractions (V4ENERGY), greenhouse gases (V4CLIMATE), fertilisers (V4ECO / food),
+# minerals and ores, metals, plastics, cement, drugs (V4HEALTH).
+#
+# * `chebi` is the identifier (authoritative). `name` is the ChEBI name at curation time (release 256, 2026-10-06):
+#   the connectors only *check* it and report a mismatch (renamed entity or curation error); they never select or map
+#   anything by name.
+# * `groups` is REVA curation metadata for this file (why the seed is here); it is NOT loaded as a statement.
+# * `pubchem: false` skips the PubChem lookup (classes, roles, polymers without a standardised CID).
+# * role_members: entities that ChEBI states `has_role` the role are added (one hop, ChEBI's own statements).
+# * class_members: direct `is_a` children (depth 1) of the class, or every descendant with `depth: all`.
+version: 1
+owner: V4CHEM
+chebi_release_checked: 256
+seeds:
+  # ------------------------------------------------------------- hydrocarbons / petroleum fractions / petrochemicals
+  - {chebi: 24632, name: hydrocarbon, groups: [hydrocarbon_class], pubchem: false}
+  - {chebi: 18310, name: alkane, groups: [hydrocarbon_class], pubchem: false}
+  - {chebi: 23453, name: cycloalkane, groups: [hydrocarbon_class], pubchem: false}
+  - {chebi: 33658, name: arene, groups: [hydrocarbon_class], pubchem: false}
+  - {chebi: 33848, name: polycyclic arene, groups: [hydrocarbon_class], pubchem: false}
+  - {chebi: 32878, name: alkene, groups: [hydrocarbon_class], pubchem: false}
+  - {chebi: 22339, name: alkyne, groups: [hydrocarbon_class], pubchem: false}
+  - {chebi: 33655, name: aromatic compound, groups: [hydrocarbon_class], pubchem: false}
+  - {chebi: 16183, name: methane, groups: [hydrocarbon, natural_gas, greenhouse_gas]}
+  - {chebi: 42266, name: ethane, groups: [hydrocarbon, natural_gas]}
+  - {chebi: 32879, name: propane, groups: [hydrocarbon, lpg]}
+  - {chebi: 37808, name: butane, groups: [hydrocarbon, lpg]}
+  - {chebi: 30363, name: isobutane, groups: [hydrocarbon, lpg]}
+  - {chebi: 37830, name: pentane, groups: [hydrocarbon]}
+  - {chebi: 29021, name: hexane, groups: [hydrocarbon]}
+  - {chebi: 43098, name: heptane, groups: [hydrocarbon, gasoline_reference]}
+  - {chebi: 17590, name: octane, groups: [hydrocarbon]}
+  - {chebi: 41808, name: decane, groups: [hydrocarbon]}
+  - {chebi: 28817, name: dodecane, groups: [hydrocarbon, kerosene_range]}
+  - {chebi: 45296, name: hexadecane, groups: [hydrocarbon, diesel_reference]}
+  - {chebi: 29005, name: cyclohexane, groups: [hydrocarbon, naphthene]}
+  - {chebi: 23492, name: cyclopentane, groups: [hydrocarbon, naphthene]}
+  - {chebi: 16716, name: benzene, groups: [hydrocarbon, aromatic]}
+  - {chebi: 17578, name: toluene, groups: [hydrocarbon, aromatic]}
+  - {chebi: 28063, name: o-xylene, groups: [hydrocarbon, aromatic]}
+  - {chebi: 27417, name: p-xylene, groups: [hydrocarbon, aromatic]}
+  - {chebi: 16101, name: ethylbenzene, groups: [hydrocarbon, aromatic]}
+  - {chebi: 16482, name: naphthalene, groups: [hydrocarbon, aromatic]}
+  - {chebi: 18153, name: ethene, groups: [hydrocarbon, petrochemical]}
+  - {chebi: 16052, name: propene, groups: [hydrocarbon, petrochemical]}
+  - {chebi: 27518, name: acetylene, groups: [hydrocarbon, petrochemical]}
+  - {chebi: 39478, name: "buta-1,3-diene", groups: [hydrocarbon, petrochemical]}
+  - {chebi: 27452, name: styrene, groups: [hydrocarbon, petrochemical]}
+  - {chebi: 30856, name: thiophene, groups: [crude_oil_heteroatom]}
+  - {chebi: 23681, name: dibenzothiophene, groups: [crude_oil_heteroatom]}
+  - {chebi: 16227, name: pyridine, groups: [crude_oil_heteroatom]}
+  - {chebi: 132140, name: methane clathrate, groups: [natural_gas]}
+  - {chebi: 17790, name: methanol, groups: [fuel, petrochemical]}
+  - {chebi: 16236, name: ethanol, groups: [fuel, drug]}
+  - {chebi: 18276, name: dihydrogen, groups: [fuel, energy_carrier]}
+  # ------------------------------------------------------------- greenhouse gases and air pollutants
+  - {chebi: 16526, name: carbon dioxide, groups: [greenhouse_gas]}
+  - {chebi: 17045, name: dinitrogen oxide, groups: [greenhouse_gas]}
+  - {chebi: 25812, name: ozone, groups: [greenhouse_gas]}
+  - {chebi: 30496, name: sulfur hexafluoride, groups: [greenhouse_gas]}
+  - {chebi: 15377, name: water, groups: [greenhouse_gas]}
+  - {chebi: 48236, name: trichlorofluoromethane, groups: [greenhouse_gas, cfc]}
+  - {chebi: 38825, name: tetrafluoromethane, groups: [greenhouse_gas, pfc]}
+  - {chebi: 30231, name: nitrogen trifluoride, groups: [greenhouse_gas]}
+  - {chebi: 17245, name: carbon monoxide, groups: [air_pollutant]}
+  - {chebi: 18422, name: sulfur dioxide, groups: [air_pollutant]}
+  - {chebi: 33101, name: nitrogen dioxide, groups: [air_pollutant]}
+  - {chebi: 16136, name: hydrogen sulfide, groups: [natural_gas_impurity]}
+  - {chebi: 17997, name: dinitrogen, groups: [atmosphere]}
+  - {chebi: 15379, name: dioxygen, groups: [atmosphere]}
+  - {chebi: 76413, name: greenhouse gas, groups: [role], pubchem: false}
+  # ------------------------------------------------------------- fertilisers and industrial chemicals
+  - {chebi: 16134, name: ammonia, groups: [fertiliser, industrial]}
+  - {chebi: 16199, name: urea, groups: [fertiliser]}
+  - {chebi: 63038, name: ammonium nitrate, groups: [fertiliser]}
+  - {chebi: 62946, name: ammonium sulfate, groups: [fertiliser]}
+  - {chebi: 32588, name: potassium chloride, groups: [fertiliser, potash]}
+  - {chebi: 63051, name: diammonium hydrogen phosphate, groups: [fertiliser]}
+  - {chebi: 62982, name: ammonium dihydrogen phosphate, groups: [fertiliser]}
+  - {chebi: 26078, name: phosphoric acid, groups: [fertiliser, industrial]}
+  - {chebi: 48107, name: nitric acid, groups: [industrial]}
+  - {chebi: 26836, name: sulfuric acid, groups: [industrial]}
+  - {chebi: 32145, name: sodium hydroxide, groups: [industrial]}
+  - {chebi: 29310, name: dichlorine, groups: [industrial]}
+  - {chebi: 15366, name: acetic acid, groups: [industrial]}
+  - {chebi: 16842, name: formaldehyde, groups: [industrial]}
+  - {chebi: 33287, name: fertilizer, groups: [role], pubchem: false}
+  # ------------------------------------------------------------- minerals, ores, cement, materials
+  - {chebi: 46662, name: mineral, groups: [mineral_class], pubchem: false}
+  - {chebi: 3311, name: calcium carbonate, groups: [mineral, cement_raw_material]}
+  - {chebi: 30563, name: silicon dioxide, groups: [mineral, glass]}
+  - {chebi: 50819, name: ferric oxide, groups: [iron_ore]}
+  - {chebi: 30187, name: aluminium oxide, groups: [aluminium_ore]}
+  - {chebi: 26710, name: sodium chloride, groups: [mineral]}
+  - {chebi: 31346, name: calcium sulfate, groups: [mineral, cement_additive]}
+  - {chebi: 23414, name: copper(II) sulfate, groups: [industrial]}
+  - {chebi: 31344, name: calcium oxide, groups: [cement, lime]}
+  - {chebi: 35150, name: calcium hydroxide, groups: [cement, lime]}
+  - {chebi: 32234, name: titanium dioxide, groups: [pigment]}
+  - {chebi: 6504, name: lithium carbonate, groups: [battery_material]}
+  - {chebi: 50818, name: hematite, groups: [iron_ore, mineral], pubchem: false}
+  - {chebi: 46726, name: magnetite, groups: [iron_ore, mineral], pubchem: false}
+  - {chebi: 46719, name: calcite, groups: [mineral], pubchem: false}
+  - {chebi: 46727, name: quartz, groups: [mineral], pubchem: false}
+  - {chebi: 46715, name: halite, groups: [mineral], pubchem: false}
+  - {chebi: 48838, name: gypsum, groups: [mineral], pubchem: false}
+  - {chebi: 86471, name: pyrite, groups: [mineral], pubchem: false}
+  - {chebi: 86202, name: chalcopyrite, groups: [copper_ore, mineral], pubchem: false}
+  - {chebi: 52254, name: apatite, groups: [phosphate_ore, mineral], pubchem: false}
+  - {chebi: 46713, name: fluorite, groups: [mineral], pubchem: false}
+  - {chebi: 33418, name: graphite, groups: [mineral, battery_material], pubchem: false}
+  - {chebi: 33417, name: diamond, groups: [mineral], pubchem: false}
+  - {chebi: 142648, name: alloy, groups: [material_class], pubchem: false}
+  # ------------------------------------------------------------- plastics and monomers
+  - {chebi: 60027, name: polymer, groups: [polymer_class], pubchem: false}
+  - {chebi: 53227, name: poly(ethylene), groups: [plastic], pubchem: false}
+  - {chebi: 53550, name: poly(propylene), groups: [plastic], pubchem: false}
+  - {chebi: 53276, name: poly(styrene), groups: [plastic], pubchem: false}
+  - {chebi: 53243, name: poly(vinyl chloride), groups: [plastic], pubchem: false}
+  - {chebi: 61452, name: poly(ethylene terephthalate) polymer, groups: [plastic], pubchem: false}
+  - {chebi: 28509, name: chloroethene, groups: [monomer]}
+  - {chebi: 15702, name: terephthalic acid, groups: [monomer]}
+  - {chebi: 30742, name: ethylene glycol, groups: [monomer]}
+  - {chebi: 33216, name: bisphenol A, groups: [monomer]}
+  # ------------------------------------------------------------- metals (ChEBI atoms; elements themselves are element:<Z>)
+  - {chebi: 33521, name: metal atom, groups: [metal_class], pubchem: false}
+  - {chebi: 18248, name: iron atom, groups: [metal]}
+  - {chebi: 28694, name: copper atom, groups: [metal]}
+  - {chebi: 28984, name: aluminium atom, groups: [metal]}
+  - {chebi: 29287, name: gold atom, groups: [metal]}
+  - {chebi: 30512, name: silver atom, groups: [metal]}
+  - {chebi: 25016, name: lead atom, groups: [metal]}
+  - {chebi: 27363, name: zinc atom, groups: [metal]}
+  - {chebi: 28112, name: nickel atom, groups: [metal, battery_material]}
+  - {chebi: 33341, name: titanium atom, groups: [metal]}
+  - {chebi: 30145, name: lithium atom, groups: [metal, battery_material]}
+  - {chebi: 27638, name: cobalt atom, groups: [metal, battery_material]}
+  - {chebi: 27214, name: uranium atom, groups: [metal, nuclear_fuel]}
+  - {chebi: 33364, name: platinum atom, groups: [metal]}
+  - {chebi: 27007, name: tin atom, groups: [metal]}
+  - {chebi: 28073, name: chromium atom, groups: [metal]}
+  - {chebi: 18291, name: manganese atom, groups: [metal]}
+  - {chebi: 27698, name: vanadium atom, groups: [metal, crude_oil_trace]}
+  - {chebi: 27594, name: carbon atom, groups: [element]}
+  - {chebi: 49637, name: hydrogen atom, groups: [element]}
+  - {chebi: 25805, name: oxygen atom, groups: [element]}
+  - {chebi: 25555, name: nitrogen atom, groups: [element]}
+  - {chebi: 26833, name: sulfur atom, groups: [element]}
+  - {chebi: 27573, name: silicon atom, groups: [element]}
+  - {chebi: 36927, name: carbon-14 atom, groups: [isotope]}
+  - {chebi: 29237, name: deuterium atom, groups: [isotope]}
+  - {chebi: 29238, name: tritium atom, groups: [isotope]}
+  # ------------------------------------------------------------- drugs and biomolecules (V4HEALTH references)
+  - {chebi: 15365, name: acetylsalicylic acid, groups: [drug]}
+  - {chebi: 46195, name: paracetamol, groups: [drug]}
+  - {chebi: 5855, name: ibuprofen, groups: [drug]}
+  - {chebi: 18208, name: benzylpenicillin, groups: [drug, antibiotic]}
+  - {chebi: 2676, name: amoxicillin, groups: [drug, antibiotic]}
+  - {chebi: 17303, name: morphine, groups: [drug]}
+  - {chebi: 16714, name: codeine, groups: [drug]}
+  - {chebi: 6801, name: metformin, groups: [drug]}
+  - {chebi: 3638, name: chloroquine, groups: [drug, antimalarial]}
+  - {chebi: 15854, name: quinine, groups: [drug, antimalarial]}
+  - {chebi: 6078, name: ivermectin, groups: [drug, antiparasitic]}
+  - {chebi: 41879, name: dexamethasone, groups: [drug]}
+  - {chebi: 39548, name: atorvastatin, groups: [drug]}
+  - {chebi: 2549, name: albuterol, groups: [drug]}
+  - {chebi: 27732, name: caffeine, groups: [drug, stimulant]}
+  - {chebi: 18723, name: nicotine, groups: [drug, stimulant]}
+  - {chebi: 145810, name: insulin, groups: [drug, hormone], pubchem: false}
+  - {chebi: 17234, name: glucose, groups: [biomolecule]}
+  - {chebi: 17992, name: sucrose, groups: [biomolecule, food]}
+  - {chebi: 17754, name: glycerol, groups: [biomolecule]}
+  - {chebi: 15422, name: ATP, groups: [biomolecule]}
+  - {chebi: 23888, name: drug, groups: [role], pubchem: false}
+role_members:
+  - {chebi: 76413, name: greenhouse gas}
+  - {chebi: 35230, name: fossil fuel}
+  - {chebi: 33292, name: fuel}
+  - {chebi: 33287, name: fertilizer}
+class_members:
+  - {chebi: 18310, name: alkane, depth: 1}
+  - {chebi: 23453, name: cycloalkane, depth: 1}
+  - {chebi: 46662, name: mineral, depth: all}

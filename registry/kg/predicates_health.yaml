@@ -105,6 +105,9 @@ predicates:
   - {pid: "mondo:in_taxon", value_kind: item, reva_predicate: mondo_in_taxon, family: context, ro: "RO:0002162",
      label_en: "in taxon (Mondo; non-human animal disease)", label_fr: "dans le taxon (Mondo ; maladie animale non humaine)",
      inverse_name: mondo_taxon_of_disease, inverse_label_en: "taxon of the disease (Mondo)", inverse_label_fr: "taxon de la maladie (Mondo)"}
+  - {pid: "mondo:transmitted_by", value_kind: item, reva_predicate: mondo_transmitted_by, family: context, ro: "RO:0002451",
+     label_en: "transmitted by (Mondo)", label_fr: "transmis(e) par (Mondo)",
+     inverse_name: mondo_transmits, inverse_label_en: "transmits (Mondo)", inverse_label_fr: "transmet (Mondo)"}
   - {pid: "mondo:equivalent_doid", value_kind: item, reva_predicate: mondo_equivalent_doid,
      label_en: "equivalent Disease Ontology class (Mondo xref annotated MONDO:equivalentTo)",
      label_fr: "classe équivalente de la Disease Ontology (xref Mondo annotée MONDO:equivalentTo)",

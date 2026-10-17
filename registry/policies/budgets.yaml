@@ -1,6 +1,6 @@
-policy_version: "budgets-1.3.13"
+policy_version: "budgets-1.3.14"
 daily:
-  http_requests_total: 13200
+  http_requests_total: 13248
   http_bytes_total: 3221225472
 per_source_daily_requests:
   worldbank.wdi: 200
@@ -41,8 +41,8 @@ per_source_daily_requests:
   cow.terrchange: 6
   # cshapes.cran: requested by KGGEOPOL (kggeopol.yaml)
   cshapes.cran: 8
-  # eia.opendata_bulk: requested by A-RESOURCES (a_resources.yaml)
-  eia.opendata_bulk: 8
+  # eia.opendata_bulk: requested by A-RESOURCES (a_resources.yaml), V4ENERGY (v4energy.yaml)
+  eia.opendata_bulk: 12
   # esrb.fcdb: requested by A-ECRISES (a_ecrises.yaml), AUDFIX (audfix.yaml)
   esrb.fcdb: 8
   # eu.sanctionsmap: requested by A-SANCTIONS (a_sanctions.yaml)
@@ -175,6 +175,8 @@ per_source_daily_requests:
   unhcr.population: 150
   # unsd.ama: requested by A-FACTBOOK (a_factbook.yaml)
   unsd.ama: 20
+  # unsd.classifications: requested by V4LINK (v4link.yaml)
+  unsd.classifications: 30
   # unsd.syb: requested by A-UN (a_un.yaml)
   unsd.syb: 5
   # untc.mtdsg: requested by A-TREATIES (a_treaties.yaml)
@@ -207,8 +209,12 @@ per_source_daily_requests:
   worldbank.atlas: 40
   # worldbank.cckp: requested by A-GEO (a_geo.yaml)
   worldbank.cckp: 6
+  # worldbank.cmo: requested by V4ENERGY (v4energy.yaml)
+  worldbank.cmo: 8
   # worldbank.wbl: requested by A-LAW (a_law.yaml)
   worldbank.wbl: 10
+  # wri.gppd: requested by V4ENERGY (v4energy.yaml)
+  wri.gppd: 6
 llm:
   # Autonomy LLM evidence extraction stays disabled (zero budget).
   monthly_usd: 0

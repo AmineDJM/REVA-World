@@ -1,0 +1,20 @@
+# Budget request from agent V4ENERGY (2026-10-17). Merged by `python -m reva.atlas.budget_merge --write`.
+agent: V4ENERGY
+requests:
+  - source_key: worldbank.cmo
+    # One full run (connector atlas.wb_pinksheet) = commodity-markets page (~0.06 MB) + monthly workbook (0.6 MB)
+    # + annual workbook (3.2 MB) = 3 requests, ~3.9 MB.
+    daily_requests: 8
+    expected_bytes_per_day: 10000000
+    reason: "3 requests (~4 MB) per full run plus one retry; World Bank CC BY 4.0, no key"
+  - source_key: wri.gppd
+    # One full run (connector atlas.wri_gppd) = README (8 kB) + DATABASE_VERSION (6 B) + CSV (12 MB) = 3 requests.
+    daily_requests: 6
+    expected_bytes_per_day: 26000000
+    reason: "3 requests (~12 MB) per full run plus one retry; raw.githubusercontent.com, no key"
+  - source_key: eia.opendata_bulk
+    # atlas.eia_intl (3 requests, 24.3 MB) and the new atlas.eia_steo (manifest + STEO.zip 5.4 MB = 2 requests)
+    # share this key: 5 requests per day when both run, plus retries.
+    daily_requests: 12
+    expected_bytes_per_day: 70000000
+    reason: "atlas.eia_steo adds 2 requests (~5.5 MB) per run to atlas.eia_intl's 3 on the same bulk host"

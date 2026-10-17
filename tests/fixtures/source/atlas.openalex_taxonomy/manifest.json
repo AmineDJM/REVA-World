@@ -1,0 +1,122 @@
+[
+  {
+    "request_fingerprint": "4a722dbe51a83518a22edf1a9852c4cf603c79ad630b11453b730e2a6f1a7e41",
+    "url": "https://openalex.s3.amazonaws.com/data/jsonl/topics/manifest.json",
+    "file": "4a722dbe51a83518.json",
+    "sha256": "ba38fc9c64b0e47083f0b604b8ae25818e74638aee4b26823c5ea04fac22f863",
+    "status": 200,
+    "headers": {
+      "last-modified": "Wed, 14 Oct 2026 18:27:36 GMT",
+      "content-type": "binary/octet-stream"
+    },
+    "retrieved_at": "2026-10-17T13:37:31.574157+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": "53553daa8f5ddc547e9f80089e1e38ec73042cb905133eb1c8040419459ee84f",
+    "note": "real manifest restricted to the subset files (record counts recomputed)"
+  },
+  {
+    "request_fingerprint": "908a9960d242f2b33c8c57f12f7d6d6f78539436ab82f5fb14d4f91e091b56b0",
+    "url": "https://openalex.s3.amazonaws.com/data/jsonl/topics/updated_date=2026-10-14/part_0000.gz",
+    "file": "908a9960d242f2b3.gz",
+    "sha256": "6ec9ec7288ca5d6f879f9702a4eb7cfd18d5ef2f5afe7b26827a7e54b2553189",
+    "status": 200,
+    "headers": {
+      "last-modified": "Wed, 14 Oct 2026 18:27:35 GMT",
+      "content-type": "binary/octet-stream"
+    },
+    "retrieved_at": "2026-10-17T13:37:31.548996+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": "a12fb4f638b05783fcfce384629a70aea1b2d09129c88e56240d69cc9be46fce",
+    "note": "subset of the snapshot file: 6 of 4375 records, verbatim"
+  },
+  {
+    "request_fingerprint": "a07bddf943548e4c5639c3211b2974a1e885bb2aac443e85281a4771409fc8b0",
+    "url": "https://openalex.s3.amazonaws.com/data/jsonl/subfields/manifest.json",
+    "file": "a07bddf943548e4c.json",
+    "sha256": "a191d0b7b87b24db5c80ae41a1a8ba21567f9e39694c65ccb44a5c1ec8a26248",
+    "status": 200,
+    "headers": {
+      "last-modified": "Wed, 14 Oct 2026 18:27:37 GMT",
+      "content-type": "binary/octet-stream"
+    },
+    "retrieved_at": "2026-10-17T13:37:32.114098+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": "815658afd4ebf1733a14d27d31ca863072a621769bb44ac633c747b163937677",
+    "note": "real manifest restricted to the subset files (record counts recomputed)"
+  },
+  {
+    "request_fingerprint": "f85f93755e3123f6d7dcb776c5dad2dbadfe5cb538787f1fbb08970f92e3eac3",
+    "url": "https://openalex.s3.amazonaws.com/data/jsonl/subfields/updated_date=2026-10-14/part_0000.gz",
+    "file": "f85f93755e3123f6.gz",
+    "sha256": "4438ba3a67d7a9bb2ec9c3af7ccd7920c9a30e5e767858bf583e2c6866ed4b2f",
+    "status": 200,
+    "headers": {
+      "last-modified": "Wed, 14 Oct 2026 18:27:36 GMT",
+      "content-type": "binary/octet-stream"
+    },
+    "retrieved_at": "2026-10-17T13:37:32.113291+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": "5246243c76191b71ba55619e56609d410fe8b4e6904c1504170ce02b90614138",
+    "note": "subset of the snapshot file: 11 of 251 records, verbatim"
+  },
+  {
+    "request_fingerprint": "0c921f4436aa9d459a6e1cc8b03b2c5c3537e3a9276ed351c9e94531f9607b0e",
+    "url": "https://openalex.s3.amazonaws.com/data/jsonl/fields/manifest.json",
+    "file": "0c921f4436aa9d45.json",
+    "sha256": "861bec3921384d106c1516d0980e7fa5f2cc893807ed717f6b84bad5e19d54a9",
+    "status": 200,
+    "headers": {
+      "last-modified": "Wed, 14 Oct 2026 18:27:37 GMT",
+      "content-type": "binary/octet-stream"
+    },
+    "retrieved_at": "2026-10-17T13:37:32.287477+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": "1a5626a6a07c4a6011623a7a84ca9f752f2e87488199d8c7e57f96b27d165150",
+    "note": "real manifest restricted to the subset files (record counts recomputed)"
+  },
+  {
+    "request_fingerprint": "0c431543d7d235f15cfb30c114b591c76062727c84ca70b24318f8d606c5fcd3",
+    "url": "https://openalex.s3.amazonaws.com/data/jsonl/fields/updated_date=2026-10-14/part_0000.gz",
+    "file": "0c431543d7d235f1.gz",
+    "sha256": "3acff1f27c6d166e1dad606213fa50025f70fc5423ab47c169c7326b650dea56",
+    "status": 200,
+    "headers": {
+      "last-modified": "Wed, 14 Oct 2026 18:27:37 GMT",
+      "content-type": "binary/octet-stream"
+    },
+    "retrieved_at": "2026-10-17T13:37:32.287305+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": "e8d54e441027a5b012649765e7859dee148e32ea668d4fab8f5e313a249ed6e9",
+    "note": "subset of the snapshot file: 7 of 26 records, verbatim"
+  },
+  {
+    "request_fingerprint": "9e9d5e391ba28cdb2df7a51ef1fd7611866d9cfc1af1f1d23f98a2436fddf310",
+    "url": "https://openalex.s3.amazonaws.com/data/jsonl/domains/manifest.json",
+    "file": "9e9d5e391ba28cdb.json",
+    "sha256": "0fd3740280bf40a47482d6acb1a198d29291fa96bbfe0f56fa8c338857c27aa1",
+    "status": 200,
+    "headers": {
+      "last-modified": "Wed, 14 Oct 2026 18:27:38 GMT",
+      "content-type": "binary/octet-stream"
+    },
+    "retrieved_at": "2026-10-17T13:37:32.418345+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": "8c2058d7b0f5f09d3ab8e44cdb3b23667864651e49b18583449f5baa79acf535",
+    "note": "real manifest restricted to the subset files (record counts recomputed)"
+  },
+  {
+    "request_fingerprint": "87ca75cd514bdc02a065b9b74a5b7d2a6748eb28d974e43685a0badcb5599d9b",
+    "url": "https://openalex.s3.amazonaws.com/data/jsonl/domains/updated_date=2026-10-14/part_0000.gz",
+    "file": "87ca75cd514bdc02.gz",
+    "sha256": "fa66419cab232105907dd4775fe352a9b6a307323c5537a63e17ef159e62685d",
+    "status": 200,
+    "headers": {
+      "last-modified": "Wed, 14 Oct 2026 18:27:38 GMT",
+      "content-type": "binary/octet-stream"
+    },
+    "retrieved_at": "2026-10-17T13:37:32.418161+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": "862cef663aa415835525aa6b6919806db204db13ae7f2611f05d56c2d395578f",
+    "note": "subset of the snapshot file: 4 of 4 records, verbatim"
+  }
+]

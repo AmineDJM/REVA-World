@@ -1,0 +1,111 @@
+# Provider geography schemes of the V4MIND atlas tables (agent V4MIND).
+# Every alias is an exact crosswalk label match or a listed name match with its evidence (never a code-shape guess).
+schemes:
+  # Hofstede dimension data matrix (6-dimensions-for-website-2015-08-16.csv): the `ctr` column is Hofstede's own
+  # 3-letter code, NOT ISO 3166 (CHI = China, BEN = Belgium Netherl, CAF = Canada French, MAC = Macedonia Rep,
+  # SAL = El Salvador, ...): aliases are built from the `country` column only.
+  # "Great Britain" is mapped to GBR (the United Kingdom entity): Hofstede publishes one national score under that name.
+  # Unmapped on purpose (regions, sub-national groups, former state): AFE Africa East; AFW Africa West; ARA Arab countries; BEF Belgium French; BEN Belgium Netherl; CAF Canada French; GEE Germany East; SAW South Africa white; SWF Switzerland French; SWG Switzerland German.
+  hofstede:
+    aliases:
+      - {code: "ALB", iso3: ALB, source: "Hofstede name = crosswalk label (Albania)"}
+      - {code: "ALG", iso3: DZA, source: "Hofstede name = crosswalk label (Algeria)"}
+      - {code: "AND", iso3: AND, source: "Hofstede name = crosswalk label (Andorra)"}
+      - {code: "ARG", iso3: ARG, source: "Hofstede name = crosswalk label (Argentina)"}
+      - {code: "ARM", iso3: ARM, source: "Hofstede name = crosswalk label (Armenia)"}
+      - {code: "AUL", iso3: AUS, source: "Hofstede name = crosswalk label (Australia)"}
+      - {code: "AUT", iso3: AUT, source: "Hofstede name = crosswalk label (Austria)"}
+      - {code: "AZE", iso3: AZE, source: "Hofstede name = crosswalk label (Azerbaijan)"}
+      - {code: "BAN", iso3: BGD, source: "Hofstede name = crosswalk label (Bangladesh)"}
+      - {code: "BLR", iso3: BLR, source: "Hofstede name = crosswalk label (Belarus)"}
+      - {code: "BEL", iso3: BEL, source: "Hofstede name = crosswalk label (Belgium)"}
+      - {code: "BOS", iso3: BIH, source: "Hofstede name Bosnia; crosswalk label Bosnia and Herzegovina"}
+      - {code: "BRA", iso3: BRA, source: "Hofstede name = crosswalk label (Brazil)"}
+      - {code: "BUL", iso3: BGR, source: "Hofstede name = crosswalk label (Bulgaria)"}
+      - {code: "BUF", iso3: BFA, source: "Hofstede name = crosswalk label (Burkina Faso)"}
+      - {code: "CAN", iso3: CAN, source: "Hofstede name = crosswalk label (Canada)"}
+      - {code: "CHL", iso3: CHL, source: "Hofstede name = crosswalk label (Chile)"}
+      - {code: "CHI", iso3: CHN, source: "Hofstede name = crosswalk label (China)"}
+      - {code: "COL", iso3: COL, source: "Hofstede name = crosswalk label (Colombia)"}
+      - {code: "COS", iso3: CRI, source: "Hofstede name = crosswalk label (Costa Rica)"}
+      - {code: "CRO", iso3: HRV, source: "Hofstede name = crosswalk label (Croatia)"}
+      - {code: "CYP", iso3: CYP, source: "Hofstede name = crosswalk label (Cyprus)"}
+      - {code: "CZE", iso3: CZE, source: "Hofstede name Czech Rep; crosswalk label Czechia"}
+      - {code: "DEN", iso3: DNK, source: "Hofstede name = crosswalk label (Denmark)"}
+      - {code: "DOM", iso3: DOM, source: "Hofstede name Dominican Rep; crosswalk label Dominican Republic"}
+      - {code: "ECA", iso3: ECU, source: "Hofstede name = crosswalk label (Ecuador)"}
+      - {code: "EGY", iso3: EGY, source: "Hofstede name = crosswalk label (Egypt)"}
+      - {code: "ETH", iso3: ETH, source: "Hofstede name = crosswalk label (Ethiopia)"}
+      - {code: "SAL", iso3: SLV, source: "Hofstede name = crosswalk label (El Salvador)"}
+      - {code: "EST", iso3: EST, source: "Hofstede name = crosswalk label (Estonia)"}
+      - {code: "FIN", iso3: FIN, source: "Hofstede name = crosswalk label (Finland)"}
+      - {code: "FRA", iso3: FRA, source: "Hofstede name = crosswalk label (France)"}
+      - {code: "GEO", iso3: GEO, source: "Hofstede name = crosswalk label (Georgia)"}
+      - {code: "GER", iso3: DEU, source: "Hofstede name = crosswalk label (Germany)"}
+      - {code: "GHA", iso3: GHA, source: "Hofstede name = crosswalk label (Ghana)"}
+      - {code: "GBR", iso3: GBR, source: "Hofstede name Great Britain; crosswalk label United Kingdom of Great Britain and Northern Ireland"}
+      - {code: "GRE", iso3: GRC, source: "Hofstede name = crosswalk label (Greece)"}
+      - {code: "GUA", iso3: GTM, source: "Hofstede name = crosswalk label (Guatemala)"}
+      - {code: "HOK", iso3: HKG, source: "Hofstede name Hong Kong; crosswalk label China, Hong Kong Special Administrative Region"}
+      - {code: "HUN", iso3: HUN, source: "Hofstede name = crosswalk label (Hungary)"}
+      - {code: "ICE", iso3: ISL, source: "Hofstede name = crosswalk label (Iceland)"}
+      - {code: "IND", iso3: IND, source: "Hofstede name = crosswalk label (India)"}
+      - {code: "IDO", iso3: IDN, source: "Hofstede name = crosswalk label (Indonesia)"}
+      - {code: "IRA", iso3: IRN, source: "Hofstede name Iran; crosswalk label Iran (Islamic Republic of)"}
+      - {code: "IRQ", iso3: IRQ, source: "Hofstede name = crosswalk label (Iraq)"}
+      - {code: "IRE", iso3: IRL, source: "Hofstede name = crosswalk label (Ireland)"}
+      - {code: "ISR", iso3: ISR, source: "Hofstede name = crosswalk label (Israel)"}
+      - {code: "ITA", iso3: ITA, source: "Hofstede name = crosswalk label (Italy)"}
+      - {code: "JAM", iso3: JAM, source: "Hofstede name = crosswalk label (Jamaica)"}
+      - {code: "JPN", iso3: JPN, source: "Hofstede name = crosswalk label (Japan)"}
+      - {code: "JOR", iso3: JOR, source: "Hofstede name = crosswalk label (Jordan)"}
+      - {code: "KOR", iso3: KOR, source: "Hofstede name Korea South; crosswalk label Republic of Korea"}
+      - {code: "KYR", iso3: KGZ, source: "Hofstede name Kyrgyz Rep; crosswalk label Kyrgyzstan"}
+      - {code: "LAT", iso3: LVA, source: "Hofstede name = crosswalk label (Latvia)"}
+      - {code: "LIT", iso3: LTU, source: "Hofstede name = crosswalk label (Lithuania)"}
+      - {code: "LUX", iso3: LUX, source: "Hofstede name = crosswalk label (Luxembourg)"}
+      - {code: "MAC", iso3: MKD, source: "Hofstede name Macedonia Rep; crosswalk label North Macedonia"}
+      - {code: "MAL", iso3: MYS, source: "Hofstede name = crosswalk label (Malaysia)"}
+      - {code: "MLI", iso3: MLI, source: "Hofstede name = crosswalk label (Mali)"}
+      - {code: "MLT", iso3: MLT, source: "Hofstede name = crosswalk label (Malta)"}
+      - {code: "MEX", iso3: MEX, source: "Hofstede name = crosswalk label (Mexico)"}
+      - {code: "MOL", iso3: MDA, source: "Hofstede name Moldova; crosswalk label Republic of Moldova"}
+      - {code: "MNG", iso3: MNE, source: "Hofstede name = crosswalk label (Montenegro)"}
+      - {code: "MOR", iso3: MAR, source: "Hofstede name = crosswalk label (Morocco)"}
+      - {code: "NET", iso3: NLD, source: "Hofstede name Netherlands; crosswalk label Netherlands (Kingdom of the)"}
+      - {code: "NZL", iso3: NZL, source: "Hofstede name = crosswalk label (New Zealand)"}
+      - {code: "NIG", iso3: NGA, source: "Hofstede name = crosswalk label (Nigeria)"}
+      - {code: "NOR", iso3: NOR, source: "Hofstede name = crosswalk label (Norway)"}
+      - {code: "PAK", iso3: PAK, source: "Hofstede name = crosswalk label (Pakistan)"}
+      - {code: "PAN", iso3: PAN, source: "Hofstede name = crosswalk label (Panama)"}
+      - {code: "PER", iso3: PER, source: "Hofstede name = crosswalk label (Peru)"}
+      - {code: "PHI", iso3: PHL, source: "Hofstede name = crosswalk label (Philippines)"}
+      - {code: "POL", iso3: POL, source: "Hofstede name = crosswalk label (Poland)"}
+      - {code: "POR", iso3: PRT, source: "Hofstede name = crosswalk label (Portugal)"}
+      - {code: "PUE", iso3: PRI, source: "Hofstede name = crosswalk label (Puerto Rico)"}
+      - {code: "ROM", iso3: ROU, source: "Hofstede name = crosswalk label (Romania)"}
+      - {code: "RUS", iso3: RUS, source: "Hofstede name Russia; crosswalk label Russian Federation"}
+      - {code: "RWA", iso3: RWA, source: "Hofstede name = crosswalk label (Rwanda)"}
+      - {code: "SAU", iso3: SAU, source: "Hofstede name = crosswalk label (Saudi Arabia)"}
+      - {code: "SER", iso3: SRB, source: "Hofstede name = crosswalk label (Serbia)"}
+      - {code: "SIN", iso3: SGP, source: "Hofstede name = crosswalk label (Singapore)"}
+      - {code: "SLK", iso3: SVK, source: "Hofstede name Slovak Rep; crosswalk label Slovakia"}
+      - {code: "SLV", iso3: SVN, source: "Hofstede name = crosswalk label (Slovenia)"}
+      - {code: "SAF", iso3: ZAF, source: "Hofstede name = crosswalk label (South Africa)"}
+      - {code: "SPA", iso3: ESP, source: "Hofstede name = crosswalk label (Spain)"}
+      - {code: "SUR", iso3: SUR, source: "Hofstede name = crosswalk label (Suriname)"}
+      - {code: "SWE", iso3: SWE, source: "Hofstede name = crosswalk label (Sweden)"}
+      - {code: "SWI", iso3: CHE, source: "Hofstede name = crosswalk label (Switzerland)"}
+      - {code: "TAI", iso3: TWN, source: "Hofstede name = crosswalk label (Taiwan)"}
+      - {code: "TAN", iso3: TZA, source: "Hofstede name Tanzania; crosswalk label United Republic of Tanzania"}
+      - {code: "THA", iso3: THA, source: "Hofstede name = crosswalk label (Thailand)"}
+      - {code: "TRI", iso3: TTO, source: "Hofstede name = crosswalk label (Trinidad and Tobago)"}
+      - {code: "TUR", iso3: TUR, source: "Hofstede name Turkey; crosswalk label Türkiye"}
+      - {code: "USA", iso3: USA, source: "Hofstede name U.S.A.; crosswalk label United States of America"}
+      - {code: "UGA", iso3: UGA, source: "Hofstede name = crosswalk label (Uganda)"}
+      - {code: "UKR", iso3: UKR, source: "Hofstede name = crosswalk label (Ukraine)"}
+      - {code: "URU", iso3: URY, source: "Hofstede name = crosswalk label (Uruguay)"}
+      - {code: "VEN", iso3: VEN, source: "Hofstede name Venezuela; crosswalk label Venezuela (Bolivarian Republic of)"}
+      - {code: "VIE", iso3: VNM, source: "Hofstede name Vietnam; crosswalk label Viet Nam"}
+      - {code: "ZAM", iso3: ZMB, source: "Hofstede name = crosswalk label (Zambia)"}
+      - {code: "ZIM", iso3: ZWE, source: "Hofstede name = crosswalk label (Zimbabwe)"}

@@ -63,12 +63,17 @@ class EdgeType:
     path_cost: float
     causal: bool = False
     causal_phrase: Mapping[str, str] | None = None
+    #: V4 universal relation family of the forward reading (registry/kg/relations_v4.yaml), when mapped
+    family: str | None = None
 
 
 @dataclass(frozen=True)
 class Taxonomy:
     link_types: Mapping[str, LinkType]
     edge_types: Mapping[str, EdgeType]
+    #: Edge properties added from the V4 family registry that are traversed only when a query names them
+    #: (kinds) or their family (families): classification (is_a) and weak context links are hubs by construction.
+    opt_in_properties: frozenset[str] = frozenset()
 
     def link(self, link_type: str) -> LinkType:
         try:
@@ -214,7 +219,49 @@ def load_taxonomy(path: Path = LINK_TYPES_FILE) -> Taxonomy:
         )
         for e in doc["statement_edges"]
     }
-    return Taxonomy(lts, ets)
+    ets, opt_in = _with_family_edges(ets)
+    return Taxonomy(lts, ets, opt_in)
+
+
+#: Families whose added edges are opt-in (see ``Taxonomy.opt_in_properties``).
+OPT_IN_FAMILIES = frozenset({"is_a", "context"})
+
+
+def _with_family_edges(ets: dict[str, EdgeType]) -> tuple[dict[str, EdgeType], frozenset[str]]:
+    """V4CORE: every property mapped to a universal relation family (``registry/kg/relations_v4.yaml`` and the
+    agents' ``relations_v4.d/*.yaml``) becomes a traversable statement edge, labelled by its family reading in
+    each direction ("est composé de" / "est un constituant de"). Properties already listed in
+    ``statement_edges`` keep their own labels and cost and only gain the ``family`` tag. No family is causal; the
+    source-asserted causal properties stay as listed here (attributed wording) and belong to no family."""
+    try:
+        from reva.kg.families import FamilyError, load_registry
+
+        reg = load_registry()
+    except (FamilyError, OSError, ValueError):  # a broken drop-in must not take the link layer down
+        return ets, frozenset()
+    out = dict(ets)
+    opt_in: set[str] = set()
+    for pid, m in reg.mappings.items():
+        fwd = reg.edge_family(pid, "out")
+        back = reg.edge_family(pid, "in")
+        if fwd is None or back is None:  # pragma: no cover - mapped properties always resolve
+            continue
+        if pid in out:
+            if not out[pid].causal:
+                out[pid] = EdgeType(**{**out[pid].__dict__, "family": fwd.family})
+            continue
+        fam = reg.families[m.family]
+        out[pid] = EdgeType(
+            property=pid,
+            labels=dict(fwd.label),
+            inverse_labels=dict(back.label),
+            path_cost=fam.path_cost,
+            causal=False,
+            family=fwd.family,
+        )
+        if m.family in OPT_IN_FAMILIES:
+            opt_in.add(pid)
+    return out, frozenset(opt_in)
 
 
 @lru_cache(maxsize=4)

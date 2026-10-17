@@ -12,9 +12,8 @@
 # * Entities are keyed by the LEI itself (`lei:<LEI>`), the identifier GLEIF publishes. A company is joined to a Wikidata
 #   item only through Wikidata's own P1278 (LEI) statements (gleif:wikidata_item, source key wikidata.wdqs), to a GEM
 #   entity only through the GEM id GLEIF publishes in the record (`gem` field). Never by name.
-# * unsd:* statements are what the UN Statistics Division structure and correspondence files state: the ISIC Rev.4
-#   hierarchy (section > division > group > class, as listed in the structure file) and the CPC Ver.2.1 -> ISIC Rev.4
-#   correspondence (the activity in which the product is typically produced, with UNSD's partial flags verbatim).
+# * Industry and product classification entities (isic4:<code>, cpc21:<code>, hs2017:<code>, ...) and their
+#   correspondences are V4LINK's (src/reva/adapters/connectors/atlas_unsd_classif.py, v4link:* predicates).
 # * A connection through these statements is a connection, not a cause.
 
 version: 1
@@ -180,42 +179,3 @@ predicates:
     description: >-
       A non-deprecated Wikidata P1278 statement re-expressed as an edge from `lei:<LEI>` to the item that carries it
       (community-edited, CC0). The only way a GLEIF record and a Wikidata company are joined.
-  # ------------------------------------------------------------------ UNSD classifications (source key unsd.classifications)
-  - pid: "unsd:isic4_parent"
-    value_kind: item
-    reva_predicate: isic4_broader
-    label_en: "is a subdivision of (ISIC Rev.4 structure)"
-    label_fr: "est une subdivision de (structure CITI Rév.4)"
-    inverse_name: isic4_narrower
-    inverse_label_en: "has subdivision (ISIC Rev.4 structure)"
-    inverse_label_fr: "a pour subdivision (structure CITI Rév.4)"
-    description: >-
-      Class -> group -> division -> section, as listed in the UNSD ISIC Rev.4 structure file (a division belongs to the
-      section row that precedes it in the file; groups and classes to the division/group their code starts with).
-  - pid: "unsd:cpc21_parent"
-    value_kind: item
-    reva_predicate: cpc21_broader
-    label_en: "is a subdivision of (CPC Ver.2.1 structure)"
-    label_fr: "est une subdivision de (structure CPC version 2.1)"
-    inverse_name: cpc21_narrower
-    inverse_label_en: "has subdivision (CPC Ver.2.1 structure)"
-    inverse_label_fr: "a pour subdivision (structure CPC version 2.1)"
-    description: Subclass -> class -> group -> division -> section of the UNSD CPC Ver.2.1 structure (code prefixes).
-  - pid: "unsd:cpc21_isic4_origin"
-    value_kind: item
-    reva_predicate: cpc21_produced_in_isic4
-    label_en: "is produced in activity (UNSD CPC 2.1 - ISIC Rev.4 correspondence)"
-    label_fr: "est produit dans l'activité (correspondance CPC 2.1 - CITI Rév.4 de la DSNU)"
-    inverse_name: isic4_produces_cpc21
-    inverse_label_en: "produces product (UNSD CPC 2.1 - ISIC Rev.4 correspondence)"
-    inverse_label_fr: "produit le produit (correspondance CPC 2.1 - CITI Rév.4 de la DSNU)"
-    description: >-
-      One row of UNSD's cpc21-isic4 correspondence: CPC subclass -> ISIC class. CPC classes products by industry of
-      origin, so the row states the activity in which the product is (typically) produced. Qualifiers cpc21_partial /
-      isic4_partial keep UNSD's 0/1 flags verbatim (1 = only part of the category corresponds).
-  - pid: "unsd:classification_level"
-    value_kind: string
-    reva_predicate: classification_level
-    label_en: "level in the classification (UNSD structure)"
-    label_fr: "niveau dans la nomenclature (structure DSNU)"
-    description: section, division, group, class (ISIC) / section, division, group, class, subclass (CPC), from the code shape.

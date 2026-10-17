@@ -101,12 +101,17 @@ rules:
      normalize: strip_prefix_chebi, value_re: "^[0-9]{1,7}$", one_value_per_holder: true, max_items_per_value: 1}
   - {property: P662, label: "PubChem CID", prefix: "pubchem_cid:", relation: identity, kind_hint: compound,
      value_re: "^[1-9][0-9]{0,11}$", one_value_per_holder: true, max_items_per_value: 1}
-  - {property: P846, label: "GBIF taxon key (legacy backbone, Wikidata 'GBIF-species-ID (before 2026 update)')",
-     prefix: "gbif:", relation: identity, kind_hint: taxon, value_re: "^[1-9][0-9]{0,11}$",
-     one_value_per_holder: true, max_items_per_value: 1,
-     note: >-
-       Wikidata renamed P846 'before 2026 update' and created P14607 'GBIF taxon ID' (571 items hold it with NCBI on
-       2026-10-17). V4BIO decides which GBIF key its taxa carry; P14607 is inactive until then.}
+  - property: P846
+    label: "GBIF taxon key (legacy backbone, Wikidata 'GBIF-species-ID (before 2026 update)')"
+    prefix: "gbif:"
+    relation: identity
+    kind_hint: taxon
+    value_re: "^[1-9][0-9]{0,11}$"
+    one_value_per_holder: true
+    max_items_per_value: 1
+    note: >-
+      Wikidata renamed P846 'before 2026 update' and created P14607 'GBIF taxon ID' (571 items hold it with NCBI on
+      2026-10-17). V4BIO decides which GBIF key its taxa carry; P14607 is inactive until then.
   - {property: P14607, label: "GBIF taxon ID (2026 backbone)", prefix: "gbif2026:", relation: identity,
      kind_hint: taxon, value_re: "^[A-Za-z0-9]{1,24}$", one_value_per_holder: true, max_items_per_value: 1,
      status: inactive}
@@ -122,8 +127,15 @@ rules:
      kind_hint: company, normalize: strip_leading_zeros, value_re: "^[1-9][0-9]{0,9}$", one_value_per_holder: true,
      max_items_per_value: 1,
      note: "EDGAR pads CIKs to 10 digits; the key drops the padding (the value as stated is kept as a qualifier)."}
-  - {property: P13333, label: "Global Energy Monitor Wiki ID", prefix: "gem_wiki:", relation: identity,
-     kind_hint: facility, value_re: "^.+$", one_value_per_holder: true, max_items_per_value: 1, status: inactive,
-     note: >-
-       13,809 items hold a GEM wiki page title (spaces, accents, punctuation), which is not a valid KG key; GEM
-       tracker rows carry the wiki URL, so V4ENERGY can bridge once a key encoding is agreed (owner decision).}
+  - property: P13333
+    label: "Global Energy Monitor Wiki ID"
+    prefix: "gem_wiki:"
+    relation: identity
+    kind_hint: facility
+    value_re: "^.+$"
+    one_value_per_holder: true
+    max_items_per_value: 1
+    status: inactive
+    note: >-
+      13,809 items hold a GEM wiki page title (spaces, accents, punctuation), which is not a valid KG key; GEM
+      tracker rows carry the wiki URL, so V4ENERGY can bridge once a key encoding is agreed (owner decision).

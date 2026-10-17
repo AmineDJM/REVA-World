@@ -77,9 +77,11 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   atlas.noaa_hazards after a registry label-quoting fix); same caps.
 # * budgets.yaml -> budgets-1.3.13 (2026-10-17, FIXB): merge of fixb.yaml (same-day re-runs of the audit2 dataset
 #   fixes: idmc.gidd 6 -> 12, ucdp.downloads 30 -> 40; cow.data unchanged at 44); same caps.
+# * budgets.yaml -> budgets-1.3.14 (2026-10-17, V4LINK): merge of v4link.yaml (new unsd.classifications 30/day for
+#   atlas.unsd_classif) and of the V4 requests filed since 1.3.13 (v4energy: worldbank.cmo, wri.gppd); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "7d251ff40a7c3cfce33558535a4b62562fff76bdf9d76ef9e743f37f731b74a4",
+    "budgets.yaml": "91d9afb3785183d4e98b7962e5c86cfe38f5e6c682bae04c21e7fbb0495aed70",
 }
 
 

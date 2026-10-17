@@ -1,0 +1,26 @@
+# V4 (agent V4ENERGY): World Bank Commodity Price Data ("The Pink Sheet"), CMO historical data workbooks.
+# Connector src/reva/adapters/connectors/atlas_pinksheet.py (atlas tables wb_cmo.monthly_prices,
+# wb_cmo.monthly_indices, wb_cmo.annual_prices_nominal, wb_cmo.annual_indices_nominal, wb_cmo.annual_prices_real,
+# wb_cmo.annual_indices_real).
+source_key: worldbank.cmo
+title: World Bank Commodity Price Data (Pink Sheet) — monthly and annual commodity prices and indices, 1960-present
+provider_url: https://www.worldbank.org/en/research/commodity-markets
+lineage_family: worldbank_cmo
+rights:
+  licence: "CC BY 4.0"
+  licence_url: https://datacatalog.worldbank.org/public-licenses#cc-by
+  attribution: "Source: World Bank, Commodity Price Data (The Pink Sheet)."
+  terms_quote: >-
+    The Commodity Markets page links its data under "Data Access and Licensing" to the World Bank public licenses
+    page, anchor cc-by (Creative Commons Attribution 4.0). Underlying price providers per series are named in the
+    workbook's Description sheet.
+metadata:
+  allowed_hosts: [www.worldbank.org, thedocs.worldbank.org]
+  files:
+    page: https://www.worldbank.org/en/research/commodity-markets
+    monthly: "CMO-Historical-Data-Monthly.xlsx (link read from the page; the document id changes monthly)"
+    annual: "CMO-Historical-Data-Annual.xlsx (link read from the page)"
+  authentication: none
+  cadence: "monthly release (first business days of the month)"
+  notation: "… not available (no cell); spreadsheet error cells (#VALUE!) kept value-less with flags.missing=provider_error"
+  not_used: "Index Weights, Description (archived, quoted in coverage notes), Mismatch Details sheets; the CMO forecast PDF"

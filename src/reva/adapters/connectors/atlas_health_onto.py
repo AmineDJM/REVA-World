@@ -59,7 +59,7 @@ from __future__ import annotations
 import json
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime
 from typing import Any
 
@@ -165,6 +165,7 @@ MONDO_RELS = {
     "disease_shares_features_of": "mondo:shares_features_of",
     "disease_responds_to": "mondo:responds_to",
     "in_taxon": "mondo:in_taxon",
+    "transmitted_by": "mondo:transmitted_by",
 }
 #: Mondo bookkeeping relations: not facts about the disease (never loaded, counted)
 MONDO_META_RELS = ("excluded_subClassOf", "should_conform_to", "curated_content_resource", "seeAlso")
@@ -306,7 +307,7 @@ class _Claims:
             axioms = list(prev.selector.get("axioms", []))
             if axiom not in axioms:
                 axioms.append(axiom)
-                self.records[cid] = ClaimRecord(**{**prev.__dict__, "selector": {**prev.selector, "axioms": axioms}})
+                self.records[cid] = replace(prev, selector={**prev.selector, "axioms": axioms})
             return
         self.records[cid] = ClaimRecord(
             cause_id=kg_id(cause),
@@ -606,7 +607,7 @@ def mondo_kg(body: bytes, *, raw_sha256: str, ri: RelationIndex) -> tuple[Parts,
             else:
                 b.skipped["is_a_target_not_live_mondo"] += 1
         for tag in ("relationship", "intersection_of"):
-            for v, _q in s.tagged(tag):
+            for v, qual in s.tagged(tag):
                 parts = v.split()
                 if tag == "intersection_of" and len(parts) == 1:
                     if parts[0] in live:
@@ -626,7 +627,7 @@ def mondo_kg(body: bytes, *, raw_sha256: str, ri: RelationIndex) -> tuple[Parts,
                 if ri.is_causal(rel):
                     if rel in MONDO_RELS or ri.resolve(rel) in MONDO_RELS:
                         raise drift(f"Mondo relation {rel} is mapped as a plain link but is causal by the rule")
-                    claims.add(i, rel, tgt, axiom=kind, selector={"tag": tag})
+                    claims.add(i, rel, tgt, axiom=kind, selector={"tag": tag, **({"annotations": qual[:500]} if qual else {})})
                     continue
                 pid = MONDO_RELS.get(rel) or MONDO_RELS.get(ri.resolve(rel))
                 if pid is None:

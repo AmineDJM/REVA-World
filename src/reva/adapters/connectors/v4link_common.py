@@ -322,9 +322,16 @@ def best_rank(rows: Sequence[Held]) -> list[Held]:
     return out
 
 
-def derive_bridges(rows: Sequence[Held], rules: Mapping[str, Rule]) -> Bridges:
+def derive_bridges(
+    rows: Sequence[Held], rules: Mapping[str, Rule], global_duplicates: Mapping[str, set[str]] | None = None
+) -> Bridges:
     """Apply the identity rules to best-rank statements: malformed values, ambiguous holders (an item with several
-    values of one property) and ambiguous values (a value on several items) are reported, never linked."""
+    values of one property) and ambiguous values (a value on several items) are reported, never linked.
+
+    ``rows`` may be a filtered subset of Wikidata (a pack with ``min_sitelinks``): ``global_duplicates`` (property ->
+    KG keys held by several items anywhere in Wikidata) then completes the ambiguity check for values whose other
+    holders were not fetched."""
+    dups = global_duplicates or {}
     rep: dict[str, Any] = {"by_property": {}}
     out = Bridges()
     best = best_rank(rows)
@@ -359,7 +366,9 @@ def derive_bridges(rows: Sequence[Held], rules: Mapping[str, Rule]) -> Bridges:
                 if len(samples["ambiguous_holder"]) < 10:
                     samples["ambiguous_holder"].append({"item": h.item, "values": sorted(per_item[h.item])[:5]})
                 continue
-            if rule.max_items_per_value is not None and len(per_value[k]) > int(rule.max_items_per_value):
+            if rule.max_items_per_value is not None and (
+                len(per_value[k]) > int(rule.max_items_per_value) or k in dups.get(pid, set())
+            ):
                 stats["ambiguous_value"] += 1
                 if len(samples["ambiguous_value"]) < 10:
                     samples["ambiguous_value"].append({"value": k, "items": sorted(per_value[k])[:5]})

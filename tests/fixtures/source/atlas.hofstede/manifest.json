@@ -1,0 +1,29 @@
+[
+  {
+    "request_fingerprint": "89f13db9f05323516601130adaf5a1438daa1c3dc3045384282737bdcaa5dd3a",
+    "url": "https://geerthofstede.com/research-and-vsm/dimension-data-matrix/",
+    "file": "89f13db9f0532351.html",
+    "sha256": "ba86c9da4096f102cc6e50382ddf9f4aee4d3f4e542e42a1b922554c9f864a3b",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T13:37:24.213585+00:00",
+    "licence": "page text: research use without permission",
+    "note": "real response"
+  },
+  {
+    "request_fingerprint": "3db7a1057157572a4dad19575f6842489340bf0c691c7946f10d9bbe8e47ad58",
+    "url": "https://geerthofstede.com/wp-content/uploads/2016/08/6-dimensions-for-website-2015-08-16.csv",
+    "file": "3db7a1057157572a.csv",
+    "sha256": "71bff58cf610ec44b870d5aa4b06bb36e3a573860d513ff802488764d6e029a6",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv",
+      "last-modified": "Tue, 20 Sep 2016 18:47:55 GMT"
+    },
+    "retrieved_at": "2026-10-17T13:37:24.522800+00:00",
+    "licence": "research use without permission; commercial use requires contacting the authors (no open licence)",
+    "note": "real response"
+  }
+]

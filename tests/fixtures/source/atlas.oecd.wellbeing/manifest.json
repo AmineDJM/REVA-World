@@ -1,0 +1,30 @@
+[
+  {
+    "request_fingerprint": "6d8ada9d35e01a09adc8205e20aa2979f06c5dd7f41590ad71dc25211a2b378b",
+    "url": "https://sdmx.oecd.org/public/rest/data/OECD.WISE.WDP,DSD_HSL@DF_HSL_CWB,/FRA+JPN+MEX.11_1+7_4+5_4+10_2+4_1.....?format=csvfilewithlabels&startPeriod=2016",
+    "file": "6d8ada9d35e01a09.csv",
+    "sha256": "1190da20bfa5381b2c3e138c7fec5eb8f080674b485622294d872d93f3a6be6a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.sdmx.data+csv; labels=name; charset=utf-8; version=2",
+      "last-modified": "2024-06-04"
+    },
+    "retrieved_at": "2026-10-17T13:36:55.746480+00:00",
+    "licence": "OECD Terms and Conditions (Data Explorer: '© OECD Terms & conditions'); CC BY 4.0 is the OECD default since 2024-07-01 (open-by-default policy); no dataset-level licence in the SDMX metadata",
+    "note": "real response (DSD_HSL@DF_HSL_CWB.0.csv, fixture key)"
+  },
+  {
+    "request_fingerprint": "50e4ec01da9fe39a02eeaa295d67f78ead37dfdbe43b315b19ec6952913edea9",
+    "url": "https://sdmx.oecd.org/public/rest/data/OECD.WISE.WDP,DSD_HSL@DF_HSL_FWB,/FRA+JPN+MEX.14_1+14_3.....?format=csvfilewithlabels&startPeriod=2016",
+    "file": "50e4ec01da9fe39a.csv",
+    "sha256": "e73911ecb614c2884724b980b936fc63cb62863f5420a62f58f5572a85addd27",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.sdmx.data+csv; version=2; labels=name; charset=utf-8",
+      "last-modified": "2024-06-04"
+    },
+    "retrieved_at": "2026-10-17T13:36:56.530711+00:00",
+    "licence": "OECD Terms and Conditions (Data Explorer: '© OECD Terms & conditions'); CC BY 4.0 is the OECD default since 2024-07-01 (open-by-default policy); no dataset-level licence in the SDMX metadata",
+    "note": "real response (DSD_HSL@DF_HSL_FWB.0.csv, fixture key)"
+  }
+]

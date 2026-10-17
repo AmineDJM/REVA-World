@@ -37,7 +37,7 @@ def api(db) -> Iterator[tuple[TestClient, str]]:  # type: ignore[no-untyped-def]
             KgProperty("P361", "item", "part_of", "part of", "partie de", "has_part"),
             KgProperty("P1056", "item", "product_or_material_produced", "product or material produced", "produit"),
             KgProperty("P828", "item", "has_cause", "has cause", "a pour cause", "cause_of", "cause of"),
-            KgProperty("P625", "coordinate", "coordinate_location", "coordinate location", "coordonnées"),
+            KgProperty("P625", "globe_coordinate", "coordinate_location", "coordinate location", "coordonnées"),
             KgProperty("syn:unrelated", "item", "unrelated", "unrelated", "sans rapport"),
             PLACE_LOCATED_IN,
             ATLAS_MEASURED_BY,

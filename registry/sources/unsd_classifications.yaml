@@ -1,22 +1,23 @@
-# V4 (agent V4INDUSTRY): UNSD Classifications Registry (ISIC Rev.4, CPC Ver.2.1, CPC 2.1 - ISIC 4 correspondence),
-# connector atlas.unsd_classif (KG industries and products).
+# V4 (agent V4LINK): UN Statistics Division classifications and correspondence tables.
+# Connector: src/reva/adapters/connectors/atlas_unsd_classif.py -> KG classification codes (HS 2022/2017/1992,
+# CPC 2.1, ISIC Rev.4, SITC Rev.4), their hierarchies (v4link:class_parent) and UNSD concordances
+# (v4link:corresponds_to). No atlas table.
 source_key: unsd.classifications
-title: UN Statistics Division - Classifications Registry (economic and social classifications)
+title: UNSD classifications on economic statistics (structures and correspondence tables)
 provider_url: https://unstats.un.org/unsd/classifications/Econ
 lineage_family: unsd_classifications
 rights:
-  licence: "UN Statistics Division classification publication (UN terms of use; pending maintainer review)"
+  licence: United Nations terms of use (free download, no account)
   licence_url: https://www.un.org/en/about-us/terms-of-use
-  attribution: "United Nations Statistics Division, Classifications Registry (unstats.un.org/unsd/classifications)"
-  review: >-
-    pending maintainer review: the download pages carry no dataset licence; ISIC and CPC are international statistical
-    standards adopted by the UN Statistical Commission and published for free use, while the general UN website terms
-    restrict redistribution of materials. Flagged on every statement (licence_status un_terms_of_use_pending_review).
+  attribution: >-
+    United Nations Statistics Division, Classifications on economic statistics
+    (https://unstats.un.org/unsd/classifications/Econ). HS descriptions: Harmonized System nomenclature
+    (c) World Customs Organization -- UNSD states no separate redistribution licence (flagged on every HS value).
 metadata:
   allowed_hosts: [unstats.un.org]
+  files: >-
+    HSCodeandDescription.xlsx, SITCCodeandDescription.xlsx, CPC_Ver_2_1_english_structure.txt,
+    ISIC_Rev_4_english_structure.Txt, CPC21-HS2017.csv, cpc21-isic4.txt (+ readme), HS2022 to HS2017 / HS1992 /
+    SITC Rev.4 conversion and correlation tables (xlsx); about 3.7 MB per run
   authentication: none
-  files:
-    - Download/In Text/ISIC_Rev_4_english_structure.Txt
-    - Download/In Text/CPC_Ver_2_1_english_structure.txt
-    - tables/CPC/CPCv21_ISIC4/cpc21-isic4.txt (+ readme.txt)
-  cadence: rarely revised (ISIC Rev.5 published 2024-2026; Rev.4 kept as the basis of TiVA/ICIO and most national data)
+  cadence: quarterly check (UNSD revises correspondence tables rarely)

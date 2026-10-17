@@ -1,0 +1,393 @@
+[
+  {
+    "request_fingerprint": "242769544b25a6d5ec1be7008343fefcad8bc695296c1c449ab2b163e8944a4a",
+    "url": "https://ghoapi.azureedge.net/api/Indicator",
+    "file": "242769544b25a6d5.json",
+    "sha256": "6d811eb201c5cc88aa443ab5db2d11d9859f6ecf9580d80269e7cebbc28724f7",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:04.959289+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "derived_from_sha256": "10cb29a3dded9a16f06e531b559b58ae3c9cdd374e7d97b177154dcf9932088c",
+    "note": "subset of the GHO indicator list (29 entries, verbatim)"
+  },
+  {
+    "request_fingerprint": "114ec207678cbb6b583f0d9eb840f6297c5128bde4c068953e9170fe0a70642f",
+    "url": "https://ghoapi.azureedge.net/api/MH_1?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "114ec207678cbb6b.json",
+    "sha256": "ff2bcd18e6a40a5a232bd1f22b1b3969d596d500c00a184b8c3a045ace3a70e5",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:05.528478+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_1, 5 countries)"
+  },
+  {
+    "request_fingerprint": "49c72041074c39539bf7f195fc296788a0b6e1d47d7d0d038ebb8f6a93d79af5",
+    "url": "https://ghoapi.azureedge.net/api/MH_2?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "49c72041074c3953.json",
+    "sha256": "e6be5fc2cbeb47ca5dda1e0074e3b17229095b751a9332678594aff9ea4645f5",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:06.086593+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_2, 5 countries)"
+  },
+  {
+    "request_fingerprint": "a21bd28e4623f81c889f800f7090272746ca64dbf899979d7269ce66b0df29ea",
+    "url": "https://ghoapi.azureedge.net/api/MH_3?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "a21bd28e4623f81c.json",
+    "sha256": "ee4dbc6d522e80e6d85880f0ea150d90ffd4b44eaa8807b4b59e4465c05bb64e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:06.650419+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_3, 5 countries)"
+  },
+  {
+    "request_fingerprint": "18eb90b1f541a017d64f79dd2fa5d797f1294b9ad8e80d7e10cc185789863f2b",
+    "url": "https://ghoapi.azureedge.net/api/MH_25?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "18eb90b1f541a017.json",
+    "sha256": "dc2ef17f2ff56cca422e3b9ad3384fb8a7483f751866129525a80f6a67bd7616",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:07.313782+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_25, 5 countries)"
+  },
+  {
+    "request_fingerprint": "f8ed5fda96de709c0a9fc823732cfb7055d5c6da7db27c5bb077af893cd4dc0b",
+    "url": "https://ghoapi.azureedge.net/api/MH_26?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "f8ed5fda96de709c.json",
+    "sha256": "fa751955d2bca6484e85ad5bba9888fbbc3ce1f74e2837b7de160f801ff5db99",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:07.854321+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_26, 5 countries)"
+  },
+  {
+    "request_fingerprint": "ff2e307f6296b81c8b25949f690389123309b4650b664f756b09fbfe73244b07",
+    "url": "https://ghoapi.azureedge.net/api/MH_27?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "ff2e307f6296b81c.json",
+    "sha256": "515d9c467d27baa9f79c3fe6fdb5de429824e0bd3ed7c62794892b292c97c8f3",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:08.424928+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_27, 5 countries)"
+  },
+  {
+    "request_fingerprint": "c7aad1af54eedfdfadabe29a1fedee2f239ce8a54c484debbaea806f4481d0f3",
+    "url": "https://ghoapi.azureedge.net/api/MH_4?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "c7aad1af54eedfdf.json",
+    "sha256": "a1b76231367055724f01fa1327c012572332f7c2e11c37f05d1d8e1d6dd6e185",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:08.976851+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_4, 5 countries)"
+  },
+  {
+    "request_fingerprint": "c3682103786775fd45cabb293d94b6ca795f88fc34ed13db171eb46a64ec0060",
+    "url": "https://ghoapi.azureedge.net/api/MH_5?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "c3682103786775fd.json",
+    "sha256": "1b4ef81341ff0f9a0e14e03fa3916d41fad689ec2b001377cb7457125462a152",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:10.189737+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_5, 5 countries)"
+  },
+  {
+    "request_fingerprint": "bc794657286da8975f1b26ac758a1533a5587ec051807af3dafda2c1e159cb2e",
+    "url": "https://ghoapi.azureedge.net/api/MH_6?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "bc794657286da897.json",
+    "sha256": "dfd4727fcc521b33805d9edbe49b1fa38fa1565040b85f34e76a7b73b0c984e3",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:10.763374+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_6, 5 countries)"
+  },
+  {
+    "request_fingerprint": "b58b538d4832972cf9eba6cd365a9918b8763daa6cbf72003e1643df374349f6",
+    "url": "https://ghoapi.azureedge.net/api/MH_7?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "b58b538d4832972c.json",
+    "sha256": "e7bc1128cb8c9a596ebb5e02b87731a6d5aa0936a849c8522873237a7da234be",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:11.204381+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_7, 5 countries)"
+  },
+  {
+    "request_fingerprint": "718742fdd5210e45f9b086e91a3fffb00bafd4e2860da06d1ffc0dd040d680e1",
+    "url": "https://ghoapi.azureedge.net/api/MH_8?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "718742fdd5210e45.json",
+    "sha256": "0e8db1bf0f3fccf92c284363f79d68a55d7e31d03090437d227110568892f18f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:11.885563+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_8, 5 countries)"
+  },
+  {
+    "request_fingerprint": "d8fbce45fcfcd915a35ba13206e32971b06ea9cde565bbca148f35a33fcb8740",
+    "url": "https://ghoapi.azureedge.net/api/MH_9?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "d8fbce45fcfcd915.json",
+    "sha256": "1d1ed0ec525104b8bcd73723dfa7ec2575c25a0c03b82750d99733d7851a9704",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:12.324747+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_9, 5 countries)"
+  },
+  {
+    "request_fingerprint": "e5ca66e70ef6c35303772f4fa94680a24d138453498ebee9f4ce127adb5a451b",
+    "url": "https://ghoapi.azureedge.net/api/MH_21?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "e5ca66e70ef6c353.json",
+    "sha256": "5dc089f320b3381a9a5cbb15d01c9bbd8838a9c30110ed0867c7d29b57596147",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:12.875511+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_21, 5 countries)"
+  },
+  {
+    "request_fingerprint": "07534a3b07025bcf4c60c52fb5a025eee9ece6649d4329fd422b4c98d5389621",
+    "url": "https://ghoapi.azureedge.net/api/MH_22?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "07534a3b07025bcf.json",
+    "sha256": "997a1c357a5c56f7ed0742949a9ecdedc0416eb91e18f26861d89597bbfa8003",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:13.422778+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_22, 5 countries)"
+  },
+  {
+    "request_fingerprint": "1a503746e5ad57408e74997dcf77c9dd0d6e2e3ecd2f75f43ab4546fa6ccfbf3",
+    "url": "https://ghoapi.azureedge.net/api/MH_23?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "1a503746e5ad5740.json",
+    "sha256": "515a1ae0a604de4a11d61f2f0a804f3d8c5ecff33f4b14ef39e6382fea616d64",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:14.093379+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_23, 5 countries)"
+  },
+  {
+    "request_fingerprint": "c0acc163c7cf6b7dd14b53bbcbee058faf97330987f1242c524b55974d3730f7",
+    "url": "https://ghoapi.azureedge.net/api/MH_10?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "c0acc163c7cf6b7d.json",
+    "sha256": "110a366f594c71aa0eccc1d046991a84c94e01f95d8de37012c8980aa8136f6b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:14.748111+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_10, 5 countries)"
+  },
+  {
+    "request_fingerprint": "98a9d042366aa01eccca2c018067b930b103ecdec2b3198e376fcd0e76155fb0",
+    "url": "https://ghoapi.azureedge.net/api/MH_11?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "98a9d042366aa01e.json",
+    "sha256": "40aed7bfd30f98ec47fe0b1fe404ee449aa5e3bcd336116876f71544e98daa2f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:15.304597+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_11, 5 countries)"
+  },
+  {
+    "request_fingerprint": "3c79092808c5e7e7a124ee5275a73b3ca543b773257d1947cdfabb5ad17c4716",
+    "url": "https://ghoapi.azureedge.net/api/MH_13?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "3c79092808c5e7e7.json",
+    "sha256": "e0529e92c9e7ee045ef47e2e67bf2c2dd72aa5d5ae928981d5834fd7d9871516",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:15.892199+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_13, 5 countries)"
+  },
+  {
+    "request_fingerprint": "2655426de1e4479e4ed68db26f393c011868df686b3ab0fcb00fb58b26a9a1da",
+    "url": "https://ghoapi.azureedge.net/api/MH_14?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "2655426de1e4479e.json",
+    "sha256": "a34a57b9e4d9935834d7c5ba9e49f1ab8bd161c956a9057a81adce0076f90aa1",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:16.098709+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_14, 5 countries)"
+  },
+  {
+    "request_fingerprint": "492c958d03911029702f83825990735ea0a01d4d338dbe4c5097352316f633b0",
+    "url": "https://ghoapi.azureedge.net/api/MH_15?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "492c958d03911029.json",
+    "sha256": "3f0db264e4029803e363034025dde6cd1b6ac0a53edc3a49fdc9ce0613e4e07b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:16.646369+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_15, 5 countries)"
+  },
+  {
+    "request_fingerprint": "2c08d5455ace50d263bc403acbe055544ab7089ddf31acd774751aa0ca656e44",
+    "url": "https://ghoapi.azureedge.net/api/MH_16?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "2c08d5455ace50d2.json",
+    "sha256": "9f4d8b9c176d3bcdcd2ebf7d4b0ca90dca3a0dd9e239b35f41a3557bbdb71fbf",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:17.324539+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_16, 5 countries)"
+  },
+  {
+    "request_fingerprint": "2b7cc27e9ae7de8acbe3ab60a82fc0acd7bed9badbfdfaeb230ced164d0a8f54",
+    "url": "https://ghoapi.azureedge.net/api/MH_17?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "2b7cc27e9ae7de8a.json",
+    "sha256": "729c28945d399009598904db5adc0b9ee0d2f48e17003d70270082eb9f086913",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:17.903097+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_17, 5 countries)"
+  },
+  {
+    "request_fingerprint": "0f7170e94a2f174d091ae91ce550ea61e623659395f0625a43d63dd5bb60c1de",
+    "url": "https://ghoapi.azureedge.net/api/MH_18?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "0f7170e94a2f174d.json",
+    "sha256": "b3ec97ac35e63af6bf9068ff792458a977fc1f44ffce5a121216a6a64436d2c4",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:18.446905+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_18, 5 countries)"
+  },
+  {
+    "request_fingerprint": "4d10fcac69dcf94b828db06769995224e876b723e76850bf2107159cfa168b7f",
+    "url": "https://ghoapi.azureedge.net/api/MH_19?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "4d10fcac69dcf94b.json",
+    "sha256": "065f8d7748b3d2d1378fe26983fc6e76521b5fe2bd0ada1870fd3b333ed43731",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:18.994419+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_19, 5 countries)"
+  },
+  {
+    "request_fingerprint": "468d2710e532645517a50afa80640dfe855a7d27cefedd1feca7c14b21dcc767",
+    "url": "https://ghoapi.azureedge.net/api/MH_20?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "468d2710e5326455.json",
+    "sha256": "870614d0f5f6f53729550ef784c9f8e274e832ed675c55dcece32c149c87a4b6",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:19.203562+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_20, 5 countries)"
+  },
+  {
+    "request_fingerprint": "760a7d8fc0fd844b4bd7bc9ea7d9514f812fba9a0197c06e0571fcd4595abba7",
+    "url": "https://ghoapi.azureedge.net/api/MH_24?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "760a7d8fc0fd844b.json",
+    "sha256": "1e0e0873b3938e884e7d0d64c3a23041ca814bf47f79931c1beb3ae6ae310366",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:19.750009+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:MH_24, 5 countries)"
+  },
+  {
+    "request_fingerprint": "9bab313d97cae3ea2ca466e7632ce7eb7729e4a508db2557ac2080c79f29c612",
+    "url": "https://ghoapi.azureedge.net/api/GDO_q35?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "9bab313d97cae3ea.json",
+    "sha256": "321fd4b012e365e9edc909f26132c4f3644699750f1d990865b7ce5d29759158",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:20.305922+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:GDO_q35, 5 countries)"
+  },
+  {
+    "request_fingerprint": "c0e3fe05f1b6399e37fec22228943d50944dfa8912aeb6f435e2ae63a6439d49",
+    "url": "https://ghoapi.azureedge.net/api/RSUD_1?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "c0e3fe05f1b6399e.json",
+    "sha256": "23b7ce52566146d903516ec35b9def7e1eea698bbe0e60d08262d96268f5dcee",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:20.862486+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:RSUD_1, 5 countries)"
+  },
+  {
+    "request_fingerprint": "1943456b6d0b8c4a521392a9472190f6ebf246e9456c3d04aea7b614fafa4100",
+    "url": "https://ghoapi.azureedge.net/api/RSUD_2?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'JPN')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "1943456b6d0b8c4a.json",
+    "sha256": "515a5aec12abd9f1d68526b03f9b9e817c3efb02ba88f56df74fd4e5f7304707",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:39:21.428780+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "note": "real response (gho.data:RSUD_2, 5 countries)"
+  }
+]

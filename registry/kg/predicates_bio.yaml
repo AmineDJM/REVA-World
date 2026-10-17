@@ -1,0 +1,146 @@
+# Dataset predicates of the tree-of-life and molecular-biology layer (owner: V4BIO). Not Wikidata properties: the
+# connectors register them in the KG allow-list (kg.property / kg.property_version) through
+# reva.kg.model.register_properties (src/reva/adapters/connectors/bio_common.py), like predicates_lang.yaml.
+# Family mappings: registry/kg/relations_v4.d/v4bio.yaml.
+#
+# Entity keys (provider identifiers; the two REVA-composed keys say so):
+#   gbif:<key>               a name usage of the GBIF Backbone Taxonomy (legacy 2023-08-28 backbone, integer keys,
+#                            Wikidata P846), read through api.gbif.org and ChecklistBank dataset 53147 (the same
+#                            backbone imported with its GBIF keys as ids).                              kind taxon
+#   col:<id>                 a taxon of a Catalogue of Life release (ChecklistBank 3LR, ids such as CS5HF).  kind taxon
+#   ncbitaxon:<id>           an NCBI Taxonomy id (as UniProt, Ensembl and NCBI Datasets state it).      kind taxon
+#   hgnc:<n>                 an HGNC gene record (HGNC:<n>).                                             kind gene
+#   uniprot:<accession>      a UniProtKB/Swiss-Prot (reviewed) entry.                                   kind protein
+#   assembly:<GCA_/GCF_...>  an INSDC (GCA_) or RefSeq (GCF_) genome assembly accession.        kind genome_assembly
+#   chromosome:<taxid>:<name> REVA-composed key: NCBI taxon id + the chromosome's seq-region name in Ensembl's
+#                            karyotype (1..22, X, Y, MT for human). A chromosome of an organism, not one assembly's
+#                            sequence (assemblies point to it with ensembl:has_chromosome and the length).
+#                                                                                                    kind chromosome
+#
+# Honesty:
+# * Every statement is what one source states. Taxon ranks, parents and authorships are the backbone's / COL's
+#   as published; species counts are the provider's own counts (GBIF search facet, ChecklistBank tree count),
+#   with the definition quoted in each statement's qualifiers; nothing is estimated.
+# * Identity across schemes (NCBI <-> GBIF, COL <-> GBIF) is never derived from names: only from a Wikidata item
+#   that holds both identifiers (bio:wikidata_item / bio:same_taxon_via_wikidata, source key wikidata.wdqs,
+#   community-edited, ambiguous values reported and not linked).
+# * gene -> protein links are each source's own cross-reference (HGNC uniprot_ids column; UniProt's HGNC
+#   cross-reference). They are "encodes" (produces family), not causation. Gene-disease associations belong to
+#   V4HEALTH (associated_with, never causal).
+# * UniProt function text is verbatim (truncated at a fixed length, flagged when truncated).
+version: 1
+owner: V4BIO
+predicates:
+  # ------------------------------------------------------------------ GBIF backbone (source gbif.backbone)
+  - {pid: "gbif:parent", value_kind: item, reva_predicate: gbif_parent_taxon, family: is_a,
+     label_en: "has parent taxon (GBIF Backbone Taxonomy)", label_fr: "a pour taxon parent (taxonomie de référence GBIF)",
+     inverse_name: gbif_child_taxon, inverse_label_en: "has child taxon (GBIF Backbone Taxonomy)",
+     inverse_label_fr: "a pour taxon enfant (taxonomie de référence GBIF)"}
+  - {pid: "gbif:rank", value_kind: string, reva_predicate: gbif_rank,
+     label_en: "taxonomic rank (GBIF Backbone Taxonomy)", label_fr: "rang taxonomique (taxonomie de référence GBIF)"}
+  - {pid: "gbif:authorship", value_kind: string, reva_predicate: gbif_authorship,
+     label_en: "name authorship (GBIF Backbone Taxonomy)", label_fr: "auteur du nom (taxonomie de référence GBIF)"}
+  - {pid: "gbif:accepted_species_count", value_kind: quantity, reva_predicate: gbif_accepted_species_count,
+     label_en: "number of accepted species in the GBIF Backbone (search facet)",
+     label_fr: "nombre d'espèces acceptées dans la taxonomie GBIF (facette de recherche)"}
+  # ------------------------------------------------------------------ Catalogue of Life (source col.checklistbank)
+  - {pid: "col:parent", value_kind: item, reva_predicate: col_parent_taxon, family: is_a,
+     label_en: "has parent taxon (Catalogue of Life)", label_fr: "a pour taxon parent (Catalogue of Life)",
+     inverse_name: col_child_taxon, inverse_label_en: "has child taxon (Catalogue of Life)",
+     inverse_label_fr: "a pour taxon enfant (Catalogue of Life)"}
+  - {pid: "col:rank", value_kind: string, reva_predicate: col_rank,
+     label_en: "taxonomic rank (Catalogue of Life)", label_fr: "rang taxonomique (Catalogue of Life)"}
+  - {pid: "col:species_count", value_kind: quantity, reva_predicate: col_species_count,
+     label_en: "species count of the taxon (Catalogue of Life, ChecklistBank tree)",
+     label_fr: "nombre d'espèces du taxon (Catalogue of Life, arbre ChecklistBank)"}
+  - {pid: "col:release_metric", value_kind: quantity, reva_predicate: col_release_metric,
+     label_en: "release metric (Catalogue of Life import metrics)",
+     label_fr: "métrique de la version (métriques d'import du Catalogue of Life)"}
+  # ------------------------------------------------------------------ Wikidata bridges (source wikidata.wdqs)
+  - {pid: "bio:wikidata_item", value_kind: item, reva_predicate: bio_wikidata_item,
+     label_en: "is identified on the Wikidata item (identifier statement)",
+     label_fr: "est identifié sur l'élément Wikidata (déclaration d'identifiant)",
+     inverse_name: bio_wikidata_identifies, inverse_label_en: "holds the identifier of",
+     inverse_label_fr: "porte l'identifiant de"}
+  - {pid: "bio:same_taxon_via_wikidata", value_kind: item, reva_predicate: bio_same_taxon_via_wikidata,
+     label_en: "names the same taxon as (one Wikidata item holds both identifiers)",
+     label_fr: "désigne le même taxon que (un élément Wikidata porte les deux identifiants)",
+     inverse_name: bio_same_taxon_via_wikidata_of, inverse_label_en: "names the same taxon as (via Wikidata)",
+     inverse_label_fr: "désigne le même taxon que (via Wikidata)"}
+  - {pid: "bio:common_name", value_kind: monolingualtext, reva_predicate: bio_common_name,
+     label_en: "common name (Wikidata P1843, community-edited)",
+     label_fr: "nom vernaculaire (Wikidata P1843, contributif)"}
+  # ------------------------------------------------------------------ HGNC (source hgnc.complete_set)
+  - {pid: "hgnc:located_on_chromosome", value_kind: item, reva_predicate: hgnc_located_on_chromosome,
+     family: located_in,
+     label_en: "is located on chromosome (HGNC location)", label_fr: "est situé sur le chromosome (localisation HGNC)",
+     inverse_name: hgnc_chromosome_carries_gene, inverse_label_en: "carries the gene (HGNC location)",
+     inverse_label_fr: "porte le gène (localisation HGNC)"}
+  - {pid: "hgnc:encodes", value_kind: item, reva_predicate: hgnc_encodes, family: produces,
+     label_en: "encodes the protein (HGNC cross-reference to UniProt)",
+     label_fr: "code la protéine (renvoi HGNC vers UniProt)",
+     inverse_name: hgnc_encoded_by, inverse_label_en: "is encoded by (HGNC cross-reference)",
+     inverse_label_fr: "est codée par (renvoi HGNC)"}
+  - {pid: "hgnc:in_taxon", value_kind: item, reva_predicate: hgnc_in_taxon, family: context,
+     label_en: "gene of the organism (HGNC: human genes)", label_fr: "gène de l'organisme (HGNC : gènes humains)"}
+  - {pid: "hgnc:symbol", value_kind: string, reva_predicate: hgnc_symbol,
+     label_en: "approved gene symbol (HGNC)", label_fr: "symbole de gène approuvé (HGNC)"}
+  - {pid: "hgnc:name", value_kind: string, reva_predicate: hgnc_name,
+     label_en: "approved gene name (HGNC)", label_fr: "nom de gène approuvé (HGNC, en anglais)"}
+  - {pid: "hgnc:locus_type", value_kind: string, reva_predicate: hgnc_locus_type,
+     label_en: "locus type (HGNC)", label_fr: "type de locus (HGNC)"}
+  - {pid: "hgnc:locus_group", value_kind: string, reva_predicate: hgnc_locus_group,
+     label_en: "locus group (HGNC)", label_fr: "groupe de locus (HGNC)"}
+  - {pid: "hgnc:cytogenetic_location", value_kind: string, reva_predicate: hgnc_cytogenetic_location,
+     label_en: "cytogenetic location (HGNC, verbatim)", label_fr: "localisation cytogénétique (HGNC, verbatim)"}
+  - {pid: "hgnc:ensembl_gene_id", value_kind: external_id, reva_predicate: hgnc_ensembl_gene_id,
+     label_en: "Ensembl gene id (HGNC cross-reference)", label_fr: "identifiant de gène Ensembl (renvoi HGNC)"}
+  - {pid: "hgnc:ncbi_gene_id", value_kind: external_id, reva_predicate: hgnc_ncbi_gene_id,
+     label_en: "NCBI Gene id (HGNC cross-reference)", label_fr: "identifiant NCBI Gene (renvoi HGNC)"}
+  # ------------------------------------------------------------------ UniProt (source uniprot.rest)
+  - {pid: "uniprot:encoded_by", value_kind: item, reva_predicate: uniprot_encoded_by, family: produced_by,
+     label_en: "is encoded by the gene (UniProt cross-reference to HGNC)",
+     label_fr: "est codée par le gène (renvoi UniProt vers HGNC)",
+     inverse_name: uniprot_encodes, inverse_label_en: "encodes (UniProt cross-reference)",
+     inverse_label_fr: "code (renvoi UniProt)"}
+  - {pid: "uniprot:in_taxon", value_kind: item, reva_predicate: uniprot_in_taxon, family: context,
+     label_en: "protein of the organism (UniProt)", label_fr: "protéine de l'organisme (UniProt)"}
+  - {pid: "uniprot:gene_name", value_kind: string, reva_predicate: uniprot_gene_name,
+     label_en: "primary gene name (UniProt)", label_fr: "nom de gène principal (UniProt)"}
+  - {pid: "uniprot:sequence_length", value_kind: quantity, reva_predicate: uniprot_sequence_length,
+     label_en: "sequence length in amino acids (UniProt)", label_fr: "longueur de séquence en acides aminés (UniProt)"}
+  - {pid: "uniprot:function", value_kind: monolingualtext, reva_predicate: uniprot_function,
+     label_en: "function (UniProt comment, verbatim)", label_fr: "fonction (commentaire UniProt, verbatim, en anglais)"}
+  - {pid: "uniprot:reviewed_protein_count", value_kind: quantity, reva_predicate: uniprot_reviewed_protein_count,
+     label_en: "number of reviewed (Swiss-Prot) entries of the organism (UniProtKB)",
+     label_fr: "nombre d'entrées revues (Swiss-Prot) de l'organisme (UniProtKB)"}
+  # ------------------------------------------------------------------ Ensembl (source ensembl.rest)
+  - {pid: "ensembl:assembly_of", value_kind: item, reva_predicate: ensembl_assembly_of, family: context,
+     label_en: "is the genome assembly Ensembl uses for the organism", label_fr: "est l'assemblage génomique utilisé par Ensembl pour l'organisme"}
+  - {pid: "ensembl:has_chromosome", value_kind: item, reva_predicate: ensembl_has_chromosome, family: has_part,
+     label_en: "has the chromosome in its karyotype (Ensembl)", label_fr: "a le chromosome dans son caryotype (Ensembl)",
+     inverse_name: ensembl_chromosome_of, inverse_label_en: "is a chromosome of the assembly (Ensembl karyotype)",
+     inverse_label_fr: "est un chromosome de l'assemblage (caryotype Ensembl)"}
+  - {pid: "ensembl:assembly_name", value_kind: string, reva_predicate: ensembl_assembly_name,
+     label_en: "assembly name (Ensembl)", label_fr: "nom de l'assemblage (Ensembl)"}
+  - {pid: "ensembl:genebuild", value_kind: string, reva_predicate: ensembl_genebuild,
+     label_en: "gene build (Ensembl)", label_fr: "annotation des gènes (genebuild Ensembl)"}
+  - {pid: "ensembl:base_count", value_kind: quantity, reva_predicate: ensembl_base_count,
+     label_en: "base count of the assembly (Ensembl)", label_fr: "nombre de bases de l'assemblage (Ensembl)"}
+  - {pid: "ensembl:golden_path_length", value_kind: quantity, reva_predicate: ensembl_golden_path_length,
+     label_en: "golden path length (Ensembl)", label_fr: "longueur du « golden path » (Ensembl)"}
+  # ------------------------------------------------------------------ NCBI Datasets (source ncbi.datasets)
+  - {pid: "ncbi:assembly_of", value_kind: item, reva_predicate: ncbi_assembly_of, family: context,
+     label_en: "is a reference genome assembly of the organism (NCBI Datasets)",
+     label_fr: "est un assemblage génomique de référence de l'organisme (NCBI Datasets)"}
+  - {pid: "ncbi:paired_assembly", value_kind: item, reva_predicate: ncbi_paired_assembly,
+     label_en: "has the paired INSDC/RefSeq assembly (NCBI)", label_fr: "a pour assemblage apparié INSDC/RefSeq (NCBI)"}
+  - {pid: "ncbi:annotated_gene_count", value_kind: quantity, reva_predicate: ncbi_annotated_gene_count,
+     label_en: "annotated gene count by category (NCBI annotation report)",
+     label_fr: "nombre de gènes annotés par catégorie (rapport d'annotation NCBI)"}
+  - {pid: "ncbi:assembly_name", value_kind: string, reva_predicate: ncbi_assembly_name,
+     label_en: "assembly name (NCBI)", label_fr: "nom de l'assemblage (NCBI)"}
+  - {pid: "ncbi:assembly_level", value_kind: string, reva_predicate: ncbi_assembly_level,
+     label_en: "assembly level (NCBI)", label_fr: "niveau d'assemblage (NCBI)"}
+  - {pid: "ncbi:total_sequence_length", value_kind: quantity, reva_predicate: ncbi_total_sequence_length,
+     label_en: "total sequence length (NCBI assembly statistics)", label_fr: "longueur totale de séquence (statistiques NCBI)"}

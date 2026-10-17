@@ -1,0 +1,41 @@
+[
+  {
+    "request_fingerprint": "ffd7358197217b374c38c0b69928914522603700b08b5c72ea61db1431a951da",
+    "url": "https://unstats.un.org/sdgs/UNSDGAPIV5/v1/sdg/Series/Data?seriesCode=SL_DOM_TSPD&pageSize=10000&page=1&areaCode=8&areaCode=250&areaCode=484",
+    "file": "ffd7358197217b37.json",
+    "sha256": "f90b8fb6f394a4e5129d37d121e0bfdc22b44c070dbb339bf4045ac8ef0f6951",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:37:19.366504+00:00",
+    "licence": "UNdata terms of use (free use with attribution)",
+    "note": "real response (sdg:SL_DOM_TSPD, M49 8,250,484)"
+  },
+  {
+    "request_fingerprint": "54c75150c649879f1e8d01478214e63b5abdc85f6506fd5a9f47fea20c061b9b",
+    "url": "https://unstats.un.org/sdgs/UNSDGAPIV5/v1/sdg/Series/Data?seriesCode=SL_DOM_TSPDCW&pageSize=10000&page=1&areaCode=8&areaCode=250&areaCode=484",
+    "file": "54c75150c649879f.json",
+    "sha256": "e5b4bcc8b755c0c36176631b7297d558e27a362b675d27546a71c20614a0bb33",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:37:20.769131+00:00",
+    "licence": "UNdata terms of use (free use with attribution)",
+    "note": "real response (sdg:SL_DOM_TSPDCW, M49 8,250,484)"
+  },
+  {
+    "request_fingerprint": "693bd8275946964162634f3091f3e309004486ec1cc965e31c77cbb90a2ca0bc",
+    "url": "https://unstats.un.org/sdgs/UNSDGAPIV5/v1/sdg/Series/Data?seriesCode=SL_DOM_TSPDDC&pageSize=10000&page=1&areaCode=8&areaCode=250&areaCode=484",
+    "file": "693bd82759469641.json",
+    "sha256": "d5ce30557ff0ad64c0237be6715ae24c603534891583957891cf98cbdd9fe4f7",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:37:22.204862+00:00",
+    "licence": "UNdata terms of use (free use with attribution)",
+    "note": "real response (sdg:SL_DOM_TSPDDC, M49 8,250,484)"
+  }
+]

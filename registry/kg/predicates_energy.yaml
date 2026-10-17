@@ -1,0 +1,38 @@
+# Dataset predicates of the energy & natural-resources layer (owner: V4ENERGY). Not Wikidata properties: the
+# connectors register them in the KG allow-list (kg.property / kg.property_version) through
+# reva.kg.model.register_properties, like predicates_lang.yaml / predicates_chem.yaml. The Wikidata properties
+# this layer needs are requested in registry/kg/property_requests/v4energy.yaml; relation families of the
+# entity-valued predicates are in registry/kg/relations_v4.d/v4energy.yaml.
+#
+# Entity keys (provider identifiers only, never REVA-made names):
+#   gppd:<gppd_idnr>        a power plant of the WRI Global Power Plant Database (gppd_idnr verbatim, e.g.
+#                           GEODB0040538, USA0003470, WRI1023776).                                  kind facility
+#   gppd:fuel:<code>        a GPPD fuel category (primary_fuel / other_fuel* vocabulary: Coal, Gas, Oil, Hydro,
+#                           Nuclear, Solar, Wind, Biomass, Waste, Geothermal, Storage, Cogeneration, Petcoke,
+#                           Wave and Tidal, Other); code = the category lower-cased, spaces -> "_". The category
+#                           is GPPD's own, not mapped to any Wikidata item (no identifier is published).
+#                                                                                                  kind energy_source
+#   usgs_myb:facility:<n>   a facility row of the USGS Minerals Yearbook vol. III facilities table (when loaded).
+#
+# Honesty:
+# * Every statement is what GPPD v1.3.0 states (CC BY 4.0, WRI); the per-plant upstream source (EIA, Wiki-Solar,
+#   national registries, GEODB, ...) is kept as gppd:data_source on the plant and as a qualifier.
+# * Owners are GPPD's free-text owner names: a string, never an entity (GPPD publishes no owner identifier, and
+#   REVA never matches companies by name).
+# * commissioning_year is GPPD's decimal year ("weighted by unit-capacity when data is available"), kept verbatim
+#   as a quantity, not a date.
+# * GPPD's estimated_generation_gwh_* columns (WRI model output) are NOT loaded as statements (they are modelled
+#   estimates, not reports); the raw CSV keeps them.
+version: 1
+owner: V4ENERGY
+predicates:
+  - {pid: "gppd:country", value_kind: item, reva_predicate: gppd_country, label_en: "country (Global Power Plant Database)", label_fr: "pays (Global Power Plant Database)", inverse_name: gppd_has_plant, inverse_label_en: "has power plant (GPPD)", inverse_label_fr: "a pour centrale (GPPD)"}
+  - {pid: "gppd:primary_fuel", value_kind: item, reva_predicate: gppd_primary_fuel, label_en: "primary fuel (GPPD)", label_fr: "combustible principal (GPPD)", inverse_name: gppd_primary_fuel_of, inverse_label_en: "primary fuel of (GPPD)", inverse_label_fr: "combustible principal de (GPPD)"}
+  - {pid: "gppd:other_fuel", value_kind: item, reva_predicate: gppd_other_fuel, label_en: "other fuel (GPPD)", label_fr: "autre combustible (GPPD)", inverse_name: gppd_other_fuel_of, inverse_label_en: "other fuel of (GPPD)", inverse_label_fr: "autre combustible de (GPPD)"}
+  - {pid: "gppd:capacity_mw", value_kind: quantity, reva_predicate: gppd_capacity_mw, label_en: "electrical generating capacity, MW (GPPD)", label_fr: "puissance électrique installée, MW (GPPD)"}
+  - {pid: "gppd:commissioning_year", value_kind: quantity, reva_predicate: gppd_commissioning_year, label_en: "commissioning year, capacity-weighted decimal year (GPPD)", label_fr: "année de mise en service, moyenne pondérée par la puissance (GPPD)"}
+  - {pid: "gppd:coordinates", value_kind: globe_coordinate, reva_predicate: gppd_coordinates, label_en: "coordinates (GPPD)", label_fr: "coordonnées (GPPD)"}
+  - {pid: "gppd:owner_name", value_kind: string, reva_predicate: gppd_owner_name, label_en: "owner, as named by GPPD (free text)", label_fr: "propriétaire, tel que nommé par GPPD (texte libre)"}
+  - {pid: "gppd:generation_gwh", value_kind: quantity, reva_predicate: gppd_generation_gwh, label_en: "reported annual electricity generation, GWh (GPPD)", label_fr: "production annuelle d'électricité déclarée, GWh (GPPD)"}
+  - {pid: "gppd:wepp_id", value_kind: external_id, reva_predicate: gppd_wepp_id, label_en: "Platts WEPP id cited by GPPD", label_fr: "identifiant Platts WEPP cité par GPPD"}
+  - {pid: "gppd:data_source", value_kind: string, reva_predicate: gppd_data_source, label_en: "upstream data source of the plant record (GPPD)", label_fr: "source amont de la fiche (GPPD)"}

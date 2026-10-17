@@ -1,0 +1,29 @@
+# V4INDUSTRY mappings of the GLEIF predicates (registry/kg/predicates_industry.yaml) to the universal relation
+# families. Wikidata company properties (P127, P749, P355, P1830, P1056, P176, P159, P452, ...) are mapped by V4CORE
+# in relations_v4.yaml; industry/product classification predicates (v4link:*) by V4LINK.
+# Deliberately unmapped: gleif:wikidata_item (identity bridge: Wikidata's P1278 says the item and the LEI record name
+# the same legal entity -- not a relation between two things), the literal predicates (regions, city string,
+# jurisdiction, legal form, statuses, counts).
+version: 1
+agent: V4INDUSTRY
+note: >-
+  GLEIF Level 2 "parents" are accounting-consolidation parents reported by the child entity (IFRS / US GAAP sense):
+  read as owned_by (subtype consolidated_by), without a share -- GLEIF publishes no ownership percentage. Countries
+  come from the record's legal / headquarters address joined by ISO code. GEM ids are GLEIF's own LEI-to-GEM mapping.
+mappings:
+  - {property: "gleif:direct_parent", family: owned_by, subtype: directly_consolidated_by, source: gleif.api,
+     subject_kinds: [legal_entity, fund, branch, sole_proprietor, government_entity, international_organisation],
+     object_kinds: [legal_entity, fund, government_entity, international_organisation],
+     note: "GLEIF IS_DIRECTLY_CONSOLIDATED_BY (accounting consolidation; no share published)"}
+  - {property: "gleif:ultimate_parent", family: owned_by, subtype: ultimately_consolidated_by, source: gleif.api,
+     subject_kinds: [legal_entity, fund, branch, sole_proprietor, government_entity, international_organisation],
+     object_kinds: [legal_entity, fund, government_entity, international_organisation],
+     note: "GLEIF IS_ULTIMATELY_CONSOLIDATED_BY (highest consolidating entity; no share published)"}
+  - {property: "gleif:legal_address_country", family: located_in, subtype: legal_address, source: gleif.api,
+     object_kinds: [country]}
+  - {property: "gleif:headquarters_country", family: located_in, subtype: headquarters, source: gleif.api,
+     object_kinds: [country]}
+  - {property: "gleif:successor", family: context, subtype: successor_entity, source: gleif.api,
+     note: "successor legal entity named in the record (e.g. after a merger); not ownership"}
+  - {property: "gleif:gem_entity", family: context, subtype: gem_entity_id_published_by_gleif, source: gleif.api,
+     note: "GLEIF's LEI-to-GEM mapping: the GEM entity record of the same legal entity (identifier bridge kept traversable for energy ownership chains)"}

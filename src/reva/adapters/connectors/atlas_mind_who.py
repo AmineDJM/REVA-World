@@ -16,10 +16,12 @@ Indicators (GHO codes and names verbatim from the indicator list, read 2026-10-1
   ``MH_12`` (age-standardised suicide rate) is already in A-HEALTHEDU's ``who.gho`` and is not requested here.
 * ``GDO_q35`` Estimated population-based prevalence of depression (one year, 2015, in the API).
 * ``RSUD_1`` / ``RSUD_2`` point prevalence (%) of alcohol / drug use disorders, 15+ years (2004 in the API).
-* ``SDG_SH_STA_SCIDEN`` Number of suicide deaths (the rate is in ``who.gho``).
+
+``SDG_SH_STA_SCIDEN`` (Number of suicide deaths) has no country row in the API (2026-10-17) and is not requested;
+suicide rates are in A-HEALTHEDU's ``who.gho`` (``MH_12``, ``SDGSUICIDE``) and A-UN's ``un_sdg.sdg_headline``.
 
 ``flags.estimate_class``: Mental Health Atlas items are ``country_reported`` (Member State questionnaire answers
-compiled by WHO); the prevalence and suicide-death estimates are WHO estimates (``who_comparable_estimate``; the API
+compiled by WHO); the prevalence estimates are WHO estimates (``who_comparable_estimate``; the API
 does not state the method per row). Classification by V4MIND from the GHO indicator names, recorded per cell.
 
 Prevalence, workforce and suicide figures describe populations, not individuals; they are associations at the
@@ -76,7 +78,6 @@ _SPEC: tuple[tuple[str, str, str, str], ...] = (
     ("GDO_q35", "%", "who_comparable_estimate", "WHO estimate published in the GHO (method not stated per row)"),
     ("RSUD_1", "%", "who_comparable_estimate", "WHO estimate published in the GHO (method not stated per row)"),
     ("RSUD_2", "%", "who_comparable_estimate", "WHO estimate published in the GHO (method not stated per row)"),
-    ("SDG_SH_STA_SCIDEN", "suicide deaths (number)", "who_comparable_estimate", "WHO Global Health Estimates (GHE)"),
 )
 
 
@@ -168,7 +169,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     note = (
         "WHO GHO mental health: Mental Health Atlas country questionnaire items (MH_*; policy/plan/legislation answers "
         "kept as text, workforce/facilities/beds per 100,000), depression prevalence estimate (GDO_q35), alcohol and "
-        "drug use disorder prevalence (RSUD_1/RSUD_2), number of suicide deaths (SDG_SH_STA_SCIDEN); country rows, "
+        "drug use disorder prevalence by sex (RSUD_1/RSUD_2); country rows, "
         "parsed with A-HEALTHEDU's GHO rules. Empty indicators: " + (", ".join(rep["empty_indicators"]) or "none") + "."
         + ("" if live else f" Fixture subset {','.join(FIXTURE_COUNTRIES)}.")
     )

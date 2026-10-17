@@ -1,0 +1,16 @@
+# Budget request from agent V4LINK (classification concordances and identifier bridges, docs/dev/v4_v4link.md).
+# ATLASCORE merge rule: max(current, request) per source, never the sum.
+# The Wikidata bridges (atlas.v4link_wikidata) run under WDHARVEST's existing wikidata.wdqs budget (1500/day):
+# 8 pack queries + 1 country query + up to 9 duplicate checks per run (~40 MB), no increase requested.
+agent: V4LINK
+requests:
+  - source_key: unsd.classifications
+    # unstats.un.org: 10 small files per run (xlsx/txt/csv, ~3.7 MB in total), no account.
+    daily_requests: 30
+    expected_bytes_per_day: 12000000
+    reason: "atlas.unsd_classif: 10 files per run (classification structures + concordances); 30/day = 3 runs incl. retries"
+daily_totals_increase:
+  http_requests_total: "+30"
+  http_bytes_total: "+12_000_000"
+notes: >-
+  unstats.un.org answered every file with 200 on 2026-10-17; the files change rarely (Last-Modified 2008-2022).

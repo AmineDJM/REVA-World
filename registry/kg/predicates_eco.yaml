@@ -1,0 +1,174 @@
+# Dataset predicates of the ecology layer (owner: V4ECO). Not Wikidata properties: they are registered in the KG
+# allow-list (kg.property / kg.property_version) by the V4ECO connectors themselves through
+# reva.kg.model.register_properties (src/reva/adapters/connectors/eco_common.py), like KGLANG's
+# predicates_lang.yaml. WDHARVEST's registry/kg/properties.yaml (Wikidata only) is not touched.
+#
+# Relation families: registry/kg/relations_v4.d/v4eco.yaml (none of them causal).
+#
+# Honesty:
+# * gbif_occ:* statements are derived by REVA from GBIF's own occurrence-index aggregations (GraphQL facets); an
+#   occurrence record documents that an organism was recorded somewhere at some time. Counts reflect sampling
+#   effort and data mobilisation, never abundance or population size.
+# * globi:* statements are what the Global Biotic Interactions index (GloBI) returns: each edge is an interaction
+#   record type between two taxa as published by one or more contributing datasets; the interaction type is
+#   GloBI's (OBO Relation Ontology term), never inferred by REVA. Taxa are identified by the external ids GloBI
+#   returns (COL, NCBI, EOL, GBIF, ...): two ids are never merged by name.
+# * resolve:* statements are the attributes of the RESOLVE Ecoregions 2017 release (Dinerstein et al. 2017,
+#   CC BY 4.0): ecoregion -> biome and ecoregion -> biogeographic realm as coded in the release's attribute table.
+# * A connection through these statements is a connection, not a cause.
+
+version: 1
+owner: V4ECO
+predicates:
+  - pid: "gbif_occ:recorded_in"
+    value_kind: item
+    reva_predicate: gbif_recorded_in
+    label_en: "has occurrence records in (GBIF)"
+    label_fr: "a des observations enregistrées dans (GBIF)"
+    inverse_name: gbif_has_records_of
+    inverse_label_en: "has GBIF occurrence records of"
+    inverse_label_fr: "a des observations GBIF de"
+    derived: true
+    description: >-
+      Taxon -> country: the GBIF occurrence index holds at least MIN_RECORDS_FOR_EDGE (10) occurrence records of the
+      taxon (or its descendants) whose GBIF-interpreted countryCode is that country, counting only records with
+      occurrenceStatus PRESENT and basisOfRecord other than FOSSIL_SPECIMEN and LIVING_SPECIMEN. Qualifier
+      `occurrences` gives the count at the index snapshot date. Records are evidence of presence, not of native
+      range: introduced, vagrant or misidentified organisms are included as GBIF publishes them.
+  - pid: "gbif_occ:measured_by"
+    value_kind: item
+    reva_predicate: gbif_measured_by
+    label_en: "is measured by (atlas series, GBIF occurrence facets)"
+    label_fr: "est mesuré par (série de l'atlas, facettes d'occurrences GBIF)"
+    inverse_name: gbif_measures
+    inverse_label_en: "measures (GBIF occurrence facets)"
+    inverse_label_fr: "mesure (facettes d'occurrences GBIF)"
+    derived: false
+    description: >-
+      Taxon -> atlas dataset entity `atlas:gbif_occ.<dataset>`: the atlas table holds per-country series about the
+      taxon (qualifier `indicators` lists the indicator ids). Values are read from the atlas, never copied here.
+  - pid: "gbif:iucn_red_list_category"
+    value_kind: string
+    reva_predicate: gbif_iucn_red_list_category
+    label_en: "IUCN Red List category (as indexed by GBIF)"
+    label_fr: "catégorie de la Liste rouge de l'UICN (indexée par GBIF)"
+    derived: false
+    description: >-
+      The global IUCN Red List category GBIF attaches to a backbone species (GET /v1/species/{key}/iucnRedListCategory),
+      taken from the checklist dataset "The IUCN Red List of Threatened Species" published on GBIF
+      (19491596-35ae-4a91-9a98-85cf505f1bd3, licence stated there: CC BY 4.0). Value = the two-letter code; qualifiers
+      keep the category name and the IUCN taxon id. A category is an expert assessment of extinction risk, not a
+      population count.
+  - pid: "globi:eats"
+    value_kind: item
+    reva_predicate: globi_eats
+    label_en: "eats (GloBI, RO_0002470)"
+    label_fr: "mange (GloBI, RO_0002470)"
+    inverse_name: globi_eaten_by
+    inverse_label_en: "is eaten by (GloBI)"
+    inverse_label_fr: "est mangé par (GloBI)"
+    derived: false
+    description: GloBI interaction type `eats` (http://purl.obolibrary.org/obo/RO_0002470), source taxon -> food taxon.
+  - pid: "globi:preys_on"
+    value_kind: item
+    reva_predicate: globi_preys_on
+    label_en: "preys on (GloBI, RO_0002439)"
+    label_fr: "chasse (GloBI, RO_0002439)"
+    inverse_name: globi_preyed_upon_by
+    inverse_label_en: "is preyed upon by (GloBI)"
+    inverse_label_fr: "est chassé par (GloBI)"
+    derived: false
+    description: GloBI interaction type `preysOn` (http://purl.obolibrary.org/obo/RO_0002439), predator -> prey.
+  - pid: "globi:parasite_of"
+    value_kind: item
+    reva_predicate: globi_parasite_of
+    label_en: "is a parasite of (GloBI, RO_0002444 and sub-relations)"
+    label_fr: "est un parasite de (GloBI, RO_0002444 et sous-relations)"
+    inverse_name: globi_has_parasite
+    inverse_label_en: "has parasite (GloBI)"
+    inverse_label_fr: "a pour parasite (GloBI)"
+    derived: false
+    description: >-
+      GloBI interaction types `parasiteOf`, `endoparasiteOf`, `ectoparasiteOf`, `parasitoidOf` (parasite -> host);
+      the exact GloBI type is kept in the qualifier `interaction_type`.
+  - pid: "globi:pathogen_of"
+    value_kind: item
+    reva_predicate: globi_pathogen_of
+    label_en: "is a pathogen of (GloBI, RO_0002556)"
+    label_fr: "est un pathogène de (GloBI, RO_0002556)"
+    inverse_name: globi_has_pathogen
+    inverse_label_en: "has pathogen (GloBI)"
+    inverse_label_fr: "a pour pathogène (GloBI)"
+    derived: false
+    description: >-
+      GloBI interaction type `pathogenOf` (pathogen -> host) as recorded by the contributing dataset. A recorded
+      host-pathogen interaction, not a claim that the pathogen causes a given disease outcome.
+  - pid: "globi:pollinates"
+    value_kind: item
+    reva_predicate: globi_pollinates
+    label_en: "pollinates (GloBI, RO_0002455)"
+    label_fr: "pollinise (GloBI, RO_0002455)"
+    inverse_name: globi_pollinated_by
+    inverse_label_en: "is pollinated by (GloBI)"
+    inverse_label_fr: "est pollinisé par (GloBI)"
+    derived: false
+    description: GloBI interaction type `pollinates` (pollinator -> plant).
+  - pid: "globi:visits_flowers_of"
+    value_kind: item
+    reva_predicate: globi_visits_flowers_of
+    label_en: "visits flowers of (GloBI, RO_0002622)"
+    label_fr: "visite les fleurs de (GloBI, RO_0002622)"
+    inverse_name: globi_flowers_visited_by
+    inverse_label_en: "has flowers visited by (GloBI)"
+    inverse_label_fr: "a des fleurs visitées par (GloBI)"
+    derived: false
+    description: GloBI interaction type `visitsFlowersOf` (flower visitor -> plant); a visit is not proof of pollination.
+  - pid: "globi:vector_of"
+    value_kind: item
+    reva_predicate: globi_vector_of
+    label_en: "is a vector of (GloBI, RO_0002459)"
+    label_fr: "est vecteur de (GloBI, RO_0002459)"
+    inverse_name: globi_has_vector
+    inverse_label_en: "has vector (GloBI)"
+    inverse_label_fr: "a pour vecteur (GloBI)"
+    derived: false
+    description: GloBI interaction type `vectorOf` (vector -> pathogen).
+  - pid: "globi:has_host"
+    value_kind: item
+    reva_predicate: globi_has_host
+    label_en: "has host (GloBI, RO_0002454)"
+    label_fr: "a pour hôte (GloBI, RO_0002454)"
+    inverse_name: globi_host_of
+    inverse_label_en: "is host of (GloBI)"
+    inverse_label_fr: "est l'hôte de (GloBI)"
+    derived: false
+    description: GloBI interaction type `hasHost` (symbiont -> host).
+  - pid: "resolve:in_biome"
+    value_kind: item
+    reva_predicate: resolve_in_biome
+    label_en: "belongs to the biome (RESOLVE Ecoregions 2017)"
+    label_fr: "appartient au biome (Écorégions RESOLVE 2017)"
+    inverse_name: resolve_biome_of
+    inverse_label_en: "biome of (RESOLVE Ecoregions 2017)"
+    inverse_label_fr: "biome de (Écorégions RESOLVE 2017)"
+    derived: false
+    description: Ecoregion -> biome, attribute BIOME_NUM / BIOME_NAME of the release's attribute table (Ecoregions2017.dbf).
+  - pid: "resolve:in_realm"
+    value_kind: item
+    reva_predicate: resolve_in_realm
+    label_en: "belongs to the biogeographic realm (RESOLVE Ecoregions 2017)"
+    label_fr: "appartient au domaine biogéographique (Écorégions RESOLVE 2017)"
+    inverse_name: resolve_realm_of
+    inverse_label_en: "biogeographic realm of (RESOLVE Ecoregions 2017)"
+    inverse_label_fr: "domaine biogéographique de (Écorégions RESOLVE 2017)"
+    derived: false
+    description: Ecoregion -> realm, attribute REALM of the release's attribute table (the realm name is its only code).
+  - pid: "resolve:nature_needs_half"
+    value_kind: string
+    reva_predicate: resolve_nature_needs_half
+    label_en: "Nature Needs Half category (RESOLVE Ecoregions 2017)"
+    label_fr: "catégorie « Nature Needs Half » (Écorégions RESOLVE 2017)"
+    derived: false
+    description: >-
+      Attributes NNH (1-4) and NNH_NAME of the release: the authors' protection/habitat category of the ecoregion
+      (Dinerstein et al. 2017), quoted verbatim.
