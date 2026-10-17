@@ -107,6 +107,16 @@ def report() -> dict[str, object]:
             "flags": '{"available_at":"2024-10-01T00:00:00Z","estimate_kind":"actual"}',
         },
     ]
+    vint.append(
+        {
+            "indicator": "Y",
+            "iso3": "DEU",
+            "value": "2",
+            "unit": "%",
+            **_year(2020),
+            "flags": '{"estimate_kind":"forecast"}',
+        }
+    )
     tables = {
         ("wb", "wdi_social", raw_wdi): wdi,
         ("un_wpp", "wpp2024_demo", raw_wpp): wpp,
@@ -142,7 +152,9 @@ def report() -> dict[str, object]:
         art_rows.append({"sha256": sha, "rights": json.dumps({"licence": rights}) if rights else "{}"})
         loc_rows.append({"artifact_sha256": sha, "namespace": "raw", "verified_byte_size": 20})
 
-    def stmt(i: int, s: str, p: str, o: str | None, raw: str | None = raw_kg, valid_lo: D | None = None) -> dict[str, Any]:
+    def stmt(
+        i: int, s: str, p: str, o: str | None, raw: str | None = raw_kg, valid_lo: D | None = None
+    ) -> dict[str, Any]:
         return {
             "id": i,
             "subject_qid": s,
@@ -246,6 +258,7 @@ def test_time(report: dict[str, Any]) -> None:
     assert _check(report, "time.future_observation")["count"] == 2
     assert _check(report, "time.projection_table_unflagged")["count"] == 1
     assert _check(report, "time.forecast_as_observation")["count"] == 1
+    assert _check(report, "time.projection_word_unflagged")["count"] == 1  # estimate_kind "forecast"
     kg = _check(report, "time.kg_future_statement")
     assert kg["count"] == 1 and kg["breakdown"][0]["predicate"] == "P571"
 

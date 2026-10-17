@@ -619,8 +619,8 @@ def causal_checks(
     leaks: list[dict[str, Any]] = []
     for pid, n in sorted(kg_pids.items()):
         m = reg.mappings.get(pid)
-        worded = pid in CAUSAL_PIDS or bool(rx.search(pid.split(":", 1)[-1].replace("_", " ")))
-        if worded:
+        pid_worded = pid in CAUSAL_PIDS or bool(rx.search(pid.split(":", 1)[-1].replace("_", " ")))
+        if pid_worded:
             leaks.append(
                 {
                     "predicate": pid,
