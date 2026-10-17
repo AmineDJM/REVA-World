@@ -17,10 +17,24 @@ withdrew it when V4LINK's broader one landed (my UNSD fixture excerpts remain in
 ## Status
 
 * **Code, fixtures, tests: done and committed** (commits `4e325d2`, catalog commit after it).
-* **Live ingest: not run (disk rule).** Free disk stayed at 4.6-4.7 GB (< 5 GB) from the moment the connectors were
-  ready (other agents' loads and snapshot packs). Connector versions are registered in the dev DB (`reva seed`).
-  Every live size below was measured with the exact live requests during development (probe responses deleted
-  afterwards; nothing was loaded). Commands to finish are at the end.
+* **Live ingest: done for GLEIF, the P1278 bridge and TiVA** (dev DB `reva`, 2026-10-17, after free disk rose to
+  6.6 GB; budgets-1.3.23 / 1.3.25):
+
+  | run | requests / bytes | loaded |
+  |---|---|---|
+  | `atlas.gleif_wikidata` 1.0.1 | 1 WDQS / 33.7 MB | 53,463 `gleif:wikidata_item` statements (53,523 rows; 60 invalid LEI values skipped; 53,267 LEIs, 53,118 items; 194 LEIs on several items, 325 items with several LEIs -- kept as stated) |
+  | `atlas.gleif` 1.0.1 (all 4 datasets, one run) | 2,214 / 22.4 MB | atlas `gleif.lei_counts` 1,190 rows (250 countries; XK unmapped), `gleif.legal_form_counts` 568 rows (20 countries); KG 3,398 `lei:` entities (2,486 legal_entity, 891 government_entity -- municipalities and public bodies Wikidata gives an LEI --, 11 international_organisation, 9 fund, 1 sole_proprietor), 43,237 `gleif:*` statements: 221 direct / 234 ultimate parents, 5,315 reporting exceptions (NO_KNOWN_PERSON 1,634 direct, NON_CONSOLIDATING 675, NATURAL_PERSONS 212, NON_PUBLIC 73, NO_LEI 69), 290 GEM ids, 1,102 OpenCorporates ids, 30 successors; 200 largest groups with child counts; seeds 3,276 (3,181 from P1278 >= 20 sitelinks + 95 groups), 0 missing from the index, 122 parents fetched |
+  | `atlas.oecd_tiva` 1.0.1 | 12 / 42.3 MB | `oecd.tiva_principal` 181,454 rows, `oecd.tiva_fdva` 330,000 rows (2010-2022; aggregates W, OECD, EU27_2020, ASEAN, G20 ... unmapped as intended) |
+
+  Known blemish of the 1.0.1 GLEIF run: the 200 `gleif:legal_form` statements of the group records were first
+  loaded without ELF names (groups dataset) and the entities dataset's richer version was reported `conflicting`
+  (same Golden Copy revision) and not stored. Fixed in 1.0.2 (groups fetch the ELF list too); it takes effect on
+  the next Golden Copy run.
+* **Wikidata company / factory specs: not loaded.** `reva.kg.harvest run --db reva_kg_v4industry` selected the
+  seeds (3,104 companies, 3,567 factories via WDQS) but `wbgetentities` stayed throttled (HTTP 429 "You are making
+  too many requests", 13 attempts per spec, the shared-egress throttle known since V3); nothing was loaded and the
+  throwaway DB was dropped. Re-run on a quiet day (command below). P1278 / P5531 / P2139 / P2403 / P2295 / P2226 are
+  now allow-listed (property requests merged).
 * Tests: `tests/unit/test_v4industry.py` (16 passed), `tests/integration/test_v4industry_ingest.py` (3 passed:
   fixture ingest of every dataset into a throwaway DB, idempotent re-run, the Toyota LEI -> Wikidata / GEM bridge);
   ruff, ruff format, mypy clean on all V4INDUSTRY modules; `tests/unit/test_kg_families.py` and
@@ -109,13 +123,19 @@ produces / produced_by / owns / located_in mappings of the Wikidata company and 
   en Toyota Motor Corporation) -> gleif:wikidata_item -> Q53268 (Wikidata P1278) and -> gleif:gem_entity ->
   `gem:E100001016208` (GLEIF's mapping), legal form T417 株式会社, legal address Q17 (Japan). With V4ENERGY's GEM
   ownership data on `gem:` keys, Q53268 -> LEI -> GEM entity -> plants is a chain of published identifiers only.
-* **Supply chain (atlas)**: `oecd.tiva_fdva` `FDVA|fd_area=FRA|va_activity=C` at geography CHN, 2022 = value added of
-  Chinese manufacturing embodied in French final demand (ICIO estimate), `flags.isic4_section = C` -> V4LINK's
-  `isic4:C` -> CPC products (`v4link:corresponds_to`) -> HS codes -> BACI trade flows.
+* **Supply chain (atlas, live)**: `oecd.tiva_fdva` `FDVA|fd_area=FRA|va_activity=C`, 2022: value added of
+  manufacturing embodied in French final demand = 36,242.3 million USD from Germany, 28,579.2 from China, 14,642.8
+  from the USA (ICIO estimates), `flags.isic4_section = C` -> V4LINK's `isic4:C` -> CPC products
+  (`v4link:corresponds_to`) -> HS codes -> BACI trade flows.
+* **Live KG chains**: Google LLC `lei:` -> gleif:ultimate_parent -> Alphabet Inc. `lei:5493006MHB84DD0ZWV18`
+  (Wikidata Q95 via P1278); Juventus F.C. S.p.A. (Q1422) -> gleif:ultimate_parent -> EXOR N.V.
+  `lei:5493002ENHZ6NYET7405`; Microsoft (Q2283) -> gleif:gem_entity -> `gem:E100001000937`; City of Los Angeles
+  (Q65) -> `gem:E100001000317` (municipal utilities appear in GEM ownership data).
 
 ## What is missing and why
 
-* **Live loads** (all of the above): disk below 5 GB during the whole window (rule). Commands below.
+* **Wikidata company and factory snapshots** (wbapi throttled, see Status): the companies' industry, products,
+  employees, revenue and the factory layer wait for the harvest re-run.
 * **GLEIF relationship details** (relationship periods, accounting standard, validation documents of each Level 2
   record) need one request per child (`/direct-parent-relationship`); the batch `include` gives only the parent
   LEI. Not fetched; statements carry `as_of_golden_copy` instead of a start date (no date is invented).
@@ -145,20 +165,19 @@ produces / produced_by / owns / located_in mappings of the Wikidata company and 
    GENERAL category includes associations, public bodies and trusts. V4CORE may alias `legal_entity` in the
    generic entity page.
 
-## Commands to finish (when `df -h /` shows >= 5 GB free)
+## Commands to finish / refresh (when `df -h /` shows >= 5 GB free)
 
 ```bash
 cd /home/user/REVA-World
-flock /tmp/reva-devdb.lock uv run reva seed                                   # already done once; repeat after code changes
-# 1. Wikidata P1278 bridge (1 WDQS query, ~34 MB, archived gzip) -- needed before the GLEIF seeds
+flock /tmp/reva-devdb.lock uv run reva seed                                   # registers atlas.gleif 1.0.2
+# 1-3 were run live on 2026-10-17 (see Status); refresh monthly:
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.gleif_wikidata
-# 2. GLEIF, all datasets in ONE run (planned 2,600 requests of the 3,000/day budget; ~45 min at 1.1 s)
+# GLEIF, all datasets in ONE run (planned 2,600 requests of the 3,000/day budget; ~40 min at 1.1 s)
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.gleif
 #    (bigger budget day: --option legal_form_countries=US,CA,FR,RU --dataset legal_form_counts)
-# 3. OECD TiVA (12 requests, ~50 MB)
+# OECD TiVA (12 requests, 42 MB)
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.oecd_tiva
-# 4. Wikidata companies + factories (throwaway harvest DB, then governed import into reva)
-uv run python -m reva.kg.harvest merge-property-requests                     # P1278, P5531, P2139, P2403, P2295, P2226
+# 4. Wikidata companies + factories (throwaway harvest DB, then governed import into reva) -- NOT YET RUN (wbapi 429)
 uv run python -m reva.kg.harvest run --db reva_kg_v4industry \
     registry/kg/queries/industry/v4_companies_lei.yaml registry/kg/queries/industry/v4_factories.yaml
 flock /tmp/reva-devdb.lock uv run python -m reva.kg.import_harvest --from-db reva_kg_v4industry
