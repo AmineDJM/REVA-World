@@ -206,7 +206,7 @@ def build_batch(
             )
             continue
         frame = frames[pin["artifact_sha256"]]
-        series, n = extract_series(frame, fam)
+        series, n = extract_series(frame, fam, pin.get("recorded_at"))  # FIX5: periods after the record date
         notes.extend(n)
         extra_pins: dict[str, dict[str, Any]] = {}
         if fam.value_rule == "meeting_change":
@@ -679,8 +679,10 @@ def resolve_due(
         for fk in fams:
             fam = _family_of(manifest["families"][fk])
             pin = manifest["data"]["tables"][fam.dataset_key]
-            issue_series[fk] = extract_series(cache.get(pin["artifact_sha256"]), fam)[0]
-            later[fk] = [(v, extract_series(cache.get(v["artifact_sha256"]), fam)[0]) for v in versions[fk]]
+            issue_series[fk] = extract_series(cache.get(pin["artifact_sha256"]), fam, pin.get("recorded_at"))[0]
+            later[fk] = [
+                (v, extract_series(cache.get(v["artifact_sha256"]), fam, v.get("recorded_at"))[0]) for v in versions[fk]
+            ]
         res = resolve_batch(manifest, handled, issue_series, later, today=now.date())
         if not res["outcomes"]:
             out.append({"batch_sha256": b["sha"], "status": "awaiting_outcomes", "due": len(due)})
@@ -867,7 +869,7 @@ def run_backtest(
         pin = pins.get(fam.dataset_key)
         if pin is None:
             continue
-        series, _ = extract_series(cache.get(pin["artifact_sha256"]), fam)
+        series, _ = extract_series(cache.get(pin["artifact_sha256"]), fam, pin.get("recorded_at"))
         fam_results.append(backtest_family(fam, series, years=years, level=specs.interval_level))
         used[fam.dataset_key] = _short_pin(pin)
     if not fam_results:
