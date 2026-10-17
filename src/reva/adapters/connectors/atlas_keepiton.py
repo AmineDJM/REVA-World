@@ -86,19 +86,65 @@ METHOD_URL = "https://www.accessnow.org/guide/shutdown-tracker-optimization-proj
 MEDIA_URL = "https://www.accessnow.org/trademarks-copyright-and-media-usage/"
 HOSTS = ("docs.google.com", "www.accessnow.org")
 HEADER = (
-    "start_date_type", "start_date", "country", "geo_scope", "area_name", "shutdown_type", "affected_network",
-    "shutdown_extent", "ordered_by", "decision_maker", "actual_cause", "actual_cause_details", "info_source",
-    "info_source_link", "shutdown_status", "end_date", "duration", "gov_justification", "gov_just_details", "gov_ack",
-    "legal_just", "legal_method", "gov_ack_source", "gov_ack_quote", "facebook_affected", "twitter_affected",
-    "whatsapp_affected", "instagram_affected", "telegram_affected", "other_affected", "sms_affected",
-    "phonecall_affected", "telcos_involved", "telco_ack", "telco_ack_source", "telco_ack_quote", "election",
-    "violence", "hr_abuse_reported", "users_targeted", "users_target_detail", "users_notified", "econ_impact",
-    "event", "an_link", "region", "count_year",
-)  # fmt: skip
+    "start_date_type",
+    "start_date",
+    "country",
+    "geo_scope",
+    "area_name",
+    "shutdown_type",
+    "affected_network",
+    "shutdown_extent",
+    "ordered_by",
+    "decision_maker",
+    "actual_cause",
+    "actual_cause_details",
+    "info_source",
+    "info_source_link",
+    "shutdown_status",
+    "end_date",
+    "duration",
+    "gov_justification",
+    "gov_just_details",
+    "gov_ack",
+    "legal_just",
+    "legal_method",
+    "gov_ack_source",
+    "gov_ack_quote",
+    "facebook_affected",
+    "twitter_affected",
+    "whatsapp_affected",
+    "instagram_affected",
+    "telegram_affected",
+    "other_affected",
+    "sms_affected",
+    "phonecall_affected",
+    "telcos_involved",
+    "telco_ack",
+    "telco_ack_source",
+    "telco_ack_quote",
+    "election",
+    "violence",
+    "hr_abuse_reported",
+    "users_targeted",
+    "users_target_detail",
+    "users_notified",
+    "econ_impact",
+    "event",
+    "an_link",
+    "region",
+    "count_year",
+)
 KEY_COLUMNS = (
-    "start_date", "country", "area_name", "shutdown_type", "affected_network", "shutdown_extent", "ordered_by",
-    "actual_cause", "end_date",
-)  # fmt: skip
+    "start_date",
+    "country",
+    "area_name",
+    "shutdown_type",
+    "affected_network",
+    "shutdown_extent",
+    "ordered_by",
+    "actual_cause",
+    "end_date",
+)
 BREAKDOWNS = ("shutdown_type", "affected_network", "shutdown_extent", "ordered_by", "actual_cause")
 SPECIFIC = {
     "shutdown_type": "keepiton:shutdown_type",
@@ -120,15 +166,39 @@ SERVICES = {
     "phonecall_affected": "Phone calls",
 }
 GENERIC = (
-    "start_date_type", "geo_scope", "area_name", "decision_maker", "actual_cause_details", "info_source",
-    "gov_just_details", "gov_ack", "legal_just", "legal_method", "gov_ack_quote", "other_affected", "telcos_involved",
-    "telco_ack", "telco_ack_quote", "election", "violence", "hr_abuse_reported", "users_targeted",
-    "users_target_detail", "users_notified", "event", "region",
-)  # fmt: skip
+    "start_date_type",
+    "geo_scope",
+    "area_name",
+    "decision_maker",
+    "actual_cause_details",
+    "info_source",
+    "gov_just_details",
+    "gov_ack",
+    "legal_just",
+    "legal_method",
+    "gov_ack_quote",
+    "other_affected",
+    "telcos_involved",
+    "telco_ack",
+    "telco_ack_quote",
+    "election",
+    "violence",
+    "hr_abuse_reported",
+    "users_targeted",
+    "users_target_detail",
+    "users_notified",
+    "event",
+    "region",
+)
 URL_COLUMNS = ("info_source_link", "an_link", "gov_ack_source", "telco_ack_source")
 NOT_LOADED = {"econ_impact": "mixed text/number column: the visualization endpoint drops its text cells"}
-KG_PIDS = (*SPECIFIC.values(), "keepiton:duration_days", "keepiton:coded_field", "keepiton:service_affected",
-           "keepiton:source_url")  # fmt: skip
+KG_PIDS = (
+    *SPECIFIC.values(),
+    "keepiton:duration_days",
+    "keepiton:coded_field",
+    "keepiton:service_affected",
+    "keepiton:source_url",
+)
 WIKIDATA_PIDS = ("P17", "P580", "P582")
 LICENCE = (
     "No dataset licence stated (Access Now STOP public Google Sheet); Access Now media-usage CC BY 4.0 covers "
@@ -319,8 +389,11 @@ def atlas_frames(insts: list[Instance], sha: str, typed: dict[str, str], defs: d
         start, end = mdy(v["start_date"]), mdy(v["end_date"])
         if start is None:
             continue
-        p1, basis = (end + timedelta(days=1), "start_date .. end_date") if end and end >= start else (
-            start + timedelta(days=1), "start day (no usable end_date)")  # fmt: skip
+        p1, basis = (
+            (end + timedelta(days=1), "start_date .. end_date")
+            if end and end >= start
+            else (start + timedelta(days=1), "start day (no usable end_date)")
+        )
         for ctry in inst.countries:
             inst_rows.add(
                 source=SOURCE,
@@ -380,31 +453,49 @@ def kg_records(
             KgEntity(
                 qid=inst.node,
                 kind="internet_shutdown",
-                labels={"en": f"Internet shutdown in {v['country']} ({v['area_name'][:80] or 'area not stated'}), "
-                        f"from {when} (Access Now STOP)"},  # fmt: skip
+                labels={
+                    "en": f"Internet shutdown in {v['country']} ({v['area_name'][:80] or 'area not stated'}), "
+                    f"from {when} (Access Now STOP)"
+                },
                 descriptions={"en": (v["event"] or v["actual_cause_details"] or "STOP shutdown instance")[:250]},
             )
         )
         sel = {"tab": TAB, "rows": inst.rows}
 
         def add(key: str, prop: str, *, _i: Instance = inst, _sel: dict[str, Any] = sel, **kw: Any) -> None:
-            sts.append(KgStatement(key=f"{_i.key}:{key}", subject=_i.node, property=prop, raw_sha256=sha,
-                                   selector=_sel, **kw))  # fmt: skip
+            sts.append(
+                KgStatement(key=f"{_i.key}:{key}", subject=_i.node, property=prop, raw_sha256=sha, selector=_sel, **kw)
+            )
 
         for ctry in inst.countries:
             iso = country_iso3(ctry, GEO_SCHEME)
             if iso is None:
                 stats["country_unmapped"] += 1
-                add(f"country_text:{dc.slug(ctry)}", "keepiton:coded_field", value=_s(ctry),
-                    qualifiers={"column": "country", "definition": defs.get("country", "")[:500],
-                                "note": "not a crosswalk country: no P17 edge"})  # fmt: skip
+                add(
+                    f"country_text:{dc.slug(ctry)}",
+                    "keepiton:coded_field",
+                    value=_s(ctry),
+                    qualifiers={
+                        "column": "country",
+                        "definition": defs.get("country", "")[:500],
+                        "note": "not a crosswalk country: no P17 edge",
+                    },
+                )
                 continue
             stats["country_qid" if iso in qids else "country_iso3_node"] += 1
-            add(f"P17:{iso}", "P17", object_qid=qids.get(iso) or f"iso3:{iso}",
-                qualifiers={"country_as_stated": v["country"], "iso3": iso})
+            add(
+                f"P17:{iso}",
+                "P17",
+                object_qid=qids.get(iso) or f"iso3:{iso}",
+                qualifiers={"country_as_stated": v["country"], "iso3": iso},
+            )
         if start:
-            add("start", "P580", value=_t(start), qualifiers={"column": "start_date",
-                                                                "start_date_type": v["start_date_type"] or None})
+            add(
+                "start",
+                "P580",
+                value=_t(start),
+                qualifiers={"column": "start_date", "start_date_type": v["start_date_type"] or None},
+            )
         if end:
             add("end", "P582", value=_t(end), qualifiers={"column": "end_date"})
         elif "end_date" in blank_typed:
@@ -413,22 +504,33 @@ def kg_records(
             if v[col]:
                 add(col, prop, value=_s(v[col]), qualifiers={"definition": defs.get(col, "")[:500]})
         if _NUM.match(v["duration"]):
-            add("duration", "keepiton:duration_days", value={"type": "quantity", "amount": v["duration"], "unit": "day"},
-                qualifiers={"definition": defs.get("duration", "")[:500]})  # fmt: skip
+            add(
+                "duration",
+                "keepiton:duration_days",
+                value={"type": "quantity", "amount": v["duration"], "unit": "day"},
+                qualifiers={"definition": defs.get("duration", "")[:500]},
+            )
         for col in GENERIC:
             if v[col]:
                 q2: dict[str, Any] = {"column": col, "definition": defs.get(col, "")[:500] or "not described"}
                 if len(v[col]) > 4000:
                     q2["truncated"] = True
                 add(f"f:{col}", "keepiton:coded_field", value=_s(v[col]), qualifiers=q2)
-        add("count_years", "keepiton:coded_field", value=_s(", ".join(inst.count_years)),
-            qualifiers={"column": "count_year", "definition": "calendar years in which STOP counts the instance"})
+        add(
+            "count_years",
+            "keepiton:coded_field",
+            value=_s(", ".join(inst.count_years)),
+            qualifiers={"column": "count_year", "definition": "calendar years in which STOP counts the instance"},
+        )
         for col in SERVICES:
             if v[col] == "Yes":
                 stats["service_links"] += 1
-                add(f"svc:{col}", "keepiton:service_affected",
+                add(
+                    f"svc:{col}",
+                    "keepiton:service_affected",
                     object_qid=f"keepiton:service:{col.removesuffix('_affected')}",
-                    qualifiers={"column": col, "definition": defs.get(col, "")[:500]})  # fmt: skip
+                    qualifiers={"column": col, "definition": defs.get(col, "")[:500]},
+                )
         for col in URL_COLUMNS:
             for j, url in enumerate(u.strip() for u in v[col].split(";") if u.strip()):
                 add(f"url:{col}:{j}", "keepiton:source_url", value=_s(url), qualifiers={"column": col})
@@ -491,8 +593,12 @@ async def atlas_ingest(run: Any, *, load_kg: bool = True) -> dict[str, Any]:
         return {"tables": {}}
     meth = await run.get(METHOD_URL, key="page:methodology", media_types=("text/html",), max_bytes=5_000_000)
     media = await run.get(MEDIA_URL, key="page:media_usage", media_types=("text/html",), max_bytes=5_000_000)
-    head = await run.get(HEADER_URL, key="gviz:header", media_types=("application/javascript", "application/json",
-                         "text/javascript"), max_bytes=1_000_000)  # fmt: skip
+    head = await run.get(
+        HEADER_URL,
+        key="gviz:header",
+        media_types=("application/javascript", "application/json", "text/javascript"),
+        max_bytes=1_000_000,
+    )
     data = await run.get(CSV_URL, key="gviz:csv", media_types=("text/csv",), max_bytes=20_000_000)
     shas = {k: run.archive(r) for k, r in (("method", meth), ("media", media), ("header", head), ("csv", data))}
     facts = page_facts(meth.body, media.body)
@@ -509,10 +615,19 @@ async def atlas_ingest(run: Any, *, load_kg: bool = True) -> dict[str, Any]:
         f"({stats['rows']} rows, {stats['instances']} instances; {facts.get('coverage', '')[:120]}). Columns typed "
         f"by the endpoint {typed_cols}: their text cells are served empty (typed Missing, never zero). "
     )
-    out: dict[str, Any] = {"tables": {}, "sheet": stats, "typed_columns": typed_cols, "pages": {
-        "methodology": {"sha256": shas["method"], "updated": facts["updated"], "columns_described":
-                        sum(bool(x) for x in defs.values())},
-        "media_usage": {"sha256": shas["media"], "statement": facts.get("media_licence")}}}  # fmt: skip
+    out: dict[str, Any] = {
+        "tables": {},
+        "sheet": stats,
+        "typed_columns": typed_cols,
+        "pages": {
+            "methodology": {
+                "sha256": shas["method"],
+                "updated": facts["updated"],
+                "columns_described": sum(bool(x) for x in defs.values()),
+            },
+            "media_usage": {"sha256": shas["media"], "statement": facts.get("media_licence")},
+        },
+    }
     notes = {
         "shutdowns_cy": "Exact counts of STOP rows per country x count_year (STOP counts an ongoing shutdown in "
         "every year it is active); breakdowns by shutdown_type, affected_network, shutdown_extent, ordered_by, "

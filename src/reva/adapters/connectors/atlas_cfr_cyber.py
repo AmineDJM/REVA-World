@@ -63,8 +63,20 @@ PAGE_URL = "https://www.cfr.org/cyber-operations/"
 CSV_URL = "https://static.cfr.org/cyber-operations/data/cyber-operations-incidents.csv"
 TERMS_URL = "https://www.cfr.org/terms-use"
 HOSTS = ("www.cfr.org", "static.cfr.org")
-HEADER = ("Title", "Date", "Affiliations", "Description", "Response", "Victims", "Sponsor", "Type", "Category",
-          "Sources_1", "Sources_2", "Sources_3")  # fmt: skip
+HEADER = (
+    "Title",
+    "Date",
+    "Affiliations",
+    "Description",
+    "Response",
+    "Victims",
+    "Sponsor",
+    "Type",
+    "Category",
+    "Sources_1",
+    "Sources_2",
+    "Sources_3",
+)
 #: CSV ``Type`` value -> the tracker glossary term that defines it
 GLOSSARY_TERMS = {
     "Denial of service": "Distributed Denial of Service",
@@ -76,17 +88,29 @@ GLOSSARY_TERMS = {
     "Financial Theft": "Financial Theft",
 }
 _GLOSSARY_ORDER = (
-    "Distributed Denial of Service", "Espionage", "Defacement", "Data Destruction", "Sabotage", "Doxing",
-    "Financial Theft", "These terms were adapted",
-)  # fmt: skip
+    "Distributed Denial of Service",
+    "Espionage",
+    "Defacement",
+    "Data Destruction",
+    "Sabotage",
+    "Doxing",
+    "Financial Theft",
+    "These terms were adapted",
+)
 ATTRIBUTION_QUOTE = (
     "This data set identifies suspected threat actors and their state sponsors based on what the reporting suggests"
 )
 KG_PIDS = (
-    "cfr_cyber:suspected_state_sponsor", "cfr_cyber:operation_type", "cfr_cyber:victim_category",
-    "cfr_cyber:victims", "cfr_cyber:threat_actor_as_stated", "cfr_cyber:sponsor_as_stated", "cfr_cyber:description",
-    "cfr_cyber:government_response", "cfr_cyber:source_url",
-)  # fmt: skip
+    "cfr_cyber:suspected_state_sponsor",
+    "cfr_cyber:operation_type",
+    "cfr_cyber:victim_category",
+    "cfr_cyber:victims",
+    "cfr_cyber:threat_actor_as_stated",
+    "cfr_cyber:sponsor_as_stated",
+    "cfr_cyber:description",
+    "cfr_cyber:government_response",
+    "cfr_cyber:source_url",
+)
 WIKIDATA_PIDS = ("P585",)
 LICENCE = (
     "CFR Terms of Use: all rights reserved; no reproduction or distribution for any public or commercial purpose "
@@ -124,7 +148,9 @@ def page_facts(page_html: bytes, terms_html: bytes | None = None) -> dict[str, A
         "scope": dc.quote_between(t, "The Digital and Cyberspace Policy program", (" Know of an incident",)),
         "attribution": dc.quote_between(t, ATTRIBUTION_QUOTE, (" Completeness of Data",)),
         "completeness": dc.quote_between(t, "No claims are made that the data", (" There are three reasons",)),
-        "inclusion": dc.quote_between(t, "The tracker only contains data in which the perpetrator", (" The tracker focuses",)),
+        "inclusion": dc.quote_between(
+            t, "The tracker only contains data in which the perpetrator", (" The tracker focuses",)
+        ),
         "rights_footer": "All rights reserved." if "All rights reserved" in t else "",
         "glossary": glossary,
     }
@@ -249,20 +275,27 @@ def kg_records(
                 qid=o.node,
                 kind="cyber_operation",
                 labels={"en": f"{v['Title'][:200]} ({o.when.isoformat() if o.when else 'undated'}, CFR tracker)"},
-                descriptions={"en": "State-sponsored cyber incident as recorded by the CFR Cyber Operations Tracker; "
-                              f"suspected sponsor per CFR: {v['Sponsor'] or 'not stated'}"},  # fmt: skip
+                descriptions={
+                    "en": "State-sponsored cyber incident as recorded by the CFR Cyber Operations Tracker; "
+                    f"suspected sponsor per CFR: {v['Sponsor'] or 'not stated'}"
+                },
             )
         )
         sel = {"file": CSV_URL.rsplit("/", 1)[-1], "row": o.row}
 
         def add(key: str, prop: str, *, _o: Operation = o, _sel: dict[str, Any] = sel, **kw: Any) -> None:
-            sts.append(KgStatement(key=f"{_o.key}:{key}", subject=_o.node, property=prop, raw_sha256=sha,
-                                   selector=_sel, **kw))  # fmt: skip
+            sts.append(
+                KgStatement(key=f"{_o.key}:{key}", subject=_o.node, property=prop, raw_sha256=sha, selector=_sel, **kw)
+            )
 
         if o.when:
-            add("date", "P585", value={"type": "time", "time": o.when.isoformat(), "precision": 11},
-                qualifiers={"column": "Date"})  # fmt: skip
-        tkw = {"start": o.when.isoformat(), "start_precision": 11} if o.when else {}
+            add(
+                "date",
+                "P585",
+                value={"type": "time", "time": o.when.isoformat(), "precision": 11},
+                qualifiers={"column": "Date"},
+            )
+        tkw: dict[str, Any] = {"start": o.when.isoformat(), "start_precision": 11} if o.when else {}
         for s in o.sponsors:
             iso = country_iso3(s, GEO_SCHEME)
             if iso is None:
@@ -273,8 +306,12 @@ def kg_records(
                 f"sponsor:{iso}",
                 "cfr_cyber:suspected_state_sponsor",
                 object_qid=qids.get(iso) or f"iso3:{iso}",
-                qualifiers={"sponsor_as_stated": s, "iso3": iso, "attribution": attribution[:500],
-                            "claim": "suspected state sponsor as attributed by CFR"},  # fmt: skip
+                qualifiers={
+                    "sponsor_as_stated": s,
+                    "iso3": iso,
+                    "attribution": attribution[:500],
+                    "claim": "suspected state sponsor as attributed by CFR",
+                },
                 **tkw,
             )
         for col, prop in (
@@ -354,8 +391,9 @@ async def atlas_ingest(run: Any, *, load_kg: bool = True) -> dict[str, Any]:
         return {"tables": {}}
     page = await run.get(PAGE_URL, key="page:tracker", media_types=("text/html",), max_bytes=10_000_000)
     terms = await run.get(TERMS_URL, key="page:terms", media_types=("text/html",), max_bytes=5_000_000)
-    data = await run.get(CSV_URL, key="csv:incidents", media_types=("text/csv", "application/octet-stream"),
-                         max_bytes=10_000_000)  # fmt: skip
+    data = await run.get(
+        CSV_URL, key="csv:incidents", media_types=("text/csv", "application/octet-stream"), max_bytes=10_000_000
+    )
     shas = {k: run.archive(r) for k, r in (("page", page), ("terms", terms), ("csv", data))}
     facts = page_facts(page.body, terms.body)
     ops, stats = parse_csv(data.body, dc.scheme_names(GEO_SCHEME))
@@ -377,8 +415,11 @@ async def atlas_ingest(run: Any, *, load_kg: bool = True) -> dict[str, Any]:
     out: dict[str, Any] = {
         "tables": {DATASET: {"dataset_key": reg["dataset_key"], "rows": reg["row_count"], "created": reg["created"]}},
         "csv": stats,
-        "pages": {"tracker": shas["page"], "terms": shas["terms"],
-                  "facts": {k: v for k, v in facts.items() if k != "glossary"}},  # fmt: skip
+        "pages": {
+            "tracker": shas["page"],
+            "terms": shas["terms"],
+            "facts": {k: v for k, v in facts.items() if k != "glossary"},
+        },
     }
     if load_kg:
         ents, sts, kstats = kg_records(ops, shas["csv"], load_qid_for_iso3(), facts)
