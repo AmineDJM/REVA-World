@@ -249,3 +249,30 @@ def test_weo_cases_ignore_vintages_published_after_the_origin() -> None:
     # the outcome of 2010 (first vintage on/after 1 Oct 2011) does not exist in either set: no score possible
     assert all(c.outcome is None for c in a)
     assert a[0].preds[R.WEO].point == 1.1  # type: ignore[union-attr]
+
+
+# ----------------------------------------------------------------------------- registry issuance of winners
+def test_registered_weo_forecasters_issue_calibrated_densities() -> None:
+    from reva.evaluation.pred_models import issue as I
+
+    hist = [(y, 2.0 + 0.5 * math.sin(y)) for y in range(1990, 2026)]
+    errs = list(np.random.default_rng(10).standard_normal(300))
+    p = I.forecast_weo_registered("forecast.weo_conformal", hist, 3.0, errs)
+    assert isinstance(p, Predictive) and p.point == 3.0 and len(p.sample) == 200
+    b = I.forecast_weo_registered("forecast.weo_bias_corrected", hist, 3.0, [e + 1.0 for e in errs])
+    assert isinstance(b, Predictive) and b.point > 3.0
+    assert isinstance(I.forecast_weo_registered("forecast.weo_conformal", hist, None, errs), Abstain)
+    assert isinstance(I.forecast_weo_registered("forecast.weo_conformal", hist, 3.0, errs[:5]), Abstain)
+
+
+def test_only_holdout_confirmed_scopes_with_a_family_issue() -> None:
+    from reva.evaluation.pred_models import issue as I
+
+    scopes = I.issuing_scopes()
+    for mk, fams in scopes.items():
+        assert mk in I.ISSUERS and all(f in I.FAMILY_OF.values() for f in fams)
+    reg = {(r["candidate"], r["task"], r["variable"], r["horizon"]) for r in I.registered()}
+    for mk, fams in scopes.items():
+        for fam in fams:
+            key = next(k for k, v in I.FAMILY_OF.items() if v == fam)
+            assert (mk, *key) in reg
