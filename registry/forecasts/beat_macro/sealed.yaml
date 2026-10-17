@@ -1,4 +1,6 @@
-# BEAT-MACRO prospective issuance (append-only). Only holdout-confirmed scopes issue.
+# BEAT-MACRO prospective issuance (append-only). Only holdout-confirmed scopes issue. Monthly from 2026-11
+# (weekly forecast_registry:issue job -> beat_macro.seal.issue_monthly, one batch per month, idempotent).
+# Display: point only; intervals sealed but labelled "intervalle non calibré (couverture holdout 56 %) — non affiché".
 schema: reva-beat-macro-sealed/1
 batches:
   - scope: g7rt|unemployment_rate|cy|forecast.bm_stack|benchmark.imf_weo|ae
@@ -14,3 +16,18 @@ batches:
     inputs: IMF WEO 2026-10 (in force; attributed input), OECD MEI edition 202608, past errors of the November bucket
     uses_official_forecast: true
     resolution: first WEO vintage publishing 2026 as an actual (registry rule; normally April 2027)
+    status: superseded for evaluation by the 2026-11 monthly batch below (decided 2026-10-17, before any outcome;
+      identical points; pre-hook record without month key or interval label). Kept sealed, never voided.
+  - scope: g7rt|unemployment_rate|cy|forecast.bm_stack|benchmark.imf_weo|ae
+    beat_macro_month: 2026-11
+    registry_family: weo.unemployment
+    cycle: 2026-Q4
+    target: '2026'
+    model: forecast.bm_stack@1.0.0
+    batch_sha256: df82d49e2aaa2ec98bbcc20067746cc4b784c25c4bf9f5de301bbdc60c1a1061
+    supplement_of: 96c6ad48167100d5f5ee8d8195cb1a785d206f493cd9fa12f1937c54a0f001c5
+    issued_at_utc: '2026-10-17T22:40'
+    information_cutoff: issue time (early issuance for November; no outcome published before 2026-11-01)
+    questions: 7
+    display: point_only
+    note: free disk was 4.72 GB at sealing (below the 5 GB condition); the write is one small JSON artifact

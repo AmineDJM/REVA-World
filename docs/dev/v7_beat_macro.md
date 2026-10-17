@@ -21,7 +21,7 @@ under-covered (80 % interval covered 62 %); the G7 CPI combination (×0.97), the
 forecast) passed any test**; for GDP (G7, real-time) the pure nowcast is ×1.86 worse than the WEO and the
 combination is equal to it (×0.99); against the ECB SPF nothing reached development significance. The confirmed
 combination was sealed prospectively in the registry for the 7 G7 questions `weo.unemployment` 2026
-(batch `43d9d1bf…`). The attributed oil pass-through made every CPI nowcast worse.
+(monthly batches from 2026-11, first `df82d49e…`; point only). The attributed oil pass-through made every CPI nowcast worse.
 
 ## 2. What was built
 
@@ -33,7 +33,7 @@ combination was sealed prospectively in the registry for the 7 G7 questions `weo
 | Development stage, mechanical hypothesis selection, holdout opened once (ledger, code digest), descriptives | `src/reva/evaluation/beat_macro/service.py` |
 | Prospective sealing of confirmed scopes (supplementary registry batch) | `src/reva/evaluation/beat_macro/seal.py` |
 | CLI `dev` / `holdout` / `issue` | `src/reva/cli/beat_macro.py` |
-| Tests (bridges exact on synthetic truth, lag rule, stack uses only published errors, later outcomes never change earlier forecasts, holdout once, seal scope + attribution) — 9 | `tests/unit/forecasting/test_beat_macro.py` |
+| Tests (bridges exact on synthetic truth, lag rule, stack uses only published errors, later outcomes never change earlier forecasts, holdout once, seal scope + attribution + point-only label, monthly plan idempotent / never backdated, job order beat_macro → ensemble) — 12 | `tests/unit/forecasting/test_beat_macro.py` |
 | Evidence | `registry/forecasts/beat_macro/{protocol.yaml, development.json, hypotheses.yaml, holdout.json, holdout_ledger.yaml, sealed.yaml}` |
 | Model entry | `registry/models/methods.yaml` (`forecast.bm_stack@1.0.0`, seeded) |
 
@@ -166,19 +166,38 @@ reasonably calibrated, unlike V6's strawman (0.93–1.00).
 | G7 GDP combination | ×0.99 — equal to the WEO |
 | US SPF | not tested (no between-release real-time data, see §10) |
 
-## 9. Prospective registry
+## 9. Prospective registry (monthly, point only)
 
-Sealed (dev DB, origin live, cycle 2026-Q4, 2026-10-17): supplementary batch
-`43d9d1bf046aafaf63cc6253738d1dd40a5210539388ea14b3c92257a2cd8944` (supplement of batch `96c6ad48…`), model
-`forecast.bm_stack@1.0.0`, 7 questions `weo.unemployment` 2026 (h0). Inputs at issue: WEO 2026-10 in force
-(attributed input), MEI edition 202608, past errors of the November bucket (the information state at issue = a
-fresh October WEO + the August MEI edition; asserted that no outcome was published between issue and 1 November).
-λ = 0.62. Points (80 % interval): USA 4.22 [3.88, 4.32], JPN 2.54 [2.21, 2.65], DEU 3.92 [3.59, 4.03], FRA 8.27
-[7.94, 8.38], GBR 5.06 [4.73, 5.17], ITA 5.59 [5.26, 5.70], CAN 6.56 [6.23, 6.67] (WEO points 4.16, 2.53, 3.97, 8.42,
-5.28, 5.61, 6.55). Resolution by the registry rule (first WEO vintage with 2026 as an actual, ≈ April 2027; the
-holdout used the October-of-next-year vintage). Nothing else was sealed (no other scope confirmed). Note: at the
-time of sealing the October WEO is fresh, so the expected prospective gain is the small November-bucket one (×0.64 on
-the holdout); the larger gains come at later monthly origins, which need monthly issuance (§11).
+**Lead decisions applied (2026-10-17):** (1) monthly issuance of `forecast.bm_stack` on the confirmed scope only;
+(2) the point is published, the interval is sealed but labelled « intervalle non calibré (couverture holdout 56 %)
+— non affiché » and never shown as a claim.
+
+* **Hook.** `reva.evaluation.beat_macro.seal.issue_monthly` runs inside the weekly `forecast_registry:issue` job
+  (`registry/service.py::handle_forecast_registry`), **before** the BEAT-ENSEMBLE step, which stays last (one ensemble
+  forecast per question and version must see the month's `bm_stack` batch; order asserted by a test). It seals one
+  supplementary batch per calendar month (`task_scope.beat_macro_month = "YYYY-MM"`); a month already sealed is
+  skipped (checked again under the registry issue advisory lock), so the weekly job is idempotent. The information
+  cutoff is 00:00 UTC on the 1st of the month: the exact evaluation origin and bucket. Early issuance for the
+  next month is allowed by CLI (`--month`), with cutoff = issue time and an assertion that no outcome was published
+  in between. Past months are refused (no reconstructed seals). CLI: `python -m reva.cli.beat_macro issue
+  [--month YYYY-MM] --dry-run|--seal`.
+* **Display.** Records carry `display: point_only` + `interval_status`; `registry/read.py::question` masks
+  `predictive` / `quantiles` / `interval` for such records (`seal.mask_for_display`). The sealed bytes are unchanged.
+* **Sealed (dev DB, origin live, cycle 2026-Q4):**
+
+| month | batch | questions | information | note |
+|---|---|---|---|---|
+| 2026-11 | `df82d49e2aaa2ec98bbcc20067746cc4b784c25c4bf9f5de301bbdc60c1a1061` | 7 G7 `weo.unemployment` 2026 | WEO 2026-10 in force (attributed input), MEI edition 202608, November bucket; cutoff 2026-10-17 22:40 (early) | point only; re-run returns "already sealed for 2026-11" (verified live) |
+| (pre-hook) | `43d9d1bf046aafaf63cc6253738d1dd40a5210539388ea14b3c92257a2cd8944` | same 7 | same information, same points | sealed before the lead decisions without month key / interval label; **superseded for evaluation by the 2026-11 batch** (decided before any outcome); kept sealed, never voided |
+
+Points (WEO projection in brackets): USA 4.22 (4.16), JPN 2.54 (2.53), DEU 3.92 (3.97), FRA 8.27 (8.42), GBR 5.06
+(5.28), ITA 5.59 (5.61), CAN 6.56 (6.55); λ = 0.62. Resolution by the registry rule (first WEO vintage with 2026 as
+an actual, ≈ April 2027; the holdout used the October-of-next-year vintage). From 2026-12 the weekly job seals each
+month automatically; from January 2027 the target becomes 2027 (cycle 2027-Q1 questions). Nothing else is sealed.
+**Process deviation:** the condition was "seal if free disk ≥ 5 GB"; free disk read 5.18 GB just before the run
+but 4.72 GB at the moment of sealing (other agents writing). The command did not re-check the condition before
+writing. The write is a single small JSON artifact plus registry rows. It is not voided, because a seal must not
+be deleted.
 
 ## 10. Honesty notes and limits
 
@@ -213,17 +232,16 @@ the holdout); the larger gains come at later monthly origins, which need monthly
 * **Gradient boosting / ridge with spillover features from trade/IO links**: not built (no dependency; the cross-
   country element is the pooled stacking weight; the one structural prior tried — oil pass-through — failed).
 * **Broad GDP/unemployment panels**: only final vintages (revised) beyond the G7 — ineligible.
-* **Monthly issuance**: the registry issues per quarterly cycle; the stack's largest gains are at August–October
-  origins, so a monthly supplementary issuance job is needed to realise them prospectively.
+* **Monthly issuance**: done (§9).
 
 ## 12. Owner decisions
 
-1. Add a monthly issuance hook for `forecast.bm_stack` (G7 unemployment) on the 1st of each month (supplementary
-   batches on the open `weo.unemployment` h0 questions), so prospective evidence covers the months where it gains.
-2. FRED/ALFRED API key — the only route to between-release real-time data for a US SPF test.
-3. Archive WEO Update vintages (January/July) — needed for fair GDP comparisons at all months.
-4. Whether the under-covering `bm_stack` interval may be shown, or only its point (recommended: point only, with the
-   "uses the IMF forecast" wording).
+Decided by the lead (2026-10-17): monthly issuance of the confirmed scope — done; point-only display with a
+labelled, non-displayed interval — done.
+
+Still open:
+1. FRED/ALFRED API key — the only route to between-release real-time data for a US SPF test.
+2. Archive WEO Update vintages (January/July) — needed for fair GDP comparisons at all months.
 
 ## 13. Commands
 
@@ -233,5 +251,6 @@ uv run python -m reva.cli.beat_macro dev       # development stage -> developmen
 uv run python -m reva.cli.beat_macro holdout   # opens the holdout ONCE (done; ledger refuses a second opening)
 uv run python -m reva.cli.beat_macro issue --dry-run
 flock /tmp/reva-devdb.lock uv run reva seed
-flock /tmp/reva-devdb.lock uv run python -m reva.cli.beat_macro issue --seal   # October only (bucket mapping)
+flock /tmp/reva-devdb.lock uv run python -m reva.cli.beat_macro issue --seal   # this month's batch (idempotent);
+                                                    # also run by the weekly forecast_registry:issue job
 ```

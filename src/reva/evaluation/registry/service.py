@@ -197,6 +197,9 @@ def build_batch(
         if fam.dataset_key is None:
             pending.append({"family": fam.key, "reason": f"awaiting: {fam.awaiting}"})
             continue
+        if fam.raw.get("issued_by"):  # V7: issued only by its own timed issuer (e.g. W1 nowcast offsets)
+            pending.append({"family": fam.key, "reason": f"issued only by {fam.raw['issued_by']}"})
+            continue
         pin = pins.get(fam.dataset_key)
         if pin is None:
             pending.append(
