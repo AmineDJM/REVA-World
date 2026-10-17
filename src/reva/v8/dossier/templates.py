@@ -143,6 +143,7 @@ class Template:
 
     def sentence_ids(self) -> set[str]:
         ids = {f"summary.{s.id}" for s in self.t.summary}
+        ids |= {f"summary.{s.id}.missing" for s in self.t.summary if s.missing}
         ids |= {f"honesty.{i}" for i in range(len(self.t.honesty))}
         ids |= {"title", "subtitle"}
         for s in self.t.sections:
@@ -181,9 +182,12 @@ def load_template(kind: str, directory: Path = TEMPLATE_DIR) -> Template | None:
     return _cached(str(p), st.st_mtime, st.st_size)
 
 
+ORDER = ["country", "commodity", "disease", "drug", "conflict", "decision"]
+
+
 def all_templates(directory: Path = TEMPLATE_DIR) -> list[Template]:
     out = []
-    for p in sorted(directory.glob("*.yaml")):
+    for p in sorted(directory.glob("*.yaml"), key=lambda p: (ORDER.index(p.stem) if p.stem in ORDER else 99, p.stem)):
         t = load_template(p.stem, directory)
         if t is not None:
             out.append(t)

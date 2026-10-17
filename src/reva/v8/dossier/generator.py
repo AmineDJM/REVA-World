@@ -13,6 +13,7 @@ Rendering rules (tested in tests/unit/v8/test_dossier_generator.py):
 
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import json
 import logging
@@ -62,7 +63,9 @@ class Notes:
 
 # ============================================================================== sentence rendering
 class Renderer:
-    def __init__(self, notes: Notes, subject_values: Mapping[str, Item], vocab: Mapping[str, str] | None = None) -> None:
+    def __init__(
+        self, notes: Notes, subject_values: Mapping[str, Item], vocab: Mapping[str, str] | None = None
+    ) -> None:
         self.notes = notes
         self.subject = subject_values
         self.vocab = dict(vocab or {})
@@ -146,12 +149,18 @@ def resolve_subject(tpl: Template, sid: str, ctx: Ctx) -> tuple[M.SubjectRef, di
         if isinstance(c, Miss):
             raise UnknownSubject(f"pays {iso3} inconnu du registre")
         qid = _country_qids().get(iso3)
-        params = {"iso3": iso3, "qid": qid or "", "ids": [qid] if qid else []}
-        ref = M.SubjectRef(kind=t.kind, id=iso3, label=c.text, sublabel=f"{iso3}" + (f" · {qid}" if qid else ""), entity_href=f"/v8/fiche/country/{iso3}")
-        return ref, params, {"subject": c, "iso3": label_val(iso3, c.src)}
+        cparams: dict[str, Any] = {"iso3": iso3, "qid": qid or "", "ids": [qid] if qid else []}
+        ref = M.SubjectRef(
+            kind=t.kind,
+            id=iso3,
+            label=c.text,
+            sublabel=f"{iso3}" + (f" · {qid}" if qid else ""),
+            entity_href=f"/v8/fiche/country/{iso3}",
+        )
+        return ref, cparams, {"subject": c, "iso3": label_val(iso3, c.src)}
     cur = t.subjects.get(sid)
     if cur is not None:
-        params = {"id": sid, **cur.params}
+        params: dict[str, Any] = {"id": sid, **cur.params}
         lab = label_val(cur.label, reg_src)
         href = f"/v8/fiche/{cur.entity_kind or 'entity'}/{cur.entity}" if cur.entity else None
         ref = M.SubjectRef(kind=t.kind, id=sid, label=cur.label, sublabel=cur.sublabel, entity_href=href)
@@ -160,7 +169,9 @@ def resolve_subject(tpl: Template, sid: str, ctx: Ctx) -> tuple[M.SubjectRef, di
             vals.update(_decision_values(sid))
         return ref, params, vals
     if t.resolver == "curated":
-        raise UnknownSubject(f"aucun modèle de dossier {t.kind} pour {sid!r} (sujets décrits : {', '.join(t.subjects)})")
+        raise UnknownSubject(
+            f"aucun modèle de dossier {t.kind} pour {sid!r} (sujets décrits : {', '.join(t.subjects)})"
+        )
     if t.resolver == "decision":
         from reva.predict.decision import reference_decisions
 
@@ -169,7 +180,11 @@ def resolve_subject(tpl: Template, sid: str, ctx: Ctx) -> tuple[M.SubjectRef, di
             raise UnknownSubject(f"décision de référence {sid!r} inconnue")
         dd = d.model_dump(mode="json")
         ref = M.SubjectRef(kind=t.kind, id=sid, label=dd["label_fr"], sublabel=dd["instrument"])
-        return ref, {"id": sid, "reference_id": sid, "countries": dd.get("countries") or []}, {"subject": label_val(dd["label_fr"], reg_src), **_decision_values(sid)}
+        return (
+            ref,
+            {"id": sid, "reference_id": sid, "countries": dd.get("countries") or []},
+            {"subject": label_val(dd["label_fr"], reg_src), **_decision_values(sid)},
+        )
     # KG-backed generic subjects
     from reva.kg import query as kq
 
@@ -179,8 +194,13 @@ def resolve_subject(tpl: Template, sid: str, ctx: Ctx) -> tuple[M.SubjectRef, di
     labels = kq.labels_for(ctx.conn, [sid]).get(sid, {})
     label = labels.get("fr") or labels.get("en") or sid
     kind = ent.get("kind") or "entity"
-    ksrc = Src(source=str((ent.get("provenance") or {}).get("source_key") or "kg"), title="Graphe de connaissances REVA", ref=sid, licence=None)
-    params: dict[str, Any] = {"id": sid, "ids": [sid]}
+    ksrc = Src(
+        source=str((ent.get("provenance") or {}).get("source_key") or "kg"),
+        title="Graphe de connaissances REVA",
+        ref=sid,
+        licence=None,
+    )
+    params = {"id": sid, "ids": [sid]}
     params.update(_subst(t.generic, params))
     if t.resolver == "chembl_drug":
         params["ids"] = _drug_ids(ctx, sid)
@@ -200,7 +220,14 @@ def _drug_ids(ctx: Ctx, sid: str) -> list[str]:
     from reva.kg import query as kq
 
     ids = [sid]
-    res = kq.neighbours(ctx.conn, sid, direction="both", properties=["chembl:parent_molecule", "eml:chembl_molecule"], limit=50, origin=ctx.origin)
+    res = kq.neighbours(
+        ctx.conn,
+        sid,
+        direction="both",
+        properties=["chembl:parent_molecule", "eml:chembl_molecule"],
+        limit=50,
+        origin=ctx.origin,
+    )
     for e in res["edges"]:
         if e["property"]["pid"] == "chembl:parent_molecule" and e["direction"] == "out" and e["object"]:
             ids.insert(0, e["object"]["qid"])  # sid is a salt: its parent comes first
@@ -211,7 +238,14 @@ def _drug_ids(ctx: Ctx, sid: str) -> list[str]:
         if i not in seen:
             seen.append(i)
     if seen[0] != sid and seen[0].startswith("chembl:"):
-        res2 = kq.neighbours(ctx.conn, seen[0], direction="in", properties=["chembl:parent_molecule", "eml:chembl_molecule"], limit=50, origin=ctx.origin)
+        res2 = kq.neighbours(
+            ctx.conn,
+            seen[0],
+            direction="in",
+            properties=["chembl:parent_molecule", "eml:chembl_molecule"],
+            limit=50,
+            origin=ctx.origin,
+        )
         for e in res2["edges"]:
             if e["subject"]["qid"] not in seen:
                 seen.append(e["subject"]["qid"])
@@ -259,12 +293,10 @@ def _run_block(ctx: Ctx, b: BlockT, params: Mapping[str, Any]) -> Result:
         return fn(ctx, **kw)
     except TemplateError:
         raise
-    except Exception as e:  # noqa: BLE001 - a failing source is stated as missing, never hidden or invented
+    except Exception as e:
         log.warning("dossier query %s failed: %s", b.query, e)
-        try:
+        with contextlib.suppress(Exception):
             ctx.conn.rollback()
-        except Exception:  # noqa: BLE001
-            pass
         return Result(empty_reason=f"source indisponible lors du calcul ({type(e).__name__})")
     finally:
         ctx.timings[f"{b.id}:{b.query}"] = round((time.perf_counter() - t0) * 1000, 1)
@@ -288,7 +320,9 @@ def _render_block(
         reason = "; ".join(dict.fromkeys(m.reason for m in miss))
         what = s.what or b.empty.what
         if s.missing:
-            ms, _ = r.sentence(f"{base}.{s.id}.missing", s.missing, {**res.values, **{k: v for k, v in res.values.items()}})
+            ms, _ = r.sentence(
+                f"{base}.{s.id}.missing", s.missing, {**res.values, **{k: v for k, v in res.values.items()}}
+            )
             sentences.append(ms)
         else:
             if sentences:
@@ -347,14 +381,18 @@ def _render_block(
             if miss and b.list_.item_missing:
                 it, _ = r.sentence(f"{base}.item_missing", b.list_.item_missing, row)
             items.append(it)
-        out.append(M.ListBlock(id=f"{base}.list", template_id=f"{base}.item", title=b.list_.title, items=items, more=res.more))
+        out.append(
+            M.ListBlock(id=f"{base}.list", template_id=f"{base}.item", title=b.list_.title, items=items, more=res.more)
+        )
     if (b.table or b.list_) and not res.rows:
         reason = res.empty_reason or "aucune ligne"
         out.append(M.MissingBlock(id=f"{base}.rows", template_id=f"{base}.empty", what=b.empty.what, reason=reason))
         not_covered.append(M.NotCovered(what=b.empty.what, reason=reason, section=sec_title))
     if b.missing_list:
         for m in res.missing:
-            out.append(M.MissingBlock(id=f"{base}.m{len(out)}", template_id=f"{base}.empty", what=m.what, reason=m.reason))
+            out.append(
+                M.MissingBlock(id=f"{base}.m{len(out)}", template_id=f"{base}.empty", what=m.what, reason=m.reason)
+            )
             not_covered.append(M.NotCovered(what=m.what, reason=m.reason, section=sec_title))
     elif res.missing:
         for m in res.missing:
@@ -362,7 +400,9 @@ def _render_block(
     return out
 
 
-def build_document(tpl: Template, ctx: Ctx, ref: M.SubjectRef, params: dict[str, Any], svals: dict[str, Item], t0: float) -> M.Document:
+def build_document(
+    tpl: Template, ctx: Ctx, ref: M.SubjectRef, params: dict[str, Any], svals: dict[str, Item], t0: float
+) -> M.Document:
     t = tpl.t
     notes = Notes()
     r = Renderer(notes, svals, t.vocab)
@@ -392,7 +432,17 @@ def build_document(tpl: Template, ctx: Ctx, ref: M.SubjectRef, params: dict[str,
     lic: dict[tuple[str, str], dict[str, Any]] = {}
     for f in fns:
         if f.licence:
-            lic.setdefault((f.source, f.licence), {"source": f.source, "title": f.title, "licence": f.licence, "restricted": f.restricted, "non_commercial": f.non_commercial, "url": f.licence_url})
+            lic.setdefault(
+                (f.source, f.licence),
+                {
+                    "source": f.source,
+                    "title": f.title,
+                    "licence": f.licence,
+                    "restricted": f.restricted,
+                    "non_commercial": f.non_commercial,
+                    "url": f.licence_url,
+                },
+            )
     licences = sorted(lic.values(), key=lambda x: (not x["restricted"], x["title"], x["licence"]))
     n_sent = len(summary) + sum(len(b.sentences) for s in sections for b in s.blocks if isinstance(b, M.ParagraphBlock))
     n_sent += sum(len(b.items) for s in sections for b in s.blocks if isinstance(b, M.ListBlock))
@@ -477,12 +527,10 @@ def generate(
                 snap, _ = request_snapshot(conn, store, origin=origin)
                 atlas_sha = snap.sha256
                 atlas_q = query_for(snap, store, build=False)
-            except Exception as e:  # noqa: BLE001 - without an atlas file the atlas sections are stated missing
+            except Exception as e:
                 log.warning("dossier: atlas unavailable: %s", e)
-                try:
+                with contextlib.suppress(Exception):
                     conn.rollback()
-                except Exception:  # noqa: BLE001
-                    pass
         elif atlas is not None:
             atlas_q = atlas
             atlas_sha = getattr(getattr(atlas, "snapshot", None), "sha256", None)
@@ -532,4 +580,4 @@ def _cache_put(key: str, data: dict[str, Any]) -> None:
         pass
 
 
-__all__ = ["generate", "build_document", "TemplateError", "UnknownSubject", "SentenceT"]
+__all__ = ["SentenceT", "TemplateError", "UnknownSubject", "build_document", "generate"]

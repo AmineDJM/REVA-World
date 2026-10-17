@@ -30,6 +30,7 @@ UNIT_FR: dict[str, str] = {
     "deaths per 100 000 population": "décès pour 100 000 habitants",
     "DALYs per 100 000 population": "AVCI pour 100 000 habitants",
     "per 1,000 population at risk": "pour 1 000 personnes exposées",
+    "per 1000 population at risk": "pour 1 000 personnes exposées",
     "MW": "MW",
     "percent": "%",
     "log_points": "points log",
@@ -65,7 +66,7 @@ def to_decimal(v: Any) -> Decimal | None:
 def _group(int_part: str) -> str:
     neg = int_part.startswith("-")
     s = int_part.lstrip("-")
-    out = []
+    out: list[str] = []
     while len(s) > 3:
         out.insert(0, s[-3:])
         s = s[:-3]
@@ -95,7 +96,7 @@ def auto_digits(d: Decimal) -> int:
     if a == 0:
         return 0
     # keep 2 significant digits for small values
-    return min(6, max(2, -int(math.floor(math.log10(float(a)))) + 1))
+    return min(6, max(2, -math.floor(math.log10(float(a))) + 1))
 
 
 def fr_number(v: Any, digits: int | None = None, unit: str | None = None) -> str | None:
@@ -138,8 +139,8 @@ def fr_period(p: str | None) -> str | None:
     if len(p) == 6 and p[4] == "Q":
         return f"T{p[5]} {p[:4]}"
     if len(p) == 10 and p[4] == "-" and p[7] == "-":
-        y, m, d = p.split("-")
-        mi = int(m)
+        y, ms, d = p.split("-")
+        mi = int(ms)
         if 1 <= mi <= 12:
             day = int(d)
             return f"{'1er' if day == 1 else day} {MONTHS_FR[mi - 1].rstrip('.') if mi in (3, 5, 6, 8) else MONTHS_FR[mi - 1]} {y}"

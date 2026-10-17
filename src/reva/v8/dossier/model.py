@@ -35,18 +35,22 @@ class Footnote(_M):
     source: str = Field(description="Source key (atlas source, KG source key, registry, publication)")
     title: str = Field(description="Human label of the source / dataset (from the source's own metadata)")
     dataset: str | None = None
-    indicator: str | None = Field(None, description="Series / property / estimate key inside the source")
-    period: str | None = Field(None, description="Period the value refers to (as published)")
-    licence: str | None = Field(None, description="Licence or terms as recorded with the artifact; null = unknown")
+    indicator: str | None = Field(default=None, description="Series / property / estimate key inside the source")
+    period: str | None = Field(default=None, description="Period the value refers to (as published)")
+    licence: str | None = Field(
+        default=None, description="Licence or terms as recorded with the artifact; null = unknown"
+    )
     licence_url: str | None = None
     restricted: bool = Field(False, description="Non-commercial, share-alike, no-derivatives or not-open terms")
     non_commercial: bool = False
     required_notice: str | None = None
-    ref: str | None = Field(None, description="Raw artifact sha256, statement key, estimate key or question id")
+    ref: str | None = Field(default=None, description="Raw artifact sha256, statement key, estimate key or question id")
     url: str | None = None
     retrieved: str | None = None
-    verification: str | None = Field(None, description="e.g. community_edited_not_verified, derived, unvalidated")
-    method: str | None = Field(None, description="For derived values: how REVA computed them")
+    verification: str | None = Field(
+        default=None, description="e.g. community_edited_not_verified, derived, unvalidated"
+    )
+    method: str | None = Field(default=None, description="For derived values: how REVA computed them")
 
 
 class Part(_M):
@@ -54,12 +58,12 @@ class Part(_M):
 
     t: Literal["text", "value", "missing"]
     text: str = Field(description="Display text (for values: formatted in French)")
-    exact: str | None = Field(None, description="Exact value as reported (decimal string), for values")
+    exact: str | None = Field(default=None, description="Exact value as reported (decimal string), for values")
     unit: str | None = None
     kind: ValueKind | None = None
-    fn: int | None = Field(None, description="Footnote number (every value part has one)")
-    reason: str | None = Field(None, description="Why the value is missing (missing parts)")
-    href: str | None = Field(None, description="V8 deep link of the entity this value names, if any")
+    fn: int | None = Field(default=None, description="Footnote number (every value part has one)")
+    reason: str | None = Field(default=None, description="Why the value is missing (missing parts)")
+    href: str | None = Field(default=None, description="V8 deep link of the entity this value names, if any")
 
 
 class Sentence(_M):
@@ -148,7 +152,9 @@ class SubjectRef(_M):
     id: str
     label: str
     sublabel: str | None = None
-    entity_href: str | None = Field(None, description="V8 fiche link of the subject, when it is a KG entity/country")
+    entity_href: str | None = Field(
+        default=None, description="V8 fiche link of the subject, when it is a KG entity/country"
+    )
 
 
 class NotCovered(_M):

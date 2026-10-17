@@ -70,7 +70,7 @@ sections:
             text: "Territoire en jeu : {territory}."
           - id: intensity
             what: "Intensité"
-            text: "Niveau d'intensité déclaré pour {intensity_when} : {intensity} (1 = 25 à 999 décès liés aux combats dans l'année ; 2 = au moins 1 000, selon le codebook UCDP)."
+            text: "Niveau d'intensité déclaré pour {intensity_when} : {intensity} (échelle de la source : « {intensity_q_scale} »)."
           - id: events
             what: "Période des événements géoréférencés"
             text: "Événements géoréférencés (UCDP GED) du {first_event} au {last_event}."

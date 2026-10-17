@@ -191,15 +191,19 @@ class Ctx:
 def data_snapshot_id(conn: Any, atlas_sha: str | None, origin: str) -> str:
     """Cheap fingerprint of everything a brief reads: the atlas snapshot, the newest registered table version,
     KG / causal / effect loads and the forecast registry batches. Changes whenever any of them changes."""
-    row = conn.execute(
-        text(
-            """SELECT (SELECT max(recorded_at)::text FROM evidence.dataset WHERE origin = :o) AS ds,
+    row = (
+        conn.execute(
+            text(
+                """SELECT (SELECT max(recorded_at)::text FROM evidence.dataset WHERE origin = :o) AS ds,
                       (SELECT max(id) FROM kg.load) AS kl,
                       (SELECT max(id) FROM kg.causal_load) AS cl,
                       (SELECT max(id) FROM kg.effect_load) AS el,
                       (SELECT max(recorded_at)::text FROM model.evaluation) AS ev"""
-        ),
-        {"o": origin},
-    ).mappings().one()
+            ),
+            {"o": origin},
+        )
+        .mappings()
+        .one()
+    )
     blob = json.dumps({"atlas": atlas_sha, "origin": origin, **{k: row[k] for k in row.keys()}}, default=str)
     return hashlib.sha256(blob.encode()).hexdigest()[:16]

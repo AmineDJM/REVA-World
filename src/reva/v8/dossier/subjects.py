@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import logging
 import unicodedata
 from typing import Any
 
 from reva.v8.dossier import model as M
 from reva.v8.dossier.templates import all_templates
+
+log = logging.getLogger(__name__)
 
 #: KG entity kinds a brief kind accepts (generic subjects) and the id prefix it requires.
 KG_KINDS: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
@@ -54,7 +57,9 @@ def search(conn: Any, q: str | None, kind: str | None = None, limit: int = 20) -
                 names = [c.label_fr or "", c.label, c.iso3, *c.names]
                 if any(fq == fold(n) or fold(n).startswith(fq) for n in names if n):
                     if not any(h.kind == "country" and h.id == c.iso3 for h in hits):
-                        hits.append(M.SubjectHit(kind="country", id=c.iso3, label=c.label_fr or c.label, sublabel=c.iso3))
+                        hits.append(
+                            M.SubjectHit(kind="country", id=c.iso3, label=c.label_fr or c.label, sublabel=c.iso3)
+                        )
                 if len(hits) >= limit:
                     break
         if kind in (None, "decision"):
@@ -64,7 +69,9 @@ def search(conn: Any, q: str | None, kind: str | None = None, limit: int = 20) -
                 dd = d.model_dump(mode="json")
                 if fq in fold(dd["label_fr"]) or fq in fold(dd["id"]):
                     if not any(h.kind == "decision" and h.id == dd["id"] for h in hits):
-                        hits.append(M.SubjectHit(kind="decision", id=dd["id"], label=dd["label_fr"], sublabel=dd["instrument"]))
+                        hits.append(
+                            M.SubjectHit(kind="decision", id=dd["id"], label=dd["label_fr"], sublabel=dd["instrument"])
+                        )
         if conn is not None and len(fq) >= 3:
             from reva.kg import query as kq
 
@@ -74,12 +81,15 @@ def search(conn: Any, q: str | None, kind: str | None = None, limit: int = 20) -
                 for ek in ekinds:
                     try:
                         res = kq.search(conn, q or "", langs=["fr", "en"], kind=ek, limit=8, origin="live")
-                    except Exception:  # noqa: BLE001 - a failing lookup only means fewer suggestions
+                    except Exception as e:  # a failing lookup only means fewer suggestions
+                        log.info("dossier subject search (%s) failed: %s", ek, e)
                         continue
                     for r in res["results"]:
                         if not r["qid"].startswith(prefixes):
                             continue
                         lab = (r.get("labels") or {}).get("fr") or (r.get("labels") or {}).get("en") or r["qid"]
                         if not any(h.id == r["qid"] for h in hits):
-                            hits.append(M.SubjectHit(kind=bk, id=r["qid"], label=lab, sublabel=f"{r['kind']} · {r['qid']}"))
+                            hits.append(
+                                M.SubjectHit(kind=bk, id=r["qid"], label=lab, sublabel=f"{r['kind']} · {r['qid']}")
+                            )
     return M.SubjectList(query=q, hits=hits[:limit], kinds=kinds())

@@ -107,7 +107,9 @@ def _year(c: Mapping[str, Any]) -> str:
 
 
 def _ref_src(kind: str, ident: str, *, title: str | None = None, method: str | None = None) -> Src:
-    return Src(source=kind, title=title or source_title(kind), ref=ident, method=method, licence="REVA (registre public)")
+    return Src(
+        source=kind, title=title or source_title(kind), ref=ident, method=method, licence="REVA (registre public)"
+    )
 
 
 # ============================================================================== atlas (pinned snapshot)
@@ -334,8 +336,7 @@ def table_series(
         return out
     rows = f.to_dicts()
     unit = rows[-1]["unit"]
-    vals = [(r, _f(r["value"])) for r in rows]
-    vals = [(r, v) for r, v in vals if v is not None]
+    vals: list[tuple[dict[str, Any], float]] = [(r, v) for r in rows if (v := _f(r["value"])) is not None]
     last = vals[-1][0]
     hi = max(vals, key=lambda t: t[1])[0]
     lo = min(vals, key=lambda t: t[1])[0]
@@ -419,7 +420,14 @@ def table_ranking(
 
 @query("table.geo_value")
 def table_geo_value(
-    ctx: Ctx, *, dataset: str, indicator: str, geo: str, geo_col: str = "provider_geo", freq: str = "A", title: str | None = None
+    ctx: Ctx,
+    *,
+    dataset: str,
+    indicator: str,
+    geo: str,
+    geo_col: str = "provider_geo",
+    freq: str = "A",
+    title: str | None = None,
 ) -> Result:
     """Latest value of one indicator for one provider geography (e.g. EIA 'WORL' world aggregate)."""
     return table_series(ctx, dataset=dataset, indicator=indicator, geo=geo, geo_col=geo_col, freq=freq, title=title)
@@ -542,7 +550,9 @@ def _literal_val(ctx: Ctx, e: Mapping[str, Any], src: Src) -> Item:
     v = e.get("value") or {}
     t = v.get("type")
     if t == "quantity":
-        return num_val(v.get("amount"), src, unit=v.get("unit") if v.get("unit") not in ("1", None) else None, kind="observed")
+        return num_val(
+            v.get("amount"), src, unit=v.get("unit") if v.get("unit") not in ("1", None) else None, kind="observed"
+        )
     if t == "time":
         return label_val(_time_text(v), src)
     if t in ("string", "external_id", "monolingualtext", "url"):
@@ -552,7 +562,9 @@ def _literal_val(ctx: Ctx, e: Mapping[str, Any], src: Src) -> Item:
     return Miss(src.title, "valeur de forme inconnue")
 
 
-def _edges(ctx: Ctx, ids: Iterable[str], properties: Iterable[str] | None, direction: str = "out", limit: int = 500) -> list[dict[str, Any]]:
+def _edges(
+    ctx: Ctx, ids: Iterable[str], properties: Iterable[str] | None, direction: str = "out", limit: int = 500
+) -> list[dict[str, Any]]:
     from reva.kg import query as kq
 
     out = []
@@ -597,13 +609,22 @@ def kg_literals(ctx: Ctx, *, ids: Iterable[str], properties: Mapping[str, str], 
         if not es:
             out.values[alias] = Miss(pid, "aucune déclaration chargée dans le graphe pour cette propriété")
             continue
-        es.sort(key=lambda e: (ids.index(e["_from"]), str((e.get("point_in_time") or e.get("start") or {}).get("time") or "")), reverse=False)
+        es.sort(
+            key=lambda e: (
+                ids.index(e["_from"]),
+                str((e.get("point_in_time") or e.get("start") or {}).get("time") or ""),
+            ),
+            reverse=False,
+        )
         e = es[-1] if any(x.get("point_in_time") for x in es) else es[0]
         when = _time_text(e.get("point_in_time") or e.get("start"))
         src = kg_src(ctx, e, rights, when)
         out.values[alias] = _literal_val(ctx, e, src)
         if when:
             out.values[f"{alias}_when"] = label_val(when, src)
+        for qk, qv in (e.get("qualifiers") or {}).items():
+            if isinstance(qv, str) and qv.strip():
+                out.values[f"{alias}_q_{qk}"] = label_val(qv, src)
         out.values[f"{alias}_n"] = num_val(len(es), src, kind="derived", digits=0)
     return out
 
@@ -663,7 +684,12 @@ def kg_edges(
     rows.sort(key=lambda t: t[0], reverse=(sort == "date_desc"))
     out = Result(rows=[r for _, r in rows[:limit]], more=max(0, len(rows) - limit) + unlabelled)
     out.values["n"] = (
-        num_val(len(rows), rows[0][1]["name"].src if rows and isinstance(rows[0][1]["name"], Val) else Src("kg", "graphe"), kind="derived", digits=0)
+        num_val(
+            len(rows),
+            rows[0][1]["name"].src if rows and isinstance(rows[0][1]["name"], Val) else Src("kg", "graphe"),
+            kind="derived",
+            digits=0,
+        )
         if rows
         else Miss("nombre", "aucune déclaration")
     )
@@ -701,8 +727,12 @@ def kg_quantity_series(ctx: Ctx, *, id: str, property: str, label: str = "", kin
     out.values["max"] = num_val(pts[peak]["value"]["amount"], psrc, unit=unit, kind=kind)
     out.values["max_year"] = label_val(peak, psrc)
     total = sum(_f(pts[y]["value"]["amount"]) or 0.0 for y in years)
-    tsrc = Src(**{**kg_src(ctx, pts[years[-1]], rights, f"{years[0]}–{years[-1]}").__dict__,
-                  "method": f"somme REVA des {len(years)} valeurs annuelles publiées (meilleure estimation)"})
+    tsrc = Src(
+        **{
+            **kg_src(ctx, pts[years[-1]], rights, f"{years[0]}–{years[-1]}").__dict__,
+            "method": f"somme REVA des {len(years)} valeurs annuelles publiées (meilleure estimation)",
+        }
+    )
     out.values["total"] = num_val(f"{total:.0f}", tsrc, unit=unit, kind="derived", digits=0)
     out.values["n_years"] = num_val(len(years), tsrc, kind="derived", digits=0)
     out.series.append(
@@ -728,7 +758,9 @@ def kg_quantity_series(ctx: Ctx, *, id: str, property: str, label: str = "", kin
 
 
 @query("kg.timeline")
-def kg_timeline(ctx: Ctx, *, id: str, limit: int = 12, properties: Iterable[str] | None = None, since: str | None = None) -> Result:
+def kg_timeline(
+    ctx: Ctx, *, id: str, limit: int = 12, properties: Iterable[str] | None = None, since: str | None = None
+) -> Result:
     """Dated statements about an entity (newest first), each with its source."""
     from reva.kg import query as kq
 
@@ -785,9 +817,10 @@ def kg_facilities(
     """Facilities with ``property`` = ``object`` grouped by ``group_property`` (count + sum of a quantity)."""
     from sqlalchemy import text
 
-    rows = ctx.conn.execute(
-        text(
-            """SELECT g.object_qid AS grp, count(*) AS n,
+    rows = (
+        ctx.conn.execute(
+            text(
+                """SELECT g.object_qid AS grp, count(*) AS n,
                       sum((c.value->>'amount')::numeric) AS total,
                       min(f.source_key) AS source_key, min(f.source_revision) AS rev, min(f.raw_sha256) AS raw
                  FROM kg.statement_current f
@@ -795,9 +828,12 @@ def kg_facilities(
                  LEFT JOIN kg.statement_current c ON c.subject_qid = f.subject_qid AND c.property_pid = :sp
                 WHERE f.property_pid = :p AND f.object_qid = :o AND f.origin = :origin
                 GROUP BY 1 ORDER BY 3 DESC NULLS LAST"""
-        ),
-        {"p": property, "o": object, "gp": group_property, "sp": sum_property, "origin": ctx.origin},
-    ).mappings().all()
+            ),
+            {"p": property, "o": object, "gp": group_property, "sp": sum_property, "origin": ctx.origin},
+        )
+        .mappings()
+        .all()
+    )
     out = Result()
     if not rows:
         out.empty_reason = "aucune installation de ce type dans le graphe"
@@ -852,7 +888,15 @@ def claim_src(c: Mapping[str, Any]) -> Src:
 
 
 @query("causal.claims")
-def causal_claims(ctx: Ctx, *, ids: Iterable[str], side: str = "causes", limit: int = 8, min_grade: str | None = None, generic: bool = False) -> Result:
+def causal_claims(
+    ctx: Ctx,
+    *,
+    ids: Iterable[str],
+    side: str = "causes",
+    limit: int = 8,
+    min_grade: str | None = None,
+    generic: bool = False,
+) -> Result:
     """Attributed causal claims whose effect (``causes``) or cause (``effects``) is one of ``ids``."""
     from reva.causal import graph as cg
 
@@ -867,7 +911,7 @@ def causal_claims(ctx: Ctx, *, ids: Iterable[str], side: str = "causes", limit: 
         else:
             try:
                 got = cg.effects(ctx.conn, qid, origin=ctx.origin, min_grade=min_grade, limit=200)["claims"]
-            except Exception:  # noqa: BLE001 - an unknown id has no claims (stated as missing below)
+            except Exception:
                 got = []
         for c in got:
             if c["claim_key"] not in seen:
@@ -880,8 +924,16 @@ def causal_claims(ctx: Ctx, *, ids: Iterable[str], side: str = "causes", limit: 
         g = (c.get("grade") or {}).get("grade") or "?"
         out.rows.append(
             {
-                "cause": label_val(c["cause"].get("label_fr") or c["cause"]["label"], src, href=_entity_href(c["cause"].get("kind"), c["cause"]["id"])),
-                "effect": label_val(c["effect"].get("label_fr") or c["effect"]["label"], src, href=_entity_href(c["effect"].get("kind"), c["effect"]["id"])),
+                "cause": label_val(
+                    c["cause"].get("label_fr") or c["cause"]["label"],
+                    src,
+                    href=_entity_href(c["cause"].get("kind"), c["cause"]["id"]),
+                ),
+                "effect": label_val(
+                    c["effect"].get("label_fr") or c["effect"]["label"],
+                    src,
+                    href=_entity_href(c["effect"].get("kind"), c["effect"]["id"]),
+                ),
                 "relation": label_val((c.get("relation_label") or {}).get("fr") or c["relation"], src, kind="claim"),
                 "source": label_val(src.title, src),
                 "tier": label_val(str(c["source"].get("tier") or "?"), src),
@@ -928,10 +980,24 @@ def effects_estimates(
             {
                 "cause": label_val(e["cause"].get("label_fr") or e["cause"].get("label") or e["cause"]["id"], src),
                 "effect": label_val(e["effect"].get("label_fr") or e["effect"].get("label") or e["effect"]["id"], src),
-                "measure": label_val({"elasticity": "élasticité", "response": "réponse", "semi_elasticity": "semi-élasticité"}.get(e["measure"], e["measure"]), src),
-                "point": num_val(e.get("as_printed") or e.get("point"), src, unit=None if u in ("ratio", None) else u, kind="estimate"),
-                "ci_low": num_val(unc.get("ci_low"), src, kind="estimate") if unc.get("ci_low") is not None else Miss("intervalle", "non publié par la source"),
-                "ci_high": num_val(unc.get("ci_high"), src, kind="estimate") if unc.get("ci_high") is not None else Miss("intervalle", "non publié par la source"),
+                "measure": label_val(
+                    {"elasticity": "élasticité", "response": "réponse", "semi_elasticity": "semi-élasticité"}.get(
+                        e["measure"], e["measure"]
+                    ),
+                    src,
+                ),
+                "point": num_val(
+                    e.get("as_printed") or e.get("point"),
+                    src,
+                    unit=None if u in ("ratio", None) else u,
+                    kind="estimate",
+                ),
+                "ci_low": num_val(unc.get("ci_low"), src, kind="estimate")
+                if unc.get("ci_low") is not None
+                else Miss("intervalle", "non publié par la source"),
+                "ci_high": num_val(unc.get("ci_high"), src, kind="estimate")
+                if unc.get("ci_high") is not None
+                else Miss("intervalle", "non publié par la source"),
                 "citation": label_val(src.title, src),
                 "method": label_val(str(e.get("method") or ""), src),
             }
@@ -968,12 +1034,20 @@ MODEL_FR = {
 
 
 @query("forecasts.family")
-def forecasts_family(ctx: Ctx, *, family: str, geo: str | None = None, models: Iterable[str] = ("reva.ensemble",), reference: str | None = None, limit: int = 6) -> Result:
+def forecasts_family(
+    ctx: Ctx,
+    *,
+    family: str,
+    geo: str | None = None,
+    models: Iterable[str] = ("reva.ensemble",),
+    reference: str | None = None,
+    limit: int = 6,
+) -> Result:
     """Pending / resolved sealed questions of one family: REVA's forecast, the official reference, the outcome."""
     from reva.evaluation.registry import read as R
 
     out = Result()
-    qs, total = R.questions(ctx.conn, ctx.store, ctx.origin, family=family, geo=geo, limit=200)
+    qs, _total = R.questions(ctx.conn, ctx.store, ctx.origin, family=family, geo=geo, limit=200)
     if not qs:
         out.empty_reason = f"aucune question scellée dans la famille {family}"
         return out
@@ -995,8 +1069,12 @@ def forecasts_family(ctx: Ctx, *, family: str, geo: str | None = None, models: I
         last_obs = last_obs or qq.get("last_observed")
         per = q["reference_period"]
         src = _registry_src(q["question_id"], f"Registre prospectif REVA — {q['label_fr']}", per)
-        row: dict[str, Item] = {"period": period_val(per, src), "status": label_val(
-            {"pending": "en attente", "resolved": "résolue", "void": "annulée"}.get(q["status"], q["status"]), src)}
+        row: dict[str, Item] = {
+            "period": period_val(per, src),
+            "status": label_val(
+                {"pending": "en attente", "resolved": "résolue", "void": "annulée"}.get(q["status"], q["status"]), src
+            ),
+        }
         by = {f["model"]: f for f in d["forecasts"]}
         for i, m in enumerate(want):
             f = by.get(m)
@@ -1006,20 +1084,42 @@ def forecasts_family(ctx: Ctx, *, family: str, geo: str | None = None, models: I
                 continue
             qs_ = f.get("quantiles") or {}
             row[key] = num_val(f.get("point"), src, unit=qq.get("unit"), kind="forecast")
-            row[f"{key}_lo"] = num_val(qs_.get("0.05"), src, unit=qq.get("unit"), kind="forecast") if qs_.get("0.05") else Miss("intervalle", "non publié")
-            row[f"{key}_hi"] = num_val(qs_.get("0.95"), src, unit=qq.get("unit"), kind="forecast") if qs_.get("0.95") else Miss("intervalle", "non publié")
+            row[f"{key}_lo"] = (
+                num_val(qs_.get("0.05"), src, unit=qq.get("unit"), kind="forecast")
+                if qs_.get("0.05")
+                else Miss("intervalle", "non publié")
+            )
+            row[f"{key}_hi"] = (
+                num_val(qs_.get("0.95"), src, unit=qq.get("unit"), kind="forecast")
+                if qs_.get("0.95")
+                else Miss("intervalle", "non publié")
+            )
         if reference:
             f = by.get(reference)
-            row["ref"] = num_val(f.get("point"), src, unit=qq.get("unit"), kind="projection") if f else Miss(MODEL_FR.get(reference, reference), "pas de prévision de référence")
+            row["ref"] = (
+                num_val(f.get("point"), src, unit=qq.get("unit"), kind="projection")
+                if f
+                else Miss(MODEL_FR.get(reference, reference), "pas de prévision de référence")
+            )
         oc = d.get("outcome")
-        row["outcome"] = num_val(oc.get("value"), src, unit=qq.get("unit")) if isinstance(oc, dict) and oc.get("value") is not None else Miss("résultat", "question non encore résolue")
+        row["outcome"] = (
+            num_val(oc.get("value"), src, unit=qq.get("unit"))
+            if isinstance(oc, dict) and oc.get("value") is not None
+            else Miss("résultat", "question non encore résolue")
+        )
         out.rows.append(row)
     if last_obs:
-        lsrc = _registry_src(first["question_id"], f"Registre prospectif REVA — dernière observation ({first['label_fr']})", last_obs.get("period"))
+        lsrc = _registry_src(
+            first["question_id"],
+            f"Registre prospectif REVA — dernière observation ({first['label_fr']})",
+            last_obs.get("period"),
+        )
         out.values["last_value"] = num_val(last_obs.get("value"), lsrc, unit=first.get("unit"))
         out.values["last_period"] = period_val(last_obs.get("period"), lsrc)
     out.values["judged"] = label_val(
-        "non jugée (aucune question résolue)" if n_res == 0 else f"{n_res} question(s) résolue(s)", fsrc, kind="forecast"
+        "non jugée (aucune question résolue)" if n_res == 0 else f"{n_res} question(s) résolue(s)",
+        fsrc,
+        kind="forecast",
     )
     return out
 
@@ -1030,7 +1130,7 @@ def forecasts_geo(ctx: Ctx, *, geo: str, limit: int = 8) -> Result:
     from reva.evaluation.registry import read as R
 
     out = Result()
-    qs, total = R.questions(ctx.conn, ctx.store, ctx.origin, geo=geo, limit=1000)
+    qs, _total = R.questions(ctx.conn, ctx.store, ctx.origin, geo=geo, limit=1000)
     if not qs:
         out.empty_reason = f"aucune question scellée sur {geo}"
         return out
@@ -1042,15 +1142,19 @@ def forecasts_geo(ctx: Ctx, *, geo: str, limit: int = 8) -> Result:
     out.values["n_families"] = num_val(len(fams), src0, kind="derived", digits=0)
     out.values["n_resolved"] = num_val(sum(1 for q in qs if q["status"] == "resolved"), src0, kind="derived", digits=0)
     rows = []
-    for fam, lst in sorted(fams.items(), key=lambda t: -len(t[1])):
+    for _fam, lst in sorted(fams.items(), key=lambda t: -len(t[1])):
         lst.sort(key=lambda q: q["reference_period"])
         nxt = next((q for q in lst if q["status"] == "pending"), lst[0])
-        src = _registry_src(nxt["question_id"], f"Registre prospectif REVA — {nxt['label_fr']}", nxt["reference_period"])
+        src = _registry_src(
+            nxt["question_id"], f"Registre prospectif REVA — {nxt['label_fr']}", nxt["reference_period"]
+        )
         row: dict[str, Item] = {
             "family": label_val(nxt["label_fr"], src),
             "n": num_val(len(lst), src, kind="derived", digits=0),
             "next_period": period_val(nxt["reference_period"], src),
-            "resolution": label_val(fr_period(nxt.get("expected_resolution")) or str(nxt.get("expected_resolution")), src),
+            "resolution": label_val(
+                fr_period(nxt.get("expected_resolution")) or str(nxt.get("expected_resolution")), src
+            ),
         }
         d = R.question(ctx.conn, ctx.store, nxt["question_id"])
         f = next((x for x in (d or {}).get("forecasts", []) if x["model"] == "reva.ensemble"), None) or next(
@@ -1100,10 +1204,14 @@ def beat_tests(ctx: Ctx, *, file: str, code: str, benchmark_fr: str, title: str,
             {
                 "window": label_val(str(t.get("window")), src),
                 "h": num_val(t.get("h"), src, kind="derived", digits=0),
-                "ratio": num_val(f"{t.get('ratio'):.2f}", src, kind="derived", digits=2) if t.get("ratio") is not None else Miss("ratio", "non calculé"),
+                "ratio": num_val(f"{t.get('ratio'):.2f}", src, kind="derived", digits=2)
+                if t.get("ratio") is not None
+                else Miss("ratio", "non calculé"),
                 "n": num_val(t.get("n"), src, kind="derived", digits=0),
                 "verdict": label_val(
-                    f"bat {benchmark_fr} (Holm)" if t.get("holm_win") else f"ne bat pas {benchmark_fr}", src, kind="forecast"
+                    f"bat {benchmark_fr} (Holm)" if t.get("holm_win") else f"ne bat pas {benchmark_fr}",
+                    src,
+                    kind="forecast",
                 ),
             }
         )
@@ -1142,7 +1250,9 @@ def _run_decision(ctx: Ctx, reference_id: str) -> dict[str, Any] | None:
     return out
 
 
-def _decision_src(out: Mapping[str, Any], ident: str, title: str = "Moteur de décision REVA (scénario non validé)") -> Src:
+def _decision_src(
+    out: Mapping[str, Any], ident: str, title: str = "Moteur de décision REVA (scénario non validé)"
+) -> Src:
     return Src(
         source="reva.predict",
         title=title,
@@ -1171,7 +1281,9 @@ def predict_decision(ctx: Ctx, *, reference_id: str, limit: int = 8) -> Result:
     mag = dec.get("magnitude") or {}
     out.values["magnitude"] = num_val(mag.get("value"), dsrc, unit=mag.get("unit"), kind="scenario", show_unit=True)
     out.values["horizon"] = num_val(dec.get("horizon_quarters"), dsrc, kind="label", digits=0)
-    out.values["validation"] = label_val((res.get("validation") or {}).get("label"), _decision_src(res, "validation"), kind="scenario")
+    out.values["validation"] = label_val(
+        (res.get("validation") or {}).get("label"), _decision_src(res, "validation"), kind="scenario"
+    )
     for i, dc in enumerate(res.get("direct_changes") or []):
         s = _decision_src(res, f"direct_change:{i}", "Moteur de décision REVA — hypothèse de scénario")
         out.values[f"direct_{i}"] = num_val(dc.get("change"), s, unit=dc.get("unit"), kind="scenario")
@@ -1184,7 +1296,14 @@ def predict_decision(ctx: Ctx, *, reference_id: str, limit: int = 8) -> Result:
         row: dict[str, Item] = {"variable": label_val(lab, vsrc)}
         if per is None:
             reason = next((p.get("missing_reason") for p in v["periods"] if p.get("missing_reason")), "non quantifié")
-            row.update({"period": Miss("période", str(reason)), "p50": Miss(lab, str(reason)), "p05": Miss(lab, str(reason)), "p95": Miss(lab, str(reason))})
+            row.update(
+                {
+                    "period": Miss("période", str(reason)),
+                    "p50": Miss(lab, str(reason)),
+                    "p05": Miss(lab, str(reason)),
+                    "p95": Miss(lab, str(reason)),
+                }
+            )
         else:
             psrc = _decision_src(res, f"{v['id']}@{per['period']}")
             row["period"] = period_val(per["period"], psrc)
@@ -1248,7 +1367,9 @@ def predict_unquantified(ctx: Ctx, *, reference_id: str, limit: int = 6) -> Resu
             indicator=f"affirmation causale, niveau {s.get('tier')}, note {c.get('grade')}",
             ref=c.get("claim_key"),
             licence="CC0-1.0" if str(s.get("source_key", "")).startswith("wikidata") else None,
-            verification="community_edited_not_verified" if str(s.get("source_key", "")).startswith("wikidata") else None,
+            verification="community_edited_not_verified"
+            if str(s.get("source_key", "")).startswith("wikidata")
+            else None,
         )
         out.rows.append(
             {
@@ -1273,7 +1394,13 @@ def predict_references(ctx: Ctx, *, instruments: Iterable[str] = (), ids: Iterab
     for d in reference_decisions().values():
         dd = d.model_dump(mode="json")
         if dd["instrument"] in inst or dd["id"] in idset:
-            src = Src(source="reva.predict", title="Registre des décisions de référence REVA", indicator=dd["id"], licence="REVA", ref=dd["id"])
+            src = Src(
+                source="reva.predict",
+                title="Registre des décisions de référence REVA",
+                indicator=dd["id"],
+                licence="REVA",
+                ref=dd["id"],
+            )
             out.rows.append(
                 {
                     "label": label_val(dd.get("label_fr"), src, href=f"/v8/dossier/decision/{dd['id']}"),

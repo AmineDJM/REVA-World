@@ -133,7 +133,7 @@ sections:
         sentences:
           - id: inc
             what: "Incidence"
-            text: "Incidence estimée (pour 1 000 personnes exposées) en {year} : {top1} {top1_value}, {top2} {top2_value}, {top3} {top3_value} ; {n_countries} pays d'endémie déclarés."
+            text: "Incidence estimée en {year} : {top1} {top1_value}, {top2} {top2_value}, {top3} {top3_value} ; {n_countries} pays d'endémie déclarés."
         table:
           caption: "Incidence du paludisme, huit pays les plus touchés"
           columns:

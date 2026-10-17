@@ -124,7 +124,9 @@ def _md_block(b: M.Block) -> list[str]:
             pts = [p for p in s.points if p.y is not None]
             if pts:
                 rng = f"{pts[0].x} → {pts[-1].x}"
-                out.append(f"- {s.label} ({KIND_FR.get(s.kind, s.kind) or 'observé'}) : {len(pts)} points, {rng}[^{s.fn}]")
+                out.append(
+                    f"- {s.label} ({KIND_FR.get(s.kind, s.kind) or 'observé'}) : {len(pts)} points, {rng}[^{s.fn}]"
+                )
         if b.note:
             out.append(f"_{b.note}_")
         return [*out, ""]
@@ -241,14 +243,18 @@ def _svg_chart(b: M.ChartBlock, w: int = 680, h: int = 260) -> str:
         y = Y(t)
         lab = f"{t:,.0f}".replace(",", " ") if step >= 1 else f"{t:.2f}".replace(".", ",")
         g.append(f'<line x1="{pad_l}" x2="{w - pad_r}" y1="{y:.1f}" y2="{y:.1f}" stroke="#e3e5ea"/>')
-        g.append(f'<text x="{pad_l - 6}" y="{y + 4:.1f}" text-anchor="end" font-size="10" fill="#5b616d" font-family="system-ui">{lab}</text>')
+        g.append(
+            f'<text x="{pad_l - 6}" y="{y + 4:.1f}" text-anchor="end" font-size="10" fill="#5b616d" font-family="system-ui">{lab}</text>'
+        )
         t += step
     every = max(1, n // 8)
     for i, x in enumerate(xs):
         if b.x_kind == "category" or i % every == 0 or i == n - 1:
             anchor = "end" if b.x_kind == "category" else "middle"
             rot = f' transform="rotate(-30 {X(i):.1f} {h - pad_b + 12})"' if b.x_kind == "category" else ""
-            g.append(f'<text x="{X(i):.1f}" y="{h - pad_b + 14}" text-anchor="{anchor}" font-size="10" fill="#5b616d" font-family="system-ui"{rot}>{_e(x[:18])}</text>')
+            g.append(
+                f'<text x="{X(i):.1f}" y="{h - pad_b + 14}" text-anchor="{anchor}" font-size="10" fill="#5b616d" font-family="system-ui"{rot}>{_e(x[:18])}</text>'
+            )
     idx = {x: i for i, x in enumerate(xs)}
     for si, s in enumerate(b.series):
         c = colors[si % len(colors)]
@@ -259,7 +265,9 @@ def _svg_chart(b: M.ChartBlock, w: int = 680, h: int = 260) -> str:
                 if p.y is None:
                     continue
                 x0 = X(idx[p.x]) - bw / 2
-                g.append(f'<rect x="{x0:.1f}" y="{Y(max(p.y, 0)):.1f}" width="{bw:.1f}" height="{abs(Y(p.y) - Y(0)):.1f}" fill="{c}" opacity=".85"/>')
+                g.append(
+                    f'<rect x="{x0:.1f}" y="{Y(max(p.y, 0)):.1f}" width="{bw:.1f}" height="{abs(Y(p.y) - Y(0)):.1f}" fill="{c}" opacity=".85"/>'
+                )
             continue
         band = [(idx[p.x], p.lo, p.hi) for p in s.points if p.lo is not None and p.hi is not None]
         if band:
@@ -276,8 +284,8 @@ def _svg_chart(b: M.ChartBlock, w: int = 680, h: int = 260) -> str:
             if len(seg) > 1:
                 g.append(f'<polyline points="{" ".join(seg)}" fill="none" stroke="{c}" stroke-width="1.8"{dash}/>')
             elif len(seg) == 1:
-                x, y = seg[0].split(",")
-                g.append(f'<circle cx="{x}" cy="{y}" r="2.5" fill="{c}"/>')
+                cx, cy = seg[0].split(",")
+                g.append(f'<circle cx="{cx}" cy="{cy}" r="2.5" fill="{c}"/>')
     g.append("</svg>")
     return "".join(g)
 
@@ -291,9 +299,15 @@ def _h_block(b: M.Block) -> str:
         more = f'<li class="miss">… et {b.more} autre(s) chez la source, non listé(s)</li>' if b.more else ""
         return f'{t}<ul class="items">{items}{more}</ul>'
     if isinstance(b, M.TableBlock):
-        head = "".join(f'<th class="{"n" if n else ""}">{_e(c)}</th>' for c, n in zip(b.columns, b.numeric, strict=True))
+        head = "".join(
+            f'<th class="{"n" if n else ""}">{_e(c)}</th>' for c, n in zip(b.columns, b.numeric, strict=True)
+        )
         rows = "".join(
-            "<tr>" + "".join(f'<td class="{"n" if n else ""}">{_h_parts(c.parts)}</td>' for c, n in zip(r, b.numeric, strict=True)) + "</tr>"
+            "<tr>"
+            + "".join(
+                f'<td class="{"n" if n else ""}">{_h_parts(c.parts)}</td>' for c, n in zip(r, b.numeric, strict=True)
+            )
+            + "</tr>"
             for r in b.rows
         )
         note = f'<p class="lede">{_e(b.note)}</p>' if b.note else ""
@@ -317,16 +331,21 @@ def to_html(doc: M.Document) -> str:
     secs = []
     for s in doc.sections:
         lede = f'<p class="lede">{_e(s.lede)}</p>' if s.lede else ""
-        secs.append(f'<section id="s-{s.id}"><h2>{_e(s.title)}</h2>{lede}{"".join(_h_block(b) for b in s.blocks)}</section>')
+        secs.append(
+            f'<section id="s-{s.id}"><h2>{_e(s.title)}</h2>{lede}{"".join(_h_block(b) for b in s.blocks)}</section>'
+        )
     summ = "".join(f"<li>{_h_parts(x.parts)}</li>" for x in doc.summary)
     nc = "".join(
-        f"<li><b>{_e(n.what)}</b> — {_e(n.reason)}{' <i>(' + _e(n.section) + ')</i>' if n.section else ''}</li>" for n in doc.not_covered
+        f"<li><b>{_e(n.what)}</b> — {_e(n.reason)}{' <i>(' + _e(n.section) + ')</i>' if n.section else ''}</li>"
+        for n in doc.not_covered
     )
     lic = "".join(
         f"<li>{_e(x['title'])} — {_e(x['licence'])}{' <span class=nc>⚠ restrictive</span>' if x.get('restricted') else ''}</li>"
         for x in doc.licences
     )
-    fns = "".join(f'<li id="fn{f.n}">{_e(_fn_line(f))} <a href="#r{f.n}" class="noprint">↩</a></li>' for f in doc.footnotes)
+    fns = "".join(
+        f'<li id="fn{f.n}">{_e(_fn_line(f))} <a href="#r{f.n}" class="noprint">↩</a></li>' for f in doc.footnotes
+    )
     rules = "".join(f"<li>{_e(h)}</li>" for h in doc.honesty)
     atlas = f" · atlas {_e(m.atlas_snapshot[:12])}" if m.atlas_snapshot else ""
     return f"""<!doctype html>
@@ -336,9 +355,9 @@ def to_html(doc: M.Document) -> str:
 <header><div class="kicker">REVA · {_e(doc.subtitle)}</div><h1>{_e(doc.title)}</h1>
 <p class="sub">{_e(doc.subject.sublabel or "")}</p>
 <div class="meta">Généré le {_e(m.generated_at)} · modèle {_e(m.template)} v{_e(m.template_version)} · instantané de données {_e(m.snapshot_id)}{atlas} · {m.values} valeurs sourcées, {m.missing} manques déclarés, {len(doc.footnotes)} notes</div></header>
-{'<div class="essentiel"><h2>L’essentiel</h2><ul>' + summ + '</ul></div>' if summ else ''}
+{'<div class="essentiel"><h2>L’essentiel</h2><ul>' + summ + "</ul></div>" if summ else ""}
 <nav class="toc" aria-label="Sommaire"><ol>{toc}</ol></nav>
-{''.join(secs)}
+{"".join(secs)}
 <section id="non-couvert"><h2>Ce que ce dossier ne couvre pas</h2><ul class="notcovered">{nc}</ul></section>
 <section><h2>Règles de lecture</h2><ul class="rules">{rules}</ul></section>
 <section><h2>Licences des sources citées</h2><ul class="sources">{lic}</ul></section>
