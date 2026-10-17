@@ -180,8 +180,18 @@ def get_links_path(
         max_length=MAX_NON_TRANSIT,
         description="Properties whose objects may end a path but are never passed through (P37, P2936, P30, P2348)",
     ),
+    family: list[str] | None = Query(
+        None,
+        max_length=30,
+        description="V4 relation families (registry/kg/relations_v4.yaml): only statement hops that read, in path "
+        "order, as one of them (made_of, part_of, located_in, produced_by...). No family is causal",
+    ),
 ) -> LinksPathResponse:
     t = Timer()
+    if family:
+        from reva.kg.family_query import check_families, registry
+
+        check_families(registry(), family)
     for x in (*(kind or ()), *(exclude_kind or ())):
         if not re.match(KIND_PATTERN, x):
             raise ValidationProblem("invalid kind", kind=x[:64])
@@ -238,6 +248,7 @@ def get_links_path(
                 via_any=frozenset(via_any or ()),
                 via_all=frozenset(via_all or ()),
                 non_transit_props=frozenset(non_transit or ()),
+                families=frozenset(family) if family else None,
             )
     except service.UnknownCountry as e:
         raise NotFound("country not found in the knowledge graph (no ISO 3166 alpha-3 statement)", iso3=str(e)) from e

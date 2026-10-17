@@ -2096,6 +2096,45 @@
         "title": "AtlasHeadlineSeriesResponse",
         "type": "object"
       },
+      "AtlasHint": {
+        "additionalProperties": false,
+        "properties": {
+          "concept": {
+            "description": "Atlas catalog concept the series belongs to (GET /v1/atlas/series)",
+            "title": "Concept",
+            "type": "string"
+          },
+          "iso3": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iso3"
+          },
+          "table": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Table"
+          }
+        },
+        "required": [
+          "concept",
+          "iso3",
+          "table"
+        ],
+        "title": "AtlasHint",
+        "type": "object"
+      },
       "AtlasLicence": {
         "additionalProperties": true,
         "properties": {
@@ -7796,6 +7835,35 @@
         "title": "ContextEdge",
         "type": "object"
       },
+      "Coordinates": {
+        "additionalProperties": false,
+        "properties": {
+          "latitude": {
+            "title": "Latitude",
+            "type": "number"
+          },
+          "longitude": {
+            "title": "Longitude",
+            "type": "number"
+          },
+          "source_key": {
+            "title": "Source Key",
+            "type": "string"
+          },
+          "statement_key": {
+            "title": "Statement Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "latitude",
+          "longitude",
+          "statement_key",
+          "source_key"
+        ],
+        "title": "Coordinates",
+        "type": "object"
+      },
       "CostReport": {
         "additionalProperties": false,
         "properties": {
@@ -9627,6 +9695,347 @@
         "title": "EntityDetailResponse",
         "type": "object"
       },
+      "EntityFamilies": {
+        "additionalProperties": false,
+        "properties": {
+          "families": {
+            "items": {
+              "$ref": "#/components/schemas/FamilyGroup"
+            },
+            "title": "Families",
+            "type": "array"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "object"
+          },
+          "literals": {
+            "items": {
+              "$ref": "#/components/schemas/LiteralStatement"
+            },
+            "title": "Literals",
+            "type": "array"
+          },
+          "literals_truncated": {
+            "title": "Literals Truncated",
+            "type": "boolean"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "qid": {
+            "title": "Qid",
+            "type": "string"
+          },
+          "registry": {
+            "$ref": "#/components/schemas/RegistryInfo"
+          },
+          "scan_capped": {
+            "title": "Scan Capped",
+            "type": "boolean"
+          },
+          "unmapped": {
+            "items": {
+              "$ref": "#/components/schemas/UnmappedProperty"
+            },
+            "title": "Unmapped",
+            "type": "array"
+          }
+        },
+        "required": [
+          "qid",
+          "label",
+          "labels",
+          "kind",
+          "families",
+          "unmapped",
+          "literals",
+          "literals_truncated",
+          "scan_capped",
+          "registry",
+          "notes"
+        ],
+        "title": "EntityFamilies",
+        "type": "object"
+      },
+      "EntityFamiliesResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "applicability": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "baseline_release": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BaselineReleaseRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compression_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "context_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Context the data belongs to (null for registry metadata)",
+            "title": "Context Id"
+          },
+          "context_mode": {
+            "enum": [
+              "evidence",
+              "belief",
+              "simulation",
+              "evaluation",
+              "population",
+              "registry",
+              "operations"
+            ],
+            "title": "Context Mode",
+            "type": "string"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CostReport"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/EntityFamilies"
+          },
+          "data_freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Freshness"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimand": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimand"
+          },
+          "evidence_profile": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "historical_validation": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "knowledge_cutoff": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
+            "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
+          },
+          "modality": {
+            "enum": [
+              "reported_observation",
+              "selected_estimate",
+              "forecast",
+              "identified_causal_estimate",
+              "assumption_conditioned_scenario",
+              "unsupported",
+              "metadata",
+              "evaluation"
+            ],
+            "title": "Modality",
+            "type": "string"
+          },
+          "model_disagreement": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "model_versions": {
+            "items": {
+              "$ref": "#/components/schemas/ModelVersionRef"
+            },
+            "title": "Model Versions",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Opaque keyset cursor; null when no further page",
+            "title": "Next Cursor"
+          },
+          "numerical_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "origin": {
+            "description": "live, test_fixture (labelled fixture data), mixed or none",
+            "enum": [
+              "live",
+              "test_fixture",
+              "mixed",
+              "none"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance_links": {
+            "items": {
+              "$ref": "#/components/schemas/ProvenanceLink"
+            },
+            "title": "Provenance Links",
+            "type": "array"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support"
+          },
+          "uncertainty": {
+            "$ref": "#/components/schemas/UncertaintySummary"
+          },
+          "units": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "valid_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valid-time window of the returned data",
+            "title": "Valid Time"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "context_id",
+          "context_mode",
+          "origin",
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "knowledge_cutoff_basis",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
+        ],
+        "title": "EntityFamiliesResponse",
+        "type": "object"
+      },
       "EntityListResponse": {
         "additionalProperties": false,
         "properties": {
@@ -9885,6 +10294,333 @@
           "next_cursor"
         ],
         "title": "EntityListResponse",
+        "type": "object"
+      },
+      "EntityPlaces": {
+        "additionalProperties": false,
+        "properties": {
+          "chain": {
+            "items": {
+              "$ref": "#/components/schemas/PlaceLevel"
+            },
+            "title": "Chain",
+            "type": "array"
+          },
+          "coordinates": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Coordinates"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "country_iso3": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country Iso3"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "levels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Levels",
+            "type": "object"
+          },
+          "located_in_properties": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Located In Properties",
+            "type": "array"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "qid": {
+            "title": "Qid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "qid",
+          "label",
+          "chain",
+          "levels",
+          "country_iso3",
+          "coordinates",
+          "located_in_properties",
+          "note"
+        ],
+        "title": "EntityPlaces",
+        "type": "object"
+      },
+      "EntityPlacesResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "applicability": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "baseline_release": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BaselineReleaseRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compression_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "context_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Context the data belongs to (null for registry metadata)",
+            "title": "Context Id"
+          },
+          "context_mode": {
+            "enum": [
+              "evidence",
+              "belief",
+              "simulation",
+              "evaluation",
+              "population",
+              "registry",
+              "operations"
+            ],
+            "title": "Context Mode",
+            "type": "string"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CostReport"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/EntityPlaces"
+          },
+          "data_freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Freshness"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimand": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimand"
+          },
+          "evidence_profile": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "historical_validation": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "knowledge_cutoff": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
+            "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
+          },
+          "modality": {
+            "enum": [
+              "reported_observation",
+              "selected_estimate",
+              "forecast",
+              "identified_causal_estimate",
+              "assumption_conditioned_scenario",
+              "unsupported",
+              "metadata",
+              "evaluation"
+            ],
+            "title": "Modality",
+            "type": "string"
+          },
+          "model_disagreement": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "model_versions": {
+            "items": {
+              "$ref": "#/components/schemas/ModelVersionRef"
+            },
+            "title": "Model Versions",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Opaque keyset cursor; null when no further page",
+            "title": "Next Cursor"
+          },
+          "numerical_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "origin": {
+            "description": "live, test_fixture (labelled fixture data), mixed or none",
+            "enum": [
+              "live",
+              "test_fixture",
+              "mixed",
+              "none"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance_links": {
+            "items": {
+              "$ref": "#/components/schemas/ProvenanceLink"
+            },
+            "title": "Provenance Links",
+            "type": "array"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support"
+          },
+          "uncertainty": {
+            "$ref": "#/components/schemas/UncertaintySummary"
+          },
+          "units": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "valid_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valid-time window of the returned data",
+            "title": "Valid Time"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "context_id",
+          "context_mode",
+          "origin",
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "knowledge_cutoff_basis",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
+        ],
+        "title": "EntityPlacesResponse",
         "type": "object"
       },
       "EntityRef": {
@@ -11768,6 +12504,1122 @@
         "title": "Extractor",
         "type": "object"
       },
+      "FamilyGroup": {
+        "additionalProperties": false,
+        "properties": {
+          "causal": {
+            "const": false,
+            "title": "Causal",
+            "type": "boolean"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "count_is_lower_bound": {
+            "title": "Count Is Lower Bound",
+            "type": "boolean"
+          },
+          "family": {
+            "title": "Family",
+            "type": "string"
+          },
+          "group": {
+            "title": "Group",
+            "type": "string"
+          },
+          "inverse_label": {
+            "$ref": "#/components/schemas/FamilyLabels"
+          },
+          "label": {
+            "$ref": "#/components/schemas/FamilyLabels"
+          },
+          "neighbours": {
+            "items": {
+              "$ref": "#/components/schemas/FamilyNeighbour"
+            },
+            "title": "Neighbours",
+            "type": "array"
+          },
+          "properties": {
+            "items": {
+              "$ref": "#/components/schemas/FamilyPropertyCount"
+            },
+            "title": "Properties",
+            "type": "array"
+          },
+          "shown": {
+            "title": "Shown",
+            "type": "integer"
+          },
+          "symmetric": {
+            "title": "Symmetric",
+            "type": "boolean"
+          },
+          "truncated": {
+            "title": "Truncated",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "family",
+          "label",
+          "inverse_label",
+          "group",
+          "symmetric",
+          "count",
+          "count_is_lower_bound",
+          "shown",
+          "truncated",
+          "properties",
+          "neighbours",
+          "causal"
+        ],
+        "title": "FamilyGroup",
+        "type": "object"
+      },
+      "FamilyLabels": {
+        "additionalProperties": false,
+        "properties": {
+          "en": {
+            "title": "En",
+            "type": "string"
+          },
+          "fr": {
+            "title": "Fr",
+            "type": "string"
+          }
+        },
+        "required": [
+          "en",
+          "fr"
+        ],
+        "title": "FamilyLabels",
+        "type": "object"
+      },
+      "FamilyMappingOut": {
+        "additionalProperties": false,
+        "properties": {
+          "agent": {
+            "title": "Agent",
+            "type": "string"
+          },
+          "direction": {
+            "enum": [
+              "forward",
+              "reverse"
+            ],
+            "title": "Direction",
+            "type": "string"
+          },
+          "family": {
+            "title": "Family",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "origin": {
+            "description": "File the mapping is declared in (relations_v4.yaml or relations_v4.d/<agent>.yaml)",
+            "title": "Origin",
+            "type": "string"
+          },
+          "property": {
+            "title": "Property",
+            "type": "string"
+          },
+          "share_qualifier": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share Qualifier"
+          },
+          "share_scale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share Scale"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "subtype": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtype"
+          }
+        },
+        "required": [
+          "property",
+          "family",
+          "direction",
+          "subtype",
+          "source",
+          "share_qualifier",
+          "share_scale",
+          "origin",
+          "agent",
+          "note"
+        ],
+        "title": "FamilyMappingOut",
+        "type": "object"
+      },
+      "FamilyMappingRef": {
+        "additionalProperties": false,
+        "properties": {
+          "agent": {
+            "title": "Agent",
+            "type": "string"
+          },
+          "direction": {
+            "enum": [
+              "forward",
+              "reverse"
+            ],
+            "title": "Direction",
+            "type": "string"
+          },
+          "origin": {
+            "title": "Origin",
+            "type": "string"
+          }
+        },
+        "required": [
+          "origin",
+          "agent",
+          "direction"
+        ],
+        "title": "FamilyMappingRef",
+        "type": "object"
+      },
+      "FamilyNeighbour": {
+        "additionalProperties": false,
+        "properties": {
+          "atlas": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AtlasHint"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "measured_by only: the atlas series to read"
+          },
+          "mapping": {
+            "$ref": "#/components/schemas/FamilyMappingRef"
+          },
+          "neighbour": {
+            "$ref": "#/components/schemas/KgRef"
+          },
+          "reading": {
+            "$ref": "#/components/schemas/FamilyReading"
+          },
+          "rights": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ValueRights"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Licence of the raw artifact the statement was parsed from"
+          },
+          "share": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FamilyShare"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Only when the mapping declares a share; null = Missing, never 0"
+          },
+          "statement": {
+            "$ref": "#/components/schemas/KgStatementOut"
+          },
+          "subtype": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtype"
+          }
+        },
+        "required": [
+          "neighbour",
+          "reading",
+          "subtype",
+          "mapping",
+          "share",
+          "atlas",
+          "rights",
+          "statement"
+        ],
+        "title": "FamilyNeighbour",
+        "type": "object"
+      },
+      "FamilyOut": {
+        "additionalProperties": false,
+        "properties": {
+          "causal": {
+            "const": false,
+            "description": "Always false: no relation family is causal",
+            "title": "Causal",
+            "type": "boolean"
+          },
+          "description": {
+            "$ref": "#/components/schemas/FamilyLabels"
+          },
+          "group": {
+            "title": "Group",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "inverse_family": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inverse Family"
+          },
+          "inverse_label": {
+            "$ref": "#/components/schemas/FamilyLabels"
+          },
+          "label": {
+            "$ref": "#/components/schemas/FamilyLabels"
+          },
+          "mappings": {
+            "title": "Mappings",
+            "type": "integer"
+          },
+          "path_cost": {
+            "title": "Path Cost",
+            "type": "number"
+          },
+          "share_allowed": {
+            "title": "Share Allowed",
+            "type": "boolean"
+          },
+          "symmetric": {
+            "title": "Symmetric",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "inverse_label",
+          "inverse_family",
+          "symmetric",
+          "group",
+          "path_cost",
+          "share_allowed",
+          "causal",
+          "description",
+          "mappings"
+        ],
+        "title": "FamilyOut",
+        "type": "object"
+      },
+      "FamilyPathResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "applicability": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "baseline_release": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BaselineReleaseRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compression_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "context_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Context the data belongs to (null for registry metadata)",
+            "title": "Context Id"
+          },
+          "context_mode": {
+            "enum": [
+              "evidence",
+              "belief",
+              "simulation",
+              "evaluation",
+              "population",
+              "registry",
+              "operations"
+            ],
+            "title": "Context Mode",
+            "type": "string"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CostReport"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/FamilyPathResult"
+          },
+          "data_freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Freshness"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimand": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimand"
+          },
+          "evidence_profile": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "historical_validation": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "knowledge_cutoff": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
+            "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
+          },
+          "modality": {
+            "enum": [
+              "reported_observation",
+              "selected_estimate",
+              "forecast",
+              "identified_causal_estimate",
+              "assumption_conditioned_scenario",
+              "unsupported",
+              "metadata",
+              "evaluation"
+            ],
+            "title": "Modality",
+            "type": "string"
+          },
+          "model_disagreement": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "model_versions": {
+            "items": {
+              "$ref": "#/components/schemas/ModelVersionRef"
+            },
+            "title": "Model Versions",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Opaque keyset cursor; null when no further page",
+            "title": "Next Cursor"
+          },
+          "numerical_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "origin": {
+            "description": "live, test_fixture (labelled fixture data), mixed or none",
+            "enum": [
+              "live",
+              "test_fixture",
+              "mixed",
+              "none"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance_links": {
+            "items": {
+              "$ref": "#/components/schemas/ProvenanceLink"
+            },
+            "title": "Provenance Links",
+            "type": "array"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support"
+          },
+          "uncertainty": {
+            "$ref": "#/components/schemas/UncertaintySummary"
+          },
+          "units": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "valid_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valid-time window of the returned data",
+            "title": "Valid Time"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "context_id",
+          "context_mode",
+          "origin",
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "knowledge_cutoff_basis",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
+        ],
+        "title": "FamilyPathResponse",
+        "type": "object"
+      },
+      "FamilyPathResult": {
+        "additionalProperties": false,
+        "properties": {
+          "community_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Community Note"
+          },
+          "families": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Families"
+          },
+          "found": {
+            "title": "Found",
+            "type": "boolean"
+          },
+          "from": {
+            "title": "From",
+            "type": "string"
+          },
+          "from_label": {
+            "title": "From Label",
+            "type": "string"
+          },
+          "not_found_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Not Found Reason"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "paths": {
+            "items": {
+              "$ref": "#/components/schemas/KgPath"
+            },
+            "title": "Paths",
+            "type": "array"
+          },
+          "search": {
+            "$ref": "#/components/schemas/KgPathSearch"
+          },
+          "to": {
+            "title": "To",
+            "type": "string"
+          },
+          "to_label": {
+            "title": "To Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "from_label",
+          "to_label",
+          "found",
+          "paths",
+          "note",
+          "search",
+          "not_found_reason",
+          "community_note",
+          "families"
+        ],
+        "title": "FamilyPathResult",
+        "type": "object"
+      },
+      "FamilyPropertyCount": {
+        "additionalProperties": false,
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "label_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label En"
+          },
+          "label_fr": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label Fr"
+          },
+          "pid": {
+            "title": "Pid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pid",
+          "count",
+          "label_fr",
+          "label_en"
+        ],
+        "title": "FamilyPropertyCount",
+        "type": "object"
+      },
+      "FamilyReading": {
+        "additionalProperties": false,
+        "properties": {
+          "inverse": {
+            "description": "True when the label is the family's inverse reading",
+            "title": "Inverse",
+            "type": "boolean"
+          },
+          "label": {
+            "$ref": "#/components/schemas/FamilyLabels",
+            "description": "Relation read from the entity to the neighbour"
+          }
+        },
+        "required": [
+          "label",
+          "inverse"
+        ],
+        "title": "FamilyReading",
+        "type": "object"
+      },
+      "FamilyRegistryOut": {
+        "additionalProperties": false,
+        "properties": {
+          "families": {
+            "items": {
+              "$ref": "#/components/schemas/FamilyOut"
+            },
+            "title": "Families",
+            "type": "array"
+          },
+          "files": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "mappings": {
+            "items": {
+              "$ref": "#/components/schemas/FamilyMappingOut"
+            },
+            "title": "Mappings",
+            "type": "array"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          }
+        },
+        "required": [
+          "families",
+          "mappings",
+          "files",
+          "note"
+        ],
+        "title": "FamilyRegistryOut",
+        "type": "object"
+      },
+      "FamilyRegistryResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "applicability": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "baseline_release": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BaselineReleaseRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compression_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "context_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Context the data belongs to (null for registry metadata)",
+            "title": "Context Id"
+          },
+          "context_mode": {
+            "enum": [
+              "evidence",
+              "belief",
+              "simulation",
+              "evaluation",
+              "population",
+              "registry",
+              "operations"
+            ],
+            "title": "Context Mode",
+            "type": "string"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CostReport"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/FamilyRegistryOut"
+          },
+          "data_freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Freshness"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimand": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimand"
+          },
+          "evidence_profile": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "historical_validation": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "knowledge_cutoff": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
+            "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
+          },
+          "modality": {
+            "enum": [
+              "reported_observation",
+              "selected_estimate",
+              "forecast",
+              "identified_causal_estimate",
+              "assumption_conditioned_scenario",
+              "unsupported",
+              "metadata",
+              "evaluation"
+            ],
+            "title": "Modality",
+            "type": "string"
+          },
+          "model_disagreement": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "model_versions": {
+            "items": {
+              "$ref": "#/components/schemas/ModelVersionRef"
+            },
+            "title": "Model Versions",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Opaque keyset cursor; null when no further page",
+            "title": "Next Cursor"
+          },
+          "numerical_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "origin": {
+            "description": "live, test_fixture (labelled fixture data), mixed or none",
+            "enum": [
+              "live",
+              "test_fixture",
+              "mixed",
+              "none"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance_links": {
+            "items": {
+              "$ref": "#/components/schemas/ProvenanceLink"
+            },
+            "title": "Provenance Links",
+            "type": "array"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support"
+          },
+          "uncertainty": {
+            "$ref": "#/components/schemas/UncertaintySummary"
+          },
+          "units": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "valid_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valid-time window of the returned data",
+            "title": "Valid Time"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "context_id",
+          "context_mode",
+          "origin",
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "knowledge_cutoff_basis",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
+        ],
+        "title": "FamilyRegistryResponse",
+        "type": "object"
+      },
+      "FamilyShare": {
+        "additionalProperties": false,
+        "properties": {
+          "fraction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Normalised fraction 0..1 for dimensionless scales; null otherwise",
+            "title": "Fraction"
+          },
+          "qualifier": {
+            "title": "Qualifier",
+            "type": "string"
+          },
+          "scale": {
+            "title": "Scale",
+            "type": "string"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "value": {
+            "description": "Share as the source gives it (decimal string)",
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "fraction",
+          "unit",
+          "scale",
+          "qualifier"
+        ],
+        "title": "FamilyShare",
+        "type": "object"
+      },
       "FeatureCollection": {
         "additionalProperties": false,
         "properties": {
@@ -13541,6 +15393,17 @@
               }
             ]
           },
+          "family": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KgHopFamily"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "V4 relation family of the hop read in path order (null: property mapped to no family)"
+          },
           "from": {
             "$ref": "#/components/schemas/KgRef"
           },
@@ -13697,9 +15560,39 @@
           "dated",
           "time_status",
           "wording",
-          "causal_assertion"
+          "causal_assertion",
+          "family"
         ],
         "title": "KgHop",
+        "type": "object"
+      },
+      "KgHopFamily": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Universal relation family (registry/kg/relations_v4.yaml); never causal",
+            "title": "Id",
+            "type": "string"
+          },
+          "inverse": {
+            "title": "Inverse",
+            "type": "boolean"
+          },
+          "label": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Family reading in path order, {en, fr}",
+            "title": "Label",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "inverse"
+        ],
+        "title": "KgHopFamily",
         "type": "object"
       },
       "KgHub": {
@@ -16027,6 +17920,164 @@
           "next_cursor"
         ],
         "title": "LinksPathResponse",
+        "type": "object"
+      },
+      "LiteralStatement": {
+        "additionalProperties": false,
+        "properties": {
+          "direction": {
+            "anyOf": [
+              {
+                "enum": [
+                  "out",
+                  "in"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Direction"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KgTimeOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "object": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KgRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "point_in_time": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KgTimeOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "property": {
+            "$ref": "#/components/schemas/KgPropertyOut"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/KgProvenance"
+          },
+          "qualifiers": {
+            "additionalProperties": true,
+            "title": "Qualifiers",
+            "type": "object"
+          },
+          "rights": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ValueRights"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "row_id": {
+            "title": "Row Id",
+            "type": "integer"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KgTimeOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "subject": {
+            "$ref": "#/components/schemas/KgRef"
+          },
+          "time_calendars": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Calendars"
+          },
+          "valid_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Derived inclusive start date used for filtering, ISO 8601 with astronomical years (-0043-03-15 = 15 March 44 BCE; null: open)",
+            "title": "Valid From"
+          },
+          "valid_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Derived inclusive end date used for filtering, astronomical years (null: open)",
+            "title": "Valid To"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Typed literal (quantities as decimal strings)",
+            "title": "Value"
+          }
+        },
+        "required": [
+          "row_id",
+          "subject",
+          "property",
+          "object",
+          "value",
+          "start",
+          "end",
+          "point_in_time",
+          "time_calendars",
+          "valid_from",
+          "valid_to",
+          "qualifiers",
+          "provenance",
+          "direction",
+          "rights"
+        ],
+        "title": "LiteralStatement",
         "type": "object"
       },
       "LocationResponse": {
@@ -18833,6 +20884,89 @@
         "title": "Place",
         "type": "object"
       },
+      "PlaceLevel": {
+        "additionalProperties": false,
+        "properties": {
+          "basis": {
+            "enum": [
+              "start",
+              "statement",
+              "iso3166_2_code_prefix"
+            ],
+            "title": "Basis",
+            "type": "string"
+          },
+          "coordinates": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Coordinates"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "entity": {
+            "$ref": "#/components/schemas/KgRef"
+          },
+          "iso3": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iso3"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "0 country, 1 ADM1, 2 ADM2 when the identifier states it; else null",
+            "title": "Level"
+          },
+          "statement_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Statement Key"
+          },
+          "via": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Via"
+          }
+        },
+        "required": [
+          "entity",
+          "level",
+          "via",
+          "statement_key",
+          "basis",
+          "iso3",
+          "coordinates"
+        ],
+        "title": "PlaceLevel",
+        "type": "object"
+      },
       "Problem": {
         "additionalProperties": true,
         "description": "RFC 9457 problem details (application/problem+json).\n\nBuilt directly from ``RevaError.problem()`` (not serialized through this\nmodel), so optional members are genuinely optional on the wire.",
@@ -19792,6 +21926,33 @@
           "fr"
         ],
         "title": "Reason",
+        "type": "object"
+      },
+      "RegistryInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "families": {
+            "title": "Families",
+            "type": "integer"
+          },
+          "files": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "mappings": {
+            "title": "Mappings",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "families",
+          "mappings",
+          "files"
+        ],
+        "title": "RegistryInfo",
         "type": "object"
       },
       "Relation": {
@@ -23899,6 +26060,64 @@
         "title": "UncertaintySummary",
         "type": "object"
       },
+      "UnmappedProperty": {
+        "additionalProperties": false,
+        "properties": {
+          "causal_assertion": {
+            "description": "A source-asserted causal property (read it through /v1/causal)",
+            "title": "Causal Assertion",
+            "type": "boolean"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "direction": {
+            "enum": [
+              "out",
+              "in"
+            ],
+            "title": "Direction",
+            "type": "string"
+          },
+          "label_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label En"
+          },
+          "label_fr": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label Fr"
+          },
+          "pid": {
+            "title": "Pid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pid",
+          "direction",
+          "count",
+          "label_fr",
+          "label_en",
+          "causal_assertion"
+        ],
+        "title": "UnmappedProperty",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -23937,6 +26156,98 @@
           "type"
         ],
         "title": "ValidationError",
+        "type": "object"
+      },
+      "ValueRights": {
+        "additionalProperties": false,
+        "properties": {
+          "attribution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attribution"
+          },
+          "basis": {
+            "title": "Basis",
+            "type": "string"
+          },
+          "commercial_use": {
+            "title": "Commercial Use",
+            "type": "string"
+          },
+          "licence": {
+            "title": "Licence",
+            "type": "string"
+          },
+          "licence_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Licence Url"
+          },
+          "no_derivatives": {
+            "title": "No Derivatives",
+            "type": "boolean"
+          },
+          "non_commercial": {
+            "title": "Non Commercial",
+            "type": "boolean"
+          },
+          "open_licence": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Open Licence"
+          },
+          "restricted": {
+            "title": "Restricted",
+            "type": "boolean"
+          },
+          "restriction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Restriction"
+          },
+          "share_alike": {
+            "title": "Share Alike",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "licence",
+          "licence_url",
+          "attribution",
+          "commercial_use",
+          "non_commercial",
+          "share_alike",
+          "no_derivatives",
+          "open_licence",
+          "restricted",
+          "basis",
+          "restriction"
+        ],
+        "title": "ValueRights",
         "type": "object"
       },
       "WhyLane": {
@@ -28336,6 +30647,177 @@
         ]
       }
     },
+    "/v1/kg/entities/{qid}/families": {
+      "get": {
+        "operationId": "get_entity_families_v1_kg_entities__qid__families_get",
+        "parameters": [
+          {
+            "description": "Wikidata Q-id or provider-scoped key",
+            "in": "path",
+            "name": "qid",
+            "required": true,
+            "schema": {
+              "description": "Wikidata Q-id or provider-scoped key",
+              "maxLength": 161,
+              "pattern": "^(Q[1-9][0-9]{0,11}|[a-z][a-z0-9_]{1,31}:[A-Za-z0-9_.:-]{1,128})$",
+              "title": "Qid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Only these families (default: all)",
+            "in": "query",
+            "name": "family",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 30,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only these families (default: all)",
+              "title": "Family"
+            }
+          },
+          {
+            "description": "Neighbours shown per family",
+            "in": "query",
+            "name": "per_family",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "description": "Neighbours shown per family",
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Per Family",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "valid_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^-?[0-9]{1,7}(-[0-9]{2}(-[0-9]{2})?)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Valid From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "valid_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^-?[0-9]{1,7}(-[0-9]{2}(-[0-9]{2})?)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Valid To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_undated",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Include Undated",
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Also return literal values (identifiers, quantities, dates)",
+            "in": "query",
+            "name": "include_literals",
+            "required": false,
+            "schema": {
+              "default": true,
+              "description": "Also return literal values (identifiers, quantities, dates)",
+              "title": "Include Literals",
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere",
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "live",
+                    "test_fixture",
+                    "any"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere",
+              "title": "Origin"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityFamiliesResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Entity Families",
+        "tags": [
+          "knowledge-graph"
+        ]
+      }
+    },
     "/v1/kg/entities/{qid}/neighbours": {
       "get": {
         "operationId": "get_neighbours_v1_kg_entities__qid__neighbours_get",
@@ -28557,6 +31039,85 @@
         ]
       }
     },
+    "/v1/kg/entities/{qid}/places": {
+      "get": {
+        "operationId": "get_entity_places_v1_kg_entities__qid__places_get",
+        "parameters": [
+          {
+            "description": "Wikidata Q-id or provider-scoped key",
+            "in": "path",
+            "name": "qid",
+            "required": true,
+            "schema": {
+              "description": "Wikidata Q-id or provider-scoped key",
+              "maxLength": 161,
+              "pattern": "^(Q[1-9][0-9]{0,11}|[a-z][a-z0-9_]{1,31}:[A-Za-z0-9_.:-]{1,128})$",
+              "title": "Qid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere",
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "live",
+                    "test_fixture",
+                    "any"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere",
+              "title": "Origin"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityPlacesResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Entity Places",
+        "tags": [
+          "knowledge-graph"
+        ]
+      }
+    },
     "/v1/kg/entities/{qid}/timeline": {
       "get": {
         "operationId": "get_timeline_v1_kg_entities__qid__timeline_get",
@@ -28687,6 +31248,241 @@
           }
         },
         "summary": "Get Timeline",
+        "tags": [
+          "knowledge-graph"
+        ]
+      }
+    },
+    "/v1/kg/families": {
+      "get": {
+        "operationId": "list_families_v1_kg_families_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyRegistryResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "List Families",
+        "tags": [
+          "knowledge-graph"
+        ]
+      }
+    },
+    "/v1/kg/families/path": {
+      "get": {
+        "operationId": "get_family_path_v1_kg_families_path_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "maxLength": 161,
+              "pattern": "^(Q[1-9][0-9]{0,11}|[a-z][a-z0-9_]{1,31}:[A-Za-z0-9_.:-]{1,128})$",
+              "title": "From",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "maxLength": 161,
+              "pattern": "^(Q[1-9][0-9]{0,11}|[a-z][a-z0-9_]{1,31}:[A-Za-z0-9_.:-]{1,128})$",
+              "title": "To",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Allowed families (in reading direction)",
+            "in": "query",
+            "name": "family",
+            "required": true,
+            "schema": {
+              "description": "Allowed families (in reading direction)",
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 30,
+              "minItems": 1,
+              "title": "Family",
+              "type": "array"
+            }
+          },
+          {
+            "in": "query",
+            "name": "max_hops",
+            "required": false,
+            "schema": {
+              "default": 4,
+              "maximum": 5,
+              "minimum": 1,
+              "title": "Max Hops",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "valid_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^-?[0-9]{1,7}(-[0-9]{2}(-[0-9]{2})?)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Valid From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "valid_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^-?[0-9]{1,7}(-[0-9]{2}(-[0-9]{2})?)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Valid To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_undated",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Include Undated",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "hub_limit",
+            "required": false,
+            "schema": {
+              "default": 2000,
+              "maximum": 5000,
+              "minimum": 1,
+              "title": "Hub Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "allow_hub",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Allow Hub"
+            }
+          },
+          {
+            "in": "query",
+            "name": "max_paths",
+            "required": false,
+            "schema": {
+              "default": 5,
+              "maximum": 20,
+              "minimum": 1,
+              "title": "Max Paths",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere",
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "live",
+                    "test_fixture",
+                    "any"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Rows of this origin only; 'any' = live and test_fixture. Default: live in production, any elsewhere",
+              "title": "Origin"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyPathResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Family Path",
         "tags": [
           "knowledge-graph"
         ]
@@ -29502,6 +32298,28 @@
               ],
               "description": "Properties whose objects may end a path but are never passed through (P37, P2936, P30, P2348)",
               "title": "Non Transit"
+            }
+          },
+          {
+            "description": "V4 relation families (registry/kg/relations_v4.yaml): only statement hops that read, in path order, as one of them (made_of, part_of, located_in, produced_by...). No family is causal",
+            "in": "query",
+            "name": "family",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 30,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "V4 relation families (registry/kg/relations_v4.yaml): only statement hops that read, in path order, as one of them (made_of, part_of, located_in, produced_by...). No family is causal",
+              "title": "Family"
             }
           }
         ],
