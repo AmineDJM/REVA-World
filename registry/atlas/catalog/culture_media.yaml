@@ -22,7 +22,7 @@ concepts:
     source_order:
       - "musicbrainz.country_stats.mb_artists"
     provider_declared: true
-    notes: "Catalogue coverage, not the number of musicians in the country; 1.5 M of ~2.6 M artists had no country on 2026-10-17."
+    notes: "Catalogue coverage, not the number of musicians in the country; 1,518,606 artists (half of the Artists column total) were under Unknown country on 2026-10-17."
   - id: culture_media.mb_release_events
     labels: {fr: "Sorties musicales avec un événement de sortie dans le pays (MusicBrainz)", en: "Music releases with a release event in the country (MusicBrainz)"}
     definition: >-

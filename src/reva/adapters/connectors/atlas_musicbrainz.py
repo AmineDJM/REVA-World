@@ -38,7 +38,7 @@ summarised SQL):
 Honesty
 -------
 * Counts measure **what MusicBrainz volunteers have catalogued**, not national music output: coverage is very
-  uneven between countries and over time; the "Unknown country" row (1.5 M of ~2.6 M artists on 2026-10-17) is
+  uneven between countries and over time; the "Unknown country" row (1,518,606 artists, half of the column total, on 2026-10-17) is
   kept (provider_geo ``mb:null``, unmapped) so the share without a country is always visible.
 * MusicBrainz also uses codes that are not current countries (``XE`` Europe, ``XW`` Worldwide, ``SU`` Soviet Union,
   ``YU`` Yugoslavia, ``CS`` Serbia and Montenegro, ``XC`` Czechoslovakia, ``XG`` East Germany, ``XK`` Kosovo, ``AN``
