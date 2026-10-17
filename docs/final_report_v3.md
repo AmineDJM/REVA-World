@@ -184,7 +184,7 @@ planner is what runs.
 ```bash
 docker start reva-db || make up            # PostgreSQL 17 + PostGIS
 uv sync && (cd ui && npm ci)
-uv run reva db bootstrap                   # migrations to head 0016_causal_ops, roles, seed
+uv run reva db bootstrap                   # migrations to head 0017_links_retention, roles, seed
 uv run reva atlas list                     # 108 atlas sources
 uv run reva atlas ingest <source>          # one at a time, budget-metered (3 GiB/day cap)
 uv run reva atlas snapshot --skip-unchanged --warm
@@ -218,8 +218,9 @@ Resume details, disk needs and the data snapshot branches are in `docs/dev/HANDO
 | `0014_recorded_at_window` | lead | server timestamps accept the column default evaluated earlier in the same statement (still reject pre-statement and future values) |
 | `0015_causal` | CAUSCORE | causal claims, grades, retractions, candidates, owner-only reviews |
 | `0016_causal_ops` | CAUSOPS | `causal_refresh` job kind |
+| `0017_links_retention` | LINKRET | owner-only `kg.prune_link_materialisation`, `kg.link_prune` audit table, `reva links prune` |
 
-  Schema contract: head `0016_causal_ops` (`migrations/schema_contract.json`). The V3 schema fixes from the reviews
+  Schema contract: head `0017_links_retention` (`migrations/schema_contract.json`). The V3 schema fixes from the reviews
   and from operations shipped as new migrations (0011, 0014). This report did not check whether 0009–0016 were
   edited in place before 0016.
 * **Data is not in the main branch.** The dev database, `var/objects` (~3.8 GB) and the Wikidata archive are
