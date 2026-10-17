@@ -1,0 +1,41 @@
+[
+  {
+    "request_fingerprint": "7afe9ca5488bc751fe9486275f8df838ea49bdb1532878d9e7100d7d554a6e1f",
+    "url": "https://api.imf.org/external/sdmx/2.1/data/IMF.STA,COFER/....Q",
+    "file": "7afe9ca5488bc751.xml",
+    "sha256": "fd614cb5be21d2a57c2718118f84942d38217fd4bbb5a9465309e6cbdd1ad146",
+    "status": 200,
+    "headers": {
+      "content-type": "application/xml"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "IMF Copyright and Usage terms (https://www.imf.org/external/terms.htm); provider LICENSE attribute: '(c) International Monetary Fund Copyright. All Rights Reserved.' Cite: International Monetary Fund, <dataset>, https://data.imf.org/en/datasets/<agency>:<flow>",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "2f54e1b3e4761ac9750acf1220471b426cc62af73102c717c5f9b0b1070fca43",
+    "url": "https://api.imf.org/external/sdmx/2.1/data/IMF.FAD,GDD/.FL_S1311MIXED_POGDP_PT+FL_S13_POGDP_PT+FL_S14_POGDP_PT+F3T4_S14_POGDP_PT+FL_S11_POGDP_PT+F3T4_S11_POGDP_PT+FL_S11001_POGDP_PT+FL_S1ZS_POGDP_PT+FL_PS_POGDP_PT+F3T4_PS_POGDP_PT.A",
+    "file": "2f54e1b3e4761ac9.xml",
+    "sha256": "c1497843e57d2241c3ced8f398bd8244e66cb1bfcb0b7b36fddb21a8340a525b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/xml"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "IMF Copyright and Usage terms (https://www.imf.org/external/terms.htm); provider LICENSE attribute: '(c) International Monetary Fund Copyright. All Rights Reserved.' Cite: International Monetary Fund, <dataset>, https://data.imf.org/en/datasets/<agency>:<flow>",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "60517eee1b36ac221f6a4412d6b4c1c4bb384131e8c409ef0f1177871a33123c",
+    "url": "https://api.imf.org/external/sdmx/2.1/data/IMF.FAD,HPD/.G63G_S13_POFYGDP.A",
+    "file": "60517eee1b36ac22.xml",
+    "sha256": "76eaf3af8f2daeef0a1588b28611c427e26ad3ca73425f3c98e6a02329c35ace",
+    "status": 200,
+    "headers": {
+      "content-type": "application/xml"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "IMF Copyright and Usage terms (https://www.imf.org/external/terms.htm); provider LICENSE attribute: '(c) International Monetary Fund Copyright. All Rights Reserved.' Cite: International Monetary Fund, <dataset>, https://data.imf.org/en/datasets/<agency>:<flow>",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  }
+]

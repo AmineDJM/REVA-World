@@ -18,7 +18,10 @@ What REVA records (and does not)
 * KG (source key ``carbonbrief.attribution``): one entity per distinct ``Name`` (the source's own label, exact text,
   this source only) -- ``cbattr:extreme:<h>`` of kind ``extreme_event`` (typed as a disaster event by
   ``registry/events/taxonomy.yaml``) or, when every row of the Name says ``Trend``, ``cbattr:trend:<h>`` of kind
-  ``climate_trend`` (never an event); its event type (``cbattr:event_type``), period (``P585`` year or ``P580``/``P582`` years when the field
+  ``climate_trend`` (never an event). FIX4A (audit AUDIT3 L8): the CSV publishes no event or study id, so this id is
+  **REVA-made** (first 16 hex digits of the sha256 of the exact ``Name`` text; identical Names are one entity, a
+  Name spelled two ways is two) and every such entity carries a ``cbattr:identity_rule`` statement saying so
+  (:data:`EVENT_ID_RULE`). Its event type (``cbattr:event_type``), period (``P585`` year or ``P580``/``P582`` years when the field
   is ``YYYY`` / ``YYYY-YY(YY)``; any other text kept verbatim in ``cbattr:event_period_text``), countries
   (``cbattr:country`` -> country QID, from the ISO3 codes the source publishes; family ``located_in``) and one
   ``cbattr:finding`` per study row: the classification verbatim with the citation, link, rapid-study flag and summary
@@ -61,7 +64,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.attribution_cb"
-VERSION = "1.0.2"  # 1.0.2: publisher URL tails stripped from link DOIs; 1.0.1: 1.0.0 was an in-flight snapshot
+VERSION = "1.1.0"  # 1.1.0 (FIX4A, AUDIT3 L8): REVA-made id rule stated per entity; 1.0.2: publisher URL tails stripped from link DOIs; 1.0.1: 1.0.0 was an in-flight snapshot
 SOURCE_KEY = "carbonbrief.attribution"
 ATLAS_SOURCE = "attribution_cb"
 DATASET = "findings"
@@ -136,7 +139,19 @@ KG_PREDICATES: dict[str, tuple[str, str, str, str]] = {
         "conclusion d'une étude d'attribution (classification Carbon Brief)",
     ),
     "cbattr:definition": ("string", "cbattr_definition", "definition (verbatim)", "définition (verbatim)"),
+    "cbattr:identity_rule": (
+        "string",
+        "cbattr_identity_rule",
+        "how REVA made this identifier (Carbon Brief attribution map)",
+        "comment REVA a construit cet identifiant (carte d'attribution Carbon Brief)",
+    ),
 }
+#: FIX4A (AUDIT3 L8): stated on every extreme / trend entity
+EVENT_ID_RULE = (
+    "REVA-made identifier: the first 16 hex digits of the sha256 of the exact 'Name' text of Carbon Brief's CSV "
+    "(Carbon Brief publishes no event id). Rows with an identical Name are grouped as one entity: two events sharing "
+    "a name would be merged and one event spelled two ways would be split; no other matching is done."
+)
 WIKIDATA_PIDS = ("P585", "P580", "P582")
 
 
@@ -350,6 +365,8 @@ def kg_items(rows: list[Row], csv_f: Any, page_f: Any, meta: Mapping[str, str], 
                              descriptions={"en": "extreme weather event or trend in Carbon Brief's attribution map"},
                              source_revision=rev))  # fmt: skip
         h = eid.rsplit(":", 1)[1]
+        st(eid, "cbattr:identity_rule", f"cbattr:{h}:identity_rule", value={"type": "string", "value": EVENT_ID_RULE},
+           quals={"reva_made_identifier": True, "keyed_by": "Name (exact text)"})  # fmt: skip
         for et in sorted({r["Event type"] for r in rs if r["Event type"]}):
             st(eid, "cbattr:event_type", f"cbattr:{h}:type:{et}", value={"type": "string", "value": et})
         for pt in sorted({r["Event year/Trend"] for r in rs if r["Event year/Trend"]}):

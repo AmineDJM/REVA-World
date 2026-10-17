@@ -108,7 +108,9 @@ def parse_variables(data: bytes, *, known_concepts: set[str] | None = None) -> V
         )
     for vid, ev in out.items():
         if ev.growth_variable and ev.growth_variable not in out:
-            raise ValidationProblem("variables.yaml: unknown growth_variable", id=vid, growth_variable=ev.growth_variable)
+            raise ValidationProblem(
+                "variables.yaml: unknown growth_variable", id=vid, growth_variable=ev.growth_variable
+            )
     return Variables(out, hashlib.sha256(data).hexdigest())
 
 

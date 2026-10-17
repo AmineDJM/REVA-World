@@ -1,0 +1,54 @@
+[
+  {
+    "request_fingerprint": "9da38d92770bcd9b3cfb51f1df70ffaadeb60d665a98d06b46b83dba0ae44b5f",
+    "url": "https://stats.bis.org/api/v1/data/WS_LBS_D_PUB/Q.S+F.C+L.A.TO1.A.5J.A..A.5J.N?format=csv",
+    "file": "9da38d92770bcd9b.csv",
+    "sha256": "613ec2da14eb34ad9612f9e5d92e3187c01004ff1a7f6ae96382d3a9fa3c3a86",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "BIS terms of permitted use of BIS statistics: use unrestricted provided the BIS is cited as the source, translations marked unofficial, no misleading use, no extra charge in commercial products",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "94d9bb0d2eb201c449bcf47d67183e13e06a24081ec766b84545ffb4f727282a",
+    "url": "https://stats.bis.org/api/v1/data/WS_LBS_D_PUB/Q.S.C+L.A.TO1.A.5J.A.5A.A..N?format=csv",
+    "file": "94d9bb0d2eb201c4.csv",
+    "sha256": "c7ad877bff471ff8e5101c9f173c0c3509cfc99ebb34d3f1f237a53af908befc",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "BIS terms of permitted use of BIS statistics: use unrestricted provided the BIS is cited as the source, translations marked unofficial, no misleading use, no extra charge in commercial products",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "2a87da4cf8b9fe76d8dfdcdb424a52e7eee98968070b67add47971ca2c6cea87",
+    "url": "https://stats.bis.org/api/v1/data/WS_NA_SEC_DSS/Q.N..XW.S13+S1311.S1.N.L.LE.F3.T._Z.USD._T..V.N._T?format=csv",
+    "file": "2a87da4cf8b9fe76.csv",
+    "sha256": "efb5b854d230f75a4d68d20036c4d72c1e1b601303434ab665c7eb0f2092e5f2",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "BIS terms of permitted use of BIS statistics: use unrestricted provided the BIS is cited as the source, translations marked unofficial, no misleading use, no extra charge in commercial products",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "077c1458648460671b1d6e16dccab28ad3b2a20921a38df740266035eb32b1f9",
+    "url": "https://data.bis.org/help/legal",
+    "file": "077c145864846067.html",
+    "sha256": "aebbb4c40d465bb259ce04a780dca1a958fa813efb5a6b0d6e742eb89e8125a6",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "BIS terms of permitted use of BIS statistics: use unrestricted provided the BIS is cited as the source, translations marked unofficial, no misleading use, no extra charge in commercial products",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (visible text of the page)"
+  }
+]

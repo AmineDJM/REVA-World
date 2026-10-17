@@ -1,0 +1,48 @@
+SERIES,DESCRIPTION
+RPQB56A,Quarterly amounts outstanding of Central Bank sterling reserve balance liabilities (in sterling millions) not seasonally adjusted
+RPQB58A,Quarterly amounts outstanding of Central Bank short-term open market operations (fine-tune sterling) (in sterling millions) not seasonally adjusted
+RPQB9R8,Quarterly amounts outstanding of Central Bank sterling short-term market operations with Bank of England counterparties (one-week sterling) (in sterling millions) not seasonally adjusted
+RPQBV79,Quarterly amounts outstanding of Central Bank short-term open market operations (other maturity within-maintenance period sterling) (in sterling millions) not seasonally adjusted
+RPQB55A,Quarterly amounts outstanding of Central Bank sterling notes in circulation total (in sterling millions) not seasonally adjusted
+RPQB62A,Quarterly amounts outstanding of Central Bank sterling cash ratio deposits from monetary financial institutions (in sterling millions) not seasonally adjusted
+RPQZ6MO,Quarterly amounts outstanding of Central Bank other sterling liabilities (in sterling millions) not seasonally adjusted
+RPQZ6MS,Quarterly amounts outstanding of Central Bank sterling capital and reserves (equity) from monetary financial institutions (in sterling millions) not seasonally adjusted
+RPQB59A,Quarterly amounts outstanding of Central Bank foreign currency public securities issued total (in sterling millions) not seasonally adjusted
+RPQZ6MT,Quarterly amounts outstanding of other foreign currency liabilities (in sterling millions) not seasonally adjusted
+RPQB75A,Quarterly amounts outstanding of Central Bank assets/liabilities total (in sterling millions) not seasonally adjusted
+RPQB68A,Quarterly amounts outstanding of Central Bank sterling fine-tuning reverse repos with Bank of England counterparties (in sterling millions) not seasonally adjusted
+
+RPQB67A,Quarterly amounts outstanding of Central Bank sterling one week sterling reverse repos with Bank of England counterparties (in sterling millions) not seasonally adjusted
+
+RPQBL59,Quarterly amounts outstanding of Central Bank sterling other maturity within-maintenance period reverse repos Bank of England counterparties (in sterling millions) not seasonally adjusted
+
+RPQZ4TJ,Quarterly amounts outstanding of Central Bank sterling indexed long-term repo with Bank of England counterparties (in sterling millions) not seasonally adjusted
+
+RPQZ4TK,Quarterly amounts outstanding of Central Bank sterling contingent term repo facility with Bank of England counterparties (in sterling millions) not seasonally adjusted
+
+RPQZ4TL,Quarterly amounts outstanding of Central Bank sterling denominated bond holdings total (in sterling millions) not seasonally adjusted
+
+RPQZP2P,Accounting value of the aggregate drawings from the Term Funding Scheme on the Bank of England balance sheet (in sterling millions) financed by the creation of central bank reserves
+RPQZOQ4,Accounting value of the aggregate drawings from the Term Funding Scheme with additional incentives for SMEs (TFSME) (in sterling millions) financed by the creation of central bank reserves
+RPQZ4TM,Quarterly amounts outstanding of Central Bank sterling loan to Asset Purchase Facility total (in sterling millions) not seasonally adjusted
+
+RPQZOM3,Quarterly amounts outstanding of Central Bank sterling deposit with Alternative Liquidity Facility total (in sterling millions) not seasonally adjusted
+
+
+RPQZOQ3,Quarterly amounts outstanding of Central Bank sterling loan to Covid Corporate Financing Facility total (in sterling millions) not seasonally adjusted
+RPQB72A,Quarterly amounts outstanding of Central Bank sterling ways and means advances to HM government (in sterling millions) not seasonally adjusted
+RPQZ6MW,Quarterly amounts outstanding of Central Bank sterling other assets (in sterling millions) not seasonally adjusted
+
+RPQZ4TN,Quarterly amounts outstanding of Central Bank all foreign currency reserve assets total (in sterling millions) not seasonally adjusted
+
+RPQZ6MX,Quarterly amounts outstanding of Central Bank other foreign currency assets (in sterling millions) not seasonally adjusted
+
+
+DATE,RPQB56A,RPQB58A,RPQB9R8,RPQBV79,RPQB55A,RPQB62A,RPQZ6MO,RPQZ6MS,RPQB59A,RPQZ6MT,RPQB75A,RPQB68A,RPQB67A,RPQBL59,RPQZ4TJ,RPQZ4TK,RPQZ4TL,RPQZP2P,RPQZOQ4,RPQZ4TM,RPQZOM3,RPQZOQ3,RPQB72A,RPQZ6MW,RPQZ4TN,RPQZ6MX
+31 Mar 2014,297848,0,0,0,60659,4078,24141,3034,3601,10203,403564,0,0,0,1313,0,10174,,,375000,,,370,807,3588,12312
+30 Jun 2014,302868,0,0,0,61761,4128,18912,3032,3517,9835,404053,0,0,0,1908,0,10264,,,375000,,,370,612,3508,12391
+30 Sep 2014,291312,0,0,0,62713,4128,30605,3127,3703,9477,405065,0,0,0,1658,0,10245,,,375000,,,370,805,3686,13301
+30 Sep 2024,730989,0,0,0,89144,0,56545,4250,12694,9718,903340,0,37059,0,4260,0,14870,0,121714,695024,0,0,370,3748,13510,12785
+31 Dec 2024,711588,0,0,0,91932,0,21885,4325,15440,9925,855095,0,38075,0,7391,0,14842,0,102672,659015,0,0,370,3643,15977,13110
+31 Mar 2025,694512,0,0,0,91230,0,46869,4406,14052,10799,861868,0,58394,0,14825,0,14018,0,88938,654531,6,0,370,3311,13739,13736
+30 Jun 2025,681248,0,0,0,93055,0,47574,4396,13795,15321,855389,0,72782,0,26338,0,13488,0,83000,622521,0,0,370,3304,14669,18917

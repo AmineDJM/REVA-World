@@ -578,7 +578,10 @@ def causal_available(engine: Any) -> bool:
 
 
 def _load_one(
-    engine: Any, store: Any, d: ClaimDelivery, source_row_present: Callable[[Mapping[str, Any]], bool | None] | None = None
+    engine: Any,
+    store: Any,
+    d: ClaimDelivery,
+    source_row_present: Callable[[Mapping[str, Any]], bool | None] | None = None,
 ) -> dict[str, Any]:
     codebook_cls, claim_cls = _causal_api("Codebook"), _causal_api("DatasetClaim")
     load_dataset_claims = _causal_api("load_dataset_claims")

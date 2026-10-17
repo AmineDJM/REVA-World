@@ -1,0 +1,74 @@
+# Wikidata statement packs read through QLever (owner: WDOPS, V6; loader:
+# src/reva/adapters/connectors/atlas_wdops_qlever.py, source atlas.wdops_qlever, budget key qlever.wikidata).
+#
+# Why: the WDHARVEST statements specs (registry/kg/queries/**) re-read every subject from a Wikidata entity snapshot
+# (one Special:EntityData request per entity while the action API answers 429) -- about 4,000 entities per day on the
+# wikidata.wbapi budget, far below the ~150k subjects the V4 statements specs select. A pack reads the same
+# statements (same Wikidata statement ids, same properties) in one SPARQL query from QLever's live-updated index of
+# the Wikidata dump, with the subject and object en/fr labels.
+#
+# What a pack row is (and is not): a Wikidata statement as QLever indexes it -- subject, allow-listed property,
+# item object, rank, statement id. Entity revision, qualifiers and references are NOT read: revision recorded as
+# unknown, references "unknown (not read)", never "unreferenced". Deprecated statements are dropped in Python
+# (QLever answered rank FILTERs inconsistently on 2026-10-17). A statement the KG already holds from a Wikidata
+# snapshot (wikidata.wbapi / wikidata.wdqs, same statement id) is not loaded twice; the snapshot wins.
+#
+# Selection: `items` is a SPARQL group pattern binding ?item; `max_items` keeps the N holders with the most
+# sitelinks (ORDER BY/LIMIT: a documented size bound, never a judgement on the items left out); `max_rows` is an
+# upper bound -- a pack returning more rows fails (nothing silently truncated). Every property must be in
+# registry/kg/properties.yaml with kind entity. `mirrors` names the WDHARVEST spec whose statements the pack reads.
+version: 1
+packs:
+  - id: eco_food
+    mirrors: geography.ecology.main_food_source
+    properties: [P1034]
+    max_rows: 8000
+    note: "P1034 main food source (all holders; 2,330 statements probed on WDQS 2026-10-17)."
+  - id: eco_host
+    mirrors: geography.ecology.host
+    properties: [P2975]
+    max_items: 8000
+    max_rows: 30000
+    note: "P2975 host (the 8,000 holders with most sitelinks)."
+  - id: eco_iucn
+    mirrors: geography.ecology.iucn_status
+    properties: [P141]
+    max_items: 25000
+    max_rows: 40000
+    note: "P141 IUCN conservation status (the 25,000 taxa with most sitelinks)."
+  - id: eco_endemic
+    mirrors: geography.ecology.endemic_to
+    properties: [P183]
+    max_items: 30000
+    max_rows: 60000
+    note: "P183 endemic to (the 30,000 taxa with most sitelinks)."
+  - id: eco_range
+    mirrors: geography.ecology.taxon_range
+    properties: [P9714]
+    max_items: 25000
+    max_rows: 80000
+    note: "P9714 taxon range (the 25,000 taxa with most sitelinks)."
+  - id: chem_petroleum
+    mirrors: science.chem_petroleum_composition
+    items: "?item wdt:P279* wd:Q22656 ."
+    properties: [P527, P186]
+    max_rows: 3000
+    note: "Petroleum (Q22656) and its subclasses: has part(s) / made from material, as Wikidata states them."
+  - id: chem_elements
+    mirrors: science.chem_element_discovery
+    items: "?item wdt:P31 wd:Q11344 ."
+    properties: [P61, P189]
+    max_rows: 2000
+    note: "Chemical elements (Q11344): discoverer or inventor, location of discovery (dates stay with the snapshot spec)."
+  - id: chem_materials
+    mirrors: science.chem_materials_made_from
+    items: "VALUES ?root { wd:Q37756 wd:Q11427 wd:Q11474 wd:Q45190 wd:Q22657 wd:Q11469 wd:Q83323 wd:Q42501 } ?item wdt:P279* ?root ."
+    properties: [P186, P527]
+    max_rows: 40000
+    note: "Subclasses of fuels, materials and chemical products: made from material / has part(s)."
+  - id: health_treat
+    mirrors: science.health_disease_treatments_symptoms
+    items: "?item wdt:P699 [] ."
+    properties: [P2176, P780]
+    max_rows: 80000
+    note: "Disease Ontology-bearing disease items: drug or therapy used for treatment, symptoms and signs."

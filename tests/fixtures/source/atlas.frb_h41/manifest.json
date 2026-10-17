@@ -1,0 +1,41 @@
+[
+  {
+    "request_fingerprint": "7172b91f88f7e5419dae4b9548537513f2255e87d07aa5c4ffeca70083bbf69b",
+    "url": "https://www.federalreserve.gov/releases/h41/data/FRB_h41_xml.zip",
+    "file": "7172b91f88f7e541.zip",
+    "sha256": "8a4380b3da64526d842674d77926249910daf91bf4048456878a32b54f5e6900",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-zip-compressed"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "Public domain (Board of Governors of the Federal Reserve System website information); cite the Board",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "3a427cadb28cdd7b396982155d67bb90ba93053817bb4907afd7eeca06c46905",
+    "url": "https://www.federalreserve.gov/releases/h41/about.htm",
+    "file": "3a427cadb28cdd7b.html",
+    "sha256": "0adec439ee8662079ef416b90422d054568b0da6bee169fc3d5e87441e912795",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "Public domain (Board of Governors of the Federal Reserve System website information); cite the Board",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (visible text of the page)"
+  },
+  {
+    "request_fingerprint": "7dc9107dc33862004ef2fb76ac855d88405637d04f31a3c789869031301378b9",
+    "url": "https://www.federalreserve.gov/disclaimer.htm",
+    "file": "7dc9107dc3386200.html",
+    "sha256": "c39f2f174f7dac6d110f0ae57bc22c07ec0fdf1b9b3cef69f117c56dc32162b7",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "Public domain (Board of Governors of the Federal Reserve System website information); cite the Board",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (visible text of the page)"
+  }
+]

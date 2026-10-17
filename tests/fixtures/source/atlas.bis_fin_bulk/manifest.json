@@ -1,0 +1,41 @@
+[
+  {
+    "request_fingerprint": "345f43c7d9d52476faf6ddd80e138b6d9384a248462e84710d00dc70112e22fa",
+    "url": "https://data.bis.org/static/bulk/WS_CBTA_csv_flat.zip",
+    "file": "345f43c7d9d52476.zip",
+    "sha256": "8a450ef9804c18f87b42a9a92e412e29536b23650bcf88c13c5264ed0093b469",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "BIS terms of permitted use of BIS statistics: use unrestricted provided the BIS is cited as the source, translations marked unofficial, no misleading use, no extra charge in commercial products",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "ca2f046491344fb661eb51a4453adbfc308170e72315d7beff893cef771b5750",
+    "url": "https://data.bis.org/static/bulk/WS_GLI_csv_flat.zip",
+    "file": "ca2f046491344fb6.zip",
+    "sha256": "304800d1cb11abf8175d2859132668dcf85ef51b1392497a62095f07968df9c1",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "BIS terms of permitted use of BIS statistics: use unrestricted provided the BIS is cited as the source, translations marked unofficial, no misleading use, no extra charge in commercial products",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "077c1458648460671b1d6e16dccab28ad3b2a20921a38df740266035eb32b1f9",
+    "url": "https://data.bis.org/help/legal",
+    "file": "077c145864846067.html",
+    "sha256": "aebbb4c40d465bb259ce04a780dca1a958fa813efb5a6b0d6e742eb89e8125a6",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "BIS terms of permitted use of BIS statistics: use unrestricted provided the BIS is cited as the source, translations marked unofficial, no misleading use, no extra charge in commercial products",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (visible text of the page)"
+  }
+]

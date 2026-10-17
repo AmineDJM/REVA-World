@@ -24,10 +24,14 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import date
 from decimal import Decimal
+from functools import lru_cache
+from pathlib import Path
 from statistics import NormalDist
 from typing import Any
 
-from reva.predict.decision import VarRef
+import yaml
+
+from reva.predict.decision import REGISTRY_DIR, VarRef
 
 # ------------------------------------------------------------------------------------------- unit vocabulary
 #: Exact definitional unit factors for stated shock units: (canonical unit, factor) with
@@ -102,11 +106,17 @@ METHOD_RANK: dict[str, int] = {
     "other": 1,
 }
 CHOICE_RULE = (
-    "one estimate per edge, never summed or averaged: (1) scope applies exactly to the geography > world panel > "
-    "country group or unstated scope; (2) published uncertainty > none; (3) dated lag profile > dated single "
-    "horizon > undated; (4) identification family (identity > meta-analysis > experimental/quasi-experimental > "
-    "LP/SVAR/event study > VAR > regressions > structural/IO > calibration); (5) most recent as-of; (6) key"
+    "one estimate per edge, never summed or averaged: (1) scope is the geography alone > pooled panel listing the "
+    "geography or world panel > country group (membership not checked) or unstated scope; (2) published "
+    "uncertainty > none; (3) dated lag profile > dated single horizon > undated; (4) identification family "
+    "(identity > meta-analysis > experimental/quasi-experimental > LP/SVAR/event study > VAR > regressions > "
+    "structural/IO > calibration); (5) declared variant preference (registry/predict/estimate_preferences.yaml: "
+    "publication-bias corrected > uncorrected, median > mean, when one publication reports several variants); "
+    "(6) most recent as-of; a tie that remains after (1)-(6) is not broken: no estimate is chosen and the tie is "
+    "reported as a gap (never an alphabetical pick)"
 )
+PREFERENCES_PATH = REGISTRY_DIR / "estimate_preferences.yaml"
+NEUTRAL_PREFERENCE = 100
 OLD_ESTIMATE_YEARS = 20
 
 
@@ -357,6 +367,9 @@ def hop_from_estimate(est: Mapping[str, Any], unit_of: Callable[[VarRef], str | 
         problems.append("effect_unit_undetermined")
     if in_unit == "std_dev":
         problems.append("std_dev_shock_needs_cause_standard_deviation")
+    bad = consistency_problem(est)
+    if bad:
+        problems.append(bad)
     point = _f(est.get("point"))
     na = normal_approx(est)
     sd = na.get("sd")
@@ -437,21 +450,30 @@ def hop_from_estimate(est: Mapping[str, Any], unit_of: Callable[[VarRef], str | 
 
 
 # ------------------------------------------------------------------------------------------- applicability
-APPLICABILITY_RANK = {"exact": 3, "world_panel": 2, "group_unverified": 1, "scope_unstated": 1}
+APPLICABILITY_RANK = {"exact": 3, "panel_member": 2, "world_panel": 2, "group_unverified": 1, "scope_unstated": 1}
 
 
 def applicability(scope: Mapping[str, Any], geo: str, start_year: int) -> tuple[str, list[str]]:
     """Scope of an estimate vs a geography and the decision's start year.
 
-    ``exact`` (geo listed), ``world_panel`` (scope lists WLD: a transported average), ``group_unverified``
-    (only a verbatim country group: membership is not machine-checked), ``scope_unstated``, or
-    ``out_of_scope`` (countries listed, geo not among them: the estimate is not used for that geography).
+    ``exact`` (the scope is this geography alone), ``panel_member`` (a pooled panel whose listed countries
+    include geo: an average over the panel, not a geo-specific estimate — audit AUDIT3 M5c), ``world_panel``
+    (scope lists WLD: a transported average), ``group_unverified`` (only a verbatim country group: pooled panel,
+    membership not checked), ``scope_unstated``, or ``out_of_scope`` (countries listed, geo not among them: the
+    estimate is not used for that geography).
     """
     notes: list[str] = []
     countries = [str(c) for c in (scope.get("countries") or [])]
     group = scope.get("country_group")
-    if geo in countries:
+    if geo in countries and len(set(countries)) == 1:
         status = "exact"
+    elif geo in countries:
+        status = "panel_member"
+        n = scope.get("n_countries") or len(set(countries))
+        notes.append(
+            f"pooled panel ({n} countries; {geo} is in the listed sample): an average over the panel, not an "
+            f"estimate specific to {geo}"
+        )
     elif "WLD" in countries:
         status = "world_panel"
         if geo != "WLD":
@@ -460,7 +482,7 @@ def applicability(scope: Mapping[str, Any], geo: str, start_year: int) -> tuple[
         return "out_of_scope", [f"estimate scope {countries} does not include {geo}"]
     elif group:
         status = "group_unverified"
-        notes.append(f"estimate scope is the group '{group}' (verbatim); membership of {geo} is not machine-checked")
+        notes.append(f"pooled panel ('{group}', verbatim); {geo} membership not checked")
     else:
         status = "scope_unstated"
         notes.append("the estimate states no geographic scope")
@@ -476,14 +498,77 @@ def applicability(scope: Mapping[str, Any], geo: str, start_year: int) -> tuple[
     return status, notes
 
 
-def choice_key(h: Hop, app_status: str) -> tuple[Any, ...]:
+@lru_cache(maxsize=4)
+def _preferences(path: str) -> dict[str, dict[str, Any]]:
+    try:
+        with open(path, encoding="utf-8") as f:
+            doc = yaml.safe_load(f) or {}
+    except FileNotFoundError:
+        return {}
+    rules = {str(r["id"]): dict(r) for r in doc.get("rules") or []}
+    out: dict[str, dict[str, Any]] = {}
+    for p in doc.get("preferences") or []:
+        rule = rules.get(str(p.get("rule")))
+        if rule is None:
+            raise ValueError(f"estimate_preferences.yaml: unknown rule {p.get('rule')!r}")
+        out[str(p["estimate_key"])] = {
+            "rank": int(p["rank"]),
+            "variant_fr": p.get("variant_fr"),
+            "variant_en": p.get("variant_en"),
+            "rule": rule["id"],
+            "rule_fr": rule.get("statement_fr"),
+        }
+    return out
+
+
+def preference(estimate_key: str, path: Path | None = None) -> dict[str, Any] | None:
+    """The declared variant preference of an estimate (``registry/predict/estimate_preferences.yaml``), or None."""
+    return _preferences(str(path or PREFERENCES_PATH)).get(estimate_key)
+
+
+def choice_key(h: Hop, app_status: str, prefs: Path | None = None) -> tuple[Any, ...]:
     dated_rank = 2 if (h.dated is not None and len(h.dated) > 1) else 1 if h.dated is not None else 0
     as_of = h.as_of.toordinal() if h.as_of else 0
+    pref = preference(h.estimate_key, prefs)
     return (
         -APPLICABILITY_RANK.get(app_status, 0),
         0 if h.has_uncertainty else 1,
         -dated_rank,
         -METHOD_RANK.get(str(h.method), 0),
+        pref["rank"] if pref else NEUTRAL_PREFERENCE,
         -as_of,
-        h.estimate_key,
+        h.estimate_key,  # ordering only: equal keys up to here are an unresolved tie (see ``tied``)
     )
+
+
+def tied(a: tuple[Any, ...], b: tuple[Any, ...]) -> bool:
+    """Two candidates equal on every declared rule: the engine must not pick one (no alphabetical tie-break)."""
+    return a[:-1] == b[:-1]
+
+
+# ------------------------------------------------------------------------------------------- consistency
+def consistency_problem(est: Mapping[str, Any]) -> str | None:
+    """Level-vs-growth consistency of the estimate's effect with the variable it names (audit AUDIT3 M3).
+
+    Same rule as the effect loader (``reva.effects.consistency``): a cumulative / percent level response stored on
+    a growth-rate id, or a growth rate stored on a level variable that has a curated growth variable, is refused
+    (never converted: a difference of local-projection horizons is not exactly the growth response)."""
+    try:
+        from reva.effects.consistency import side_problem
+        from reva.effects.variables import load_variables
+    except ImportError:  # pragma: no cover - reva.effects is part of the package
+        return None
+    var = load_variables()
+    eff = est.get("effect") or {}
+    kind, id_ = str(eff.get("kind")), str(eff.get("id"))
+    growth = id_ in var.growth_ids().get(kind, set())
+    gvar = var.items[id_].growth_variable if kind == "variable" and id_ in var.items else None
+    why = side_problem(
+        transform=eff.get("transform"),
+        is_growth=growth,
+        growth_variable=gvar,
+        definition=eff.get("definition"),
+        measure=est.get("measure"),
+        unit=est.get("unit"),
+    )
+    return f"effect_{why}" if why else None

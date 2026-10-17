@@ -1,0 +1,54 @@
+[
+  {
+    "request_fingerprint": "4f53b6f6915a6dbf9b262aa54fe3f1def70eba933212845427d9c80cac0cb9af",
+    "url": "https://www.bankofengland.co.uk/boeapps/database/_iadb-fromshowcolumns.asp?csv.x=yes&Datefrom=01/Jan/2014&Dateto=now&SeriesCodes=RPWB55A,RPWB56A,RPWB59A,RPWB67A,RPWZ4TJ,RPWZ4TK,RPWZOQ4,RPWZ4TL,RPWZ4TM,RPWZOI7,RPWZ4TN&CSVF=TT&UsingCodes=Y&VPD=Y&VFD=N",
+    "file": "4f53b6f6915a6dbf.csv",
+    "sha256": "005bd5d2f59c6b3540b68cbcea40dacefc9e9ebd395b7b1ce5460a73c590f491",
+    "status": 200,
+    "headers": {
+      "content-type": "application/csv"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "UK Open Government Licence v3.0 (Bank of England Database)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "3c03930b54e154bb36a575badaabe1041a05a762589c6a07ce50025447d5c0ae",
+    "url": "https://www.bankofengland.co.uk/boeapps/database/_iadb-fromshowcolumns.asp?csv.x=yes&Datefrom=01/Jan/2014&Dateto=now&SeriesCodes=RPQB56A,RPQB58A,RPQB9R8,RPQBV79,RPQB55A,RPQB62A,RPQZ6MO,RPQZ6MS,RPQB59A,RPQZ6MT,RPQB75A,RPQB68A,RPQB67A,RPQBL59,RPQZ4TJ,RPQZ4TK,RPQZ4TL,RPQZP2P,RPQZOQ4,RPQZ4TM,RPQZOM3,RPQZOQ3,RPQB72A,RPQZ6MW,RPQZ4TN,RPQZ6MX&CSVF=TT&UsingCodes=Y&VPD=Y&VFD=N",
+    "file": "3c03930b54e154bb.csv",
+    "sha256": "86a0e58e2e4af8567eee234ea27c188c476857d646195abe902d83ba70f94d2b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/csv"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "UK Open Government Licence v3.0 (Bank of England Database)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "513e451e750bbe3bec2a09a3dd3f72dec3a989c7d5aa7a791c30d00d8e6cbbee",
+    "url": "https://www.bankofengland.co.uk/legal",
+    "file": "513e451e750bbe3b.html",
+    "sha256": "a6688839d5c875782550af0e74b0d686ca72d40d119c7c406265843e65ef7d1f",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "UK Open Government Licence v3.0 (Bank of England Database)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (visible text of the page)"
+  },
+  {
+    "request_fingerprint": "b1cbf566b6e0008fe58c1629a8de20007e959461aedde8ce02d9adfe8f133070",
+    "url": "https://www.bankofengland.co.uk/weekly-report/balance-sheet-and-weekly-report",
+    "file": "b1cbf566b6e0008f.html",
+    "sha256": "bedcbf9107975add673e6f8b08840865a54b73294d8e0c8851cd367af6b2fb9b",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "UK Open Government Licence v3.0 (Bank of England Database)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (visible text of the page)"
+  }
+]

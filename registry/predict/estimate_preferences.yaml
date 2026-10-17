@@ -1,0 +1,41 @@
+# Declared variant preferences for the decision engine's choice among estimates of one edge (agent FIX4B,
+# 2026-10-17; audit AUDIT3 M4). Read by reva.predict.estimates.choice_key as rule (5) of CHOICE_RULE, after scope,
+# published uncertainty, dating and identification family, before as-of. Lower rank = preferred; an estimate not
+# listed has the neutral rank 100. A tie that remains after every rule is NOT broken (no alphabetical pick): the
+# engine reports it as a gap `unresolved_tie` with the tied estimate keys.
+#
+# These are REVA's curation choices, stated as such (not the sources' recommendations). The chosen variant is
+# named in the hop (`preference.variant_fr`) and in the variable's notes; the other variants stay listed as
+# alternatives, never summed or averaged.
+schema: reva-predict-preferences/1
+rules:
+  - id: bias_corrected_median_first
+    statement_en: >-
+      When one meta-analysis reports its summary effect both before and after a correction for publication bias,
+      and both as a mean and as a median, prefer the publication-bias-corrected figure (the source itself argues
+      that uncorrected averages overstate effects), and the median over the mean (less sensitive to extreme study
+      estimates). Order: corrected median, corrected mean, uncorrected median, uncorrected mean.
+    statement_fr: >-
+      Quand une méta-analyse publie son effet résumé avant et après correction du biais de publication, en
+      moyenne et en médiane : la valeur corrigée est préférée (la source indique que les moyennes non corrigées
+      surestiment les effets), et la médiane à la moyenne (moins sensible aux estimations extrêmes). Ordre :
+      médiane corrigée, moyenne corrigée, médiane non corrigée, moyenne non corrigée.
+  - id: median_over_mean
+    statement_en: >-
+      When one meta-analysis reports a mean and a median of the same effect and no publication-bias correction of
+      it, prefer the median (less sensitive to extreme study estimates).
+    statement_fr: >-
+      Quand une méta-analyse publie la moyenne et la médiane d'un même effet sans correction du biais de
+      publication : la médiane est préférée (moins sensible aux estimations extrêmes).
+preferences:
+  # ECB Occasional Paper 377 (Bobasu, Ciccarelli & Notarpietro 2025), +25 bp unexpected policy-rate shock.
+  - {estimate_key: "pub:effects.literature:bobasu_ciccarelli_notarpietro_2025:output_peak_median_bias_corrected", rank: 1, rule: bias_corrected_median_first, variant_fr: "médiane corrigée du biais de publication", variant_en: "publication-bias-corrected median"}
+  - {estimate_key: "pub:effects.literature:bobasu_ciccarelli_notarpietro_2025:output_peak_mean_bias_corrected", rank: 2, rule: bias_corrected_median_first, variant_fr: "moyenne corrigée du biais de publication", variant_en: "publication-bias-corrected mean"}
+  - {estimate_key: "pub:effects.literature:bobasu_ciccarelli_notarpietro_2025:output_peak_median", rank: 3, rule: bias_corrected_median_first, variant_fr: "médiane non corrigée", variant_en: "uncorrected median"}
+  - {estimate_key: "pub:effects.literature:bobasu_ciccarelli_notarpietro_2025:output_peak_mean", rank: 4, rule: bias_corrected_median_first, variant_fr: "moyenne non corrigée", variant_en: "uncorrected mean"}
+  - {estimate_key: "pub:effects.literature:bobasu_ciccarelli_notarpietro_2025:price_level_peak_median_bias_corrected", rank: 1, rule: bias_corrected_median_first, variant_fr: "médiane corrigée du biais de publication", variant_en: "publication-bias-corrected median"}
+  - {estimate_key: "pub:effects.literature:bobasu_ciccarelli_notarpietro_2025:price_level_peak_mean_bias_corrected", rank: 2, rule: bias_corrected_median_first, variant_fr: "moyenne corrigée du biais de publication", variant_en: "publication-bias-corrected mean"}
+  - {estimate_key: "pub:effects.literature:bobasu_ciccarelli_notarpietro_2025:price_level_peak_median", rank: 3, rule: bias_corrected_median_first, variant_fr: "médiane non corrigée", variant_en: "uncorrected median"}
+  - {estimate_key: "pub:effects.literature:bobasu_ciccarelli_notarpietro_2025:price_level_peak_mean", rank: 4, rule: bias_corrected_median_first, variant_fr: "moyenne non corrigée", variant_en: "uncorrected mean"}
+  - {estimate_key: "pub:effects.literature:bobasu_ciccarelli_notarpietro_2025:inflation_peak_median", rank: 1, rule: median_over_mean, variant_fr: "médiane (aucune correction du biais publiée pour l'inflation)", variant_en: "median (no bias-corrected inflation figure published)"}
+  - {estimate_key: "pub:effects.literature:bobasu_ciccarelli_notarpietro_2025:inflation_peak_mean", rank: 2, rule: median_over_mean, variant_fr: "moyenne", variant_en: "mean"}

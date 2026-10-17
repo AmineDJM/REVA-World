@@ -1,0 +1,93 @@
+[
+  {
+    "request_fingerprint": "722bbd1a12bd05ff203daa32908c9c9d170302bd5c439b0b863fee7e0791278e",
+    "url": "https://data-api.ecb.europa.eu/service/data/ILM/W.U2.C.A010000+A020000+A020100+A020200+A030000+A040000+A040100+A040200+A050000+A050100+A050200+A050300+A050400+A050500+A050600+A060000+A070000+A070100+A070200+A080000+A110000+L010000+L020000+L020100+L020200+L020300+L020400+L020500+L030000+L040000+L050000+L050100+L050200+L060000+L070000+L080000+L080100+L080200+L090000+L120000+L140000+L150000+T000000..?format=csvdata",
+    "file": "722bbd1a12bd05ff.csv",
+    "sha256": "7a46da6dff89776913204ff13d3adb045978b1a5536fce79b6936e858af8f1b0",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "ECB website copyright: free use provided the information appears accurately and the ECB is cited as the source (modifications stated explicitly)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "4f9d2b97116615458ac8c903f3b4e80634cd9bf401182bf1f74a112c1e22dfd3",
+    "url": "https://data-api.ecb.europa.eu/service/data/IRS/M..L.L40.CI.0000..N.Z?format=csvdata",
+    "file": "4f9d2b9711661545.csv",
+    "sha256": "414d346dc513bc78e1c429c32f61da42eac70cee443b9c697bfb719f4ccc1133",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "ECB website copyright: free use provided the information appears accurately and the ECB is cited as the source (modifications stated explicitly)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "6f00cdcbc98da73cb3a64b7f33a2ce297bdfac7ffcebc65b2387c2210e9f58b6",
+    "url": "https://data-api.ecb.europa.eu/service/data/YC/B.U2.EUR.4F.G_N_A+G_N_C.SV_C_YM.SR_2Y+SR_10Y?format=csvdata",
+    "file": "6f00cdcbc98da73c.csv",
+    "sha256": "d9a55e41da7fb761960a0646abf8f5a4074be74212e6e8b54fd1d5b38df59102",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "ECB website copyright: free use provided the information appears accurately and the ECB is cited as the source (modifications stated explicitly)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "36ff17cc03a7421c32b5aea54a250908ec42d881e9aa8835b22cc8690299b642",
+    "url": "https://www.ecb.europa.eu/press/wfs/html/index.en.html",
+    "file": "36ff17cc03a7421c.html",
+    "sha256": "310458375133b0649e005a54642350f46c9e88aa9bfdc20a5719493ec33a48c5",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "ECB website copyright: free use provided the information appears accurately and the ECB is cited as the source (modifications stated explicitly)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (visible text of the page)"
+  },
+  {
+    "request_fingerprint": "440ff771c6ccf0ec3a3554c2d4f4f819ecc085d12fddd93b89e06498e7de6add",
+    "url": "https://www.ecb.europa.eu/stats/financial_markets_and_interest_rates/long_term_interest_rates/html/index.en.html",
+    "file": "440ff771c6ccf0ec.html",
+    "sha256": "1a4a221a93fb4c11795be7781f5d3be50b8ddd853bdf0fa6e2282179b2a3318d",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "ECB website copyright: free use provided the information appears accurately and the ECB is cited as the source (modifications stated explicitly)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (visible text of the page)"
+  },
+  {
+    "request_fingerprint": "cbd4093de6b4061b8eb8c5a717068d693de2e6267ffc8daf8abe9ee8be9c7bd7",
+    "url": "https://www.ecb.europa.eu/stats/financial_markets_and_interest_rates/euro_area_yield_curves/html/index.en.html",
+    "file": "cbd4093de6b4061b.html",
+    "sha256": "4e0aea5bf1670cec268c22a1949e0c03b3b271072ae7096cc4963c8885219dc4",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "ECB website copyright: free use provided the information appears accurately and the ECB is cited as the source (modifications stated explicitly)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (visible text of the page)"
+  },
+  {
+    "request_fingerprint": "674e117901189d0f1d23770a8f1325d33f7eeb07fad5f2ebb4571129fa06f720",
+    "url": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html",
+    "file": "674e117901189d0f.html",
+    "sha256": "565ecfc0bd7ae29e4a2e61ee87971de5d4c5a0e04842707a030b194b771489ec",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "ECB website copyright: free use provided the information appears accurately and the ECB is cited as the source (modifications stated explicitly)",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (visible text of the page)"
+  }
+]

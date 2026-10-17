@@ -1,0 +1,67 @@
+[
+  {
+    "request_fingerprint": "ff1f84733cc9a9eae01776d3037409e07a6d1350d540cc606c814177d15c5b20",
+    "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_Factors_CSV.zip",
+    "file": "ff1f84733cc9a9ea.zip",
+    "sha256": "b1550a4fa1cf7c8c28c555b9ebce1ae7e5c9b357ba4e068a602766de5b30b4a4",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-zip-compressed"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "No licence granted: (c) Eugene F. Fama and Kenneth R. French (Kenneth R. French Data Library); computed from licensed CRSP data; not an open licence",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "28c9036c29dcd36a2ba31ffd13865b6ec4e5f9b16e37432290c736e872dd6c50",
+    "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_Factors_daily_CSV.zip",
+    "file": "28c9036c29dcd36a.zip",
+    "sha256": "a876da14ffca16f4675342ba37e256aff66750bfda21386f046e1d227fbeb2d9",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-zip-compressed"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "No licence granted: (c) Eugene F. Fama and Kenneth R. French (Kenneth R. French Data Library); computed from licensed CRSP data; not an open licence",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "7002556935a12cc1045acd61a97e106f4d37af2780642d9c8786dc376e89136d",
+    "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_5_Factors_2x3_CSV.zip",
+    "file": "7002556935a12cc1.zip",
+    "sha256": "036b839e674cba2d3cdb6e5dc2d3046cd7891d605752873737463e8a4f5d3b11",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-zip-compressed"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "No licence granted: (c) Eugene F. Fama and Kenneth R. French (Kenneth R. French Data Library); computed from licensed CRSP data; not an open licence",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "61fa8135508eb25ca26fc9d99a35c9cfa82d5342727b21bc053087b6bc0611ce",
+    "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Momentum_Factor_CSV.zip",
+    "file": "61fa8135508eb25c.zip",
+    "sha256": "b739f0ab7803b5ea73f6e364fb903bc07522cb4fb4af9ba7e504f9aaf174cc4f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-zip-compressed"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "No licence granted: (c) Eugene F. Fama and Kenneth R. French (Kenneth R. French Data Library); computed from licensed CRSP data; not an open licence",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+  },
+  {
+    "request_fingerprint": "d5e42a9a9d320b24897b3f55f3cc777d5934d70306c56c1b8621f2bb69e1475d",
+    "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html",
+    "file": "d5e42a9a9d320b24.html",
+    "sha256": "1fcc021f8a612bc0b96a535614917492d1fc0dbc3aa0f3803c7ed655ad0de6a3",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:00:00+00:00",
+    "licence": "No licence granted: (c) Eugene F. Fama and Kenneth R. French (Kenneth R. French Data Library); computed from licensed CRSP data; not an open licence",
+    "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (visible text of the page)"
+  }
+]

@@ -210,7 +210,7 @@ def test_history_as_of_uses_only_vintages_published_by_the_cutoff() -> None:
 
 def test_as_of_backtest_against_the_hub_ensemble(frames: dict[str, pl.DataFrame]) -> None:
     fam = C.cached_specs().family("nhsn.flu_hosp")
-    series, labels, _ = C.extract_series(frames["atlas.cdc.flusight_target"], fam)
+    series, _labels, _ = C.extract_series(frames["atlas.cdc.flusight_target"], fam)
     vint = C.extract_vintages(frames["atlas.cdc.flusight_vintages"], fam)
     ens = C.extract_ensemble(frames["atlas.cdc.flusight_ensemble"], fam)
     tasks, skipped = C.as_of_tasks(fam, series, vint, ens)
@@ -227,7 +227,9 @@ def test_as_of_backtest_against_the_hub_ensemble(frames: dict[str, pl.DataFrame]
 def test_winner_rule_needs_significance() -> None:
     fam = C.cached_specs().family("erviss.ili_rate")
     hist = [(i, 50 + 30 * math.sin(2 * math.pi * i / 52)) for i in range(5000, 5300)]
-    tasks = [C.Task(f"o{o}", "X", 1, o + 1, [x for x in hist if x[0] <= o], dict(hist)[o + 1]) for o in range(5200, 5290)]
+    tasks = [
+        C.Task(f"o{o}", "X", 1, o + 1, [x for x in hist if x[0] <= o], dict(hist)[o + 1]) for o in range(5200, 5290)
+    ]
     res = C.run_backtest(fam, tasks, alpha=0.05)
     for w in res["winners"]:
         for b in fam.baselines:

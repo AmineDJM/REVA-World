@@ -1,0 +1,21 @@
+SERIES,DESCRIPTION
+RPWB55A,Weekly amounts outstanding of Central Bank sterling notes in circulation total (in sterling millions) not seasonally adjusted
+RPWB56A,Weekly amounts outstanding of Central Bank sterling reserve balance liabilities (in sterling millions) not seasonally adjusted
+RPWB59A,Weekly amounts outstanding of Central Bank foreign currency public securities issued total (in sterling millions) not seasonally adjusted
+RPWB67A,Weekly amounts outstanding of Central Bank one-week reverse repos (Short Term Repos) with Bank of England counterparties (in sterling millions) not seasonally adjusted
+RPWZ4TJ,Weekly amounts outstanding of Central Bank sterling indexed long-term repos with Bank of England counterparties (in sterling millions) not seasonally adjusted
+RPWZ4TK,Weekly amounts outstanding of Central Bank sterling contingent term repo facility with Bank of England counterparties (in sterling millions) not seasonally adjusted
+RPWZOQ4,Accounting value of the aggregate drawings from the Term Funding Scheme with additional incentives for SMEs (TFSME) (in sterling millions) financed by the creation of central bank reserves
+RPWZ4TL,Weekly amounts outstanding of Central Bank sterling denominated bond holdings total (in sterling millions) not seasonally adjusted
+RPWZ4TM,Weekly amounts outstanding of Central Bank sterling loan to Asset Purchase Facility total (in sterling millions) not seasonally adjusted
+RPWZOI7,Weekly amounts outstanding of Central Bank sterling loan to APF for temporary long-dated UK Government Bond purchases total (in sterling millions) not seasonally adjusted
+RPWZ4TN,Weekly amounts outstanding of Central Bank all foreign currency reserve assets total (in sterling millions) not seasonally adjusted
+
+DATE,RPWB55A,RPWB56A,RPWB59A,RPWB67A,RPWZ4TJ,RPWZ4TK,RPWZOQ4,RPWZ4TL,RPWZ4TM,RPWZOI7,RPWZ4TN
+01 Jan 2014,62470,297036,3634,0,125,0,,9979,375000,,3648
+08 Jan 2014,60517,299413,3647,0,125,0,,9990,375000,,3648
+15 Jan 2014,59688,300820,3674,0,325,0,,10006,375000,,3675
+16 Sep 2026,98962,638012,21190,124141,84919,0,41613,12743,521819,,21214
+23 Sep 2026,98984,642336,22569,125390,84756,0,41613,12747,521819,,22842
+30 Sep 2026,99214,645578,23680,128918,84446,0,38513,12751,521819,,24987
+07 Oct 2026,99425,649563,23879,133441,84922,0,38513,12755,521819,,23631

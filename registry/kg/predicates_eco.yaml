@@ -176,6 +176,15 @@ predicates:
     inverse_label_fr: "domaine biogéographique de (Écorégions RESOLVE 2017)"
     derived: false
     description: Ecoregion -> realm, attribute REALM of the release's attribute table (the realm name is its only code).
+  - pid: "resolve:identity_rule"
+    value_kind: string
+    reva_predicate: resolve_identity_rule
+    label_en: "how REVA made this identifier (RESOLVE Ecoregions 2017)"
+    label_fr: "comment REVA a construit cet identifiant (Écorégions RESOLVE 2017)"
+    derived: true
+    description: >-
+      FIX4A (audit AUDIT3 L8): the release publishes no realm code; resolve_realm:<REALM> is a REVA-made identifier
+      keyed by the realm name. Stated on each realm entity so the grouping rule is never hidden.
   - pid: "resolve:nature_needs_half"
     value_kind: string
     reva_predicate: resolve_nature_needs_half

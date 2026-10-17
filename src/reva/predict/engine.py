@@ -406,8 +406,26 @@ class Engine:
                 if not cands:
                     continue
                 cands.sort(key=lambda c: es.choice_key(c[0], c[1]))
-                chosen, app, app_notes, approx = cands[0]
                 target_id = f"{effect.key}@{g}"
+                if len(cands) > 1 and es.tied(
+                    es.choice_key(cands[0][0], cands[0][1]), es.choice_key(cands[1][0], cands[1][1])
+                ):
+                    k0 = es.choice_key(cands[0][0], cands[0][1])
+                    tie = [c for c in cands if es.tied(es.choice_key(c[0], c[1]), k0)]
+                    self.gaps.append(
+                        {
+                            "code": "unresolved_tie",
+                            "node": target_id,
+                            "estimate_keys": [c[0].estimate_key for c in tie],
+                            "points": [c[0].coef for c in tie],
+                            "message_fr": "plusieurs estimations de ce lien sont à égalité sur toutes les règles de choix "
+                            "déclarées (registry/predict/estimate_preferences.yaml) : aucune n'est retenue (pas de "
+                            "choix alphabétique) ; elles sont listées ici, jamais additionnées ni moyennées",
+                        }
+                    )
+                    continue
+                chosen, app, app_notes, approx = cands[0]
+                pref = es.preference(chosen.estimate_key)
                 if target_id in self.nodes:
                     self.alt_paths.append(
                         {
@@ -439,7 +457,13 @@ class Engine:
                     path=[*node.path, hid],
                     point_estimates=set(node.point_estimates)
                     | ({chosen.estimate_key} if not chosen.has_uncertainty else set()),
-                    notes=[*notes, *chosen.notes, *app_notes, *([approx] if approx else [])],
+                    notes=[
+                        *notes,
+                        *chosen.notes,
+                        *app_notes,
+                        *([approx] if approx else []),
+                        *([f"variante retenue : {pref['variant_fr']} (règle déclarée {pref['rule']})"] if pref else []),
+                    ],
                 )
                 if u is not None and node.undated_kind:
                     child.undated_kind = node.undated_kind if chosen.undated_kind is None else chosen.undated_kind
@@ -470,6 +494,7 @@ class Engine:
                             else {"kind": "undated", "horizon_kind": chosen.undated_kind}
                         ),
                         "applicability": {"status": app, "notes": app_notes, "geo": g},
+                        "preference": pref,
                         "notes": chosen.notes,
                         "source": chosen.provenance(),
                         "alternatives": [

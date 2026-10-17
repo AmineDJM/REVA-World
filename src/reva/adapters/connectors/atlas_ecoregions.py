@@ -14,6 +14,8 @@ KG (``load_batch``, source key ``resolve.ecoregions2017``):
 * ``resolve_eco:<ECO_ID>`` (kind ``ecoregion``, label ``ECO_NAME``), ``resolve_biome:<BIOME_NUM>`` (kind ``biome``,
   label ``BIOME_NAME``), ``resolve_realm:<REALM>`` (kind ``biogeographic_realm``; the realm name is the release's
   only code for it, used verbatim with spaces as ``_``);
+  FIX4A (audit AUDIT3 L8): the realm id is **REVA-made** (keyed by the source's name string; the release has no
+  realm code) and each realm entity says so in a ``resolve:identity_rule`` statement (:data:`REALM_ID_RULE`);
 * ``resolve:in_biome`` and ``resolve:in_realm`` (ecoregion -> biome / realm; family ``part_of``) and
   ``resolve:nature_needs_half`` (NNH category 1-4 with its name, verbatim).
 
@@ -34,7 +36,7 @@ from reva.adapters.connectors.eco_common import guarded_load
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.ecoregions"
-CONNECTOR_VERSION = "1.0.1"  # 1.0.0 was registered from an in-flight snapshot with different code
+CONNECTOR_VERSION = "1.1.0"  # 1.1.0 (FIX4A, AUDIT3 L8): realm identity rule stated; 1.0.0 was an in-flight snapshot
 PARSER_VERSION = "atlas-ecoregions-1"
 SOURCE_KEY = "resolve.ecoregions2017"
 ATLAS_SOURCE = "ecoregions"
@@ -47,7 +49,12 @@ MAX_DBF_BYTES = 5_000_000
 MIN_ECOREGIONS = 800  # 847 records (846 ecoregions + "Rock and Ice") in the 2017 release
 EXPECTED_LICENCE = "CC-BY 4.0"
 REQUIRED_FIELDS = ("ECO_NAME", "BIOME_NUM", "BIOME_NAME", "REALM", "ECO_ID", "NNH", "NNH_NAME", "LICENSE")
-PIDS = ("resolve:in_biome", "resolve:in_realm", "resolve:nature_needs_half")
+PIDS = ("resolve:in_biome", "resolve:in_realm", "resolve:nature_needs_half", "resolve:identity_rule")
+#: FIX4A (AUDIT3 L8): stated on every realm entity
+REALM_ID_RULE = (
+    "REVA-made identifier: resolve_realm:<REALM> is the release's REALM attribute text with spaces as '_'. RESOLVE "
+    "Ecoregions 2017 publishes no realm code; ecoregions are grouped into a realm by identical REALM text only."
+)
 RELEASE_YEAR = 2017
 
 
@@ -271,6 +278,18 @@ def kg_parts(ecos: Sequence[Ecoregion], *, raw_sha256: str, source_revision: str
                     "fr": "domaine biogéographique (Écorégions RESOLVE 2017)",
                 },
                 source_revision=source_revision,
+            )
+        )
+        sts.append(
+            KgStatement(
+                subject_qid=node,
+                property_pid="resolve:identity_rule",
+                value={"type": "string", "value": REALM_ID_RULE},
+                qualifiers={"reva_made_identifier": True, "keyed_by": "REALM (name text)"},
+                references=ref,
+                statement_id=f"identity_rule:{node}",
+                source_revision=source_revision,
+                raw_sha256=raw_sha256,
             )
         )
     return ents, sts
