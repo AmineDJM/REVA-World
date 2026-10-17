@@ -286,5 +286,6 @@ def test_n10_dyad_claims_carry_the_typed_note(dyad: dict[str, Any]) -> None:
 
 
 def test_connector_versions_bumped() -> None:
-    assert (I.VERSION, D.VERSION, W.VERSION, T.CONNECTOR_VERSION) == ("1.1.0", "1.1.1", "1.1.0", "1.2.1")
+    # atlas.cowwars 1.1.0 (FIXB) -> 1.1.1 (SWEEP2: spells-summary dates declare ``derivation``)
+    assert (I.VERSION, D.VERSION, W.VERSION, T.CONNECTOR_VERSION) == ("1.1.0", "1.1.1", "1.1.1", "1.2.1")
     assert D.KG_REVISION.endswith("+reva-1.1.1")

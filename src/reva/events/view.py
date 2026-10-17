@@ -378,6 +378,11 @@ def descendant_classes(
 
 
 # --------------------------------------------------------------------------------------------- interval
+#: ``derivation`` qualifiers of time statements that summarise a dataset's participation spells (earliest start,
+#: latest end); such dates give the ``derived_from_participation_spells`` basis, as spells derived here do.
+SPELLS_DERIVATIONS = frozenset({"participation_spells_summary"})  # atlas.cowwars SPELLS_DERIVATION
+
+
 def _interval(
     tax: Taxonomy,
     own: Sequence[Mapping[str, Any]],
@@ -413,6 +418,11 @@ def _interval(
     # P576 (then a dataset's last episode end).
     lo_src = start or pit or inception
     hi_src = end or pit or dissolved or episode_end
+    chosen_src = [x for x in (lo_src, hi_src) if x is not None]
+    if chosen_src and all(x["provenance"]["derivation"] in SPELLS_DERIVATIONS for x in chosen_src):
+        # dates a connector computed from the participation spells it codes (e.g. atlas.cowwars), not
+        # event-level dates reported by the source (SWEEP2)
+        basis = derived_from or "derived_from_participation_spells"
     lo = lo_src["_lo"] if lo_src else None
     hi = hi_src["_hi"] if hi_src else None
     if lo is None and hi is None and incoming_spells:

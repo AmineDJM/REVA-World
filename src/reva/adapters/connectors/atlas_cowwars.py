@@ -53,7 +53,10 @@ from reva.adapters.connectors import causmore_common as cm
 from reva.adapters.connectors.atlas_geopol_common import KgEntity, KgStatement
 
 NAME = "atlas.cowwars"
-VERSION = "1.1.0"  # 1.1.0 (FIXB, audit2 N8): codebook quote_source; COW intra-state v5.1 archived as numbering evidence
+# 1.1.0 (FIXB, audit2 N8): codebook quote_source; COW intra-state v5.1 archived as numbering evidence.
+# 1.1.1 (SWEEP2): the war P580/P582 summary of the coded spells declares ``derivation`` (was a free-form ``derived``
+# qualifier, so the KG and the event view showed it as source-reported dates).
+VERSION = "1.1.1"
 PARSER_VERSION = "atlas_cowwars/1"
 SOURCE_KEY = "cow.data"
 ATLAS_SOURCE = "cow"
@@ -70,6 +73,9 @@ FILES = {
 DATASETS = {k: f"cow_{k}" for k in KINDS}
 CODEBOOKS = {k: f"cow_{k}_codebook" for k in KINDS}
 VERSIONS = {"inter": "4.0", "extra": "4.0", "intra": "4.1", "nonstate": "4.0"}
+#: ``derivation`` qualifier of the war P580/P582: REVA's summary of the coded spells (the event view reads it as
+#: ``derived_from_participation_spells``, reva.events.view.SPELLS_DERIVATIONS).
+SPELLS_DERIVATION = "participation_spells_summary"
 MIN_ROWS = {"inter": 300, "extra": 150, "intra": 400, "nonstate": 50}
 MEDIA = ("text/csv", "application/csv", "application/octet-stream", "text/plain", "application/vnd.ms-excel")
 PDF_MEDIA = ("application/pdf", "application/octet-stream")
@@ -324,14 +330,18 @@ def build_kg(data: Mapping[str, Sequence[Mapping[str, str]]], *, shas: Mapping[s
                 end=end,
                 raw_sha256=sha,
                 selector={**sel, "columns": ["Start*", "End*"]},
+                # ``derivation`` (not a free-form key) so that the KG provenance says "derived", not "source
+                # reported" (reva.kg.query.derivation_of), and the event view gives the derived basis (SWEEP2).
                 qualifiers={
-                    "derived": "earliest coded start and latest coded end over the war's records (REVA summary of "
+                    "derivation": SPELLS_DERIVATION,
+                    "method": "earliest coded start and latest coded end over the war's records (REVA summary of "
                     "the coded spells); no end when a spell is coded -7 (ongoing at the end of the data)",
                     "ongoing": ongoing or None,
                 }
                 if ongoing
                 else {
-                    "derived": "earliest coded start and latest coded end over the war's records (REVA summary of "
+                    "derivation": SPELLS_DERIVATION,
+                    "method": "earliest coded start and latest coded end over the war's records (REVA summary of "
                     "the coded spells)",
                 },
             ):

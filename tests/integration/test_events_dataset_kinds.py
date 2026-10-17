@@ -146,6 +146,24 @@ def _source_keys() -> list[str]:
     return sorted(keys)
 
 
+def _fixture_raws() -> list[str]:
+    """sha256 of the raw fixture files these ingests replay. Claims cite the raw they were coded from, so this
+    keeps out claims of other tests' sources that share a KG source key (``cow.data`` is also CAUSMORE's
+    ``atlas.cowwars``, loaded by test_causmore_ingest in the same session DB) (SWEEP2)."""
+    import json
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1] / "fixtures" / "source"
+    shas: set[str] = set()
+    for module, names, _ in SOURCES:
+        specs = module.atlas_source()
+        for spec in specs if isinstance(specs, list) else [specs]:
+            if names is None or spec.name in names:
+                manifest = json.loads((root / spec.name / "manifest.json").read_text(encoding="utf-8"))
+                shas |= {e["sha256"] for e in manifest}
+    return sorted(shas)
+
+
 def _family(qid: str) -> str:
     head = qid.split(":")[0]
     if head.startswith(("navco", "mec", "mmp", "ptcoup", "cowtc", "icowclaim")):
@@ -211,9 +229,9 @@ def test_causal_claims_attach_to_typed_events(loaded: Any, classified: dict[str,
         rows = c.execute(
             text(
                 "SELECT source_key, cause_id, effect_id FROM kg.causal_claim_current "
-                "WHERE origin = 'test_fixture' AND source_key = ANY(:keys)"
+                "WHERE origin = 'test_fixture' AND source_key = ANY(:keys) AND raw_sha256 = ANY(:raws)"
             ),
-            {"keys": _source_keys()},
+            {"keys": _source_keys(), "raws": _fixture_raws()},
         ).all()
         extra = {e for _, a, b in rows for e in (a, b) if e not in classified}
         kinds = {
