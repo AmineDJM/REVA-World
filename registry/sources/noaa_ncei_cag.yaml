@@ -1,0 +1,20 @@
+# V7 (agent BEAT-AGRI): NOAA NCEI Climate at a Glance, regional agricultural-belt monthly series.
+# Connector src/reva/adapters/connectors/atlas_ncei_cag.py (atlas table ncei_cag.agbelt_monthly).
+source_key: noaa.ncei_cag
+title: NOAA NCEI Climate at a Glance regional time series (Corn Belt, Soybean Belt, Primary Corn and Soybean Belt), monthly temperature and precipitation
+provider_url: https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/
+lineage_family: noaa_nclimdiv
+rights:
+  licence: "Public domain (U.S. Government work, NOAA)"
+  licence_url: https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/
+  attribution: "NOAA National Centers for Environmental Information, Climate at a Glance: Regional Time Series"
+  terms_quote: >-
+    Works of the U.S. Government are not subject to copyright protection in the United States (17 U.S.C. 105).
+  licence_checked: "2026-10-17"
+metadata:
+  allowed_hosts: [www.ncei.noaa.gov]
+  files:
+    series_csv: https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/regional/time-series/<region>/<tavg|pcp>/1/0/<y0>-<y1>/data.csv
+  authentication: none
+  cadence: "monthly (nClimDiv release ~ day 6 of the next month)"
+  vintage: "single current release (nClimDiv recomputed monthly): final vintage"

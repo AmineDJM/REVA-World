@@ -333,14 +333,7 @@ export function BoardView({ initial, origin: initialOrigin }: { initial: StoredB
     return true;
   };
   const addNote = () => {
-    const r = addItem(board, { kind: 'note', markdown: '', label: '' });
-    // empty notes are identical pins: make each one unique by its uid-based key
-    if (!r.added) {
-      const fresh = addItem(board, { kind: 'note', markdown: ' ', label: '' });
-      commit(fresh.board, 'Note ajoutée.');
-      return;
-    }
-    commit(r.board, 'Note ajoutée.');
+    commit(addItem(board, { kind: 'note', markdown: '' }).board, 'Note ajoutée.');
   };
 
   const move = (from: number, to: number, say = true) => {
@@ -400,7 +393,6 @@ export function BoardView({ initial, origin: initialOrigin }: { initial: StoredB
         return;
       }
       if (e.ctrlKey || e.metaKey || e.altKey) return;
-      const handles = Array.from(gridRef.current?.querySelectorAll<HTMLElement>('.v8b-handle, .v8b-card-title a') ?? []);
       if (e.key === 'j' || e.key === 'k') {
         const cards = Array.from(gridRef.current?.querySelectorAll<HTMLElement>('.v8b-card') ?? []);
         if (!cards.length) return;
@@ -411,7 +403,6 @@ export function BoardView({ initial, origin: initialOrigin }: { initial: StoredB
         target.focus();
         return;
       }
-      void handles;
       if (!editable) return;
       if (e.key === 'a' || e.key === '+') {
         e.preventDefault();

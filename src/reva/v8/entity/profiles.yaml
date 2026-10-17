@@ -1,0 +1,287 @@
+# V8 Fiche — per-kind display profiles (owner V8FICHE). Read by reva.v8.entity.profiles.
+#
+# A profile says how a Fiche of one kind is resolved from its URL (/v8/fiche/<kind>/<id>), which 3–6 headline
+# numbers lead the page, which facts a kind is expected to have (listed under "Ce qui manque" when absent) and how
+# authority ids link out. Nothing here is a value: every number shown comes from a sourced statement or atlas cell.
+#
+# headline spec types:
+#   atlas_headline: <REVA headline concept>   (countries; cross-source best value, registry/atlas/source_order)
+#   atlas_concept:  <catalog concept>         (countries; best-available cell of one catalog concept)
+#   literal: <property id>                    (latest value of a literal KG statement; several dated values -> series)
+#   family_count: <relation family>           (number of sourced relations of that family; reading in `label_fr`)
+#   relation: <property id>                   (first neighbour through that property, shown as a link)
+#   anchor_series: <series key>               (anchor fiches: one of the anchor's atlas series, latest value)
+#   anchor_top: <series key>                  (anchor fiches: top countries of a catalog concept, latest year)
+version: 1
+
+kinds:
+  country:
+    label_fr: Pays
+    aliases: [country, pays, state, etat]
+    kg_kinds: [country]
+    iso3: true
+    headline:
+      - {atlas_headline: reva.population.total, label_fr: Population}
+      - {atlas_headline: reva.economy.gdp_usd, label_fr: "PIB (US$ courants)"}
+      - {atlas_headline: reva.economy.gdp_real_growth, label_fr: Croissance du PIB réel}
+      - {atlas_headline: reva.economy.inflation_cpi, label_fr: Inflation (IPC)}
+      - {atlas_headline: reva.health.life_expectancy, label_fr: Espérance de vie}
+      - {atlas_headline: reva.labour.unemployment_rate, label_fr: Chômage}
+    expected_facts:
+      - {property: P298, label_fr: Code ISO 3166-1 alpha-3}
+      - {property: P36, label_fr: Capitale}
+      - {property: P38, label_fr: Monnaie}
+    forecasts: geo
+    effects: country
+
+  commodity:
+    label_fr: Matière première
+    aliases: [commodity, matiere_premiere, ressource]
+    kg_kinds: [commodity, energy_source]
+    id_templates: ["usgs_myb:commodity:{id}", "gppd:fuel:{id}"]
+    headline:
+      - {family_count: produced_by, label_fr: Sites producteurs déclarés}
+      - {family_count: is_a, label_fr: Classes}
+
+  compound:
+    label_fr: Composé chimique
+    aliases: [compound, chemical, chimie, chebi, molecule, chemical_class, chemical_role, mineral, chemical_element]
+    kg_kinds: [compound, chemical_class, chemical_role, mineral, chemical_element]
+    id_templates: ["chebi:{id}", "pubchem:cid:{id}", "element:{id}"]
+    headline:
+      - {literal: "chebi:formula", label_fr: Formule}
+      - {literal: "chebi:mass", label_fr: Masse moyenne}
+      - {literal: "chebi:charge", label_fr: Charge nette}
+      - {family_count: made_of, label_fr: Éléments}
+      - {family_count: is_a, label_fr: "Classes et rôles"}
+    expected_facts:
+      - {property: "chebi:formula", label_fr: Formule brute}
+      - {property: "chebi:mass", label_fr: Masse moyenne}
+      - {property: "chebi:definition", label_fr: Définition}
+
+  gene:
+    label_fr: Gène
+    aliases: [gene, gène, hgnc]
+    kg_kinds: [gene]
+    id_templates: ["hgnc:{id}"]
+    headline:
+      - {literal: "hgnc:symbol", label_fr: Symbole}
+      - {literal: "hgnc:cytogenetic_location", label_fr: Locus cytogénétique}
+      - {literal: "hgnc:locus_type", label_fr: Type de locus}
+      - {relation: "hgnc:encodes", label_fr: Protéine codée}
+      - {family_count: interacts_with, label_fr: Interactions}
+    expected_facts:
+      - {property: "hgnc:symbol", label_fr: Symbole approuvé}
+      - {property: "hgnc:name", label_fr: Nom approuvé}
+      - {property: "hgnc:ensembl_gene_id", label_fr: Identifiant Ensembl}
+      - {property: "hgnc:ncbi_gene_id", label_fr: Identifiant NCBI Gene}
+
+  disease:
+    label_fr: Maladie
+    aliases: [disease, maladie, mondo, disease_or_phenotype, phenotype]
+    kg_kinds: [disease, disease_or_phenotype, phenotype, icd11_category, mesh_descriptor]
+    id_templates: ["mondo:{id}", "doid:{id}", "efo:{id}", "orphanet:{id}", "hp:{id}", "icd11mms:{id}", "mesh:{id}"]
+    headline:
+      - {family_count: is_a, label_fr: Classes parentes et sous-types}
+      - {family_count: associated_with, label_fr: "Associations (médicaments, signes)"}
+      - {literal: "mondo:xref", match: "ICD10WHO:", label_fr: CIM-10 (OMS)}
+      - {literal: "mondo:xref", match: "OMIM:", label_fr: OMIM}
+    expected_series:
+      - {key: deaths, label_fr: Décès attribués (par pays et année), reason_fr: "aucune table de causes de décès (OMS GHE, IHME GBD) n’est reliée à cette entité dans les données chargées"}
+      - {key: dalys, label_fr: DALY (années de vie ajustées sur l’incapacité), reason_fr: "IHME GBD n’est pas chargé (licence non commerciale à examiner par le propriétaire)"}
+
+  drug:
+    label_fr: Médicament
+    aliases: [drug, medicament, médicament, chembl, drug_substance]
+    kg_kinds: [drug, drug_substance]
+    id_templates: ["chembl:{ID}", "chembl:{id}", "eml:medicine:{id}", "unii:{ID}"]
+    related_forms: {property: "chembl:parent_molecule", direction: in, label_fr: forme saline ou dérivée}
+    headline:
+      - {literal: "chembl:max_phase", label_fr: Phase maximale}
+      - {literal: "chembl:first_approval", label_fr: Première approbation}
+      - {literal: "chembl:atc_code", label_fr: Code ATC}
+      - {family_count: interacts_with, label_fr: "Cibles (mécanisme)", include_related: true}
+      - {family_count: associated_with, label_fr: Indications, include_related: true}
+    expected_facts:
+      - {property: "chembl:max_phase", label_fr: Phase maximale de développement}
+      - {property: "chembl:mechanism_target", label_fr: "Cible(s) du mécanisme d’action", related: true}
+      - {property: "chembl:indication", label_fr: Indications, related: true}
+
+  legal_entity:
+    label_fr: Entreprise
+    aliases: [legal_entity, company, entreprise, societe, lei, government_entity, fund, international_organisation]
+    kg_kinds: [legal_entity, government_entity, fund, international_organisation]
+    id_templates: ["lei:{ID}"]
+    headline:
+      - {literal: "gleif:legal_jurisdiction", label_fr: Juridiction}
+      - {literal: "gleif:entity_status", label_fr: Statut}
+      - {literal: "gleif:entity_creation_date", label_fr: Création}
+      - {literal: "gleif:headquarters_city", label_fr: Siège}
+      - {family_count: owns, label_fr: Filiales déclarées}
+      - {relation: "gleif:direct_parent", direction: in, label_fr: Société mère directe}
+    expected_facts:
+      - {property: "gleif:legal_jurisdiction", label_fr: Juridiction}
+      - {property: "gleif:direct_parent", label_fr: Société mère (ou exception déclarée)}
+
+  facility:
+    label_fr: Installation
+    aliases: [facility, power_plant, centrale, mine, installation, gppd]
+    kg_kinds: [facility]
+    id_templates: ["gppd:{ID}", "gppd:{id}", "usgs_myb:{ID}"]
+    headline:
+      - {literal: "gppd:capacity_mw", label_fr: Capacité installée}
+      - {literal: "gppd:generation_gwh", label_fr: Production annuelle déclarée}
+      - {relation: "gppd:primary_fuel", label_fr: Combustible principal}
+      - {relation: "gppd:country", label_fr: Pays}
+      - {literal: "gppd:commissioning_year", label_fr: Mise en service}
+    expected_facts:
+      - {property: "gppd:capacity_mw", label_fr: Capacité}
+      - {property: "gppd:commissioning_year", label_fr: Année de mise en service}
+      - {property: "gppd:owner", label_fr: Propriétaire}
+
+  armed_conflict:
+    label_fr: Conflit armé
+    aliases: [armed_conflict, conflict, conflit, ucdp, non_state_conflict, one_sided_violence, war]
+    kg_kinds: [armed_conflict, non_state_conflict, one_sided_violence, armed_conflict_episode, war]
+    id_templates: ["ucdp:conflict:{id}", "ucdp:{id}", "cow:war:{id}"]
+    headline:
+      - {literal: "ucdp:battle_related_deaths", label_fr: Morts au combat (dernière année)}
+      - {literal: "ucdp:start_date", label_fr: Début}
+      - {literal: "ucdp:conflict_type", label_fr: Type}
+      - {literal: "ucdp:intensity_level", label_fr: Intensité (UCDP)}
+      - {literal: "ucdp:territory_name", label_fr: Territoire disputé}
+      - {family_count: located_in, label_fr: Lieux d’événements}
+    expected_facts:
+      - {property: "ucdp:battle_related_deaths", label_fr: Morts au combat}
+      - {property: "ucdp:primary_party", label_fr: Parties principales}
+
+  taxon:
+    label_fr: Espèce / taxon
+    aliases: [taxon, species, espece, espèce, gbif]
+    kg_kinds: [taxon]
+    id_templates: ["gbif:{id}", "col:{ID}", "ncbitaxon:{id}", "itis:{id}", "worms:{id}", "eol:{id}"]
+    headline:
+      - {literal: "gbif:rank", label_fr: Rang}
+      - {literal: "gbif:authorship", label_fr: Autorité}
+      - {relation: "gbif:parent", label_fr: Taxon parent}
+      - {family_count: is_a, label_fr: Taxons liés}
+    expected_series:
+      - {key: iucn, label_fr: Statut UICN (Liste rouge), reason_fr: "Liste rouge UICN non chargée (conditions d’utilisation à examiner par le propriétaire)"}
+      - {key: occurrences, label_fr: Occurrences GBIF par pays, reason_fr: "occurrences GBIF non chargées (seul le référentiel taxonomique l’est)"}
+
+# Anchor fiches: a REVA page that gathers sourced series, KG records, forecast families and effect variables about one
+# thing no loaded source holds as a single record (the KG has no "crude oil" item). The anchor is labelled as a REVA
+# grouping, never as a source record; each value keeps its own source.
+anchors:
+  commodity:
+    crude_oil:
+      label_fr: Pétrole brut
+      label_en: Crude oil
+      aliases: [brent, petrole, pétrole, crude, oil, wti]
+      description_fr: >-
+        Page d’ancrage REVA : regroupe les séries sourcées (EIA, OWID), les codes de nomenclature (SH, CPC, CITI,
+        CTCI), les familles de prévisions et les variables d’effet qui portent sur le pétrole brut. Aucune source
+        chargée ne publie « le pétrole brut » comme un enregistrement unique.
+      kg: [hs1992:2709, hs2022:2709, hs1992:270900, cpc21:12010, sitc4:333, isic4:0610, gppd:fuel:oil]
+      series:
+        - {key: brent_spot, catalog: prices.daily.brent_spot, label_fr: Prix spot Brent (quotidien), unit: "$/baril"}
+        - {key: world_crude_production, table: eia.intl_petroleum, provider_geo: WORL, indicator: INTL.57-1-TBPD.A, label_fr: Production mondiale de brut, unit: "kb/j"}
+        - {key: world_liquids_consumption, table: eia.intl_petroleum, provider_geo: WORL, indicator: INTL.5-2-TBPD.A, label_fr: Consommation mondiale de pétrole et liquides, unit: "kb/j"}
+        - {key: oecd_stocks, table: eia.intl_petroleum, provider_geo: OECD, indicator: INTL.5-5-MBBL.A, label_fr: Stocks de pétrole (OCDE), unit: Mbbl}
+      top:
+        - {key: top_producers, catalog: resources.energy.eia.crude_oil_production, label_fr: Premiers producteurs, n: 5}
+        - {key: top_exporters, catalog: resources.energy.eia.crude_oil_exports, label_fr: Premiers exportateurs, n: 5}
+      headline:
+        - {anchor_series: brent_spot, label_fr: Brent (spot)}
+        - {anchor_series: world_crude_production, label_fr: Production mondiale}
+        - {anchor_series: world_liquids_consumption, label_fr: Consommation mondiale}
+        - {anchor_top: top_producers, label_fr: Premier producteur}
+      forecast_families: [eia.brent_monthly, eia.brent_spot_monthly_mean, eia.wti_monthly, eia.world_crude_production, eia.world_liquids_production, eia.us_crude_production, eia.oecd_commercial_stocks]
+      effect_variables: [oil_price.global, oil.world_production, oil.world_consumption, energy_price.all_products]
+
+# Labels of KG kinds without a profile (fallback: the kind id with underscores as spaces).
+kind_labels_fr:
+  protein: Protéine
+  weather_station: Station météo
+  disaster_event: Catastrophe
+  disaster_displacement: Déplacement (catastrophe)
+  event: Événement
+  hs_code: Code SH
+  cpc_code: Code CPC
+  sitc_code: Code CTCI
+  isic_code: Code CITI
+  language: Langue
+  dialect: Dialecte
+  family: Famille de langues
+  anatomical_structure: Structure anatomique
+  earthquake: Séisme
+  airport: Aéroport
+  isotope: Isotope
+  person: Personne
+  historical_state: État historique
+  polity: Entité politique
+  region_adm1: Région (ADM1)
+  nuts_region: Région NUTS
+  oecd_region: Région OCDE
+  research_topic: Thème de recherche
+  peace_agreement: Accord de paix
+  armed_group: Groupe armé
+  sanction_episode: Épisode de sanctions
+  heritage_site: Site du patrimoine
+  volcano: Volcan
+  tsunami: Tsunami
+  ecoregion: Écorégion
+  cell_type: Type cellulaire
+  symptom: Symptôme
+  wikidata_item: Élément Wikidata
+  drug_target: Cible de médicament
+  militarized_interstate_dispute: Différend interétatique militarisé
+  foreign_policy_crisis: Crise de politique étrangère
+  international_crisis: Crise internationale
+  genome_assembly: Assemblage génomique
+  chromosome: Chromosome
+  territory: Territoire
+  un_roll_call: Vote nominal (AGNU)
+  question: Question de prévision
+  effect: Estimation d’effet
+  source: Source
+
+# Authority links: prefix of a KG id -> URL template ({id} = local part after the prefix).
+authority_links:
+  Q: "https://www.wikidata.org/wiki/{qid}"
+  chebi: "https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:{id}"
+  hgnc: "https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:{id}"
+  mondo: "http://purl.obolibrary.org/obo/MONDO_{id}"
+  doid: "http://purl.obolibrary.org/obo/DOID_{id}"
+  hp: "http://purl.obolibrary.org/obo/HP_{id}"
+  efo: "http://www.ebi.ac.uk/efo/EFO_{id}"
+  uberon: "http://purl.obolibrary.org/obo/UBERON_{id}"
+  cl: "http://purl.obolibrary.org/obo/CL_{id}"
+  chembl: "https://www.ebi.ac.uk/chembl/explore/compound/{id}"
+  lei: "https://search.gleif.org/#/record/{id}"
+  gbif: "https://www.gbif.org/species/{id}"
+  ncbitaxon: "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id={id}"
+  uniprot: "https://www.uniprot.org/uniprotkb/{id}"
+  mesh: "https://meshb.nlm.nih.gov/record/ui?ui={id}"
+  unii: "https://precision.fda.gov/uniisearch/srs/unii/{id}"
+  ucdp: "https://ucdp.uu.se/conflict/{last}"
+  pubchem: "https://pubchem.ncbi.nlm.nih.gov/compound/{last}"
+  glottolog: "https://glottolog.org/resource/languoid/id/{id}"
+  openalex: "https://openalex.org/{last}"
+  gppd: "https://datasets.wri.org/dataset/globalpowerplantdatabase"
+  usgs_myb: "https://www.usgs.gov/centers/national-minerals-information-center"
+
+# External-id literal values -> URL template ({v} = the value; for "PREFIX:code" values the map key is the prefix).
+value_links:
+  "unichem:drugbank_id": "https://go.drugbank.com/drugs/{v}"
+  "eml:drugbank_id": "https://go.drugbank.com/drugs/{v}"
+  "hgnc:ensembl_gene_id": "https://www.ensembl.org/id/{v}"
+  "hgnc:ncbi_gene_id": "https://www.ncbi.nlm.nih.gov/gene/{v}"
+  "chembl:atc_code": "https://atcddd.fhi.no/atc_ddd_index/?code={v}"
+  "eml:atc_code": "https://atcddd.fhi.no/atc_ddd_index/?code={v}"
+  "gleif:opencorporates_id": "https://opencorporates.com/companies/{v}"
+  "OMIM": "https://omim.org/entry/{v}"
+  "MESH": "https://meshb.nlm.nih.gov/record/ui?ui={v}"
+  "ICD10WHO": "https://icd.who.int/browse10/2019/en#/{v}"
+  "NCIT": "https://evsexplore.semantics.cancer.gov/evsexplore/concept/ncit/{v}"
+  "UMLS": "https://uts.nlm.nih.gov/uts/umls/concept/{v}"

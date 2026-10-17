@@ -1,0 +1,19 @@
+# Budget request from agent BEAT-AGRI (V7, 2026-10-17). Merged by `uv run python -m reva.atlas.budget_merge --write`.
+agent: BEAT-AGRI
+requests:
+  - source_key: usda.wasde_esmis
+    # atlas.usda_wasde_esmis: ~37 listing pages (~88 kB) + one report per release 1998-01..now: ~150 TXT (~0.15 MB)
+    # to 2010-06 and ~200 XML (2-3.6 MB) from 2010-07. Monthly refresh = 1 page + 1 XML.
+    daily_requests: 450
+    expected_bytes_per_day: 700000000
+    reason: "~390 requests (~560 MB fetched; ~15 MB on disk after zstd) per full run; monthly refresh 2 requests"
+  - source_key: noaa.ncei_cag
+    # atlas.ncei_cag: 3 regions x 2 parameters, ~5 kB each.
+    daily_requests: 12
+    expected_bytes_per_day: 1000000
+    reason: "6 requests per run, one retry"
+daily_totals_increase:
+  http_requests_total: "+470"
+  http_bytes_total: "+700_000_000"
+notes: >-
+  Raw archive of one full run: ~560 MB fetched (XML dominates), ~15 MB on disk after DISKZ zstd (XML 45-70x).

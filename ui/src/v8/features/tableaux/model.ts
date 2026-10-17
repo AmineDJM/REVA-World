@@ -179,11 +179,13 @@ export function emptyBoard(title: string, now = new Date().toISOString()): Board
   return { id: newId('b'), title: title.trim() || 'Tableau', items: [], rules: [], created_at: now, updated_at: now };
 }
 
-/** Add a pin (no duplicate: an existing identical pin is returned unchanged). */
+/** Add a pin (no duplicate: an existing identical pin is returned unchanged; notes are always added). */
 export function addItem(board: Board, pin: PinItem, now = new Date().toISOString()): { board: Board; item: BoardItem; added: boolean } {
-  const k = pinKey(pin);
-  const existing = board.items.find((i) => pinKey(i) === k);
-  if (existing) return { board, item: existing, added: false };
+  if (pin.kind !== 'note') {
+    const k = pinKey(pin);
+    const existing = board.items.find((i) => pinKey(i) === k);
+    if (existing) return { board, item: existing, added: false };
+  }
   const item = { ...pin, uid: newId('i'), added_at: now } as BoardItem;
   return { board: { ...board, items: [...board.items, item], updated_at: now }, item, added: true };
 }
