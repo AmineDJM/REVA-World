@@ -29,7 +29,7 @@ import statistics
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from datetime import UTC, date, datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Any
 
 import numpy as np
@@ -477,53 +477,4 @@ def run(
     return res
 
 
-# --------------------------------------------------------------------------- database entry point
-
-
-def load_and_run(conn: Any, store: Any, *, origin: str = "live") -> dict[str, Any]:
-    import polars as pl
-    from sqlalchemy import text
-
-    from reva.adapters.connectors.atlas_vintage_steo import PAGE_URL, parse_archive_page
-    from reva.atlas.tables import read_atlas_table
-    from reva.evaluation.energy_backtests import VINTAGE_TABLE, origins_from_cells, outcomes_from_frame
-    from reva.evaluation.registry.data import latest_version
-    from reva.evaluation.vintages import load_vintage_cells
-
-    now = datetime.now(UTC)
-    page = conn.execute(
-        text(
-            "SELECT raw_sha256 FROM evidence.acquisition WHERE origin = :o AND response_metadata->>'final_url' = :u "
-            "ORDER BY retrieved_at DESC LIMIT 1"
-        ),
-        {"o": origin, "u": PAGE_URL},
-    ).scalar_one()
-    issues, _ = parse_archive_page(store.get("raw", page))
-    release_of = {f"{i.year:04d}-{i.month:02d}": i.release for i in issues if i.release is not None}
-    cells = load_vintage_cells(conn, store, origin=origin, dataset_keys=[VINTAGE_TABLE])
-    w1_o = origins_from_cells(cells, codes=tuple(SPOT_SERIES))
-    w2_o = origins_from_cells(cells, codes=tuple(QTY_COMPONENT))
-    pin = latest_version(conn, "atlas.eia_steo.steo_observed", origin=origin, cutoff=now)
-    spin = latest_version(conn, "atlas.eia.spot_d", origin=origin, cutoff=now)
-    if pin is None or spin is None:
-        raise LookupError("atlas.eia_steo.steo_observed / atlas.eia.spot_d not registered")
-    outcomes = outcomes_from_frame(
-        read_atlas_table(store, pin["artifact_sha256"]), codes=(*SPOT_SERIES, *QTY_COMPONENT)
-    )
-    spot = read_atlas_table(store, spin["artifact_sha256"])
-    daily: dict[str, dict[date, float]] = {}
-    for sid in SPOT_SERIES.values():
-        f = spot.filter((pl.col("indicator") == f"EIA_SPOT|series={sid}") & pl.col("value").is_not_null())
-        daily[sid] = {d: float(v) for d, v in f.select("period_start", "value").iter_rows()}
-    res = run(w1_o, w2_o, release_of, daily, outcomes)
-    res["inputs"] = {
-        "steo_archive_page_raw_sha256": page,
-        "vintage_table": VINTAGE_TABLE,
-        "vintage_issues_w1": len(w1_o),
-        "vintage_issues_w2": len(w2_o),
-        "outcome_table": {k: pin[k] for k in ("dataset_key", "artifact_sha256", "recorded_at")},
-        "daily_table": {k: spin[k] for k in ("dataset_key", "artifact_sha256", "recorded_at")},
-        "daily_licence_review": "EIA spot prices are Refinitiv (LSEG) data republished by EIA (flags.licence_review)",
-        "run_at": now.isoformat(),
-    }
-    return res
+# The database entry point (load_and_run) lives in reva.cli.beat_energy (invariant 11: no adapter imports here).

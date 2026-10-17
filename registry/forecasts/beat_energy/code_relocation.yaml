@@ -1,0 +1,10 @@
+# Addendum to protocol.yaml (which is NOT edited). Invariant 11 (lead, 2026-10-17): reva.evaluation.* may not import
+# adapters, so the database entry point load_and_run() was moved verbatim from src/reva/evaluation/beat_energy.py
+# to src/reva/cli/beat_energy.py AFTER the pre-registered run. No forecasting, scoring, test or Holm code changed.
+# Proof: the CLI re-runs the evaluation with the relocated code and refuses unless the result digest equals the
+# digest of the pre-registered run below (same pinned tables).
+schema: reva-beat-energy-code-relocation/1
+from_code_sha256: 9724ad8eb75d67ddebfe56f3e389dda389f6beead7c95b43e933197eea99632f
+to_code_sha256: 01aa91dcac739466c89a62335061824c9344cd598983805f1b3089b1c6238bc9
+moved: [load_and_run]
+preregistered_run_digest: 516f73861e79232a5ca98193059a675ad1a69148eb82659e242bc9fac2833deb

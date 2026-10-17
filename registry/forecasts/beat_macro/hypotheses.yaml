@@ -1,0 +1,74 @@
+schema: reva-beat-macro-hypotheses/1
+written_at: '2026-10-17T22:03:15.734159+00:00'
+statement: Written by the development stage from protocol.yaml's selection rule; committed
+  before the holdout is opened. Only these hypotheses can be confirmed (one Holm over
+  all of them).
+protocol_sha256: af3e6d78fd6ac91ee3581309f2bb84508b923d75a66f627336eb999be2ec4c54
+development_json_sha256: 9a1aab359cad4d72819ddf78f9bea5b258d20149a9da6fec4e37773dfae11f5d
+code_sha256: a6bd813b0dd08bc22253790c6454c2264a3463a1123734e7fb2b40c974c53909
+model_version: 1.0.0
+family_size: 7
+hypotheses:
+- task: g7rt
+  variable: cpi_inflation
+  horizon: cy
+  candidate: forecast.bm_stack
+  benchmark: benchmark.imf_weo
+  loss: ae
+  uses_official_forecast: true
+  dev_relative: 0.877633
+  dev_p_better: 1.77002e-06
+- task: g7rt
+  variable: unemployment_rate
+  horizon: cy
+  candidate: forecast.bm_stack
+  benchmark: benchmark.imf_weo
+  loss: ae
+  uses_official_forecast: true
+  dev_relative: 0.809353
+  dev_p_better: 7.18709e-10
+- task: g7rt
+  variable: unemployment_rate
+  horizon: cy
+  candidate: forecast.bm_bridge
+  benchmark: benchmark.imf_weo_errfan
+  loss: crps
+  uses_official_forecast: false
+  dev_relative: 0.807414
+  dev_p_better: 0.000654847
+- task: g7rt
+  variable: unemployment_rate
+  horizon: cy
+  candidate: forecast.bm_stack
+  benchmark: benchmark.imf_weo_errfan
+  loss: crps
+  uses_official_forecast: true
+  dev_relative: 0.450857
+  dev_p_better: 6.33652e-10
+- task: weo_cpi
+  variable: cpi_inflation
+  horizon: cy
+  candidate: forecast.bm_stack
+  benchmark: benchmark.imf_weo
+  loss: ae
+  uses_official_forecast: true
+  dev_relative: 0.825865
+  dev_p_better: 1.32637e-25
+- task: weo_cpi
+  variable: cpi_inflation
+  horizon: cy
+  candidate: forecast.bm_bridge
+  benchmark: benchmark.imf_weo_errfan
+  loss: crps
+  uses_official_forecast: false
+  dev_relative: 0.68352
+  dev_p_better: 0.00027988
+- task: weo_cpi
+  variable: cpi_inflation
+  horizon: cy
+  candidate: forecast.bm_stack
+  benchmark: benchmark.imf_weo_errfan
+  loss: crps
+  uses_official_forecast: true
+  dev_relative: 0.687665
+  dev_p_better: 2.12926e-40

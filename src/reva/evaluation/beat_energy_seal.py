@@ -9,7 +9,8 @@ The batch asks one quantity question per series on the issue month of the STEO i
 benchmarks of the pre-registered comparison: EIA's STEO point (attributed) and STEO's fair log-normal density.
 The forecasters are exactly the registered code (:mod:`reva.evaluation.beat_energy`, offset 7 days: daily prices
 up to the seal day minus ``DAILY_LAG_DAYS``), placed at the seal instant. Resolution and scoring run unchanged
-through ``registry.service.resolve_due`` (frozen family docs, pinned tables listed under ``data``).
+through ``registry.service.resolve_due`` (frozen family docs, pinned tables listed under ``data``). The
+database entry point (``seal``) lives in :mod:`reva.cli.beat_energy` (invariant 11).
 """
 
 from __future__ import annotations
@@ -173,125 +174,4 @@ def build_batch(
     }
 
 
-def seal(engine: Any, store: Any, *, origin: str = "live", actor: str = "agent:beat-energy") -> dict[str, Any]:
-    """Pins tables at the seal instant, builds and stores the batch, records one issue row per model."""
-    import polars as pl
-    from sqlalchemy import text
-
-    from reva.adapters.connectors.atlas_vintage_steo import PAGE_URL, parse_archive_page
-    from reva.adapters.postgres import repositories as repo
-    from reva.atlas.tables import read_atlas_table
-    from reva.evaluation.energy_backtests import VINTAGE_TABLE, origins_from_cells
-    from reva.evaluation.ledger import load_frozen_manifest
-    from reva.evaluation.registry import periods as P
-    from reva.evaluation.registry.data import latest_version
-    from reva.evaluation.registry.questions import extract_series
-    from reva.evaluation.registry.service import ISSUE_KIND, ISSUE_LOCK, SCOPE_KIND, _batches, _family_of, _insert_eval
-    from reva.evaluation.vintages import cells_from_atlas_frame
-
-    with engine.connect() as conn:
-        now: datetime = conn.execute(text("SELECT clock_timestamp()")).scalar_one()
-        cycle = P.cycle_of(now.date())
-        done = conn.execute(
-            text(
-                "SELECT count(*) FROM model.evaluation WHERE metrics->>'kind' = :k AND metrics->>'label' LIKE 'V7 BEAT-ENERGY%' AND task_scope->>'cycle' = :c"
-            ),
-            {"k": ISSUE_KIND, "c": cycle},
-        ).scalar_one()
-        if done:
-            return {"status": "already_sealed_this_cycle", "cycle": cycle}
-        mv = {
-            r["model_key"]: r["id"]
-            for r in conn.execute(
-                text("SELECT model_key, version, id::text AS id FROM model.version WHERE model_key = ANY(:k)"),
-                {"k": sorted(MODELS)},
-            ).mappings()
-            if r["version"] == MODELS[r["model_key"]][0]
-        }
-        if set(mv) != set(MODELS):
-            return {"status": "models_not_seeded", "missing": sorted(set(MODELS) - set(mv))}
-        originals = [b for b in _batches(conn, origin) if b["cycle"] == cycle]
-        original = None
-        for b in originals:
-            man = dict(load_frozen_manifest(store, b["sha"]))
-            if not man.get("supplement_of") and all(f in man.get("families", {}) for f in WIN_CODES.values()):
-                man["_sha256"] = b["sha"]
-                original = man
-        if original is None:
-            return {"status": "no_original_batch_with_the_families", "cycle": cycle}
-        page = conn.execute(
-            text(
-                "SELECT raw_sha256 FROM evidence.acquisition WHERE origin = :o AND response_metadata->>'final_url' = :u ORDER BY retrieved_at DESC LIMIT 1"
-            ),
-            {"o": origin, "u": PAGE_URL},
-        ).scalar_one()
-        pins = {}
-        for k in ("atlas.eia_steo.steo_observed", VINTAGE_TABLE, "atlas.eia.spot_d"):
-            p = latest_version(conn, k, origin=origin, cutoff=now)
-            if p is None:
-                return {"status": "table_missing", "table": k}
-            pins[k] = p
-    issues, _ = parse_archive_page(store.get("raw", page))
-    release_of = {f"{i.year:04d}-{i.month:02d}": i.release for i in issues if i.release is not None}
-    vpin = pins[VINTAGE_TABLE]
-    cells = cells_from_atlas_frame(
-        read_atlas_table(store, vpin["artifact_sha256"]), dataset_key=VINTAGE_TABLE,
-        table_recorded_at=datetime.fromisoformat(str(vpin["recorded_at"])),
-    )  # fmt: skip
-    origins = origins_from_cells(cells, codes=tuple(be.SPOT_SERIES))
-    spot = read_atlas_table(store, pins["atlas.eia.spot_d"]["artifact_sha256"])
-    daily: dict[str, dict[date, float]] = {}
-    for sid in be.SPOT_SERIES.values():
-        f = spot.filter((pl.col("indicator") == f"EIA_SPOT|series={sid}") & pl.col("value").is_not_null())
-        daily[sid] = {d: float(v) for d, v in f.select("period_start", "value").iter_rows()}
-    recs = seal_records(origins, release_of, daily, now)
-    vint = recs["_inforce"]["vintage"]
-    steo_cells = {}
-    for code in WIN_CODES:
-        y, m = (int(x) for x in vint.split("-"))
-        row = cells.filter(
-            (pl.col("vintage") == vint) & (pl.col("variable") == f"eia_steo:{code}") & (pl.col("period_start") == date(y, m, 1))
-        ).row(0, named=True)  # fmt: skip
-        steo_cells[code] = {k: str(row[k]) for k in ("raw_sha256", "selector", "indicator", "value")} | {
-            "table": {k: vpin[k] for k in ("dataset_key", "artifact_sha256", "recorded_at")}
-        }
-    obs = read_atlas_table(store, pins["atlas.eia_steo.steo_observed"]["artifact_sha256"])
-    series_by_family = {fk: extract_series(obs, _family_of(original["families"][fk]))[0] for fk in WIN_CODES.values()}
-    batch = build_batch(original, recs, series_by_family, pins, steo_cells, now=now, cycle=cycle)
-    qids = sorted(q["question_id"] for q in batch["questions"])
-    with engine.begin() as conn:
-        conn.execute(text("SELECT pg_advisory_xact_lock(:k)"), {"k": ISSUE_LOCK})
-        sha = repo.store_json_artifact(
-            conn, store, batch, "evaluation", schema_version="forecast-registry-batch/1",
-            rights={"licence": "internal-derived; STEO values: U.S. public domain (EIA, attributed); daily spot "
-                    "prices Refinitiv (LSEG) via EIA: licence_review"},
-        )  # fmt: skip
-        act = repo.simple_activity(
-            "evaluation.forecast_registry_issue", "evaluation", actor,
-            {"cycle": cycle, "origin": origin, "batch_sha256": sha, "supplement_of": original["_sha256"]},
-        )  # fmt: skip
-        repo.record_activity(conn, act, inputs=[(original["_sha256"], {"role": "original_batch"})], outputs=[sha])
-        ctx = repo.create_context(conn, mode="evaluation", origin=origin, manifest_sha256=sha, knowledge_cutoff=now)
-        scope = {
-            "kind": SCOPE_KIND, "origin": origin, "cycle": cycle, "batch_sha256": sha,
-            "supplement_of": original["_sha256"],
-            "question_keys": sorted(q["question_key"] for q in batch["questions"]), "question_ids": qids,
-        }  # fmt: skip
-        for mk, (ver, _d) in MODELS.items():
-            mine = [f for f in batch["forecasts"] if f["model"] == mk]
-            _insert_eval(conn, mv[mk], ctx, sha, "operational_as_known", scope,
-                         {"kind": ISSUE_KIND, "status": "sealed", "label": batch["label"], "model": f"{mk}@{ver}",
-                          "issued_at": now.isoformat(), "batch_sha256": sha, "supplement_of": original["_sha256"],
-                          "n_questions": len(qids), "n_issued": sum(1 for f in mine if f["status"] == "issued"),
-                          "n_abstained": sum(1 for f in mine if f["status"] == "abstained")}, act.id)  # fmt: skip
-    return {
-        "status": "sealed",
-        "batch_sha256": sha,
-        "cycle": cycle,
-        "issued_at": now.isoformat(),
-        "questions": [(q["question_id"], q["family"], q["reference_period"]) for q in batch["questions"]],
-        "forecasts": [(f["question_id"], f["model"], f.get("point"), f["status"]) for f in batch["forecasts"]],
-    }
-
-
-__all__ = ["KEY_OF", "MODELS", "WIN_CODES", "build_batch", "seal", "seal_records"]
+__all__ = ["KEY_OF", "MODELS", "WIN_CODES", "build_batch", "seal_records"]
