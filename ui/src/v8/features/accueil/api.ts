@@ -59,11 +59,19 @@ export const ChangesData = z.looseObject({
   kind_labels: z.record(z.string(), z.string()).nullish(),
   next_cursor: z.string().nullish(),
 });
-export type ChangesData = Omit<z.output<typeof ChangesData>, 'next_cursor'> & { next_cursor: string | null };
+export interface ChangesData {
+  since?: string | null;
+  until?: string | null;
+  items: ChangeItem[];
+  counts: Record<string, number>;
+  kind_labels?: Record<string, string> | null;
+  next_cursor: string | null;
+}
 
 export async function getChanges(q: { since?: string; kinds?: string; limit?: number; cursor?: string }, signal?: AbortSignal): Promise<ChangesData> {
   const r = await v3get('/v1/v8/changes', envelopeOf(ChangesData), { ...q }, signal);
-  return { ...r.data, next_cursor: r.data.next_cursor ?? r.next_cursor ?? null };
+  const d = r.data;
+  return { since: d.since, until: d.until, items: d.items, counts: d.counts, kind_labels: d.kind_labels, next_cursor: d.next_cursor ?? r.next_cursor ?? null };
 }
 
 // ------------------------------------------------------------------ calendar

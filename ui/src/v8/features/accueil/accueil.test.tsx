@@ -86,7 +86,7 @@ describe('accueil model', () => {
   });
 
   it('groups by day and computes windows', () => {
-    const items = (CHANGES.data.items as ChangeItem[]).slice(0, 3);
+    const items = (CHANGES.data.items as unknown as ChangeItem[]).slice(0, 3);
     const g = groupByDay(items, new Date('2026-10-18T09:00:00'));
     expect(g[0]!.day).toBe('Hier');
     expect(sinceFor('24h', Date.parse('2026-10-17T23:00:30Z'))).toBe('2026-10-16T23:00:00.000Z');
@@ -96,7 +96,7 @@ describe('accueil model', () => {
   });
 
   it('states the judged status of a resolution only as the feed gives it', () => {
-    const voided = (CHANGES.data.items as ChangeItem[]).find((i) => i.kind === 'question_resolved')!;
+    const voided = (CHANGES.data.items as unknown as ChangeItem[]).find((i) => i.kind === 'question_resolved')!;
     expect(verdictOf({ ...voided, detail: { ...voided.detail } })).toEqual({ text: 'annulée : fiscal year basis mismatch', kind: 'missing' });
     const base = { ...voided, summary: null, detail: { status: 'resolved', official: 'absent' } } as ChangeItem;
     expect(verdictOf(base)?.text).toMatch(/aucun prévisionniste officiel/);
@@ -149,8 +149,8 @@ describe('AccueilPage', () => {
     expect(within(dec).getByRole('link', { name: /\+ 9 autres/ })).toBeInTheDocument(); // 15 open in the fixture, 6 shown
     // calendar panel: next resolution group with its official forecaster
     const cal = screen.getByRole('region', { name: 'Prochaines résolutions' });
-    expect(await within(cal).findByText(/Hospitalisations COVID-19/)).toBeInTheDocument();
-    expect(within(cal).getByText(/contre cdc_covidhub/)).toBeInTheDocument();
+    expect((await within(cal).findAllByText(/Hospitalisations COVID-19/))[0]).toBeInTheDocument();
+    expect(within(cal).getAllByText(/contre cdc_covidhub/)[0]).toBeInTheDocument();
     expect(within(cal).getByText(/en retard de résolution/)).toBeInTheDocument();
     // boards: local mode, honest empty state
     const boards = screen.getByRole('region', { name: 'Tableaux épinglés' });
