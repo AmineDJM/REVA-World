@@ -28,6 +28,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[3]
 PROTOCOL = ROOT / "registry/forecasts/beat_conflict/protocol.yaml"
 CODE = ROOT / "src/reva/evaluation/conflict/beat.py"
+RUNNER = Path(__file__).resolve()
 CM_FINAL = "atlas.ucdp_ged.country_month"
 CM_CAND = "atlas.ucdp_ged.cand_country_month"
 EV_FINAL = "atlas.ucdp_ged.events"
@@ -46,14 +47,18 @@ def code_sha() -> str:
     return hashlib.sha256(CODE.read_bytes()).hexdigest()
 
 
+def runner_sha() -> str:
+    return hashlib.sha256(RUNNER.read_bytes()).hexdigest()
+
+
 def check_protocol() -> dict[str, Any]:
     proto = yaml.safe_load(PROTOCOL.read_text())
     rel = str(PROTOCOL.relative_to(ROOT))
-    head = subprocess.run(["git", "-C", str(ROOT), "show", f"HEAD:{rel}"], capture_output=True, text=True)
+    head = subprocess.run(["git", "-C", str(ROOT), "show", f"HEAD:{rel}"], capture_output=True, text=True)  # noqa: S607
     if head.returncode != 0 or head.stdout != PROTOCOL.read_text():
         raise SystemExit("protocol.yaml is not committed unchanged in HEAD: refusing to evaluate")
-    if proto["code_sha256"] != code_sha():
-        raise SystemExit("beat.py differs from the registered code_sha256: refusing to evaluate")
+    if proto["code_sha256"] != code_sha() or proto["runner_sha256"] != runner_sha():
+        raise SystemExit("beat.py or the runner differs from the registered sha256: refusing to evaluate")
     return dict(proto)
 
 
@@ -84,9 +89,7 @@ def load(engine: Any, store: Any) -> dict[str, Any]:
     used = {k: {"artifact_sha256": p["artifact_sha256"], "dataset_id": p["dataset_id"]} for k, p in pins.items() if p}
     used["atlas.views.cm_sb"] = {"artifact_sha256": inp["views_pin"]["artifact_sha256"]} if inp["views_pin"] else {}
     panel = inp["panel"]
-    universe = {
-        y: {g for g, d in panel.deaths.items() if y in d} for y in range(panel.first_year, panel.last_year + 1)
-    }
+    universe = {y: {g for g, d in panel.deaths.items() if y in d} for y in range(panel.first_year, panel.last_year + 1)}
     iso2gw: dict[int, dict[str, str]] = defaultdict(dict)
     for g, ys in panel.iso3.items():
         for y, iso in ys.items():
@@ -189,7 +192,7 @@ def evaluate(L: dict[str, Any], proto: dict[str, Any], log: Any) -> dict[str, An
     t0 = time.time()
     rows1, _ = B.run_origins(d1, list(range(o_lo, o_hi + 1)), steps, log=log)
     log(f"W1 scored {len(rows1)} in {time.time() - t0:.0f}s")
-    groups = [tuple(map(int, g.split("-"))) for g in w1["step_groups"]]
+    groups: list[tuple[int, int]] = [(int(g.split("-")[0]), int(g.split("-")[1])) for g in w1["step_groups"]]
     tests: dict[str, dict[str, Any]] = {}
     for lo, hi_ in groups:
         for met in w1["metrics"]:
@@ -202,11 +205,9 @@ def evaluate(L: dict[str, Any], proto: dict[str, Any], log: Any) -> dict[str, An
                 info1[f"W1info|{a}|vs|{b}|{met}|{lo}-{hi_}"] = B.paired_test(
                     rows1, a, b, met, (lo, hi_), lambda o, _g: o // 12
                 )
-    pairs = [(m[B.CAND]["brier"], m["_y"]["y"]) for m in rows1.values() if B.CAND in m]
-    del pairs
     cal = {
         mk: B.calibration(
-            (_p(rows1, k, mk), 1.0 if m["_y"]["y"] >= B.THRESHOLD else 0.0)
+            (_p(rows1, k, mk), 1.0 if float(m["_y"]["y"] or 0.0) >= B.THRESHOLD else 0.0)
             for k, m in rows1.items()
             if mk in m
         )
@@ -256,9 +257,7 @@ def evaluate(L: dict[str, Any], proto: dict[str, Any], log: Any) -> dict[str, An
     for lo, hi_ in ((1, 3), (3, 8), (4, 6), (7, 12)):
         for a, b in ((B.CAND, B.VIEWS), (B.PERS, B.VIEWS), (B.CAND, B.PERS)):
             for met in ("brier", "logloss", "msle"):
-                vt[f"V|{a}|vs|{b}|{met}|{lo}-{hi_}"] = B.paired_test(
-                    rowsv, a, b, met, (lo, hi_), lambda o, _g: o
-                )
+                vt[f"V|{a}|vs|{b}|{met}|{lo}-{hi_}"] = B.paired_test(rowsv, a, b, met, (lo, hi_), lambda o, _g: o)
     w3 = proto["windows"]["W3"]
     s_lo, s_hi = map(int, str(w3["steps"]).split("-"))
 
@@ -270,9 +269,6 @@ def evaluate(L: dict[str, Any], proto: dict[str, Any], log: Any) -> dict[str, An
     past = [r for r in recsv if s_lo <= r["step"] <= s_hi]
     w_prob = B.stack_weight(past, outc, "logloss")
     w_pt = B.stack_weight(past, outc, "msle")
-    # informational stack score on the same past pairs (in-sample: weights chosen on them)
-    for key, m in rowsv.items():
-        pass
     out["V"] = {
         "label": "INFORMATIONAL, V6-SEEN window (VIEWS runs loaded in V6, outcomes GED 26.1 final <= 2025-12 and "
         "UCDP Candidate 2026 preliminary); REVA inputs: GED final to the run's last input month (information "
@@ -344,7 +340,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     summ["W1_label"] = full["W1"]["label"]
     summ["V_summary"] = full["V"]["summary"]
     summ["V_label"] = full["V"]["label"]
-    summ["V_stack_weights"] = {k: {kk: vv for kk, vv in v.items() if kk != "curve"} for k, v in full["V"]["stack_weights"].items()}
+    summ["V_stack_weights"] = {
+        k: {kk: vv for kk, vv in v.items() if kk != "curve"} for k, v in full["V"]["stack_weights"].items()
+    }
     Path(a.summary).write_text(json.dumps(summ, indent=1, default=str))
     print(json.dumps({"winners": full["winners"], "admitted": full["admitted"]}, indent=1))
     return 0

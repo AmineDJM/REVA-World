@@ -317,7 +317,8 @@ def fit_step(fc: FeatureCache, fit_month: int, s: int, feats: Sequence[int]) -> 
     miss = np.isnan(x)
     impute = np.array([np.nanmean(x[:, j]) if (~miss[:, j]).any() else 0.0 for j in range(x.shape[1])])
     miss_cols = tuple(j for j in range(x.shape[1]) if miss[:, j].mean() >= 0.01)
-    proto = StepFit(tuple(feats), np.zeros(1), np.ones(1), impute, miss_cols, *([np.zeros(1)] * 3), 1.0, len(y))
+    z1 = np.zeros(1)
+    proto = StepFit(tuple(feats), z1, np.ones(1), impute, miss_cols, z1, z1, z1, 1.0, len(y))
     raw = np.hstack([np.where(miss, impute[None, :], x)] + [miss[:, [j]].astype(float) for j in miss_cols])
     mean, sd = raw.mean(axis=0), raw.std(axis=0)
     sd[sd < 1e-9] = 1.0
@@ -512,7 +513,8 @@ def family_holm(tests: Mapping[str, Mapping[str, Any]], declared: Iterable[str])
         t = dict(tests.get(k) or {"status": "pending_or_not_evaluable"})
         t["p_holm"] = adj[k]
         md = t.get("mean_diff")
-        t["win"] = bool(md is not None and md < 0 and adj[k] is not None and adj[k] < 0.05)
+        pa = adj[k]
+        t["win"] = bool(md is not None and md < 0 and pa is not None and pa < 0.05)
         out[k] = t
     return out
 
@@ -637,7 +639,7 @@ def summarise(
         for (_g, _o, s), m in rows.items():
             if not lo <= s <= hi:
                 continue
-            ev.append(1.0 if m["_y"]["y"] >= THRESHOLD else 0.0)
+            ev.append(1.0 if float(m["_y"]["y"] or 0.0) >= THRESHOLD else 0.0)
             for mk, ls in m.items():
                 if mk == "_y":
                     continue

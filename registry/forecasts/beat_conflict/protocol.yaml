@@ -1,0 +1,154 @@
+# V7 BEAT-CONFLICT pre-registration. Committed before any evaluation of W1 or W3. Do not edit.
+schema: reva-beat-conflict-protocol/1
+agent: BEAT-CONFLICT (V7)
+written_at: '2026-10-17T22:02:22Z'
+binding: docs/roadmap/v7_beat_official.md
+statement: >-
+  Pre-registered before W1 or W3 is evaluated. Only the tests listed under `family` can produce a win: ONE
+  Holm-Bonferroni family (alpha 0.05) over all of them, one-sided p for "the first model has the lower expected
+  loss"; a declared test that is not evaluable or still pending counts with p = 1. Densities are compared with
+  densities (CRPS on log1p deaths), points with points (MSLE), probabilities with probabilities (Brier, log loss);
+  never a point against a density. Everything is a country-month RISK ESTIMATE from aggregate UCDP counts, never a
+  prediction of a specific attack, actor or person. Wins and losses are reported exactly in
+  docs/dev/v7_beat_conflict.md.
+code_path: src/reva/evaluation/conflict/beat.py
+code_sha256: 6cc918d8c7844636ca218459a56ff88afd539d23989d553b7aa7cb9be018ba24
+runner_path: src/reva/cli/beat_conflict.py
+runner_sha256: a39bcd381f46d64eccc77e64d2cbdcebf8f3453eb38c956dc83ffbb38b776b3d
+runner: uv run python -m reva.cli.beat_conflict evaluate --out <full.json> --summary docs/dev/v7_beat_conflict_result.json
+what_v6_used: >-
+  V6 PRED-CONFLICT: country-YEAR back-test (UCDP orgvio 26.1 totals, origins 2004-2024, targets 2005-2026); VIEWS
+  country-month comparison of VIEWS vs persistence/base rate for runs fatalities001_2022_12, fatalities002_2023_12,
+  2024_12, 2025_03, 2025_06, 2025_09, fatalities003_2025_12 (target months 2023-01..2025-12 on GED 26.1 final and
+  2026-01..2026-08 on UCDP Candidate). No REVA country-month model was evaluated in V6.
+development_window: >-
+  Origins 2008-01..2008-06 (steps 1, 3, 6; data cut 2010-12) were run once to debug the code before this
+  registration (runtime and sanity only). They are outside W1 and never reported as evidence.
+constraints_at_registration: >-
+  Free disk 4.7 GB (< 5 GB): no live ingest allowed, so no VIEWS run beyond the 8 loaded in V6 and no UCDP Candidate
+  release after 2026-08 can be loaded now. GDELT media signals are not loaded in the dev DB; coups (Archigos ends
+  2015), sanctions (EU sanctions map: regimes without monthly dates usable as of t) and UNHCR refugees (annual) are
+  not used. VIEWS publishes monthly runs; only the 8 runs above are loaded, so no between-run "timeliness" claim
+  against VIEWS is made from historical data (it would compare REVA with a stale VIEWS run).
+models:
+  forecast.cm_hurdle: >-
+    REVA candidate. Per step s (1..12) three ridge models (lambda 1, standardised features, missing indicators for
+    features missing in >= 1 % of rows) refitted each December F on pairs (t, t+s), F-120 <= t, t+s <= F: logistic
+    P(deaths >= 25), logistic P(deaths >= 1), ridge on log1p(deaths) | deaths >= 1 with a normal residual.
+    Origin T uses the fit of the latest December <= T. Features at T (months <= T only): log1p state-based deaths in
+    T, mean of T-2..T, mean of T-11..T, max of T-11..T, 3-month trend, months since last >= 25 and since last >= 1
+    (cap 120), non-state and one-sided deaths (mean T-2..T), events (all types, sum T-2..T), distinct ADM1 units and
+    distinct PRIO-GRID cells with events in T-2..T (GED event flags; ADM1 only where adm1_status = placed),
+    neighbours' state-based deaths T-2..T and number of neighbours with a month >= 25 (CShapes 2.0 land borders
+    from the KG; 2019 borders carried forward after 2019), IMF CPI year-on-year log change and 3-month log change of
+    national currency per USD, both read at T-2 (publication lag), clipped at +-2 / +-1. Density: 0 with
+    probability 1 - P(>= 1), else max(log 2, N(mu, sigma)) on the log1p scale (100 quantiles); point for MSLE = its
+    mean on the log1p scale; P(>= 25) from the >= 25 logistic.
+  forecast.cm_hurdle_ged: informational ablation, same without the two IMF features (not in the family).
+  forecast.conflict_persistence: >-
+    benchmark (V6 rule). Point = deaths in T; P(>= 25) = (k+1)/(n+2) over transitions t -> t+s from the same
+    intensity bin (0, 1-24, 25-99, 100-999, >= 1000) with T-120 <= t, t+s <= T; fair density = log1p(y_T) + the
+    log1p changes of those transitions (its own past errors), floored at 0.
+  forecast.conflict_base_rate: informational (last-12-month mean; country frequency of >= 25 over 120 months).
+  forecast.reference_views: >-
+    benchmark attributed to VIEWS: main_mean (point) and main_dich (P(>= 25 BRDs in the country-month)) of the
+    VIEWS run whose last input month equals REVA's origin; no density (VIEWS publishes a point), so never compared
+    on CRPS.
+  forecast.cm_stack_views: >-
+    w * VIEWS + (1 - w) * cm_hurdle, linear pool for P(>= 25) (w minimising mean log loss) and on the log1p scale
+    for the point (w minimising MSLE), w on a 0.05 grid estimated ONLY from past pairs with known outcomes: every
+    loaded VIEWS run with last input month before the W3 origin, steps 3-8, outcomes GED 26.1 final (<= 2025-12) and
+    UCDP Candidate (2026-01..2026-08) as loaded at registration.
+scores:
+  binary: Brier and log loss (probabilities floored at 5e-5 and capped at 1 - 5e-5 for the log loss only), event = state-based deaths_best >= 25 in the country-month
+  density: CRPS of the 100-quantile sample on log1p(deaths)
+  point: MSLE = (point on log1p scale - log1p(deaths))^2
+  dm: >-
+    per (country, origin) the mean loss differential over the steps of the group; variance two-way cluster-robust
+    (country; time = origin calendar year in W1, target month in W3; Cameron-Gelbach-Miller, falling back to the
+    larger one-way variance when not positive); one-sided p from Student t with min(G_country, G_time) - 1 df
+absence_rule: >-
+  FIX6 zero_within_coverage (src/reva/evaluation/registry/absence.py): within a table version's covered months, an
+  absent country-month of a state of the UCDP country-year universe is 0 recorded state-based deaths (labelled; the
+  zero is never written into the atlas). States outside the universe and months outside the coverage are missing.
+windows:
+  W1:
+    name: final-vintage pseudo-real-time backtest, country-month, periods untouched by V6's country-month work
+    label: FINAL-VINTAGE BACKTEST (GED 26.1 as published in 2026; IMF CPI/FX current vintage); not real-time skill
+    data_cut: 2022-12
+    origins:
+      first: 2012-01
+      last: 2021-12
+    max_step: 8
+    step_groups:
+    - 1-2
+    - 3-5
+    - 6-8
+    metrics:
+    - brier
+    - logloss
+    - crps_log1p
+    - msle
+    outcome: atlas.ucdp_ged.country_month deaths_best|tov=sb (GED 26.1), absence rule
+    new_vs_v6: >-
+      target months 2012-02..2022-08 at country-month level; V6 used the annual totals of these years as country-year
+      outcomes (disclosed) but evaluated no country-month model on them; VIEWS has no run loaded for these origins
+      (no VIEWS test in W1).
+    informational_not_in_family: cm_hurdle_ged vs persistence, cm_hurdle vs base rate, cm_hurdle vs cm_hurdle_ged, calibration tables
+  V:
+    name: INFORMATIONAL, V6-SEEN window (not in the family)
+    content: >-
+      REVA cm_hurdle and persistence vs VIEWS at the origins of the 7 loaded VIEWS runs with outcomes (steps 1-12,
+      outcomes GED 26.1 final <= 2025-12, Candidate 2026-01..08 preliminary); REVA reads GED final up to each origin
+      (information VIEWS did not have at release: favours REVA). Used only to estimate the stack weights (training)
+      and reported as such.
+  W3:
+    name: PROSPECTIVE vs VIEWS (sealed registry forecasts)
+    origin: 2026-08
+    steps: 3-8
+    target_months: 2026-11..2027-04
+    benchmark_run: >-
+      the VIEWS run in force at the seal date (fatalities003_2026_08_t01, released 2026-09-25, last input 2026-08);
+      if a later VIEWS run is found to have been released before the seal date, it replaces it at scoring
+    data: GED 26.1 final to 2025-12 + UCDP Candidate 2026-01..2026-08 (mixed vintage, as known at the seal)
+    outcome: >-
+      the first atlas.ucdp_ged.cand_country_month version registered after the seal whose coverage includes the
+      target month (real-time vintage, preliminary), deaths_best|tov=sb, FIX6 absence rule; GED final shown when it
+      exists, informational
+    sealing: >-
+      sealed (registry batch, under flock) only for the families whose admission rule holds; persistence and VIEWS
+      (attributed) are sealed with them as benchmarks. If nothing is admitted nothing is sealed and the W3 tests
+      stay at p = 1.
+admission:
+  note: admission to the prospective registry only; W1 is a final-vintage backtest, not proof of real-time skill
+  requires:
+    ucdp.sb_conflict25_cm:
+    - W1|forecast.cm_hurdle|vs|forecast.conflict_persistence|brier|3-5
+    - W1|forecast.cm_hurdle|vs|forecast.conflict_persistence|brier|6-8
+    ucdp.sb_deaths_cm:
+    - W1|forecast.cm_hurdle|vs|forecast.conflict_persistence|crps_log1p|3-5
+    - W1|forecast.cm_hurdle|vs|forecast.conflict_persistence|crps_log1p|6-8
+  stack: forecast.cm_stack_views is sealed for a family exactly when forecast.cm_hurdle is admitted for it
+win_rule: lower mean loss AND Holm-adjusted one-sided p < 0.05 within the family below
+family:
+- W1|forecast.cm_hurdle|vs|forecast.conflict_persistence|brier|1-2
+- W1|forecast.cm_hurdle|vs|forecast.conflict_persistence|logloss|1-2
+- W1|forecast.cm_hurdle|vs|forecast.conflict_persistence|crps_log1p|1-2
+- W1|forecast.cm_hurdle|vs|forecast.conflict_persistence|msle|1-2
+- W1|forecast.cm_hurdle|vs|forecast.conflict_persistence|brier|3-5
+- W1|forecast.cm_hurdle|vs|forecast.conflict_persistence|logloss|3-5
+- W1|forecast.cm_hurdle|vs|forecast.conflict_persistence|crps_log1p|3-5
+- W1|forecast.cm_hurdle|vs|forecast.conflict_persistence|msle|3-5
+- W1|forecast.cm_hurdle|vs|forecast.conflict_persistence|brier|6-8
+- W1|forecast.cm_hurdle|vs|forecast.conflict_persistence|logloss|6-8
+- W1|forecast.cm_hurdle|vs|forecast.conflict_persistence|crps_log1p|6-8
+- W1|forecast.cm_hurdle|vs|forecast.conflict_persistence|msle|6-8
+- W3|forecast.cm_hurdle|vs|forecast.reference_views|brier|3-8
+- W3|forecast.cm_hurdle|vs|forecast.reference_views|logloss|3-8
+- W3|forecast.cm_hurdle|vs|forecast.reference_views|msle|3-8
+- W3|forecast.cm_stack_views|vs|forecast.reference_views|brier|3-8
+- W3|forecast.cm_stack_views|vs|forecast.reference_views|logloss|3-8
+- W3|forecast.cm_stack_views|vs|forecast.reference_views|msle|3-8
+- W3|forecast.cm_hurdle|vs|forecast.conflict_persistence|brier|3-8
+- W3|forecast.cm_hurdle|vs|forecast.conflict_persistence|logloss|3-8
+- W3|forecast.cm_hurdle|vs|forecast.conflict_persistence|msle|3-8
