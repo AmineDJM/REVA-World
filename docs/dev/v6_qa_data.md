@@ -105,7 +105,7 @@ GDP on all 7,036 overlaps.
   SUR); current account / growth / inflation 14–30 % beyond 10 % + 0.5 pt; ILO vs WEO unemployment 23 %; OWID (GCP) vs
   WDI (EDGAR) CO2 21 % beyond 10 % (small islands); Gapminder vs HYDE population 20 % beyond 15 %; IPU vs V-Dem
   women in parliament 8 %; WHO vs WDI health series ≤ 1 % (WDI republishes WHO). Every row names both raw objects.
-* **Licence**: 16.6 M cells (34 tables) are under restricted terms and must be named with each value (not a defect);
+* **Licence**: 16.6 M cells (50 tables) are under restricted terms and must be named with each value (not a defect);
   30 tables (IMF, Reinhart–Rogoff, …) still carry `pending_maintainer_review`; 5 REVA event-study effect estimates
   (`reva.eventstudy`) have no raw object (they are REVA runs; provenance is the run record).
 
