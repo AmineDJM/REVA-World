@@ -33,8 +33,18 @@ def _claim(c: Mapping[str, Any]) -> dict[str, Any]:
     reasons = [r.get("fr") or r.get("en") or r.get("rule_id") for r in (g.get("reasons") or [])][:4]
     return {
         "claim_key": c["claim_key"],
-        "cause": C.ref(cause.get("kind"), cause["id"], cause.get("label_fr") or cause.get("label"), loaded=bool(cause.get("label_loaded", True))),
-        "effect": C.ref(effect.get("kind"), effect["id"], effect.get("label_fr") or effect.get("label"), loaded=bool(effect.get("label_loaded", True))),
+        "cause": C.ref(
+            cause.get("kind"),
+            cause["id"],
+            cause.get("label_fr") or cause.get("label"),
+            loaded=bool(cause.get("label_loaded", True)),
+        ),
+        "effect": C.ref(
+            effect.get("kind"),
+            effect["id"],
+            effect.get("label_fr") or effect.get("label"),
+            loaded=bool(effect.get("label_loaded", True)),
+        ),
         "relation_fr": (c.get("relation_label") or {}).get("fr") or c.get("relation"),
         "wording_fr": c.get("wording_fr") or c.get("wording"),
         "stance": c.get("stance"),
@@ -128,7 +138,9 @@ def _effect(e: Mapping[str, Any], role: str) -> dict[str, Any]:
     }
 
 
-def effects(conn: Connection, *, origin: str | None, ids: list[str], country: str | None, limit: int = 12) -> dict[str, Any]:
+def effects(
+    conn: Connection, *, origin: str | None, ids: list[str], country: str | None, limit: int = 12
+) -> dict[str, Any]:
     """Effect estimates where one of ``ids`` (variables / atlas concepts / event types) is the cause or the effect,
     and — for a country — estimates scoped to it."""
     o = origin or "any"
@@ -153,4 +165,9 @@ def effects(conn: Connection, *, origin: str | None, ids: list[str], country: st
                 continue
             seen.add(e["estimate_key"])
             out.append(_effect(e, "scope"))
-    return {"items": out[: limit * 2], "n": len(seen), "n_country_scope": None if n_country is None else int(n_country), "note_fr": EFFECT_NOTE_FR}
+    return {
+        "items": out[: limit * 2],
+        "n": len(seen),
+        "n_country_scope": None if n_country is None else int(n_country),
+        "note_fr": EFFECT_NOTE_FR,
+    }

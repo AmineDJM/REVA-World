@@ -51,7 +51,8 @@ const HeadlineSeries = z.looseObject({
 
 export async function readSeries(concept: string, geo: string, headline: boolean, signal?: AbortSignal): Promise<SeriesView> {
   if (headline) {
-    const r = await v3get('/v1/atlas/headline/series', HeadlineSeries, { concept, iso3: geo }, signal);
+    // projections included so they are drawn dashed and labelled; they never answer "latest value"
+    const r = await v3get('/v1/atlas/headline/series', HeadlineSeries, { concept, iso3: geo, projections: 'include' }, signal);
     const d = r.data;
     const points = d.best
       .map((c) => ({

@@ -157,7 +157,9 @@ def literal_value(pid: str, v: Mapping[str, Any] | None) -> dict[str, Any]:
     return out
 
 
-def kg_source(st: Mapping[str, Any], rights: Mapping[str, Any] | None = None, period: str | None = None) -> dict[str, Any]:
+def kg_source(
+    st: Mapping[str, Any], rights: Mapping[str, Any] | None = None, period: str | None = None
+) -> dict[str, Any]:
     """Source chip of a KG statement (its own provenance and the licence of the raw artifact it came from)."""
     prov = st.get("provenance") or {}
     key = str(prov.get("source_key") or "")

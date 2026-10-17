@@ -1,0 +1,263 @@
+# Dossier matière première (V8DOSSIER). Declarative template: every sentence is filled with sourced values or states
+# what is missing. Commodities need a curated binding (which atlas concepts, tables, forecast families, effect
+# variables and causal episodes describe the commodity): `subjects:` below. No number is written in this file.
+kind: commodity
+label: Matière première
+resolver: curated
+id_pattern: "^[a-z][a-z0-9_]{1,40}$"
+title: "{$subject}"
+subtitle: "Dossier matière première · production, échanges, prix, prévisions, effets"
+honesty:
+  - "Chaque nombre est la valeur que publie sa source (note : source, licence, période, référence de l'artefact) ; les classements portent sur la dernière année que la plupart des pays déclarent."
+  - "Les sommes et décomptes marqués « calcul REVA » sont faits par REVA à partir des valeurs publiées ; la méthode est dans la note."
+  - "Les prévisions sont scellées avant l'issue ; « non jugée » tant qu'aucune n'est résolue. Les rétro-tests pré-enregistrés disent où REVA bat, et où il ne bat pas, la prévision officielle."
+  - "Les effets sont des estimations publiées, attribuées à leur publication et jamais moyennées ; les liens de cause historiques sont des affirmations attribuées, notées de A à E."
+  - "Une valeur absente est écrite « manquant » avec sa raison, jamais remplacée par zéro."
+not_covered:
+  - what: "Composition chimique (hydrocarbures, teneur en soufre, densité API) par qualité de brut"
+    reason: "aucune source de composition n'est chargée (les éléments Wikidata et ChEBI du pétrole ne sont pas récoltés)"
+  - what: "Réserves prouvées par pays"
+    reason: "la série EIA des réserves de brut (INTL.57-6) n'est pas chargée dans l'atlas"
+  - what: "Raffineries et capacités de raffinage"
+    reason: "aucune base d'installations de raffinage n'est chargée ; seules les centrales électriques (GPPD) le sont"
+  - what: "Flux bilatéraux de pétrole brut (SH 2709)"
+    reason: "BACI est chargé au niveau SH2 (27, combustibles minéraux), plus large que le brut ; les flux SH6 ne sont pas chargés"
+  - what: "Prix à terme, contrats futures, marges de raffinage"
+    reason: "seuls les prix spot publiés par l'EIA sont chargés"
+subjects:
+  crude_oil:
+    label: "Pétrole brut"
+    sublabel: "CPC 2.1 · 1201 · Brent, WTI"
+    entity: "cpc21:1201"
+    entity_kind: cpc_code
+    params:
+      kg: ["cpc21:1201"]
+      production: resources.energy.eia.crude_oil_production
+      consumption: resources.energy.eia.petroleum_consumption
+      exports: resources.energy.eia.crude_oil_exports
+      imports: resources.energy.eia.crude_oil_imports
+      world_table: atlas.eia.intl_petroleum
+      world_indicator: INTL.57-1-TBPD.A
+      price_table: atlas.eia_steo.steo_observed
+      price_indicator: STEO.BREPUUS.M
+      price_indicator_2: STEO.WTIPUUS.M
+      fc_family: eia.brent_monthly
+      beat_file: docs/dev/v7_beat_energy_result.json
+      beat_code: BREPUUS
+      effect_cause: oil_price.global
+      episodes: ["Q4574284", "Q1925730"]
+      plant_fuel: "gppd:fuel:oil"
+      instruments: [oil_production_quota_change, oil_price_assumption]
+      decisions: [eu_ban_russian_oil_2027q1]
+summary:
+  - id: prod
+    text: "Production mondiale de pétrole brut : {world.latest} en {world.latest_period} ; premier producteur : {prod.top1} ({prod.top1_value}, {prod.year})."
+  - id: price
+    text: "Le Brent cotait en moyenne {price.latest} en {price.latest_period} (plus haut de la série : {price.max} en {price.max_period})."
+  - id: fc
+    text: "Prochaine prévision scellée du Brent par l'ensemble REVA : {fc.n_pending} questions en attente, statut : {fc.judged}."
+  - id: beat
+    text: "En rétro-test pré-enregistré, REVA bat la prévision officielle de l'EIA sur {beat.n_wins} horizon(s) du Brent sur {beat.n_tests} tests (meilleur rapport d'erreur : {beat.best_ratio})."
+    missing: "En rétro-test pré-enregistré, aucun test de REVA contre l'EIA sur le Brent ne survit à la correction de Holm."
+sections:
+  - id: nature
+    title: Ce que désigne ce dossier
+    lede: "Le produit tel que le classent les nomenclatures chargées ; la composition physique n'est pas couverte (voir la fin du dossier)."
+    blocks:
+      - id: cpc
+        query: kg.edges
+        params: {ids: $kg, direction: both, limit: 10}
+        list:
+          title: "Classement dans la Classification centrale de produits (CPC 2.1, Nations unies)"
+          item: "{property} : {name}"
+        empty: {what: "Classement du produit"}
+  - id: production
+    title: Production
+    lede: "Qui produit le brut, d'après les données internationales de l'EIA (y compris condensats de gisement)."
+    blocks:
+      - id: world
+        query: table.series
+        params: {dataset: $world_table, indicator: $world_indicator, geo: WORL, geo_col: provider_geo, freq: A, since: "1980-01-01", label: "Monde (EIA)", title: "U.S. EIA — production mondiale de brut"}
+        sentences:
+          - id: world
+            what: "Production mondiale"
+            text: "La production mondiale de brut atteint {latest} en {latest_period}, contre {first} en {first_period} ; le plus haut de la série est {max} ({max_period})."
+        chart: {type: line, title: "Production mondiale de pétrole brut (EIA, milliers de barils par jour)", note: "Agrégat « World » publié par l'EIA, pas une somme REVA."}
+        empty: {what: "Production mondiale"}
+      - id: prod
+        query: atlas.ranking
+        params: {concept: $production, top: 10}
+        sentences:
+          - id: top
+            what: "Premiers producteurs"
+            text: "En {year}, les trois premiers producteurs sont {top1} ({top1_value}), {top2} ({top2_value}) et {top3} ({top3_value}) ; {n_countries} pays déclarent une production."
+        chart: {type: bar, title: "Dix premiers producteurs de brut"}
+        table:
+          caption: "Production de pétrole brut, dix premiers pays"
+          columns:
+            - {header: "Rang", cell: "{rank}", numeric: true}
+            - {header: "Pays", cell: "{country}"}
+            - {header: "Production", cell: "{value}", numeric: true}
+        empty: {what: "Production par pays"}
+  - id: consommation
+    title: Consommation
+    blocks:
+      - id: cons
+        query: atlas.ranking
+        params: {concept: $consumption, top: 10}
+        sentences:
+          - id: top
+            what: "Premiers consommateurs"
+            text: "En {year}, les plus gros consommateurs de pétrole et autres liquides sont {top1} ({top1_value}), {top2} ({top2_value}) et {top3} ({top3_value})."
+        table:
+          caption: "Consommation de pétrole et autres liquides, dix premiers pays"
+          columns:
+            - {header: "Rang", cell: "{rank}", numeric: true}
+            - {header: "Pays", cell: "{country}"}
+            - {header: "Consommation", cell: "{value}", numeric: true}
+        empty: {what: "Consommation par pays"}
+  - id: echanges
+    title: Échanges
+    lede: "Exportations et importations de brut déclarées par pays (EIA) ; les flux bilatéraux ne sont pas couverts."
+    blocks:
+      - id: exp
+        query: atlas.ranking
+        params: {concept: $exports, top: 8}
+        sentences:
+          - id: top
+            what: "Premiers exportateurs"
+            text: "Premiers exportateurs en {year} : {top1} ({top1_value}), {top2} ({top2_value}), {top3} ({top3_value})."
+        table:
+          caption: "Exportations de brut, huit premiers pays"
+          columns:
+            - {header: "Rang", cell: "{rank}", numeric: true}
+            - {header: "Pays", cell: "{country}"}
+            - {header: "Exportations", cell: "{value}", numeric: true}
+        empty: {what: "Exportations par pays"}
+      - id: imp
+        query: atlas.ranking
+        params: {concept: $imports, top: 8}
+        sentences:
+          - id: top
+            what: "Premiers importateurs"
+            text: "Premiers importateurs en {year} : {top1} ({top1_value}), {top2} ({top2_value}), {top3} ({top3_value})."
+        table:
+          caption: "Importations de brut, huit premiers pays"
+          columns:
+            - {header: "Rang", cell: "{rank}", numeric: true}
+            - {header: "Pays", cell: "{country}"}
+            - {header: "Importations", cell: "{value}", numeric: true}
+        empty: {what: "Importations par pays"}
+  - id: prix
+    title: Prix
+    lede: "Moyennes mensuelles du Brent et du WTI publiées dans l'historique du Short-Term Energy Outlook de l'EIA."
+    blocks:
+      - id: price
+        query: table.series
+        params: {dataset: $price_table, indicator: $price_indicator, freq: M, geo: USA, geo_col: provider_geo, since: "2000-01-01", label: "Brent", title: "U.S. EIA — Short-Term Energy Outlook, Brent (BREPUUS)"}
+        sentences:
+          - id: brent
+            what: "Prix du Brent"
+            text: "Le Brent cote en moyenne {latest} en {latest_period} ; depuis {first_period}, son plus haut mensuel est {max} ({max_period}) et son plus bas {min} ({min_period})."
+        chart: {type: line, title: "Brent, moyenne mensuelle (dollars par baril)", note: "Mois historiques seulement : les mois prévus par l'EIA ne sont pas tracés ici."}
+        empty: {what: "Prix du Brent"}
+      - id: wti
+        query: table.series
+        params: {dataset: $price_table, indicator: $price_indicator_2, freq: M, geo: USA, geo_col: provider_geo, since: "2000-01-01", label: "WTI", title: "U.S. EIA — Short-Term Energy Outlook, WTI (WTIPUUS)"}
+        sentences:
+          - id: wti
+            what: "Prix du WTI"
+            text: "Le WTI cote en moyenne {latest} en {latest_period} (plus haut mensuel depuis {first_period} : {max}, {max_period})."
+        empty: {what: "Prix du WTI"}
+  - id: previsions
+    title: Prévisions et jugement
+    lede: "Ce que prévoit REVA, ce que prévoit l'EIA, et qui a raison quand les mois sont résolus."
+    blocks:
+      - id: fc
+        query: forecasts.family
+        params: {family: $fc_family, models: [reva.ensemble], reference: forecast.reference_eia_steo, limit: 6}
+        sentences:
+          - id: state
+            text: "Dernière observation scellée : {last_value} ({last_period}). {n_pending} questions sur le Brent sont en attente de résolution, {n_resolved} résolues : prévision {judged}."
+        table:
+          caption: "Brent : prévisions scellées (médiane et intervalle à 90 %) et référence EIA"
+          columns:
+            - {header: "Mois", cell: "{period}"}
+            - {header: "Ensemble REVA", cell: "{reva}", numeric: true}
+            - {header: "Intervalle 90 %", cell: "{reva_lo} – {reva_hi}"}
+            - {header: "EIA STEO", cell: "{ref}", numeric: true}
+            - {header: "Résultat", cell: "{outcome}", numeric: true}
+            - {header: "Statut", cell: "{status}"}
+        empty: {what: "Prévisions scellées du Brent"}
+      - id: beat
+        query: beat.tests
+        params: {file: $beat_file, code: $beat_code, benchmark_fr: "l'EIA STEO", title: "REVA BEAT-ENERGY — rétro-tests pré-enregistrés contre l'EIA STEO"}
+        sentences:
+          - id: verdict
+            text: "Sur {n_tests} tests pré-enregistrés du Brent, {n_wins} horizon(s) battent l'EIA après correction de Holm ; meilleur rapport d'erreur absolue moyenne : {best_ratio} (horizon {best_h} mois)."
+            missing: "Sur {n_tests} tests pré-enregistrés du Brent, aucun ne bat l'EIA après correction de Holm."
+        table:
+          caption: "Rétro-tests contre l'EIA STEO (rapport des erreurs absolues moyennes REVA / EIA ; < 1 = REVA meilleur)"
+          columns:
+            - {header: "Fenêtre", cell: "{window}"}
+            - {header: "Horizon (mois)", cell: "{h}", numeric: true}
+            - {header: "Rapport", cell: "{ratio}", numeric: true}
+            - {header: "n", cell: "{n}", numeric: true}
+            - {header: "Verdict", cell: "{verdict}"}
+        empty: {what: "Rétro-tests contre la prévision officielle"}
+  - id: effets
+    title: Effets estimés
+    lede: "Estimations publiées des effets d'une variation du prix du brut ; chacune est citée et n'est jamais moyennée avec une autre."
+    blocks:
+      - id: effects
+        query: effects.estimates
+        params: {cause: $effect_cause, limit: 8}
+        list:
+          item: "{citation} : effet du « {cause} » sur « {effect} » — {measure} {point} (intervalle publié : {ci_low} à {ci_high})."
+          item_missing: "{citation} : effet du « {cause} » sur « {effect} » — {measure} {point} (intervalle non publié)."
+        empty: {what: "Estimations d'effet du prix du pétrole"}
+  - id: histoire
+    title: Crises pétrolières (affirmations attribuées)
+    lede: "Causes et conséquences des crises pétrolières des années 1970 selon les sources chargées ; REVA n'établit aucune causalité."
+    blocks:
+      - id: crises
+        query: causal.claims
+        params: {ids: $episodes, side: causes, limit: 8}
+        list:
+          title: "Causes affirmées"
+          item: "Selon {source} (niveau {tier}, note {grade}) : {cause} {relation} {effect}."
+        empty: {what: "Causes affirmées des crises pétrolières"}
+      - id: crises_eff
+        query: causal.claims
+        params: {ids: $episodes, side: effects, limit: 6}
+        list:
+          title: "Conséquences affirmées"
+          item: "Selon {source} (niveau {tier}, note {grade}) : {cause} {relation} {effect}."
+        empty: {what: "Conséquences affirmées des crises pétrolières"}
+  - id: installations
+    title: Installations
+    lede: "Centrales électriques dont le combustible principal est le pétrole (Global Power Plant Database) ; les raffineries ne sont pas couvertes."
+    blocks:
+      - id: plants
+        query: kg.facilities
+        params: {property: "gppd:primary_fuel", object: $plant_fuel, group_property: "gppd:country", sum_property: "gppd:capacity_mw", top: 8}
+        sentences:
+          - id: count
+            text: "{n} centrales au fioul recensées dans {n_groups} pays, pour une capacité totale de {total} (calcul REVA)."
+        table:
+          caption: "Centrales au fioul par pays (décompte et capacité, calcul REVA sur la GPPD)"
+          columns:
+            - {header: "Pays", cell: "{group}"}
+            - {header: "Centrales", cell: "{n}", numeric: true}
+            - {header: "Capacité", cell: "{total}", numeric: true}
+        empty: {what: "Centrales au fioul"}
+  - id: decisions
+    title: Décisions simulables
+    lede: "Décisions de référence du moteur de décision qui portent sur ce produit (chaque scénario est non validé)."
+    blocks:
+      - id: refs
+        query: predict.references
+        params: {instruments: $instruments, ids: $decisions}
+        list:
+          item: "{label} (à partir de {start})"
+        empty: {what: "Décisions de référence"}

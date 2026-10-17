@@ -16,7 +16,9 @@ from reva.v8.entity import forecast_part as F
 from reva.v8.entity.resolve import NotResolved, Resolved
 
 
-def _identity(res: Resolved, label: str, kind_label: str, description: str | None, source: dict[str, Any] | None) -> dict[str, Any]:
+def _identity(
+    res: Resolved, label: str, kind_label: str, description: str | None, source: dict[str, Any] | None
+) -> dict[str, Any]:
     return {
         "qid": None, "kind": res.kind, "kg_kind": None, "kind_label_fr": kind_label, "label": label, "label_fr": label,
         "label_en": None, "description": description, "definition": None, "definition_source": None, "aliases": [],
@@ -27,7 +29,9 @@ def _identity(res: Resolved, label: str, kind_label: str, description: str | Non
     }  # fmt: skip
 
 
-def fill(b: dict[str, Any], conn: Connection, store_factory: Callable[[], Any], res: Resolved, origin: str | None) -> None:
+def fill(
+    b: dict[str, Any], conn: Connection, store_factory: Callable[[], Any], res: Resolved, origin: str | None
+) -> None:
     if res.special == "question":
         _question(b, conn, store_factory(), res, origin)
     elif res.special == "effect":
@@ -37,26 +41,16 @@ def fill(b: dict[str, Any], conn: Connection, store_factory: Callable[[], Any], 
 
 
 def _question(b: dict[str, Any], conn: Connection, store: Any, res: Resolved, origin: str | None) -> None:
-    from reva.evaluation.registry import read as R
-
     if not res.id.startswith("fq_"):
         raise NotResolved("not a forecast question id", id=res.id)
-    found = None
-    for bt in R.batches(conn, origin):
-        m = R.CACHE.get(store, bt["batch_sha256"])
-        found = next((q for q in m["questions"] if q["question_id"] == res.id), None)
-        if found:
-            break
-    if found is None:
+    fc = F.forecasts(conn, store, origin, question_id=res.id, wait_s=60.0)
+    qs = fc["questions"]
+    if not qs:
         raise NotResolved("unknown forecast question", id=res.id)
-    fc = F.forecasts(conn, store, origin, geo=found.get("geo"))
-    qs = [q for q in fc["questions"] if q["question_id"] == res.id]
-    if not qs:  # more than MAX_QUESTIONS on that geography: read the family
-        fc = F.forecasts(conn, store, origin, families=[found["family"]], limit=10_000)
-        qs = [q for q in fc["questions"] if q["question_id"] == res.id]
+    found = qs[0]
     b["identity"] = _identity(res, found.get("label_fr") or res.id, "Question de prévision", found.get("text_fr"), None)
     b["forecasts"] = {**fc, "questions": qs, "n_total": len(qs), "n_pending": sum(q["status"] == "pending" for q in qs),
-                      "n_resolved": sum(q["status"] == "resolved" for q in qs), "families": [found.get("family")]}  # fmt: skip
+                      "n_resolved": sum(q["status"] == "resolved" for q in qs), "families": [str(found.get("family"))]}  # fmt: skip
     q = qs[0] if qs else None
     if q:
         b["headline"] = [
@@ -69,7 +63,14 @@ def _question(b: dict[str, Any], conn: Connection, store: Any, res: Resolved, or
              "kind": "count", "ref": None, "source": None, "missing": None, "points": [], "sub": None, "link": None},
         ]  # fmt: skip
         if q["outcome"] is None and q["status"] != "pending":
-            b["missing"].append({"section": "forecasts", "what_fr": "valeur réalisée", "reason_code": q["status"], "reason_fr": q["judged_fr"]})
+            b["missing"].append(
+                {
+                    "section": "forecasts",
+                    "what_fr": "valeur réalisée",
+                    "reason_code": q["status"],
+                    "reason_fr": q["judged_fr"],
+                }
+            )
 
 
 def _effect(b: dict[str, Any], conn: Connection, res: Resolved, origin: str | None) -> None:
@@ -79,7 +80,9 @@ def _effect(b: dict[str, Any], conn: Connection, res: Resolved, origin: str | No
     if e is None:
         raise NotResolved("unknown effect estimate", id=res.id)
     item = CL._effect(e, "estimate")
-    b["identity"] = _identity(res, f"{item['cause_fr']} → {item['effect_fr']}", "Estimation d’effet", item["wording_fr"], item["source"])
+    b["identity"] = _identity(
+        res, f"{item['cause_fr']} → {item['effect_fr']}", "Estimation d’effet", item["wording_fr"], item["source"]
+    )
     b["effects"] = {"items": [item], "n": 1, "n_country_scope": None, "note_fr": CL.EFFECT_NOTE_FR}
     b["headline"] = [
         {"key": "point", "label_fr": "Estimation ponctuelle", "value": item["point"], "value_text": None if item["point"] else "non publiée",
@@ -111,7 +114,8 @@ def _source(b: dict[str, Any], conn: Connection, res: Resolved) -> None:
            "verification": None, "origin": None, "href": row["provider_url"]}  # fmt: skip
     b["identity"] = _identity(res, row["title"], "Source", row["provider_url"], src)
     n_ds = conn.execute(
-        text("SELECT count(DISTINCT dataset_key) FROM evidence.dataset WHERE dataset_key LIKE :p"), {"p": f"atlas.{res.id}.%"}
+        text("SELECT count(DISTINCT dataset_key) FROM evidence.dataset WHERE dataset_key LIKE :p"),
+        {"p": f"atlas.{res.id}.%"},
     ).scalar_one()
     b["headline"] = [
         {"key": "licence", "label_fr": "Licence", "value": None, "value_text": (rights or {}).get("licence") or "non déclarée",

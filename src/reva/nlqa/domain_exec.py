@@ -12,10 +12,12 @@ their own fr/en labels (:func:`reva.nlqa.domains.match_terms`), and every match 
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Mapping, Sequence
 from decimal import Decimal, InvalidOperation
 from typing import TYPE_CHECKING, Any
 
+from reva.kernel.errors import RevaError
 from reva.nlqa.bridges import STRICT_BRIDGE_MATCHES
 from reva.nlqa.domains import match_terms
 from reva.nlqa.ports import AtlasCell, CapabilityUnavailable, FamilyNeighbour, FamilyView
@@ -24,6 +26,7 @@ if TYPE_CHECKING:
     from reva.nlqa.executor import Evidence, OpResult, Resolved
     from reva.nlqa.plan import PlanOp
 
+log = logging.getLogger(__name__)
 MAX_FAMILY_NEIGHBOURS = 40
 MAX_IDENTITY_HOPS = 3
 MAX_CROSS = 50
@@ -506,11 +509,11 @@ class DomainOps:
         if not groups and tables is not None:
             # V8ASK: the declared series may sit in a table registered after the atlas snapshot
             # (reva.nlqa.registered_tables); every cell names its table version and "outside_snapshot"
+            series = [tuple(str(k).split(".", 2)) for k in order if str(k).count(".") >= 2]
             try:
-                cells, pins = tables.period_cells(
-                    concept.id, [(s.source, s.dataset, s.indicator) for s in order], a["from_year"], a["to_year"]
-                )
-            except Exception:  # a table read failure leaves the snapshot's absence as the answer
+                cells, pins = tables.period_cells(concept.id, series, a["from_year"], a["to_year"])
+            except (RevaError, OSError, ValueError, LookupError) as e:  # the snapshot's absence stays the answer
+                log.warning("registered table read failed: %s", type(e).__name__)
                 cells, pins = [], []
             consulted = [*consulted, tables.name]
             groups = _by_source(cells, order)

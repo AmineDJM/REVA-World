@@ -17,7 +17,9 @@ import { ShortcutsSheet } from './ShortcutsSheet';
 import { THEME_LABEL, toggledPref, useTheme } from './theme';
 import { KeyHint } from './ui/KeyHint';
 import { Skeleton } from './ui/States';
-import './ui/index';
+// Styles only (not the primitives barrel): the shell chunk stays free of zod / react-table / react-virtual.
+import './tokens.css';
+import './ui/primitives.css';
 import './shell.css';
 
 const RAIL_KEY = 'v8.rail.collapsed';

@@ -76,7 +76,12 @@ from reva.ports.connectors import (
 )
 
 NAME = "eurostat.demography"
-VERSION = "1.0.0"
+# 1.1.0: resumable cursor that the runner persists (``complete`` is always true = valid
+# checkpoint; the cycle's progress is ``cycle_done``/``cycle_finished``). 1.0.0 returned
+# ``complete: false`` for an unfinished cycle, which ``reva.evidence.runner`` never saves, so
+# every 100-request run restarted at AT and the countries after FI were never fetched.
+VERSION = "1.1.0"
+CURSOR_FORMAT = "eurostat-demography-cycle/2"
 SOURCE_KEY = "eurostat.demography"
 PARSER_VERSION = "eurostat-demography-1"
 DATA_BASE = "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/"
@@ -626,6 +631,17 @@ def dataset_concept(dataset: str) -> str:
 
 
 # --------------------------------------------------------------------------- connector
+def cycle_done_from(cursor: Cursor | None) -> set[str]:
+    """Item keys already visited in the cursor's unfinished cycle (empty: start a new cycle).
+
+    Reads the 1.1.0 checkpoint (``cycle_done``/``cycle_finished``) and the 1.0.0 state
+    (``done`` while ``complete`` is false; ``complete: true`` meant a finished cycle)."""
+    state = dict(cursor.state) if cursor is not None else {}
+    if "cycle_finished" in state or "cycle_done" in state:
+        return set() if state.get("cycle_finished") else {str(k) for k in state.get("cycle_done") or []}
+    return {str(k) for k in state.get("done") or []} if not state.get("complete") else set()
+
+
 class EurostatDemographyConnector:
     """Reviewed built-in connector for Eurostat demography and EUROPOP2023 assumptions."""
 
@@ -747,10 +763,16 @@ class EurostatDemographyConnector:
         return items
 
     def plan(self, cursor: Cursor | None, budget: FetchBudget) -> FetchPlan:
-        """Resumable: items completed in an unfinished cycle (cursor ``done``) are skipped."""
-        state = dict(cursor.state) if cursor is not None else {}
-        done = set(state.get("done") or []) if not state.get("complete") else set()
-        self._prior_done = done
+        """Resumable: items already visited in an unfinished cycle (cursor ``cycle_done``) are skipped.
+
+        Cursor format (1.1.0, :data:`CURSOR_FORMAT`): the runner persists a cursor only when
+        its ``complete`` flag is true, so every cursor :meth:`next_cursor` returns is a valid
+        checkpoint (``complete: true``); the cycle's own progress is ``cycle_done`` /
+        ``cycle_finished``. A full cycle (282 requests) is larger than one run's request budget
+        (100), so it spans several runs. A 1.0.0 cursor (``done`` while ``complete`` is false)
+        is still read."""
+        self._prior_done = cycle_done_from(cursor)
+        done = self._prior_done
         pending = [i for i in self.all_items() if i.key not in done]
         items = tuple(pending[: max(0, budget.max_requests)])
         return FetchPlan(
@@ -766,12 +788,30 @@ class EurostatDemographyConnector:
         return to_raw(item, result, getattr(http, "origin", "live"))
 
     def next_cursor(self, plan: FetchPlan, outcomes: Sequence[FetchOutcome]) -> Cursor:
-        ok = {o.item_key for o in outcomes if o.status in ("published", "unchanged")}
-        all_keys = [i.key for i in self.all_items()]
+        """Checkpoint after a run: always ``complete: true`` (= a valid, savable checkpoint).
+
+        An item is *visited* in this cycle once its acquisition is durably recorded: published,
+        unchanged, or quarantined (deterministic on the archived bytes: retrying it in the same
+        cycle would not help and would stall the cycle; it is fetched again next cycle and its
+        country's dataset stays unregistered meanwhile). A failed item (network error, budget)
+        is not visited and is retried by the next run."""
+        all_keys = {i.key for i in self.all_items()}
+        visited = {o.item_key for o in outcomes if o.status in ("published", "unchanged", "quarantined")}
+        quarantined = sorted({o.item_key for o in outcomes if o.status == "quarantined"} & all_keys)
         prior_done = set(getattr(self, "_prior_done", set()))  # set by plan() of this run
-        done = sorted((prior_done | ok) & set(all_keys))
-        complete = len(done) == len(all_keys)
-        return Cursor(state={"complete": complete, "done": [] if complete else done, "since_year": self.since_year})
+        done = sorted((prior_done | visited) & all_keys)
+        finished = len(done) == len(all_keys)
+        return Cursor(
+            state={
+                "complete": True,
+                "format": CURSOR_FORMAT,
+                "cycle_finished": finished,
+                "cycle_done": [] if finished else done,
+                "cycle_progress": [len(done), len(all_keys)],
+                "quarantined_this_run": quarantined,
+                "since_year": self.since_year,
+            }
+        )
 
     # -------------------------------------------------------------- parsing
     def parse(self, raw: RawAcquisition) -> Iterator[ObservationBatch]:

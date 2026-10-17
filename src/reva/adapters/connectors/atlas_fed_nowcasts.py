@@ -210,7 +210,11 @@ def parse_gdpnow(body: bytes, *, raw_sha256: str, rows: Rows) -> Report:
             raise FedNowcastError(f"GDPNow sheet {sheet} missing or empty")
         head = [str(h).strip() if h is not None else "" for h in t[0]]
         try:
-            i_d, i_q, i_g = head.index("Forecast Date"), head.index("Quarter being forecasted"), head.index("GDP Nowcast")
+            i_d, i_q, i_g = (
+                head.index("Forecast Date"),
+                head.index("Quarter being forecasted"),
+                head.index("GDP Nowcast"),
+            )
             i_a, i_p = head.index("Advance Estimate From BEA"), head.index("Publication Date of Advance Estimate")
         except ValueError as e:
             raise FedNowcastError(f"GDPNow {sheet}: header changed: {head[:6]}...") from e
@@ -226,14 +230,14 @@ def parse_gdpnow(body: bytes, *, raw_sha256: str, rows: Rows) -> Report:
             if (d, yq) in seen:
                 raise FedNowcastError(f"GDPNow {sheet}: duplicate forecast date {d} for {yq}")
             seen.add((d, yq))
-            s, e = quarter_bounds(*yq)
+            ps, pe = quarter_bounds(*yq)
             fl = vintage_flags(
                 family="atl_gdpnow", vintage=d.isoformat(), available_at=day_after(d),
                 basis="fed_nowcast_publication_day", variable="real_gdp_growth_q_ann", provider_variable="GDP Nowcast",
                 estimate_kind="projection", vintage_date_text=str(r[i_d]), sheet=sheet,
                 made_before_public_launch=before_launch, target_quarter=quarter_label(*yq),
             )  # fmt: skip
-            _cell(rows, DS_GDPNOW, f"GDPNOW|v={d.isoformat()}", s, e, val, unit, fl, raw_sha256,
+            _cell(rows, DS_GDPNOW, f"GDPNOW|v={d.isoformat()}", ps, pe, val, unit, fl, raw_sha256,
                   {"sheet": sheet, "row": n, "column": "GDP Nowcast"})  # fmt: skip
             rep.cells += 1
             adv, pub = decimal_or_none(r[i_a]), r[i_p]
@@ -265,7 +269,7 @@ def parse_gdpnow(body: bytes, *, raw_sha256: str, rows: Rows) -> Report:
                     rep.skipped["current_quarter_already_archived_or_empty"] += 1
                     continue
                 seen.add((d, cq))
-                s, e = quarter_bounds(*cq)
+                ps, pe = quarter_bounds(*cq)
                 fl = vintage_flags(
                     family="atl_gdpnow", vintage=d.isoformat(), available_at=day_after(d),
                     basis="fed_nowcast_publication_day", variable="real_gdp_growth_q_ann", provider_variable="GDP*",
@@ -273,19 +277,19 @@ def parse_gdpnow(body: bytes, *, raw_sha256: str, rows: Rows) -> Report:
                     made_before_public_launch=False, target_quarter=quarter_label(*cq),
                     major_releases=str(r[i + 1] or "")[:200],
                 )  # fmt: skip
-                _cell(rows, DS_GDPNOW, f"GDPNOW|v={d.isoformat()}", s, e, val, unit, fl, raw_sha256,
+                _cell(rows, DS_GDPNOW, f"GDPNOW|v={d.isoformat()}", ps, pe, val, unit, fl, raw_sha256,
                       {"sheet": "CurrentQtrEvolution", "row": n, "column": i})  # fmt: skip
                 rep.cells += 1
     rep.notes["current_quarter"] = quarter_label(*cq) if cq else None
     for yq, (adv, pd, where) in sorted(advance.items()):
-        s, e = quarter_bounds(*yq)
+        ps, pe = quarter_bounds(*yq)
         fl = vintage_flags(
             family="atl_gdpnow", vintage="advance", available_at=day_after(pd),
             basis="bea_release_recorded_by_atlanta_fed", variable="real_gdp_growth_q_ann",
             provider_variable="Advance Estimate From BEA", estimate_kind="published_history",
             vintage_date_text=pd.isoformat(), bea_publication_date=pd.isoformat(), recorded_by="Atlanta Fed GDPNow",
         )  # fmt: skip
-        _cell(rows, DS_GDPNOW, "GDPNOW_BEA_ADVANCE|v=advance", s, e, adv, unit, fl, raw_sha256, {"where": where})
+        _cell(rows, DS_GDPNOW, "GDPNOW_BEA_ADVANCE|v=advance", ps, pe, adv, unit, fl, raw_sha256, {"where": where})
         rep.cells += 1
     rep.notes["advance_estimates"] = len(advance)
     rep.notes["forecast_dates"] = len({d for d, _ in seen})
@@ -335,7 +339,7 @@ def parse_nyfed(body: bytes, *, edition: str, raw_sha256: str, rows: Rows) -> Re
             if val is None:
                 continue
             realtime = yq >= NYFED_FIRST_REALTIME if edition == "2016" else d >= NYFED_RELAUNCH
-            s, e = quarter_bounds(*yq)
+            ps, pe = quarter_bounds(*yq)
             fl = vintage_flags(
                 family="nyfed_nowcast", vintage=d.isoformat(),
                 available_at=day_after(d) if realtime else None,
@@ -345,7 +349,7 @@ def parse_nyfed(body: bytes, *, edition: str, raw_sha256: str, rows: Rows) -> Re
                 model_edition=edition, target_quarter=quarter_label(*yq),
                 revised_after_publication=(d in NYFED_REVISED) or None,
             )  # fmt: skip
-            _cell(rows, DS_NYFED, f"NYFED_NOWCAST|v={d.isoformat()}", s, e, val, unit, fl, raw_sha256,
+            _cell(rows, DS_NYFED, f"NYFED_NOWCAST|v={d.isoformat()}", ps, pe, val, unit, fl, raw_sha256,
                   {"sheet": "Forecasts By Quarter", "row": n, "column": quarter_label(*yq), "edition": edition})  # fmt: skip
             rep.cells += 1
             rep.skipped[f"{edition}_not_real_time_loaded_without_availability"] += not realtime
@@ -430,7 +434,9 @@ def parse_cleveland(body: bytes, *, freq: str, raw_sha256: str, rows: Rows) -> R
                 rep.cells += 1
             if kind == "published_history" and seen:
                 if len(set(seen.values())) != 1:
-                    raise FedNowcastError(f"Cleveland {tlabel} {name}: several actual values {sorted(set(seen.values()))}")
+                    raise FedNowcastError(
+                        f"Cleveland {tlabel} {name}: several actual values {sorted(set(seen.values()))}"
+                    )
                 d = min(seen)
                 var = CLEV_VARIABLE[(freq, key)]
                 fl = vintage_flags(
@@ -488,7 +494,7 @@ def parse_rtdsm_monthly(body: bytes, *, file: str, raw_sha256: str, rows: Rows) 
         oy, om = int(m.group(1)), int(m.group(2))
         if (oy, om) < FIRST_OBS:
             continue
-        s, e = month_bounds(oy, om)
+        ps, pe = month_bounds(oy, om)
         for i, (vy, vm) in cols.items():
             if i >= len(r):
                 continue
@@ -501,7 +507,7 @@ def parse_rtdsm_monthly(body: bytes, *, file: str, raw_sha256: str, rows: Rows) 
                 basis="rtdsm_monthly_vintage_month_end", variable=var, provider_variable=root,
                 estimate_kind="published_history", column=head[i], file=file,
             )  # fmt: skip
-            _cell(rows, DS_RTDSM, f"{root}|v={lab}", s, e, val, unit, fl, raw_sha256,
+            _cell(rows, DS_RTDSM, f"{root}|v={lab}", ps, pe, val, unit, fl, raw_sha256,
                   {"file": file, "row": n, "column": head[i]})  # fmt: skip
             rep.cells += 1
     rep.notes[file] = {"vintages": len(cols)}
@@ -529,7 +535,7 @@ def parse_release_values(body: bytes, *, raw_sha256: str, rows: Rows) -> Report:
         if not m:
             continue
         y, q = int(m.group(1)), int(m.group(2))
-        s, e = quarter_bounds(y, q)
+        ps, pe = quarter_bounds(y, q)
         for j, lab in enumerate(("first", "second", "third", "most_recent"), start=1):
             val = decimal_or_none(r[j]) if j < len(r) else None
             if val is None:
@@ -548,7 +554,7 @@ def parse_release_values(body: bytes, *, raw_sha256: str, rows: Rows) -> Report:
                 available_at=avail, basis=basis, variable="real_gdp_growth_q_ann", provider_variable=f"ROUTPUT {lab}",
                 estimate_kind="published_history", file=RELEASE_FILE,
             )  # fmt: skip
-            _cell(rows, DS_REL, f"ROUTPUT|v={lab}", s, e, val, unit, fl, raw_sha256,
+            _cell(rows, DS_REL, f"ROUTPUT|v={lab}", ps, pe, val, unit, fl, raw_sha256,
                   {"file": RELEASE_FILE, "sheet": "DATA", "row": n, "column": lab})  # fmt: skip
             rep.cells += 1
     rep.notes["last_updated"] = updated.isoformat() if updated else None
@@ -629,17 +635,30 @@ def atlas_source() -> AtlasSourceSpec:
         licence="per table: Atlanta and Cleveland non-commercial; New York licence; Philadelphia all rights reserved",
         allowed_hosts=(ATL_HOST, NY_HOST, CLE_HOST, PHL_HOST),
         datasets=DATASETS,
-        dataset_ids=("GDPTrackingModelDataAndForecasts", "new-york-fed-staff-nowcast_data_2002-present",
-                     "New-York-Fed-Staff-Nowcast_download_data", "nowcast_month",
-                     "nowcast_quarter", *RTDSM_MONTHLY, RELEASE_FILE),  # fmt: skip
+        dataset_ids=(
+            "GDPTrackingModelDataAndForecasts",
+            "new-york-fed-staff-nowcast_data_2002-present",
+            "New-York-Fed-Staff-Nowcast_download_data",
+            "nowcast_month",
+            "nowcast_quarter",
+            *RTDSM_MONTHLY,
+            RELEASE_FILE,
+        ),
         cadence_seconds=7 * 86_400,
         planned_requests=14,
         max_response_bytes=MAX_BYTES,
         min_interval_seconds=2.0,
         parser_version=PARSER_VERSION,
         code_digest=code_digest(),
-        field_mappings={"vintage_families": ["atl_gdpnow", "nyfed_nowcast", "clev_inflation_nowcast",
-                                             "philfed_rtdsm_monthly", "philfed_release_values"]},  # fmt: skip
+        field_mappings={
+            "vintage_families": [
+                "atl_gdpnow",
+                "nyfed_nowcast",
+                "clev_inflation_nowcast",
+                "philfed_rtdsm_monthly",
+                "philfed_release_values",
+            ]
+        },
         notes="Official nowcast histories (each update keyed by publication date) + Philadelphia Fed real-time data.",
     )
 
@@ -671,7 +690,8 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
                  "2011Q4-2014Q1 made before the public launch) + current quarter; BEA advance estimates as recorded.",
                  {"cells": rep.cells, **rep.notes, "skipped": dict(rep.skipped)})  # fmt: skip
     if run.wants(DS_NYFED):
-        rows, shas, sk = Rows(), [], Counter()
+        rows, shas = Rows(), []
+        sk: Counter[str] = Counter()
         for ed, url in NYFED_URLS.items():
             body, sha = await _get(run, url, f"nyfed:workbook_{ed}", XLSX_MEDIA)
             shas.append(sha)
@@ -681,7 +701,8 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
                  "2023-09-08 (rows before the relaunch are pre-launch output). Non-real-time cells carry no "
                  "availability (never selected as of a date).", {"cells": len(rows), "skipped": dict(sk)})  # fmt: skip
     if run.wants(DS_CLEV):
-        rows, shas, notes, sk = Rows(), [], {}, Counter()
+        rows, shas, notes = Rows(), [], {}
+        sk = Counter()
         for freq in ("month", "quarter"):
             body, sha = await _get(run, CLEV_URL.format(freq=freq), f"cleveland:{freq}", JSON_MEDIA)
             shas.append(sha)

@@ -23,7 +23,7 @@ from reva.v8.entity import common as C
 
 THEMES_PATH = Path(__file__).resolve().parents[4] / "registry" / "atlas" / "themes.yaml"
 RECORDED_TTL_S = 300.0
-MAX_POINTS = 600
+MAX_POINTS = 120
 _REC_LOCK = threading.Lock()
 _REC: dict[str, Any] = {"at": 0.0, "tables": {}}
 _TABLE_LOCK = threading.Lock()
@@ -106,7 +106,9 @@ def country_series(q: Any, iso3: str) -> dict[str, Any]:
         ab = latest.get("answered_by") or {}
         pts = []
         for p in (c.get("series") or [])[-MAX_POINTS:]:
-            pts.append({"t": str(p["year"]), "x": float(p["year"]), "v": p["value"], "projection": bool(p.get("projection"))})
+            pts.append(
+                {"t": str(p["year"]), "x": float(p["year"]), "v": p["value"], "projection": bool(p.get("projection"))}
+            )
         table = f"{ab.get('source')}.{ab.get('dataset')}" if ab.get("source") else None
         cards.append(
             {
@@ -118,7 +120,9 @@ def country_series(q: Any, iso3: str) -> dict[str, Any]:
                 "value": latest.get("value"),
                 "value_text": None,
                 "period": str(latest.get("year")),
-                "kind": "projection" if latest.get("projection") else ("derived" if latest.get("method") == "derived" else "observed"),
+                "kind": "projection"
+                if latest.get("projection")
+                else ("derived" if latest.get("method") == "derived" else "observed"),
                 "source": _headline_source(latest),
                 "points": pts,
                 "n_points": int(c.get("years") or len(pts)),
@@ -126,12 +130,12 @@ def country_series(q: Any, iso3: str) -> dict[str, Any]:
                 "last": str(c.get("year_max")),
                 "source_breaks": len(c.get("source_breaks") or []),
                 "sources_used": list(c.get("sources_used") or []),
-                "link": {"table": table, "params": {"concept": c["concept_id"], "headline": "1", "geo": iso3}} if table else None,
+                "link": {"table": table, "params": {"concept": c["concept_id"], "headline": "1", "geo": iso3}}
+                if table
+                else None,
                 "out_of_snapshot": False,
                 "missing": None,
-                "consulted": [
-                    {"series": x["series"], "status": x["status"]} for x in (latest.get("consulted") or [])
-                ],
+                "consulted": [{"series": x["series"], "status": x["status"]} for x in (latest.get("consulted") or [])],
             }
         )
     missing = []
@@ -179,7 +183,9 @@ def _headline_source(cell: Mapping[str, Any]) -> dict[str, Any]:
         "raw_sha256": prov.get("raw_sha256"),
         "selector": prov.get("selector") if isinstance(prov.get("selector"), dict) else None,
         "retrieved_at": None,
-        "period": f"{str(cell.get('period_start'))[:10]} → {str(cell.get('period_end'))[:10]}" if cell.get("period_start") else None,
+        "period": f"{str(cell.get('period_start'))[:10]} → {str(cell.get('period_end'))[:10]}"
+        if cell.get("period_start")
+        else None,
         "licence": C.licence_of(cell.get("rights")),
         "verification": "derived" if cell.get("method") == "derived" else "source_reported_not_verified",
         "origin": None,
@@ -237,7 +243,10 @@ def anchor_series(q: Any, recorded: Mapping[str, Any], spec: Mapping[str, Any], 
         if s.get("catalog"):
             concept = cat.concepts.get(s["catalog"])
             if concept is None:
-                card["missing"] = {"code": "unknown_concept", "reason_fr": f"concept {s['catalog']} absent du catalogue"}
+                card["missing"] = {
+                    "code": "unknown_concept",
+                    "reason_fr": f"concept {s['catalog']} absent du catalogue",
+                }
                 out.append(card)
                 continue
             ser = concept.source_order[0]
@@ -245,7 +254,10 @@ def anchor_series(q: Any, recorded: Mapping[str, Any], spec: Mapping[str, Any], 
             card["link"] = {"table": table, "params": {"concept": s["catalog"]}}
         else:
             table, provider_geo, indicators = s["table"], s.get("provider_geo"), [s["indicator"]]
-            card["link"] = {"table": table, "params": {"indicator": s["indicator"], **({"geo": provider_geo} if provider_geo else {})}}
+            card["link"] = {
+                "table": table,
+                "params": {"indicator": s["indicator"], **({"geo": provider_geo} if provider_geo else {})},
+            }
         st = table_status(q, recorded, table)
         src, _, ds = table.partition(".")
         cells: list[dict[str, Any]] = []
@@ -278,7 +290,9 @@ def anchor_series(q: Any, recorded: Mapping[str, Any], spec: Mapping[str, Any], 
     return out
 
 
-def read_recorded_cells(store: Any, st: Mapping[str, Any], table: str, provider_geo: str | None, indicator: str) -> list[dict[str, Any]]:
+def read_recorded_cells(
+    store: Any, st: Mapping[str, Any], table: str, provider_geo: str | None, indicator: str
+) -> list[dict[str, Any]]:
     """Cells of a recorded (published) atlas table that the current snapshot does not pin yet, read from its
     verified artifact. Cached by artifact sha256 (immutable content)."""
     sha = str(st["artifact_sha256"])
@@ -349,7 +363,16 @@ def anchor_tops(q: Any, spec: Mapping[str, Any]) -> list[dict[str, Any]]:
                 best = {"year": y, "values": vals, "n": len(vals)}
                 break
         if best is None:
-            out.append({"key": t["key"], "label_fr": t["label_fr"], "year": None, "items": [], "unit": None, "concept": t["catalog"]})
+            out.append(
+                {
+                    "key": t["key"],
+                    "label_fr": t["label_fr"],
+                    "year": None,
+                    "items": [],
+                    "unit": None,
+                    "concept": t["catalog"],
+                }
+            )
             continue
 
         def num(v: Mapping[str, Any]) -> float:
@@ -367,16 +390,16 @@ def anchor_tops(q: Any, spec: Mapping[str, Any]) -> list[dict[str, Any]]:
                 "year": best["year"],
                 "n_countries": best["n"],
                 "unit": top[0].get("unit") if top else None,
-                "items": [
-                    {"iso3": v["iso3"], "value": v["value"], "source": C.atlas_source(v)} for v in top
-                ],
+                "items": [{"iso3": v["iso3"], "value": v["value"], "source": C.atlas_source(v)} for v in top],
             }
         )
     return out
 
 
 # ------------------------------------------------------------------------------------------------ measured_by
-def measured_by(q: Any, groups: list[Mapping[str, Any]], fam: Mapping[str, Any], recorded: Mapping[str, Any]) -> list[dict[str, Any]]:
+def measured_by(
+    q: Any, groups: list[Mapping[str, Any]], fam: Mapping[str, Any], recorded: Mapping[str, Any]
+) -> list[dict[str, Any]]:
     """Atlas tables a KG ``measured_by`` statement points at for this entity (regions, occupations)."""
     from reva.atlas.catalog import cached_catalog
 
@@ -407,7 +430,11 @@ def measured_by(q: Any, groups: list[Mapping[str, Any]], fam: Mapping[str, Any],
                         "unit": last.get("unit") if last else None,
                         "value": last.get("value") if last else None,
                         "value_text": last.get("value_text") if last else None,
-                        "period": C.period_label(last.get("period_start"), last.get("period_end"), last.get("period_basis")) if last else None,
+                        "period": C.period_label(
+                            last.get("period_start"), last.get("period_end"), last.get("period_basis")
+                        )
+                        if last
+                        else None,
                         "kind": "projection" if last and last.get("projection") else "observed",
                         "source": C.atlas_source(last) if last else None,
                         "points": r["points"],
@@ -416,9 +443,22 @@ def measured_by(q: Any, groups: list[Mapping[str, Any]], fam: Mapping[str, Any],
                         "last": r["points"][-1]["t"] if r["points"] else None,
                         "source_breaks": 0,
                         "sources_used": [],
-                        "link": {"table": table, "params": {"indicator": ind, **({"geo": h["provider_geo"]} if h.get("provider_geo") else {})}},
+                        "link": {
+                            "table": table,
+                            "params": {
+                                "indicator": ind,
+                                **({"geo": h["provider_geo"]} if h.get("provider_geo") else {}),
+                            },
+                        },
                         "out_of_snapshot": False,
-                        "missing": None if last else {"code": "no_value", "reason_fr": status_reason_fr(table_status(q, recorded, table), table, q.snapshot.cutoff.isoformat())[1]},
+                        "missing": None
+                        if last
+                        else {
+                            "code": "no_value",
+                            "reason_fr": status_reason_fr(
+                                table_status(q, recorded, table), table, q.snapshot.cutoff.isoformat()
+                            )[1],
+                        },
                         "consulted": [],
                     }
                 )

@@ -1,0 +1,118 @@
+# Dossier médicament (V8DOSSIER). Any ChEMBL molecule id: the generator gathers the ChEMBL parent, its salts / forms
+# (chembl:parent_molecule) and the WHO eEML records that name it (eml:chembl_molecule). No number is written here.
+kind: drug
+label: Médicament
+resolver: chembl_drug
+id_pattern: "^chembl:CHEMBL[0-9]{1,9}$"
+title: "{$subject}"
+subtitle: "Dossier médicament · identité, mécanisme, indications, liste OMS, essais"
+featured:
+  - {id: "chembl:CHEMBL941", label: "Imatinib", sublabel: "ChEMBL 941 · ATC L01EA01"}
+honesty:
+  - "Chaque affirmation est une déclaration de ChEMBL (EMBL-EBI), d'UniChem ou de la liste OMS des médicaments essentiels, citée avec sa version ; ce dossier n'est ni un avis médical ni une recommandation."
+  - "Les indications de ChEMBL couvrent toutes les phases de développement : une indication n'est pas une autorisation de mise sur le marché."
+  - "Une information absente est écrite « manquant » avec sa raison."
+not_covered:
+  - what: "Essais cliniques (ClinicalTrials.gov, EU CTR)"
+    reason: "les registres d'essais ne sont pas encore chargés (ClinicalTrials.gov en file d'attente, disque insuffisant)"
+  - what: "Effets indésirables déclarés pour ce médicament (FAERS)"
+    reason: "la table openFDA chargée ne compte les déclarations que par pays, pas par médicament"
+  - what: "Prix, remboursement, ventes"
+    reason: "aucune source de prix du médicament n'est chargée"
+  - what: "Brevets et génériques"
+    reason: "hors des sources chargées"
+summary:
+  - id: ident
+    text: "{$subject} est une molécule de type {ident.type}, de phase maximale {ident.phase}, autorisée pour la première fois en {ident.first} (ChEMBL)."
+  - id: targets
+    text: "Cibles du mécanisme d'action déclarées : {targets.n} ; indications déclarées : {ind.n}."
+  - id: eml
+    text: "Liste modèle OMS des médicaments essentiels : {lists.n} inscriptions ou sections déclarées."
+    missing: "Aucune inscription sur la liste modèle OMS des médicaments essentiels n'est chargée pour cette molécule."
+sections:
+  - id: identite
+    title: Identité
+    blocks:
+      - id: ident
+        query: kg.literals
+        params:
+          ids: $ids
+          current: false
+          properties: {type: "chembl:molecule_type", phase: "chembl:max_phase", first: "chembl:first_approval", route: "chembl:route", atc: "chembl:atc_code", drugbank: "unichem:drugbank_id"}
+        sentences:
+          - id: type
+            what: "Type de molécule et phase"
+            text: "Type : {type} ; phase de développement maximale : {phase} ; première autorisation : {first}."
+          - id: route
+            what: "Voie d'administration"
+            text: "Voie d'administration déclarée : {route}."
+          - id: codes
+            what: "Codes"
+            text: "Code ATC (WHOCC, tel que listé par ChEMBL) : {atc} ; identifiant DrugBank (UniChem) : {drugbank}."
+        empty: {what: "Identité de la molécule"}
+      - id: forms
+        query: kg.edges
+        params: {ids: $ids, properties: ["chembl:parent_molecule", "eml:chembl_molecule", "unichem:chebi", "unichem:fda_unii"], direction: both, limit: 10}
+        list:
+          title: "Formes et identifiants équivalents"
+          item: "{name} — {property}"
+        empty: {what: "Formes et sels"}
+  - id: mecanisme
+    title: Mécanisme d'action
+    lede: "Cibles moléculaires déclarées par ChEMBL pour le mécanisme d'action."
+    blocks:
+      - id: targets
+        query: kg.edges
+        params: {ids: $ids, properties: ["chembl:mechanism_target"], direction: out, limit: 12}
+        sentences:
+          - id: n
+            text: "{n} cibles déclarées."
+        list:
+          item: "{name}"
+        empty: {what: "Cibles du mécanisme d'action"}
+  - id: indications
+    title: Indications
+    lede: "Maladies pour lesquelles ChEMBL déclare une indication (toutes phases) et recommandations de la liste OMS."
+    blocks:
+      - id: ind
+        query: kg.edges
+        params: {ids: $ids, properties: ["chembl:indication"], direction: out, limit: 16}
+        sentences:
+          - id: n
+            text: "{n} indications déclarées par ChEMBL."
+        list:
+          item: "{name}"
+        empty: {what: "Indications déclarées"}
+      - id: eml
+        query: kg.edges
+        params: {ids: $ids, properties: ["eml:recommended_for"], direction: out, limit: 10}
+        list:
+          title: "Recommandé par la liste OMS des médicaments essentiels pour"
+          item: "{name}"
+        empty: {what: "Recommandations de la liste OMS"}
+  - id: oms
+    title: Liste OMS des médicaments essentiels
+    blocks:
+      - id: lists
+        query: kg.edges
+        params: {ids: $ids, properties: ["eml:on_list", "eml:in_section"], direction: out, limit: 8}
+        list:
+          item: "{property} : {name}"
+        empty: {what: "Inscription sur la liste OMS"}
+      - id: history
+        query: kg.literals
+        params: {ids: $ids, properties: {added: "eml:status_history"}, current: false}
+        sentences:
+          - id: added
+            what: "Historique d'inscription"
+            text: "Dernière modification d'inscription déclarée : {added} ({added_n} événements d'historique)."
+        empty: {what: "Historique d'inscription"}
+  - id: causes
+    title: Effets attribués
+    blocks:
+      - id: claims
+        query: causal.claims
+        params: {ids: $ids, side: effects, limit: 6}
+        list:
+          item: "Selon {source} (niveau {tier}, note {grade}) : {cause} {relation} {effect}."
+        empty: {what: "Affirmations causales sur ce médicament"}

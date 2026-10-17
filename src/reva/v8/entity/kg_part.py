@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, Literal
 
 from sqlalchemy import Connection, text
 
@@ -16,7 +16,7 @@ from reva.v8.entity import common as C
 from reva.v8.entity import profiles as P
 
 PER_FAMILY = 12
-DEGREE_CAP = 20_000
+DEGREE_CAP = 2_000
 MAX_FACT_PROPS = 40
 MAX_POINTS = 400
 #: Properties whose literal value is the entity's own name or a long text: shown in the header, not as a fact row.
@@ -58,7 +58,9 @@ def identity(conn: Connection, qid: str, origin: str | None) -> dict[str, Any] |
     community = kq.is_community_edited(row["source_key"] if row else None)
     rights = None
     if row is not None and row["raw_sha256s"]:
-        got = fq.rights_for(conn, [{"raw_sha256": s, "source_key": row["source_key"]} for s in list(row["raw_sha256s"])[:1]])
+        got = fq.rights_for(
+            conn, [{"raw_sha256": s, "source_key": row["source_key"]} for s in list(row["raw_sha256s"])[:1]]
+        )
         rights = next(iter(got.values()), None) if got else None
         if rights is None and community:
             rights = fq.WIKIDATA_RIGHTS
@@ -74,7 +76,11 @@ def identity(conn: Connection, qid: str, origin: str | None) -> dict[str, Any] |
         "sitelinks": row["sitelinks"] if row else None,
         "snapshot_loaded": row is not None,
         "community_edited": community,
-        "degree": {"statements_out": deg["statements_out"], "statements_in": deg["statements_in"], "capped_at": DEGREE_CAP},
+        "degree": {
+            "statements_out": deg["statements_out"],
+            "statements_in": deg["statements_in"],
+            "capped_at": DEGREE_CAP,
+        },
         "source": {
             "source": row["source_key"],
             "label": C.source_name(row["source_key"]),
@@ -131,7 +137,9 @@ def relation_groups(fam: Mapping[str, Any], *, via: Mapping[str, Any] | None = N
                     "share": (n.get("share") or {}).get("value") if n.get("share") else None,
                     "share_unit": (n.get("share") or {}).get("unit") if n.get("share") else None,
                     "identity": bool(n.get("identity")),
-                    "via": C.kg_ref({"qid": via["qid"], "label": via["label"], "kind": via.get("kind")}) if via else None,
+                    "via": C.kg_ref({"qid": via["qid"], "label": via["label"], "kind": via.get("kind")})
+                    if via
+                    else None,
                     "source": C.kg_source(st, n.get("rights"), C.statement_period(st)),
                 }
             )
@@ -154,12 +162,16 @@ def relation_groups(fam: Mapping[str, Any], *, via: Mapping[str, Any] | None = N
     return out
 
 
-def related_forms(conn: Connection, qid: str, spec: Mapping[str, Any] | None, origin: str | None) -> list[dict[str, Any]]:
+def related_forms(
+    conn: Connection, qid: str, spec: Mapping[str, Any] | None, origin: str | None
+) -> list[dict[str, Any]]:
     """Records the profile declares as forms of this one (ChEMBL: salts whose parent molecule is this record)."""
     if not spec:
         return []
     pid = str(spec["property"])
-    col_self, col_other = ("object_qid", "subject_qid") if spec.get("direction", "in") == "in" else ("subject_qid", "object_qid")
+    col_self, col_other = (
+        ("object_qid", "subject_qid") if spec.get("direction", "in") == "in" else ("subject_qid", "object_qid")
+    )
     qids = list(
         conn.execute(
             text(f"""SELECT DISTINCT s.{col_other} FROM kg.statement_current s
@@ -169,11 +181,16 @@ def related_forms(conn: Connection, qid: str, spec: Mapping[str, Any] | None, or
         ).scalars()
     )
     labels, kinds = kq.labels_for(conn, qids), kq.kinds_for(conn, qids)
-    return [{"qid": q, "label": kq._display(q, labels), "kind": kinds.get(q), "relation_fr": spec.get("label_fr")} for q in qids]
+    return [
+        {"qid": q, "label": kq._display(q, labels), "kind": kinds.get(q), "relation_fr": spec.get("label_fr")}
+        for q in qids
+    ]
 
 
 def first_neighbour(conn: Connection, qid: str, pid: str, direction: str, origin: str | None) -> dict[str, Any] | None:
-    res = kq.neighbours(conn, qid, direction="in" if direction == "in" else "out", properties=[pid], limit=3, origin=origin)
+    res = kq.neighbours(
+        conn, qid, direction="in" if direction == "in" else "out", properties=[pid], limit=3, origin=origin
+    )
     for e in res["edges"]:
         other = e["subject"] if direction == "in" else e["object"]
         if other:
@@ -199,7 +216,7 @@ def facts(fam: Mapping[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, 
         if typ == "globe_coordinate" or pid in ("P625", "gppd:coordinates"):
             v = sts[0].get("value") or {}
             try:
-                lat, lon = float(v.get("lat", v.get("latitude"))), float(v.get("lon", v.get("longitude")))
+                lat, lon = float(str(v.get("lat", v.get("latitude")))), float(str(v.get("lon", v.get("longitude"))))
                 coords = coords or {"lat": lat, "lon": lon, "source": C.kg_source(sts[0], sts[0].get("rights"))}
             except (TypeError, ValueError):
                 pass
@@ -209,7 +226,9 @@ def facts(fam: Mapping[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, 
                 ids.append(
                     {
                         "scheme": _scheme(pid, lv["text"], label),
-                        "value": lv["text"].split(":", 1)[1] if pid == "mondo:xref" and ":" in lv["text"] else lv["text"],
+                        "value": lv["text"].split(":", 1)[1]
+                        if pid == "mondo:xref" and ":" in lv["text"]
+                        else lv["text"],
                         "url": lv["url"],
                         "source": (st.get("provenance") or {}).get("source_key"),
                         "property": pid,
@@ -224,15 +243,17 @@ def facts(fam: Mapping[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, 
         # latest dated value leads; undated: the first (preferred rank first)
         ordered = sorted(dated, key=lambda t: (t[0] is not None, t[0] or 0.0), reverse=True)
         if not has_dates:
-            ordered = sorted(dated, key=lambda t: ((t[1].get("provenance") or {}).get("rank") != "preferred"))
-        x, st, lv = ordered[0]
+            ordered = sorted(dated, key=lambda t: (t[1].get("provenance") or {}).get("rank") != "preferred")
+        _x, st, lv = ordered[0]
         points = []
         if len(numeric) >= 2 and has_dates >= 2:
             pts: dict[float, dict[str, Any]] = {}
             for px, pst, plv in numeric:
                 if px is None:
                     continue
-                pts.setdefault(px, {"t": C.statement_period(pst) or str(int(px)), "x": px, "v": plv["value"], "projection": False})
+                pts.setdefault(
+                    px, {"t": C.statement_period(pst) or str(int(px)), "x": px, "v": plv["value"], "projection": False}
+                )
             points = sorted(pts.values(), key=lambda p: p["x"])[-MAX_POINTS:]
         out.append(
             {
@@ -323,7 +344,9 @@ def places(conn: Connection, qid: str, origin: str | None) -> dict[str, Any]:
     return {
         "chain": chain,
         "country_iso3": res.get("country_iso3"),
-        "point": {"lat": float(co["latitude"]), "lon": float(co["longitude"]), "source_key": co["source_key"]} if co else None,
+        "point": {"lat": float(co["latitude"]), "lon": float(co["longitude"]), "source_key": co["source_key"]}
+        if co
+        else None,
     }
 
 
@@ -346,10 +369,16 @@ def country_geometry(conn: Connection, iso3: str) -> dict[str, Any] | None:
         return None
     if row is None or not row["geom"]:
         return None
-    return {"geojson": row["geom"], "feature_key": row["feature_key"], "note_fr": "Contour d’affichage (Natural Earth), pas une frontière revendiquée."}
+    return {
+        "geojson": row["geom"],
+        "feature_key": row["feature_key"],
+        "note_fr": "Contour d’affichage (Natural Earth), pas une frontière revendiquée.",
+    }
 
 
-def dated_statements(conn: Connection, qid: str, origin: str | None, skip_props: set[str], limit: int = 40) -> list[dict[str, Any]]:
+def dated_statements(
+    conn: Connection, qid: str, origin: str | None, skip_props: set[str], limit: int = 40
+) -> list[dict[str, Any]]:
     res = kq.timeline(conn, qid, include_incoming=False, limit=300, origin=origin)
     out = []
     for e in res["events"]:
@@ -382,11 +411,13 @@ def relation_page(
         raise ValueError(f"unknown relation family {family}")
     pids = sorted(reg.pids_for([family]))
     res = kq.neighbours(conn, qid, direction="both", properties=pids, limit=limit, after_id=after_id, origin=origin)
-    rows = [{"raw_sha256": e["provenance"]["raw_sha256"], "source_key": e["provenance"]["source_key"]} for e in res["edges"]]
+    rows = [
+        {"raw_sha256": e["provenance"]["raw_sha256"], "source_key": e["provenance"]["source_key"]} for e in res["edges"]
+    ]
     rights = fq.rights_for(conn, rows)
     items = []
     for e in res["edges"]:
-        d = e.get("direction") or ("out" if e["subject"]["qid"] == qid else "in")
+        d: Literal["out", "in"] = "out" if e["subject"]["qid"] == qid else "in"
         ef = reg.edge_family(e["property"]["pid"], d)
         if ef is None or ef.family != family:
             continue

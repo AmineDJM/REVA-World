@@ -60,12 +60,58 @@ def test_plan_covers_every_country_and_dataset_and_resumes_from_cursor() -> None
     assert len(plan.items) == 40 and plan.budget_exhausted
     done = [FetchOutcome(item_key=i.key, status="published") for i in plan.items]
     cur = c.next_cursor(plan, done)
-    assert not cur.state["complete"] and len(cur.state["done"]) == 40
+    # 1.1.0: always a savable checkpoint (the runner persists only ``complete: true``)
+    assert cur.state["complete"] and not cur.state["cycle_finished"] and len(cur.state["cycle_done"]) == 40
     plan2 = c.plan(cur, FetchBudget(max_requests=1000))
-    assert {i.key for i in plan2.items} == {i.key for i in items} - set(cur.state["done"])
+    assert {i.key for i in plan2.items} == {i.key for i in items} - set(cur.state["cycle_done"])
     cur2 = c.next_cursor(plan2, [FetchOutcome(item_key=i.key, status="published") for i in plan2.items])
-    assert cur2.state["complete"] and cur2.state["done"] == []
+    assert cur2.state["complete"] and cur2.state["cycle_finished"] and cur2.state["cycle_done"] == []
     assert len(c.plan(Cursor(state=cur2.state), FetchBudget(max_requests=1000)).items) == len(items)  # new cycle
+
+
+def test_cursor_is_always_a_savable_checkpoint_and_resumes_across_budgeted_runs() -> None:
+    """Regression (V6 FIXPOP): with the live budget of 100 requests per run, the 282-item cycle
+    needs 3 runs; each run's cursor must be persistable (``complete: true``) and the next run
+    must continue where the previous one stopped (1.0.0 restarted at AT every run, FR never came)."""
+    c = builtin_connectors()["eurostat.demography"]
+    all_keys = [i.key for i in c.all_items()]
+    cursor: Cursor | None = None
+    fetched: list[str] = []
+    for _ in range(3):
+        plan = c.plan(cursor, FetchBudget(max_requests=100))
+        fetched += [i.key for i in plan.items]
+        cursor = c.next_cursor(plan, [FetchOutcome(item_key=i.key, status="published") for i in plan.items])
+        assert cursor.state["complete"] is True  # the runner saves it
+    assert fetched == all_keys  # each item exactly once, in plan order, across the three runs
+    assert cursor is not None and cursor.state["cycle_finished"] and cursor.state["cycle_progress"] == [282, 282]
+    assert any(k.startswith("demo_pjan:FR:") for k in fetched[100:200])  # FR comes in the 2nd run
+
+
+def test_failed_items_are_retried_and_quarantined_items_do_not_stall_the_cycle() -> None:
+    c = builtin_connectors()["eurostat.demography"]
+    plan = c.plan(None, FetchBudget(max_requests=3))
+    a, b, q = (i.key for i in plan.items)
+    cur = c.next_cursor(
+        plan,
+        [
+            FetchOutcome(item_key=a, status="published"),
+            FetchOutcome(item_key=b, status="failed", detail="budget"),
+            FetchOutcome(item_key=q, status="quarantined"),
+        ],
+    )
+    assert cur.state["cycle_done"] == sorted([a, q]) and cur.state["quarantined_this_run"] == [q]
+    nxt = [i.key for i in c.plan(cur, FetchBudget(max_requests=2)).items]
+    assert nxt[0] == b and a not in nxt and q not in nxt  # the failed item first, nothing re-fetched
+
+
+def test_legacy_1_0_0_cursor_states_are_read() -> None:
+    c = builtin_connectors()["eurostat.demography"]
+    keys = [i.key for i in c.all_items()]
+    legacy_unfinished = Cursor(state={"complete": False, "done": keys[:100], "since_year": 2000})
+    assert [i.key for i in c.plan(legacy_unfinished, FetchBudget(max_requests=1000)).items] == keys[100:]
+    legacy_finished = Cursor(state={"complete": True, "done": [], "since_year": 2000})
+    assert len(c.plan(legacy_finished, FetchBudget(max_requests=1000)).items) == len(keys)
+    assert ed.cycle_done_from(None) == set()
 
 
 def test_every_fixture_item_parses_and_passes_validation(fixture_raws: dict[str, RawAcquisition]) -> None:

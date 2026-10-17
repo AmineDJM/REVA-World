@@ -169,6 +169,7 @@ class DocumentMeta(_M):
     sentences: int
     values: int
     missing: int
+    timings_ms: dict[str, float] = Field(default_factory=dict, description="Compute time per block query (uncached)")
 
 
 class Document(_M):

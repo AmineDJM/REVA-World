@@ -13,6 +13,8 @@ export default defineConfig({
     outDir: '../src/reva/api/static',
     emptyOutDir: true,
     sourcemap: false,
+    // .vite/manifest.json: per-route bundle budgets (scripts/v8-bundle-report.mjs); not served (dot dir).
+    manifest: true,
     chunkSizeWarningLimit: 1600,
   },
   server: {

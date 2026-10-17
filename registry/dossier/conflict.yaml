@@ -1,0 +1,163 @@
+# Dossier conflit (V8DOSSIER). Any UCDP armed conflict id (ucdp:conflict:<n>): parties, intensity, battle deaths,
+# located events, peace agreements, third-party forecasts (VIEWS) and attributed causal claims. A curated binding
+# may add the Wikidata events that describe the same war (`events:`) — chosen by REVA, stated as such.
+kind: conflict
+label: Conflit
+resolver: ucdp_conflict
+id_pattern: "^ucdp:conflict:[0-9]{1,6}$"
+title: "{$subject}"
+subtitle: "Dossier conflit · parties, intensité, victimes, accords, prévisions, causes attribuées"
+featured:
+  - {id: "ucdp:conflict:13243", label: "Russie – Ukraine (gouvernement et territoire)", sublabel: "UCDP 13243 · interétatique"}
+  - {id: "ucdp:conflict:309", label: "Soudan : gouvernement", sublabel: "UCDP 309 · intra-étatique"}
+generic: {events: []}
+vocab:
+  interstate: "interétatique"
+  intrastate: "intra-étatique"
+  internationalized_intrastate: "intra-étatique internationalisé"
+  extrasystemic: "extra-systémique"
+  government: "gouvernement"
+  territory: "territoire"
+  government_and_territory: "gouvernement et territoire"
+honesty:
+  - "Les décès liés aux combats sont les estimations « best » de l'UCDP, avec leurs bornes basse et haute publiées ; ce ne sont pas des comptes exhaustifs."
+  - "Les sommes pluriannuelles sont des calculs REVA sur les valeurs annuelles publiées (méthode en note)."
+  - "Les prévisions VIEWS sont des projections d'un tiers, reproduites telles quelles et non jugées par REVA."
+  - "Les causes sont des affirmations attribuées à leur source, avec niveau et note ; REVA n'établit aucune causalité."
+  - "Une valeur absente est écrite « manquant » avec sa raison, jamais remplacée par zéro."
+not_covered:
+  - what: "Victimes civiles hors combats, déplacés, réfugiés par conflit"
+    reason: "les séries UNHCR/IDMC sont par pays, pas par conflit, et ne sont pas attribuées à ce conflit"
+  - what: "Lignes de front, cartes de contrôle territorial"
+    reason: "aucune source cartographique de contrôle n'est chargée"
+  - what: "Coûts économiques et dépenses militaires du conflit"
+    reason: "les dépenses militaires SIPRI ne sont pas chargées (autorisation en attente)"
+  - what: "Prévisions REVA propres de ce conflit"
+    reason: "le suivi pré-enregistré BEAT-CONFLICT n'a pas encore de résultat publié jugé pour ce conflit"
+subjects:
+  "ucdp:conflict:13243":
+    label: "Russie – Ukraine (gouvernement et territoire)"
+    sublabel: "UCDP 13243 · conflit interétatique · depuis le 18 mars 2014"
+    entity: "ucdp:conflict:13243"
+    entity_kind: armed_conflict
+    params:
+      ids: ["ucdp:conflict:13243"]
+      countries: [RUS, UKR]
+      events: ["Q15860072", "Q110999040"]
+summary:
+  - id: deaths
+    text: "Selon l'UCDP, {deaths.latest} décès liés aux combats en {deaths.latest_year} (bornes publiées : {deaths.latest_lo} – {deaths.latest_hi}), {deaths.total} sur {deaths.n_years} années renseignées (somme REVA)."
+  - id: start
+    text: "Début du conflit selon l'UCDP : {facts.start} ; intensité {facts.intensity} la dernière année codée ({facts.intensity_when})."
+  - id: views
+    text: "VIEWS (exécution {views.run}) projette des décès liés à la violence étatique pour les pays concernés ; projection d'un tiers, non jugée par REVA."
+sections:
+  - id: faits
+    title: Faits de base
+    blocks:
+      - id: facts
+        query: kg.literals
+        params:
+          ids: [$id]
+          current: false
+          properties: {start: "ucdp:start_date", type: "ucdp:conflict_type", incompat: "ucdp:incompatibility", territory: "ucdp:territory_name", intensity: "ucdp:intensity_level", first_event: "ucdpged:first_event_date", last_event: "ucdpged:last_event_date"}
+        sentences:
+          - id: start
+            what: "Date de début"
+            text: "Début selon l'UCDP : {start} ; type : {type|vocab} ; incompatibilité : {incompat|vocab}."
+          - id: territory
+            what: "Territoire disputé"
+            text: "Territoire en jeu : {territory}."
+          - id: intensity
+            what: "Intensité"
+            text: "Niveau d'intensité déclaré pour {intensity_when} : {intensity} (1 = 25 à 999 décès liés aux combats dans l'année ; 2 = au moins 1 000, selon le codebook UCDP)."
+          - id: events
+            what: "Période des événements géoréférencés"
+            text: "Événements géoréférencés (UCDP GED) du {first_event} au {last_event}."
+        empty: {what: "Faits de base du conflit"}
+      - id: parties
+        query: kg.edges
+        params: {ids: [$id], properties: ["ucdp:primary_party", "ucdp:secondary_party", "ucdp:nonstate_side"], direction: out, limit: 14}
+        list:
+          title: "Parties déclarées (UCDP)"
+          item: "{name} — {property}, {when} à {end}"
+          item_missing: "{name} — {property}"
+        empty: {what: "Parties au conflit"}
+      - id: location
+        query: kg.edges
+        params: {ids: [$id], properties: ["ucdp:location"], direction: out, limit: 8}
+        list:
+          title: "Pays où le conflit est localisé"
+          item: "{name}"
+        empty: {what: "Localisation"}
+  - id: victimes
+    title: Décès liés aux combats
+    lede: "Estimations annuelles de l'UCDP (meilleure estimation, bornes publiées en grisé sur le graphique)."
+    blocks:
+      - id: deaths
+        query: kg.quantity_series
+        params: {id: $id, property: "ucdp:battle_related_deaths", label: "Décès liés aux combats (UCDP, meilleure estimation)", kind: estimate}
+        sentences:
+          - id: latest
+            what: "Décès liés aux combats"
+            text: "En {latest_year}, l'UCDP estime {latest} décès liés aux combats (bornes : {latest_lo} – {latest_hi}) ; le pic de la série est {max} en {max_year}."
+          - id: total
+            what: "Total pluriannuel"
+            text: "Sur les {n_years} années renseignées, la somme des meilleures estimations annuelles atteint {total} (calcul REVA)."
+        chart: {type: fan, title: "Décès liés aux combats par an (UCDP)", note: "Ligne : meilleure estimation ; bande : bornes basse et haute publiées."}
+        empty: {what: "Décès liés aux combats"}
+      - id: adm1
+        query: kg.edges
+        params: {ids: [$id], properties: ["ucdpged:events_in_adm1"], direction: out, limit: 16}
+        list:
+          title: "Régions (ADM1) où des événements sont géoréférencés"
+          item: "{name} ({when})"
+          item_missing: "{name}"
+        empty: {what: "Régions touchées"}
+  - id: paix
+    title: Accords et processus de paix
+    blocks:
+      - id: agreements
+        query: kg.edges
+        params: {ids: [$id], properties: ["ucdppa:conflict", "pax:ucdp_conflict"], direction: in, limit: 12, sort: label}
+        sentences:
+          - id: n
+            text: "{n} accords ou textes de paix rattachés à ce conflit par l'UCDP ou PA-X."
+        list:
+          item: "{name} — {source}"
+        empty: {what: "Accords de paix"}
+  - id: previsions
+    title: Prévisions (tierces)
+    lede: "Décès prévus par VIEWS (Uppsala / PRIO) pour les pays où le conflit est localisé : projection d'un tiers, toutes violences étatiques confondues dans le pays, non jugée par REVA."
+    blocks:
+      - id: views
+        query: table.views
+        params: {iso3: $countries, months: 6}
+        chart: {type: line, title: "Décès prévus par VIEWS, par mois et par pays", note: "Projection tierce ; aucune valeur observée n'est tracée."}
+        table:
+          caption: "VIEWS : décès prévus (moyenne), six prochains mois"
+          columns:
+            - {header: "Pays", cell: "{country}"}
+            - {header: "Mois", cell: "{period}"}
+            - {header: "Décès prévus", cell: "{value}", numeric: true}
+        empty: {what: "Prévisions VIEWS"}
+  - id: causes
+    title: Causes et conséquences attribuées
+    lede: "Affirmations causales chargées sur la guerre décrite par ce conflit (événements Wikidata rattachés par REVA)."
+    blocks:
+      - id: why
+        query: causal.claims
+        params: {ids: $events, side: causes, limit: 8}
+        when: events
+        list:
+          title: "Causes affirmées"
+          item: "Selon {source} (niveau {tier}, note {grade}) : {cause} {relation} {effect}."
+        empty: {what: "Causes affirmées"}
+      - id: effects
+        query: causal.claims
+        params: {ids: $events, side: effects, limit: 8}
+        when: events
+        list:
+          title: "Conséquences affirmées"
+          item: "Selon {source} (niveau {tier}, note {grade}) : {cause} {relation} {effect}."
+        empty: {what: "Conséquences affirmées"}

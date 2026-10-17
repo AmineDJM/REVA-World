@@ -62,9 +62,10 @@ class Notes:
 
 # ============================================================================== sentence rendering
 class Renderer:
-    def __init__(self, notes: Notes, subject_values: Mapping[str, Item]) -> None:
+    def __init__(self, notes: Notes, subject_values: Mapping[str, Item], vocab: Mapping[str, str] | None = None) -> None:
         self.notes = notes
         self.subject = subject_values
+        self.vocab = dict(vocab or {})
         self.blocks: dict[str, Result] = {}
 
     def lookup(self, name: str, local: Mapping[str, Item]) -> Item:
@@ -93,11 +94,12 @@ class Renderer:
                 parts.append(M.Part(t="text", text=text[pos : m.start()]))
             it = self.lookup(m.group(1), local)
             if isinstance(it, Val):
+                shown = self.vocab.get(it.text, it.text) if m.group(2) else it.text
                 parts.append(
                     M.Part(
                         t="value",
-                        text=it.text,
-                        exact=it.exact,
+                        text=shown,
+                        exact=it.exact if it.exact is not None or shown == it.text else it.text,
                         unit=it.unit,
                         kind=it.kind,  # type: ignore[arg-type]
                         fn=self.notes.fn(it.src),
@@ -179,6 +181,7 @@ def resolve_subject(tpl: Template, sid: str, ctx: Ctx) -> tuple[M.SubjectRef, di
     kind = ent.get("kind") or "entity"
     ksrc = Src(source=str((ent.get("provenance") or {}).get("source_key") or "kg"), title="Graphe de connaissances REVA", ref=sid, licence=None)
     params: dict[str, Any] = {"id": sid, "ids": [sid]}
+    params.update(_subst(t.generic, params))
     if t.resolver == "chembl_drug":
         params["ids"] = _drug_ids(ctx, sid)
     if t.resolver == "ucdp_conflict":
@@ -251,6 +254,7 @@ def _run_block(ctx: Ctx, b: BlockT, params: Mapping[str, Any]) -> Result:
     if fn is None:
         raise TemplateError(f"unknown query {b.query}")
     kw = _subst(b.params, params)
+    t0 = time.perf_counter()
     try:
         return fn(ctx, **kw)
     except TemplateError:
@@ -262,6 +266,8 @@ def _run_block(ctx: Ctx, b: BlockT, params: Mapping[str, Any]) -> Result:
         except Exception:  # noqa: BLE001
             pass
         return Result(empty_reason=f"source indisponible lors du calcul ({type(e).__name__})")
+    finally:
+        ctx.timings[f"{b.id}:{b.query}"] = round((time.perf_counter() - t0) * 1000, 1)
 
 
 def _render_block(
@@ -335,7 +341,12 @@ def _render_block(
             )
         )
     if b.list_ and res.rows:
-        items = [r.sentence(f"{base}.item", b.list_.item, row)[0] for row in res.rows]
+        items = []
+        for row in res.rows:
+            it, miss = r.sentence(f"{base}.item", b.list_.item, row)
+            if miss and b.list_.item_missing:
+                it, _ = r.sentence(f"{base}.item_missing", b.list_.item_missing, row)
+            items.append(it)
         out.append(M.ListBlock(id=f"{base}.list", template_id=f"{base}.item", title=b.list_.title, items=items, more=res.more))
     if (b.table or b.list_) and not res.rows:
         reason = res.empty_reason or "aucune ligne"
@@ -354,7 +365,7 @@ def _render_block(
 def build_document(tpl: Template, ctx: Ctx, ref: M.SubjectRef, params: dict[str, Any], svals: dict[str, Item], t0: float) -> M.Document:
     t = tpl.t
     notes = Notes()
-    r = Renderer(notes, svals)
+    r = Renderer(notes, svals, t.vocab)
     not_covered: list[M.NotCovered] = []
     sections: list[M.Section] = []
     for sec in t.sections:
@@ -410,6 +421,7 @@ def build_document(tpl: Template, ctx: Ctx, ref: M.SubjectRef, params: dict[str,
             sentences=n_sent,
             values=n_vals,
             missing=n_miss,
+            timings_ms=dict(ctx.timings),
         ),
     )
 

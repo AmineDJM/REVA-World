@@ -20,11 +20,15 @@ not_covered:
     reason: "hors du périmètre des sources chargées (aucune source d'actualité ou de sondage n'alimente les dossiers)"
   - what: "Commerce bilatéral détaillé par produit"
     reason: "les flux BACI sont chargés au niveau HS2 et servis par la vue Liens, pas résumés ici"
+featured:
+  - {id: FRA, label: "France", sublabel: "FRA · Q142"}
+  - {id: DEU, label: "Allemagne", sublabel: "DEU · Q183"}
+  - {id: NGA, label: "Nigeria", sublabel: "NGA · Q1033"}
 summary:
   - id: pop
-    text: "{$subject} compte {eco.pop} habitants ({eco.pop_year})."
+    text: "Population de {$subject} : {eco.pop} ({eco.pop_year})."
   - id: gdp
-    text: "Son PIB atteint {eco.gdp} ({eco.gdp_year}), soit {eco.gdppc_ppp} par habitant en parité de pouvoir d'achat ({eco.gdppc_ppp_year})."
+    text: "Son PIB atteint {eco.gdp} ({eco.gdp_year}), soit {eco.gdppc_ppp} en parité de pouvoir d'achat ({eco.gdppc_ppp_year})."
   - id: macro
     text: "Croissance du PIB réel : {eco.growth} ; inflation : {eco.cpi} ; chômage : {eco.unemp} (dernières années publiées : {eco.growth_year}, {eco.cpi_year}, {eco.unemp_year})."
   - id: life
@@ -96,7 +100,7 @@ sections:
         sentences:
           - id: gdp
             what: "PIB"
-            text: "Le PIB s'établit à {gdp} en {gdp_year} ; par habitant et en parité de pouvoir d'achat, il atteint {gdppc_ppp} ({gdppc_ppp_year})."
+            text: "Le PIB s'établit à {gdp} en {gdp_year} ; en parité de pouvoir d'achat, il atteint {gdppc_ppp} ({gdppc_ppp_year})."
           - id: growth
             what: "Croissance et inflation"
             text: "La croissance du PIB réel est de {growth} en {growth_year} et l'inflation des prix à la consommation de {cpi} en {cpi_year}."
@@ -190,6 +194,7 @@ sections:
         list:
           title: "Estimations d'effet publiées couvrant ce pays"
           item: "{citation} : effet de « {cause} » sur « {effect} » — {measure} {point} (intervalle publié : {ci_low} à {ci_high})."
+          item_missing: "{citation} : effet de « {cause} » sur « {effect} » — {measure} {point} (estimation ponctuelle, intervalle non publié)."
         empty: {what: "Estimations d'effet couvrant ce pays"}
   - id: previsions
     title: Prévisions et jugement

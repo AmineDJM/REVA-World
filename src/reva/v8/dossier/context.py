@@ -138,6 +138,7 @@ class Ctx:
     atlas_q: Any = None
     subject: dict[str, Any] = field(default_factory=dict)
     memo: dict[Any, Any] = field(default_factory=dict)
+    timings: dict[str, float] = field(default_factory=dict)
     now: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     # ------------------------------------------------------------------ atlas

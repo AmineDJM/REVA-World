@@ -1,0 +1,184 @@
+# Dossier maladie (V8DOSSIER). Curated binding per disease (ontology ids, WHO GHE cause code, atlas concepts) under
+# `subjects:`; any other Mondo / Disease Ontology id gets the knowledge-graph sections only (generic resolver).
+# The WHO GHE cause code is chosen by its verbatim WHO title ("Malaria"); REVA never matches causes to diseases by
+# fuzzy name. No number is written in this file.
+kind: disease
+label: Maladie
+resolver: kg
+id_pattern: "^([a-z][a-z0-9_]{1,40}|[a-z][a-z0-9_]{0,31}:[A-Za-z0-9_.:-]{1,64})$"
+generic: {onto: ["$id"], drug_targets: ["$id"], events: ["$id"], ghe: "", incidence: "", nets: ""}
+title: "{$subject}"
+subtitle: "Dossier maladie · fardeau, classification, gènes, traitements, essais, prévisions"
+honesty:
+  - "Chaque nombre est la valeur que publie sa source (note : source, licence, période, référence) ; les estimations de l'OMS sont des estimations modélisées, marquées comme telles."
+  - "Les sommes marquées « calcul REVA » additionnent des estimations-pays publiées ; la méthode est dans la note."
+  - "Un pays sans valeur n'est pas indemne par inférence : l'OMS ne publie certaines estimations que pour les pays d'endémie."
+  - "Les indications de médicaments sont celles que déclarent ChEMBL et la liste OMS des médicaments essentiels ; ce ne sont pas des recommandations."
+  - "Une valeur absente est écrite « manquant » avec sa raison, jamais remplacée par zéro."
+not_covered:
+  - what: "Essais cliniques (ClinicalTrials.gov)"
+    reason: "le registre ClinicalTrials.gov n'est pas encore chargé (en file d'attente, disque insuffisant)"
+  - what: "Associations gène-maladie (GWAS, Open Targets)"
+    reason: "aucune source d'association gène-maladie n'est chargée pour cette maladie"
+  - what: "Prévisions de cas"
+    reason: "aucune famille de questions du registre prospectif ne porte sur cette maladie"
+  - what: "Résistances aux traitements, vecteurs, cartes de transmission"
+    reason: "hors des sources chargées"
+subjects:
+  malaria:
+    label: "Paludisme"
+    sublabel: "Mondo 0005136 · DOID 12365 · CIM-11 1F4Z · MeSH D008288"
+    entity: "mondo:0005136"
+    entity_kind: disease
+    params:
+      ids: ["mondo:0005136", "doid:12365"]
+      onto: ["mondo:0005136", "doid:12365"]
+      drug_targets: ["efo:0001068", "mesh:D008288", "icd11mms:1F4Z"]
+      ghe: who.ghe
+      ghe_deaths: "ghe.deaths|sex=TOTAL|age=TOTAL|cause=220"
+      ghe_dalys: "ghe.dalys|sex=TOTAL|age=TOTAL|cause=220"
+      ghe_rate: "ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=220"
+      incidence: health.malaria_incidence
+      nets: wb.sh.mlr.nets.zs
+      events: ["Q12156"]
+summary:
+  - id: burden
+    text: "Selon les estimations de l'OMS, {deaths.sum} décès sont attribués au paludisme en {deaths.period} dans {deaths.n_countries} pays (somme REVA des estimations-pays), dont {deaths.top1_value} en {deaths.top1}."
+  - id: incidence
+    text: "Incidence la plus élevée déclarée : {inc.top1} ({inc.top1_value}, {inc.year})."
+  - id: drugs
+    text: "{drugs.n} médicaments ou formes de médicaments sont déclarés indiqués contre le paludisme par ChEMBL ou la liste OMS des médicaments essentiels."
+sections:
+  - id: definition
+    title: Définition et classification
+    lede: "Ce que disent les ontologies de référence (texte verbatim des sources, en anglais)."
+    blocks:
+      - id: def
+        query: kg.literals
+        params: {ids: $onto, properties: {def_mondo: "mondo:definition", def_doid: "doid:definition"}, current: false}
+        sentences:
+          - id: mondo
+            what: "Définition (Mondo)"
+            text: "Mondo : « {def_mondo} »"
+          - id: doid
+            what: "Définition (Disease Ontology)"
+            text: "Disease Ontology : « {def_doid} »"
+        empty: {what: "Définition"}
+      - id: isa
+        query: kg.edges
+        params: {ids: $onto, properties: ["mondo:subclass_of", "doid:subclass_of"], direction: out, limit: 8}
+        list:
+          title: "Est une sorte de"
+          item: "{name} ({source})"
+        empty: {what: "Classes parentes"}
+      - id: forms
+        query: kg.edges
+        params: {ids: $onto, properties: ["mondo:subclass_of", "doid:subclass_of"], direction: in, limit: 12}
+        list:
+          title: "Formes déclarées"
+          item: "{name}"
+        empty: {what: "Sous-types"}
+  - id: clinique
+    title: Signes et anatomie
+    lede: "Signes et caractéristiques déclarés par les ontologies ; la localisation anatomique n'est pas déclarée pour cette maladie."
+    blocks:
+      - id: features
+        query: kg.edges
+        params: {ids: $onto, properties: ["mondo:has_feature", "doid:has_symptom", "doid:located_in", "mondo:disease_has_location"], direction: out, limit: 10}
+        list:
+          item: "{property} : {name}"
+        empty: {what: "Signes, caractéristiques et localisation anatomique"}
+  - id: fardeau
+    title: Fardeau mondial
+    lede: "Décès et années de vie ajustées sur l'incapacité (AVCI) estimés par l'OMS (Global Health Estimates), par pays."
+    blocks:
+      - id: deaths
+        query: table.ranking
+        when: ghe
+        params: {dataset: $ghe, indicator: $ghe_deaths, top: 10, title: "OMS — Global Health Estimates, décès (cause 220, « Malaria »)", kind: estimate, sum_label: "décès estimés"}
+        sentences:
+          - id: total
+            what: "Décès estimés"
+            text: "En {period}, l'OMS estime {sum} décès dus au paludisme dans les {n_countries} pays qu'elle couvre (somme REVA) ; {top1} en compte {top1_value}, devant {top2} ({top2_value}) et {top3} ({top3_value})."
+        chart: {type: bar, title: "Décès estimés dus au paludisme, dix premiers pays"}
+        table:
+          caption: "Décès estimés dus au paludisme (OMS, estimations modélisées)"
+          columns:
+            - {header: "Rang", cell: "{rank}", numeric: true}
+            - {header: "Pays", cell: "{country}"}
+            - {header: "Décès", cell: "{value}", numeric: true}
+        empty: {what: "Décès estimés"}
+      - id: dalys
+        query: table.ranking
+        when: ghe
+        params: {dataset: $ghe, indicator: $ghe_dalys, top: 5, title: "OMS — Global Health Estimates, AVCI (cause 220, « Malaria »)", kind: estimate, sum_label: "AVCI estimées"}
+        sentences:
+          - id: total
+            what: "AVCI estimées"
+            text: "Les années de vie ajustées sur l'incapacité perdues atteignent {sum} en {period} (somme REVA de {n_countries} pays), dont {top1_value} en {top1}."
+        empty: {what: "AVCI estimées"}
+      - id: rate
+        query: table.ranking
+        when: ghe
+        params: {dataset: $ghe, indicator: $ghe_rate, top: 5, title: "OMS — Global Health Estimates, décès pour 100 000 habitants (cause 220)", kind: estimate}
+        sentences:
+          - id: rate
+            what: "Mortalité rapportée à la population"
+            text: "Rapporté à la population, le taux de mortalité le plus élevé est celui de {top1} ({top1_value}), puis {top2} ({top2_value}) et {top3} ({top3_value}), en {period}."
+        empty: {what: "Taux de mortalité"}
+      - id: inc
+        query: atlas.ranking
+        when: incidence
+        params: {concept: $incidence, top: 8}
+        sentences:
+          - id: inc
+            what: "Incidence"
+            text: "Incidence estimée (pour 1 000 personnes exposées) en {year} : {top1} {top1_value}, {top2} {top2_value}, {top3} {top3_value} ; {n_countries} pays d'endémie déclarés."
+        table:
+          caption: "Incidence du paludisme, huit pays les plus touchés"
+          columns:
+            - {header: "Pays", cell: "{country}"}
+            - {header: "Incidence", cell: "{value}", numeric: true}
+        empty: {what: "Incidence"}
+  - id: prevention
+    title: Prévention
+    blocks:
+      - id: nets
+        query: atlas.ranking
+        when: nets
+        params: {concept: $nets, top: 5}
+        sentences:
+          - id: nets
+            what: "Moustiquaires imprégnées"
+            text: "Part des enfants de moins de cinq ans dormant sous moustiquaire imprégnée, valeurs les plus élevées en {year} : {top1} ({top1_value}), {top2} ({top2_value}), {top3} ({top3_value}) ; {n_countries} pays déclarent cette enquête."
+        empty: {what: "Moustiquaires imprégnées"}
+  - id: traitements
+    title: Médicaments
+    lede: "Médicaments déclarés indiqués contre la maladie par ChEMBL (phase maximale de développement) et recommandés par la liste OMS des médicaments essentiels."
+    blocks:
+      - id: drugs
+        query: kg.edges
+        params: {ids: $drug_targets, properties: ["chembl:indication", "chembl:indication_mesh", "eml:recommended_for"], direction: in, limit: 24}
+        sentences:
+          - id: n
+            text: "{n} médicaments ou formes de médicaments déclarés."
+        list:
+          item: "{name} — {source}"
+        empty: {what: "Médicaments indiqués"}
+  - id: causes
+    title: Causes et effets attribués
+    blocks:
+      - id: claims
+        query: causal.claims
+        params: {ids: $events, side: causes, limit: 6}
+        list:
+          title: "Causes affirmées"
+          item: "Selon {source} (niveau {tier}, note {grade}) : {cause} {relation} {effect}."
+        empty: {what: "Affirmations causales sur la maladie"}
+      - id: effects
+        query: causal.claims
+        params: {ids: $events, side: effects, limit: 6}
+        list:
+          title: "Conséquences affirmées"
+          item: "Selon {source} (niveau {tier}, note {grade}) : {cause} {relation} {effect}."
+        empty: {what: "Conséquences affirmées de la maladie"}

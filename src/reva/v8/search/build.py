@@ -286,6 +286,7 @@ class IndexWriter:
             """
         )
         db.executemany("INSERT INTO strs VALUES (?, ?)", [(i, v) for v, i in self.strs.items()])
+        write_pop_layer(db)
         codes = db.execute("SELECT count(*) FROM code").fetchone()[0]
         meta = {**meta, "documents": self.rid, "names": self.nid, "codes": codes, "kinds": self.counts}
         db.executemany("INSERT INTO meta VALUES (?, ?)", [(k, json.dumps(v, default=str)) for k, v in meta.items()])
@@ -301,6 +302,45 @@ class IndexWriter:
         finally:
             if self.tmp.exists():
                 self.tmp.unlink()
+
+
+def write_pop_layer(db: sqlite3.Connection) -> int:
+    """Persist the in-memory layer of popular names (sorted norms, priors, trigram postings) as blobs."""
+    import numpy as np
+
+    from reva.v8.search.normalize import trigrams
+
+    rows = db.execute(
+        "SELECT n.rid, n.norm, COALESCE(n.raw, n.norm), d.prior, d.kind FROM name n JOIN doc d ON d.rid = n.rid "
+        "WHERE n.pop = 1 ORDER BY n.norm"
+    ).fetchall()
+    post: dict[str, list[int]] = {}
+    ntri = np.zeros(len(rows), dtype=np.int32)
+    for i, r in enumerate(rows):
+        tg = trigrams(r[1])
+        ntri[i] = len(tg)
+        for t in tg:
+            post.setdefault(t, []).append(i)
+    blobs = {
+        "rid": np.array([r[0] for r in rows], dtype=np.int64).tobytes(),
+        "prior": np.array([r[3] for r in rows], dtype=np.float32).tobytes(),
+        "kind": np.array([r[4] for r in rows], dtype=np.int8).tobytes(),
+        "ntri": ntri.tobytes(),
+        "norm": "\n".join(r[1] for r in rows).encode(),
+        "raw": "\n".join(" ".join(r[2].split()) for r in rows).encode(),
+    }
+    db.execute("CREATE TABLE pop (k TEXT PRIMARY KEY, v BLOB NOT NULL)")
+    db.executemany("INSERT INTO pop VALUES (?, ?)", list(blobs.items()))
+    db.execute("CREATE TABLE pop_tri (tri TEXT PRIMARY KEY, idx BLOB NOT NULL) WITHOUT ROWID")
+    db.executemany(
+        "INSERT INTO pop_tri VALUES (?, ?)", [(t, np.array(v, dtype=np.int32).tobytes()) for t, v in post.items()]
+    )
+    return len(rows)
+
+
+def _is_code_like(s: str) -> bool:
+    """A provider indicator code worth an exact-id match (``NY.GDP.MKTP.CD``, ``PCPIPCH``), not a plain word."""
+    return len(s) >= 4 and "|" not in s and (any(not c.isalpha() for c in s) or s.isupper())
 
 
 # ------------------------------------------------------------------------------------------------ collectors
@@ -521,7 +561,7 @@ def atlas_indicators(conn: Connection, origin: str | None) -> Iterator[Doc]:
         params = {"concept": c.id}
         if first:
             params["indicator"] = first.indicator
-        codes = [c.id] + [s.indicator for s in c.source_order if len(s.indicator) >= 4 and "|" not in s.indicator]
+        codes = [c.id] + [s.indicator for s in c.source_order if _is_code_like(s.indicator)]
         yield Doc(
             kind="indicator",
             id=c.id,

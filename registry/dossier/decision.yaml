@@ -1,0 +1,133 @@
+# Dossier décision (V8DOSSIER). Any reference decision of the decision engine (registry of reference decisions):
+# the decision, the stated scenario assumptions, the propagated variables with their published-uncertainty bands,
+# every hop's attributed estimate, the causal links left unquantified, and what is missing. The result is ALWAYS an
+# unvalidated scenario — not a forecast, not a probability. No number is written in this file.
+kind: decision
+label: Décision
+resolver: decision
+id_pattern: "^[a-z][a-z0-9_]{2,80}$"
+title: "{$subject}"
+subtitle: "Dossier décision · scénario non validé — pas une probabilité"
+featured:
+  - {id: opec_plus_cut_2mbd_2027q1, label: "OPEP+ : −2 mb/j à partir de T1 2027", sublabel: "quota de production · pétrole"}
+  - {id: eu_ban_russian_oil_2027q1, label: "UE : embargo sur le pétrole russe", sublabel: "interdiction d'importer"}
+  - {id: ecb_plus_50bp_2027q1, label: "BCE : +50 pb", sublabel: "taux directeur"}
+generic: {}
+honesty:
+  - "Ce dossier décrit un scénario conditionnel à la décision et aux hypothèses énoncées : ni une prévision, ni une probabilité, tant que la chaîne de modèles n'a pas passé le juge (rétro-test en millésimes et calibration)."
+  - "Les intervalles ne reflètent que l'incertitude publiée par les estimations utilisées : ni l'incertitude de modèle, ni celle de la transposition à une autre époque ou à un autre pays."
+  - "Chaque lien chiffré vient d'une estimation publiée et citée ; un lien causal sans estimation reste sans nombre. Une seule estimation par lien, rien n'est additionné ni moyenné."
+  - "Recherche, pas un conseil financier ni une recommandation."
+not_covered:
+  - what: "Réactions des autres acteurs (producteurs hors accord, stocks stratégiques, banques centrales)"
+    reason: "le scénario suppose le respect intégral de la décision sans compensation : c'est une hypothèse énoncée, pas un résultat"
+  - what: "Effets par pays au-delà des variables mondiales"
+    reason: "aucune estimation publiée chargée ne relie ces variables mondiales aux pays listés pour cet horizon"
+  - what: "Probabilité que la décision soit prise"
+    reason: "le moteur conditionne sur la décision ; il n'en estime pas la probabilité"
+summary:
+  - id: what
+    text: "Décision étudiée : {dec.label}, par {dec.actor}, à partir de {dec.start} ; statut du résultat : {dec.validation}."
+  - id: assumption
+    text: "Hypothèse de scénario : {dec.direct_0} — {dec.direct_0_basis}"
+  - id: hops
+    text: "La propagation passe par {dec.n_hops} estimations publiées et citées."
+sections:
+  - id: decision
+    title: La décision et ses hypothèses
+    blocks:
+      - id: dec
+        query: predict.decision
+        params: {reference_id: $reference_id}
+        sentences:
+          - id: label
+            text: "{label} — acteur : {actor} ; début : {start} ; ampleur : {magnitude} ; horizon étudié : {horizon} trimestres."
+          - id: direct
+            what: "Changement direct"
+            text: "Changement direct imposé au modèle : {direct_0}. {direct_0_basis}"
+          - id: status
+            text: "Statut : {validation}."
+        missing_list: true
+        empty: {what: "Décision de référence"}
+  - id: resultats
+    title: Ce que propage le moteur
+    lede: "Médiane et bande 5 %–95 % de la première période chiffrée de chaque variable ; les périodes sans estimation publiée restent manquantes."
+    blocks:
+      - id: vars
+        query: predict.decision
+        params: {reference_id: $reference_id}
+        table:
+          caption: "Variables propagées (scénario non validé — pas une probabilité)"
+          columns:
+            - {header: "Variable", cell: "{variable}"}
+            - {header: "Période", cell: "{period}"}
+            - {header: "Médiane", cell: "{p50}", numeric: true}
+            - {header: "Bande 5–95 %", cell: "{p05} à {p95}"}
+            - {header: "Périodes non chiffrées", cell: "{n_missing}", numeric: true}
+        empty: {what: "Variables propagées"}
+  - id: chaine
+    title: La chaîne d'estimations
+    lede: "Chaque lien chiffré, avec l'estimation publiée qui le porte et ses limites d'application."
+    blocks:
+      - id: hops
+        query: predict.hops
+        params: {reference_id: $reference_id}
+        list:
+          item: "« {cause} » → « {effect} » : coefficient {coef} ({citation}) — {applicability}."
+        empty: {what: "Estimations sur le chemin"}
+      - id: unq
+        query: predict.unquantified
+        params: {reference_id: $reference_id}
+        list:
+          title: "Liens causaux non chiffrés (épisodes analogues, sans nombre propagé)"
+          item: "Selon {source} (note {grade}) : {cause} → {effect}."
+        empty: {what: "Liens causaux non chiffrés"}
+  - id: contexte
+    title: Contexte du produit concerné
+    lede: "Dernières valeurs publiées des grandeurs que la décision touche."
+    blocks:
+      - id: world
+        query: table.series
+        when: world_table
+        params: {dataset: $world_table, indicator: $world_indicator, geo: WORL, geo_col: provider_geo, freq: A, since: "2000-01-01", label: "Monde (EIA)", title: "U.S. EIA — production mondiale de brut"}
+        sentences:
+          - id: world
+            what: "Production mondiale"
+            text: "Production mondiale de brut : {latest} en {latest_period}."
+        empty: {what: "Production mondiale"}
+      - id: price
+        query: table.series
+        when: price_table
+        params: {dataset: $price_table, indicator: $price_indicator, freq: M, geo: USA, geo_col: provider_geo, since: "2015-01-01", label: "Brent", title: "U.S. EIA — Short-Term Energy Outlook, Brent (BREPUUS)"}
+        sentences:
+          - id: brent
+            what: "Prix du Brent"
+            text: "Brent : {latest} en moyenne en {latest_period}."
+        chart: {type: line, title: "Brent, moyenne mensuelle depuis 2015 (dollars par baril)", note: "Observé ; le scénario n'est pas tracé sur cette courbe."}
+        empty: {what: "Prix du Brent"}
+      - id: fc
+        query: forecasts.family
+        when: fc_family
+        params: {family: $fc_family, models: [reva.ensemble], reference: forecast.reference_eia_steo, limit: 4}
+        sentences:
+          - id: fc
+            text: "Sans la décision, la prévision scellée de REVA pour le Brent reste {judged} ({n_pending} questions en attente)."
+        table:
+          caption: "Brent sans décision : prévisions scellées de l'ensemble REVA et de l'EIA"
+          columns:
+            - {header: "Mois", cell: "{period}"}
+            - {header: "Ensemble REVA", cell: "{reva}", numeric: true}
+            - {header: "Intervalle 90 %", cell: "{reva_lo} – {reva_hi}"}
+            - {header: "EIA STEO", cell: "{ref}", numeric: true}
+        empty: {what: "Prévisions de référence"}
+subjects:
+  opec_plus_cut_2mbd_2027q1:
+    label: "OPEP+ réduit sa production de 2 mb/j à partir du 1er trimestre 2027"
+    sublabel: "quota de production · pétrole brut"
+    params:
+      reference_id: opec_plus_cut_2mbd_2027q1
+      world_table: atlas.eia.intl_petroleum
+      world_indicator: INTL.57-1-TBPD.A
+      price_table: atlas.eia_steo.steo_observed
+      price_indicator: STEO.BREPUUS.M
+      fc_family: eia.brent_monthly

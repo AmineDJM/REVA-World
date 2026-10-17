@@ -41,7 +41,9 @@ def _known(conn: Connection, cands: list[str]) -> list[str]:
     ok = [c for c in cands if QID_RE.match(c)]
     if not ok:
         return []
-    found = set(conn.execute(text("SELECT DISTINCT qid FROM kg.entity_current WHERE qid = ANY(:c)"), {"c": ok}).scalars())
+    found = set(
+        conn.execute(text("SELECT DISTINCT qid FROM kg.entity_current WHERE qid = ANY(:c)"), {"c": ok}).scalars()
+    )
     missing = [c for c in ok if c not in found]
     if missing:  # endpoints of statements only (no snapshot loaded): still a page, labelled as such
         for c in missing:
@@ -93,10 +95,17 @@ def resolve(conn: Connection, kind: str, ident: str) -> Resolved:
         raise NotResolved("no KG record for this id", kind=kind_l, id=ident, tried=cands[:8])
     qid = found[0]
     kg_kind = kq.kinds_for(conn, [qid]).get(qid)
-    canon_kind = P.profile_key(kg_kind or "") or kg_kind or (pkey or kind_l)
+    canon_kind: str = P.profile_key(kg_kind or "") or kg_kind or pkey or kind_l
     if canon_kind == "country" or kg_kind == "country":
-        iso = _iso3_of(conn, qid)
-        if iso:
-            return Resolved(kind="country", id=iso, via="qid" if qid == ident else "template", qid=qid, kg_kind=kg_kind, iso3=iso)
+        iso_of = _iso3_of(conn, qid)
+        if iso_of:
+            return Resolved(
+                kind="country",
+                id=iso_of,
+                via="qid" if qid == ident else "template",
+                qid=qid,
+                kg_kind=kg_kind,
+                iso3=iso_of,
+            )
     via = "qid" if qid == ident else "template"
     return Resolved(kind=kg_kind or canon_kind, id=qid, via=via, qid=qid, kg_kind=kg_kind)

@@ -8,7 +8,9 @@
 # beliefs (about 6e5 single-age cells for 31 countries). The cohort model reads the same
 # values as dataset inputs pinned by digest in the belief release. EUROPOP2023 tables are
 # projection assumptions: they have no observation mapping (dataset inputs only).
-connector: {name: eurostat.demography, version: "1.0.0"}
+# 1.1.0 (V6 FIXPOP): resumable-cursor fix only (parsing, mappings and applicability unchanged);
+# observations already recorded by 1.0.0 keep their own eligibility rows.
+connector: {name: eurostat.demography, version: "1.1.0"}
 mappings:
   - mapping_key: eurostat.demography.demo_pjan
     source_ref: {provider: eurostat, dataset: demo_pjan, dimensions: {freq: A, unit: NR}}

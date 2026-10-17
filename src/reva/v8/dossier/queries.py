@@ -17,7 +17,7 @@ from typing import Any
 import polars as pl
 
 from reva.v8.dossier.context import Ctx, rights_src, source_title
-from reva.v8.dossier.fmt import fr_number, fr_period, to_decimal
+from reva.v8.dossier.fmt import fr_number, fr_period, to_decimal, wd_time
 from reva.v8.dossier.values import Item, Miss, Result, SeriesData, Src, Val, label_val, num_val, period_val
 
 REPO = Path(__file__).resolve().parents[4]
@@ -522,12 +522,20 @@ def _entity_href(kind: str | None, qid: str) -> str:
 def _time_text(t: Mapping[str, Any] | None) -> str | None:
     if not t:
         return None
-    s, prec = str(t.get("time") or ""), int(t.get("precision") or 9)
-    if prec <= 9:
-        return s[:4] if not s.startswith("-") else s[:5]
-    if prec == 10:
-        return fr_period(s[:7])
-    return fr_period(s[:10])
+    return wd_time(str(t.get("time") or ""), int(t.get("precision") or 9))
+
+
+def _name(ctx: Ctx, o: Mapping[str, Any], src: Src) -> Item:
+    """Label of a neighbour entity (French, else English); an entity the KG has not labelled is stated missing."""
+    lab = _labels(ctx, [o["qid"]]).get(o["qid"])
+    if not lab or lab == o["qid"]:
+        return Miss(o["qid"], f"entité {o['qid']} sans libellé chargé dans le graphe")
+    return label_val(lab, src, href=_entity_href(o.get("kind"), o["qid"]))
+
+
+def _group_src(src: Src) -> Src:
+    """Footnote shared by the labels of one property (one note per source property, not per statement)."""
+    return Src(**{**src.__dict__, "ref": None, "period": None, "retrieved": None})
 
 
 def _literal_val(ctx: Ctx, e: Mapping[str, Any], src: Src) -> Item:
@@ -540,8 +548,7 @@ def _literal_val(ctx: Ctx, e: Mapping[str, Any], src: Src) -> Item:
     if t in ("string", "external_id", "monolingualtext", "url"):
         return label_val(str(v.get("value") or v.get("text") or ""), src)
     if e.get("object"):
-        o = e["object"]
-        return label_val(_labels(ctx, [o["qid"]]).get(o["qid"], o["label"]), src, href=_entity_href(o.get("kind"), o["qid"]))
+        return _name(ctx, e["object"], src)
     return Miss(src.title, "valeur de forme inconnue")
 
 
@@ -620,6 +627,7 @@ def kg_edges(
         edges = _current(edges)
     rights = _kg_rights(ctx, edges)
     excl = set(exclude_objects)
+    unlabelled = 0
     rows: list[tuple[str, dict[str, Item]]] = []
     seen: set[str] = set()
     for e in edges:
@@ -633,11 +641,15 @@ def kg_edges(
         seen.add(other["qid"])
         when = _time_text(e.get("point_in_time") or e.get("start"))
         end = _time_text(e.get("end"))
-        src = kg_src(ctx, e, rights, when if not end else f"{when or '?'}–{end}")
+        src = _group_src(kg_src(ctx, e, rights))
         prop = e["property"]
-        name = _labels(ctx, [other["qid"]]).get(other["qid"], other["label"])
+        nm = _name(ctx, other, src)
+        if isinstance(nm, Miss):
+            unlabelled += 1
+            continue
+        name = nm.text
         row: dict[str, Item] = {
-            "name": label_val(name, src, href=_entity_href(other.get("kind"), other["qid"])),
+            "name": nm,
             "property": label_val(prop.get("label_fr") or prop.get("label_en") or prop["pid"], src),
             "when": label_val(when, src) if when else Miss("date", "non datée par la source"),
             "end": label_val(end, src) if end else Miss("fin", "non indiquée"),
@@ -649,7 +661,7 @@ def kg_edges(
                 row[qk] = label_val(str(qual[qk]), src)
         rows.append((name.lower() if sort == "label" else str(when or ""), row))
     rows.sort(key=lambda t: t[0], reverse=(sort == "date_desc"))
-    out = Result(rows=[r for _, r in rows[:limit]], more=max(0, len(rows) - limit))
+    out = Result(rows=[r for _, r in rows[:limit]], more=max(0, len(rows) - limit) + unlabelled)
     out.values["n"] = (
         num_val(len(rows), rows[0][1]["name"].src if rows and isinstance(rows[0][1]["name"], Val) else Src("kg", "graphe"), kind="derived", digits=0)
         if rows
@@ -740,15 +752,13 @@ def kg_timeline(ctx: Ctx, *, id: str, limit: int = 12, properties: Iterable[str]
         when = _time_text(e.get("point_in_time") or e.get("start")) or _time_text(e.get("value"))
         src = kg_src(ctx, e, rights, when)
         prop = e["property"]
-        what = (
-            label_val(_labels(ctx, [other["qid"]]).get(other["qid"], other["label"]), src, href=_entity_href(other.get("kind"), other["qid"]))
-            if other
-            else _literal_val(ctx, e, src)
-        )
+        what = _name(ctx, other, _group_src(src)) if other else _literal_val(ctx, e, src)
+        if isinstance(what, Miss):
+            continue
         out.rows.append(
             {
                 "when": label_val(when, src) if when else Miss("date", "non datée"),
-                "property": label_val(prop.get("label_fr") or prop.get("label_en") or prop["pid"], src),
+                "property": label_val(prop.get("label_fr") or prop.get("label_en") or prop["pid"], _group_src(src)),
                 "what": what,
                 "direction": label_val("entrant" if e["direction"] == "in" else "sortant", src),
             }

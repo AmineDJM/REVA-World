@@ -88,12 +88,27 @@ def empty_bundle(res: Resolved) -> dict[str, Any]:
         "time": [],
         "claims": {"incoming": [], "outgoing": [], "n_in": 0, "n_out": 0, "note_fr": CL.CLAIM_NOTE_FR},
         "effects": {"items": [], "n": 0, "n_country_scope": None, "note_fr": CL.EFFECT_NOTE_FR},
-        "forecasts": {"questions": [], "n_total": 0, "n_pending": 0, "n_resolved": 0, "families": [], "note_fr": F.NOTE_FR},
+        "forecasts": {
+            "questions": [],
+            "n_total": 0,
+            "n_pending": 0,
+            "n_resolved": 0,
+            "families": [],
+            "note_fr": F.NOTE_FR,
+        },
         "missing": [],
         "sources": [],
         "notes": list(res.notes),
-        "meta": {"timings_ms": {}, "errors": [], "cached": False, "generated_at": None, "atlas_snapshot": None,
-                 "atlas_cutoff": None, "data_version": None},  # fmt: skip
+        "meta": {
+            "timings_ms": {},
+            "errors": [],
+            "cached": False,
+            "generated_at": None,
+            "atlas_snapshot": None,
+            "atlas_cutoff": None,
+            "data_version": None,
+            "warming": [],
+        },
     }
 
 
@@ -117,7 +132,14 @@ def build(
             hit = _CACHE.get(key)
             if hit and time.monotonic() - hit[0] < CACHE_TTL_S:
                 _CACHE.move_to_end(key)
-                out = {**hit[1], "meta": {**hit[1]["meta"], "cached": True, "served_ms": round((time.perf_counter() - t0) * 1000, 1)}}
+                out = {
+                    **hit[1],
+                    "meta": {
+                        **hit[1]["meta"],
+                        "cached": True,
+                        "served_ms": round((time.perf_counter() - t0) * 1000, 1),
+                    },
+                }
                 return out
     b = empty_bundle(res)
     meta = b["meta"]
@@ -132,7 +154,7 @@ def build(
     b["sources"] = sources_summary(b)
     meta["generated_at"] = datetime.now(UTC).isoformat()
     meta["timings_ms"]["total"] = round((time.perf_counter() - t0) * 1000, 1)
-    if use_cache and not meta["errors"]:
+    if use_cache and not meta["errors"] and not meta["warming"]:
         with _CACHE_LOCK:
             _CACHE[key] = (time.monotonic(), b)
             while len(_CACHE) > CACHE_SIZE:
@@ -185,13 +207,21 @@ def _fill_entity(
                         b["identity"]["definition"] = defs[0]["value_text"]
                         b["identity"]["definition_source"] = defs[0]["source"]
                 if coords:
-                    b["space"]["point"] = {"lat": coords["lat"], "lon": coords["lon"], "source_key": coords["source"]["source"]}
+                    b["space"]["point"] = {
+                        "lat": coords["lat"],
+                        "lon": coords["lon"],
+                        "source_key": coords["source"]["source"],
+                    }
             with Section(meta, "related_forms"):
                 forms = K.related_forms(conn, res.qid, prof.get("related_forms"), origin)
                 for f in forms:
                     ffam = K.families(conn, f["qid"], origin, per_family=8)
-                    groups = [g for g in K.relation_groups(ffam, via=f) if g["family"] not in (K.IDENTITY_FAMILY, "context")]
-                    b["related_forms"].append({"ref": C.kg_ref(f), "relation_fr": f.get("relation_fr"), "relations": groups})
+                    groups = [
+                        g for g in K.relation_groups(ffam, via=f) if g["family"] not in (K.IDENTITY_FAMILY, "context")
+                    ]
+                    b["related_forms"].append(
+                        {"ref": C.kg_ref(f), "relation_fr": f.get("relation_fr"), "relations": groups}
+                    )
             with Section(meta, "space"):
                 pl = K.places(conn, res.qid, origin)
                 b["space"]["chain"] = pl["chain"]
@@ -214,14 +244,22 @@ def _fill_entity(
         else:  # a country the KG does not hold: atlas only
             b["identity"] = _identity_out(res, None, prof)
         with Section(meta, "effects"):
-            ids = list(anchor.get("effect_variables") or []) if anchor else ([res.qid] if res.qid else [])
-            b["effects"] = CL.effects(conn, origin=origin, ids=ids, country=res.iso3 if prof.get("effects") == "country" else None)
+            eff_ids = [str(x) for x in anchor.get("effect_variables") or []] if anchor else []
+            country = res.iso3 if prof.get("effects") == "country" else None
+            if eff_ids or country:
+                b["effects"] = CL.effects(conn, origin=origin, ids=eff_ids, country=country)
         with Section(meta, "forecasts"):
-            if store is not None:
-                if res.iso3:
+            try:
+                if store is not None and res.iso3:
                     b["forecasts"] = F.forecasts(conn, store, origin, geo=res.iso3)
-                elif anchor and anchor.get("forecast_families"):
+                elif store is not None and anchor and anchor.get("forecast_families"):
                     b["forecasts"] = F.forecasts(conn, store, origin, families=anchor["forecast_families"])
+                elif store is not None:
+                    F.warm(conn, store, origin)
+            except F.IndexWarming as w:
+                meta["warming"].append("forecasts")
+                b["missing"].append({"section": "forecasts", "what_fr": "prévisions du registre", "reason_code": "warming",
+                                     "reason_fr": f"index du registre des prévisions en construction (premier accès de ce processus : {w}) ; rechargez dans une minute"})  # fmt: skip
         if res.qid and q is not None:
             with Section(meta, "measured_by"):
                 if any(g["family"] == "measured_by" for g in fam.get("families") or []):
@@ -247,7 +285,9 @@ def _fill_entity(
                              "reason_fr": "erreur de lecture côté serveur : " + e["error"][:160]})  # fmt: skip
 
 
-def _atlas_work(q: Any, res: Resolved, anchor: Mapping[str, Any] | None, recorded: Mapping[str, Any], store: Any) -> dict[str, Any]:
+def _atlas_work(
+    q: Any, res: Resolved, anchor: Mapping[str, Any] | None, recorded: Mapping[str, Any], store: Any
+) -> dict[str, Any]:
     out: dict[str, Any] = {"series": [], "tops": [], "missing": [], "errors": [], "timings": {}}
     t0 = time.perf_counter()
     try:
@@ -281,7 +321,7 @@ def _concept_label(cid: str) -> str:
         if c is not None:
             return str(c.labels.get("fr") or c.labels.get("en") or cid)
     except Exception:  # pragma: no cover
-        pass
+        log.debug("headline registry unavailable for %s", cid)
     return cid
 
 
@@ -301,7 +341,7 @@ def _identity_out(res: Resolved, ident: Mapping[str, Any] | None, prof: Mapping[
         try:
             label = _country(res.iso3)[1] or label
         except Exception:  # pragma: no cover
-            pass
+            log.debug("no atlas label for %s", res.iso3)
     return {
         "qid": res.qid,
         "kind": res.kind,
@@ -339,8 +379,17 @@ def _anchor_identity(res: Resolved, anchor: Mapping[str, Any]) -> dict[str, Any]
         "definition": None,
         "definition_source": None,
         "aliases": [a for a in anchor.get("aliases") or [] if a != anchor.get("label_fr")],
-        "ids": [{"scheme": "REVA (ancre)", "value": f"{res.kind}/{res.id}", "url": None, "source": "src/reva/v8/entity/profiles.yaml",
-                 "property": None, "label_fr": "page d’ancrage REVA, pas un enregistrement de source", "ref": None}],  # fmt: skip
+        "ids": [
+            {
+                "scheme": "REVA (ancre)",
+                "value": f"{res.kind}/{res.id}",
+                "url": None,
+                "source": "src/reva/v8/entity/profiles.yaml",
+                "property": None,
+                "label_fr": "page d’ancrage REVA, pas un enregistrement de source",
+                "ref": None,
+            }
+        ],
         "anchor": True,
         "anchor_note": "Page d’ancrage REVA : ce regroupement est fait par REVA ; chaque valeur garde sa propre source.",
         "source": None,
@@ -370,9 +419,22 @@ def _anchor_relations(conn: Connection, anchor: Mapping[str, Any], origin: str |
             "share_unit": None,
             "identity": False,
             "via": None,
-            "source": {"source": "reva.v8.anchor", "label": "REVA (ancre)", "dataset": None, "statement_key": None, "series": None,
-                       "property": None, "raw_sha256": None, "selector": None, "retrieved_at": None, "period": None,
-                       "licence": None, "verification": "reva_grouping", "origin": None, "href": None},  # fmt: skip
+            "source": {
+                "source": "reva.v8.anchor",
+                "label": "REVA (ancre)",
+                "dataset": None,
+                "statement_key": None,
+                "series": None,
+                "property": None,
+                "raw_sha256": None,
+                "selector": None,
+                "retrieved_at": None,
+                "period": None,
+                "licence": None,
+                "verification": "reva_grouping",
+                "origin": None,
+                "href": None,
+            },
         }
         for q in present
     ]
@@ -385,13 +447,15 @@ def _anchor_relations(conn: Connection, anchor: Mapping[str, Any], origin: str |
 
 # ------------------------------------------------------------------------------------------------ headline
 def _stat(key: str, label: str, **kw: Any) -> dict[str, Any]:
-    base = {"key": key, "label_fr": label, "value": None, "value_text": None, "unit": None, "period": None, "kind": "observed",
+    base: dict[str, Any] = {"key": key, "label_fr": label, "value": None, "value_text": None, "unit": None, "period": None, "kind": "observed",
             "ref": None, "source": None, "missing": None, "points": [], "sub": None, "link": None}  # fmt: skip
     base.update(kw)
     return base
 
 
-def headline(b: Mapping[str, Any], res: Resolved, prof: Mapping[str, Any], anchor: Mapping[str, Any] | None) -> list[dict[str, Any]]:
+def headline(
+    b: Mapping[str, Any], res: Resolved, prof: Mapping[str, Any], anchor: Mapping[str, Any] | None
+) -> list[dict[str, Any]]:
     specs = list((anchor or {}).get("headline") or prof.get("headline") or [])
     facts = {f["property"]: f for f in b["facts"]}
     ids = (b.get("identity") or {}).get("ids") or []
@@ -410,7 +474,11 @@ def headline(b: Mapping[str, Any], res: Resolved, prof: Mapping[str, Any], ancho
             k = sp["atlas_headline"]
             s = series.get(k)
             if s is None:
-                out.append(_stat(k, label, missing=_missing_for(b, k, "aucune source déclarée ne publie de valeur pour ce pays")))
+                out.append(
+                    _stat(
+                        k, label, missing=_missing_for(b, k, "aucune source déclarée ne publie de valeur pour ce pays")
+                    )
+                )
             else:
                 out.append(_stat(k, label, value=s["value"], unit=s["unit"], period=s["period"], kind=s["kind"], source=s["source"],
                                  points=s["points"][-30:], link=s["link"]))  # fmt: skip
@@ -418,7 +486,14 @@ def headline(b: Mapping[str, Any], res: Resolved, prof: Mapping[str, Any], ancho
             k = sp["anchor_series"]
             s = series.get(k)
             if s is None or s["value"] is None:
-                out.append(_stat(k, label, unit=(s or {}).get("unit"), missing=(s or {}).get("missing") or {"code": "absent", "reason_fr": "série non déclarée"}))
+                out.append(
+                    _stat(
+                        k,
+                        label,
+                        unit=(s or {}).get("unit"),
+                        missing=(s or {}).get("missing") or {"code": "absent", "reason_fr": "série non déclarée"},
+                    )
+                )
             else:
                 out.append(_stat(k, label, value=s["value"], unit=s["unit"], period=s["period"], kind=s["kind"], source=s["source"],
                                  points=s["points"][-60:], link=s["link"],
@@ -426,7 +501,13 @@ def headline(b: Mapping[str, Any], res: Resolved, prof: Mapping[str, Any], ancho
         elif "anchor_top" in sp:
             t = tops.get(sp["anchor_top"])
             if not t or not t["items"]:
-                out.append(_stat(sp["anchor_top"], label, missing={"code": "no_value", "reason_fr": "aucune année avec au moins 20 pays renseignés"}))
+                out.append(
+                    _stat(
+                        sp["anchor_top"],
+                        label,
+                        missing={"code": "no_value", "reason_fr": "aucune année avec au moins 20 pays renseignés"},
+                    )
+                )
             else:
                 first = t["items"][0]
                 out.append(_stat(sp["anchor_top"], label, value=first["value"], unit=t["unit"], period=str(t["year"]),
@@ -441,18 +522,50 @@ def headline(b: Mapping[str, Any], res: Resolved, prof: Mapping[str, Any], ancho
                     out.append(_stat(pid + "|" + scheme, label, value_text=hit["value"], kind="literal", link={"url": hit["url"]} if hit["url"] else None,
                                      source={"source": hit["source"], "label": C.source_name(hit["source"])} | _blank_source()))  # fmt: skip
                 else:
-                    out.append(_stat(pid + "|" + scheme, label, missing={"code": "not_reported", "reason_fr": "la source ne publie pas de correspondance " + scheme}))
+                    out.append(
+                        _stat(
+                            pid + "|" + scheme,
+                            label,
+                            missing={
+                                "code": "not_reported",
+                                "reason_fr": "la source ne publie pas de correspondance " + scheme,
+                            },
+                        )
+                    )
                 continue
             f = facts.get(pid)
+            idh = next((i for i in ids if i.get("property") == pid), None)
+            if f is None and idh is not None:
+                out.append(_stat(pid, label, value_text=idh["value"], kind="literal", link={"url": idh["url"]} if idh["url"] else None,
+                                 source={"source": idh["source"], "label": C.source_name(idh["source"])} | _blank_source()))  # fmt: skip
+                continue
             if f is None:
-                out.append(_stat(pid, label, missing={"code": "not_reported", "reason_fr": "aucune source chargée ne publie cette valeur pour cette entité"}))
+                out.append(
+                    _stat(
+                        pid,
+                        label,
+                        missing={
+                            "code": "not_reported",
+                            "reason_fr": "aucune source chargée ne publie cette valeur pour cette entité",
+                        },
+                    )
+                )
                 continue
             numeric = f["value"] is not None
             out.append(
-                _stat(pid, label, value=f["value"] if numeric else None, value_text=None if numeric else f["value_text"], unit=f["unit"],
-                      period=f["period"], kind="observed" if numeric else "literal", source=f["source"], points=f["points"][-40:],
-                      sub=_bounds(f) or (f"{f['count']} valeurs datées" if f["points"] else None),
-                      link={"url": f["url"]} if f.get("url") else None)  # fmt: skip
+                _stat(
+                    pid,
+                    label,
+                    value=f["value"] if numeric else None,
+                    value_text=None if numeric else f["value_text"],
+                    unit=f["unit"],
+                    period=f["period"],
+                    kind="observed" if numeric else "literal",
+                    source=f["source"],
+                    points=f["points"][-40:],
+                    sub=_bounds(f) or (f"{f['count']} valeurs datées" if f["points"] else None),
+                    link={"url": f["url"]} if f.get("url") else None,
+                )
             )
         elif "family_count" in sp:
             fam = sp["family_count"]
@@ -460,7 +573,16 @@ def headline(b: Mapping[str, Any], res: Resolved, prof: Mapping[str, Any], ancho
             if sp.get("include_related"):
                 gs += groups.get("related:" + fam, [])
             if not gs:
-                out.append(_stat(fam, label, missing={"code": "not_reported", "reason_fr": "aucune relation de ce type dans les données chargées"}))
+                out.append(
+                    _stat(
+                        fam,
+                        label,
+                        missing={
+                            "code": "not_reported",
+                            "reason_fr": "aucune relation de ce type dans les données chargées",
+                        },
+                    )
+                )
                 continue
             n = sum(int(g["count"]) for g in gs)
             lower = any(g["count_is_lower_bound"] for g in gs)
@@ -484,7 +606,17 @@ def headline(b: Mapping[str, Any], res: Resolved, prof: Mapping[str, Any], ancho
                     reason = f"exception déclarée à la source : {facts[lit]['value_text']}"
                 out.append(_stat(pid, label, missing={"code": "not_reported", "reason_fr": reason}))
             else:
-                out.append(_stat(pid, label, value_text=hit["ref"]["label"], kind="relation", ref=hit["ref"], source=hit["source"], period=hit["period"]))
+                out.append(
+                    _stat(
+                        pid,
+                        label,
+                        value_text=hit["ref"]["label"],
+                        kind="relation",
+                        ref=hit["ref"],
+                        source=hit["source"],
+                        period=hit["period"],
+                    )
+                )
     if not specs:
         out = _auto_headline(b)
     return out[:6]
@@ -510,7 +642,7 @@ def _relation_hit(b: Mapping[str, Any], pid: str) -> dict[str, Any] | None:
 
 
 def _auto_headline(b: Mapping[str, Any]) -> list[dict[str, Any]]:
-    out = []
+    out: list[dict[str, Any]] = []
     for f in b["facts"]:
         if f["long_text"] or len(out) >= 3:
             continue
@@ -565,7 +697,9 @@ def _series_from_facts(b: dict[str, Any]) -> None:
 
 def _expected_series(b: dict[str, Any], prof: Mapping[str, Any]) -> None:
     for e in prof.get("expected_series") or []:
-        b["missing"].append({"section": "series", "what_fr": e["label_fr"], "reason_code": "not_loaded", "reason_fr": e["reason_fr"]})
+        b["missing"].append(
+            {"section": "series", "what_fr": e["label_fr"], "reason_code": "not_loaded", "reason_fr": e["reason_fr"]}
+        )
 
 
 def _missing_facts(conn: Connection, b: Mapping[str, Any], prof: Mapping[str, Any]) -> list[dict[str, Any]]:
@@ -575,12 +709,14 @@ def _missing_facts(conn: Connection, b: Mapping[str, Any], prof: Mapping[str, An
     for f in b["related_forms"]:
         for g in f["relations"]:
             have |= {p["pid"] for p in g.get("properties") or []}
-    out = []
+    out: list[dict[str, Any]] = []
     for e in prof.get("expected_facts") or []:
         pid = e["property"]
         if pid in have:
             continue
-        loaded = conn.execute(text("SELECT EXISTS (SELECT 1 FROM kg.statement WHERE property_pid = :p)"), {"p": pid}).scalar_one()
+        loaded = conn.execute(
+            text("SELECT EXISTS (SELECT 1 FROM kg.statement WHERE property_pid = :p)"), {"p": pid}
+        ).scalar_one()
         out.append(
             {
                 "section": "facts",

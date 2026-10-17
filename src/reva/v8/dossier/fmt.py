@@ -26,8 +26,6 @@ UNIT_FR: dict[str, str] = {
     "tonnes per person": "tonnes par habitant",
     "per 100,000 population": "pour 100 000 habitants",
     "persons per km2 of land area": "habitants par km²",
-    "index (0-100)": "indice (0-100)",
-    "index (0-1)": "indice (0-1)",
     "DALYs": "AVCI",
     "deaths per 100 000 population": "décès pour 100 000 habitants",
     "DALYs per 100 000 population": "AVCI pour 100 000 habitants",
@@ -36,6 +34,13 @@ UNIT_FR: dict[str, str] = {
     "percent": "%",
     "log_points": "points log",
     "1": "",
+    "index (0-1)": "",
+    "index (0-100)": "",
+    "billion kilowatthours": "milliards de kWh",
+    "percentage_points": "points de %",
+    "pp": "points de %",
+    "fatalities": "décès",
+    "probability": "probabilité",
 }
 
 SCALE_UNITS = {"US dollars", "persons", "deaths", "DALYs"}
@@ -85,12 +90,12 @@ def auto_digits(d: Decimal) -> int:
         return 0
     if a >= 100:
         return 1
-    if a >= 1:
+    if a >= 0.01:
         return 2
     if a == 0:
         return 0
-    # keep 3 significant digits for small values
-    return min(6, max(2, -int(math.floor(math.log10(float(a)))) + 2))
+    # keep 2 significant digits for small values
+    return min(6, max(2, -int(math.floor(math.log10(float(a)))) + 1))
 
 
 def fr_number(v: Any, digits: int | None = None, unit: str | None = None) -> str | None:
@@ -99,10 +104,10 @@ def fr_number(v: Any, digits: int | None = None, unit: str | None = None) -> str
     if d is None:
         return None
     if unit in SCALE_UNITS and abs(d) >= Decimal(1_000_000):
-        for size, word in ((Decimal(10) ** 12, "billion(s)"), (Decimal(10) ** 9, "milliard(s)"), (Decimal(10) ** 6, "million(s)")):
+        for size, word in ((Decimal(10) ** 9, "milliard"), (Decimal(10) ** 6, "million")):
             if abs(d) >= size:
                 x = d / size
-                return f"{fr_decimal(x, 1 if abs(x) < 100 else 0)} {word.replace('(s)', 's' if abs(x) >= 2 else '')}"
+                return f"{fr_decimal(x, 1 if abs(x) < 100 else 0)} {word}{'s' if abs(x) >= 2 else ''}"
     return fr_decimal(d, auto_digits(d) if digits is None else digits)
 
 
@@ -112,8 +117,8 @@ def with_unit(text: str, unit: str | None) -> str:
         return text
     if u == "%":
         return f"{text}{NBSP}%"
-    if text.endswith(("millions", "milliards", "billions", "million", "milliard", "billion")):
-        return f"{text} de {u}" if not u.startswith(("%", "d")) else f"{text} {u}"
+    if text.endswith(("millions", "milliards", "million", "milliard")):
+        return f"{text} d'{u}" if u[:1] in "aeiouéh" else f"{text} de {u}"
     return f"{text} {u}"
 
 
@@ -125,7 +130,9 @@ def fr_period(p: str | None) -> str | None:
     if not p:
         return None
     p = str(p)
-    if len(p) == 7 and p[4] == "-" and p[:4].lstrip("-").isdigit():
+    if len(p) == 7 and p[4] == "-" and p[5] == "Q":
+        return f"T{p[6]} {p[:4]}"
+    if len(p) == 7 and p[4] == "-" and p[:4].lstrip("-").isdigit() and p[5:7].isdigit():
         m = int(p[5:7])
         return f"{MONTHS_FR[m - 1]} {p[:4]}" if 1 <= m <= 12 else p
     if len(p) == 6 and p[4] == "Q":
@@ -137,6 +144,28 @@ def fr_period(p: str | None) -> str | None:
             day = int(d)
             return f"{'1er' if day == 1 else day} {MONTHS_FR[mi - 1].rstrip('.') if mi in (3, 5, 6, 8) else MONTHS_FR[mi - 1]} {y}"
     return p
+
+
+_WD_TIME = __import__("re").compile(r"^([+-]?)(\d{1,9})(?:-(\d{2}))?(?:-(\d{2}))?")
+
+
+def wd_time(s: str | None, precision: int | None = 9) -> str | None:
+    """Wikibase / ISO time string ('+1946-11-05T00:00:00Z', '-0044-03-15') at its precision, in French."""
+    if not s:
+        return None
+    m = _WD_TIME.match(str(s).strip())
+    if not m:
+        return None
+    sign, y, mo, d = m.group(1), int(m.group(2)), m.group(3), m.group(4)
+    prec = int(precision if precision is not None else 9)
+    ys = f"{y} av. J.-C." if sign == "-" else str(y)
+    if prec <= 8:
+        return f"{(y // 10) * 10}s" if prec == 8 else ys
+    if prec == 9 or not mo or mo == "00":
+        return ys
+    if prec == 10 or not d or d == "00":
+        return fr_period(f"{y:04d}-{mo}") if sign != "-" else ys
+    return fr_period(f"{y:04d}-{mo}-{d}") if sign != "-" else ys
 
 
 def plural(n: int, one: str, many: str) -> str:

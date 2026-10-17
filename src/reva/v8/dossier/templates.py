@@ -12,7 +12,7 @@ import yaml
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 TEMPLATE_DIR = Path(__file__).resolve().parents[4] / "registry" / "dossier"
-PLACEHOLDER = re.compile(r"\{([$]?[A-Za-z0-9_.]+)\}")
+PLACEHOLDER = re.compile(r"\{([$]?[A-Za-z0-9_.]+)(\|vocab)?\}")
 ID_RE = r"^[a-z][a-z0-9_]{0,40}$"
 
 
@@ -42,6 +42,7 @@ class TableT(_T):
 class ListT(_T):
     title: str | None = None
     item: str
+    item_missing: str | None = Field(None, description="Item template used when a value of `item` is missing")
 
 
 class ChartT(_T):
@@ -88,6 +89,12 @@ class SubjectT(_T):
     featured: bool = True
 
 
+class FeaturedT(_T):
+    id: str
+    label: str
+    sublabel: str | None = None
+
+
 class TemplateT(_T):
     kind: str = Field(pattern=ID_RE)
     label: str
@@ -98,6 +105,13 @@ class TemplateT(_T):
     honesty: list[str]
     not_covered: list[NotCoveredT] = Field(default_factory=list)
     subjects: dict[str, SubjectT] = Field(default_factory=dict)
+    generic: dict[str, Any] = Field(
+        default_factory=dict, description="Parameters of a non-curated subject ('$id' = the subject id)"
+    )
+    featured: list[FeaturedT] = Field(default_factory=list)
+    vocab: dict[str, str] = Field(
+        default_factory=dict, description="French display of source codes, used by {name|vocab} (exact code kept)"
+    )
     summary: list[SentenceT] = Field(default_factory=list)
     sections: list[SectionT]
 
@@ -139,6 +153,7 @@ class Template:
                 ids |= {f"{s.id}.{b.id}.{x.id}.missing" for x in b.sentences if x.missing}
                 if b.list_:
                     ids.add(f"{s.id}.{b.id}.item")
+                    ids.add(f"{s.id}.{b.id}.item_missing")
                 if b.table:
                     ids.add(f"{s.id}.{b.id}.table")
                 if b.chart:
