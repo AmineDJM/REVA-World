@@ -52,6 +52,7 @@ VINTAGE_DATASET_KEYS: tuple[str, ...] = (
     "atlas.vintage_ea.ecb_spf",
     "atlas.vintage_oecd.stes_revisions",
     "atlas.vintage_steo.steo_archive",
+    "atlas.usda_wasde.wasde",
 )
 FINAL_VINTAGE_LABEL = "final_vintage_pseudo_real_time"
 FINAL_VINTAGE_DISCLAIMER = (

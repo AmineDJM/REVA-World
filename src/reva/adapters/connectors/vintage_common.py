@@ -84,6 +84,15 @@ AVAILABILITY_RULES: dict[str, str] = {
         "EIA STEO archive file whose Last-Modified header is after the issue's release date (the file may have "
         "been replaced after release): available_at = the first instant of the day after Last-Modified (UTC)"
     ),
+    "wasde_csv_release_date": (
+        "USDA OCE Historical WASDE Report Data CSV: 'ReleaseDate' column of the report (WASDE is released at 12:00 "
+        "Eastern time; the CSV states no time zone), the archived file's Last-Modified header being on/before that "
+        "day; available_at = the day after the release date, 00:00 UTC"
+    ),
+    "wasde_csv_file_last_modified": (
+        "USDA OCE WASDE CSV whose Last-Modified header is after the report's ReleaseDate (posted or replaced after "
+        "release, e.g. the '-V2' files): available_at = the first instant of the day after Last-Modified (UTC)"
+    ),
 }
 
 #: REVA vintage variables: id -> definition (the source's own definition is quoted per cell source in
@@ -123,6 +132,10 @@ VARIABLES: dict[str, str] = {
 #: definition is EIA's row label and table heading, quoted per cell in ``flags.series_label`` / ``flags.table``.
 VARIABLE_PREFIXES: dict[str, str] = {
     "eia_steo:": "EIA Short-Term Energy Outlook series, by EIA series code (label quoted in each cell's flags)",
+    "usda_wasde:": (
+        "USDA WASDE line, by REVA slug of the report table title / commodity / attribute (each label quoted verbatim "
+        "in the cell's flags)"
+    ),
 }
 
 
@@ -162,6 +175,7 @@ FAMILIES: dict[str, str] = {
     "ecb_spf": "ECB Survey of Professional Forecasters (average of point forecasts per round)",
     "oecd_mei_rt": "OECD Main Economic Indicators original release data and revisions (monthly editions)",
     "eia_steo": "EIA Short-Term Energy Outlook monthly issues (archived Excel data files of each release)",
+    "usda_wasde": "USDA World Agricultural Supply and Demand Estimates monthly reports (OCE historical CSV per report)",
 }
 
 
