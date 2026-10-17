@@ -213,6 +213,9 @@ def test_doc_theme_timelines() -> None:
         assert fl["signal_kind"] == g.SIGNAL_KIND and fl["gkg_theme"] in g.THEMES
         assert fl["mode"] in g.DOC_MODES and fl["as_of"] == "2026-10-17"
     inds = {r["indicator"] for r in rows}
+    # days the API timeline does not list (GDELT processing gaps, e.g. 2026-09-14..19) are no row, never zero
+    assert not [r for r in rows if r["period_start"] == date(2026, 9, 15)]
+    assert len({r["period_start"] for r in rows}) == 30
     for t in opts["themes"].split(","):
         assert {f"articles_{t.lower()}", f"monitored_{t.lower()}"} <= inds
     # an article count is the provider's integer text, never derived

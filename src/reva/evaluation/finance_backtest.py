@@ -94,11 +94,12 @@ def build_cases(specs: SpecSet, frames: Mapping[str, pl.DataFrame]) -> tuple[lis
     for fam in specs.families:
         if fam.finance is None or fam.dataset_key is None or fam.dataset_key not in frames:
             continue
-        inputs = FN.load_inputs(fam.finance, frames)
+        inputs = FN.load_inputs(fam.finance, frames, _models(fam))
         if fam.finance["kind"] == "meeting":
             meetings.append(
-                MeetingCase(fam.key, fam.finance, inputs.get("history") or [], inputs.get("inflation") or {},
-                            _models(fam))
+                MeetingCase(
+                    fam.key, fam.finance, inputs.get("history") or [], inputs.get("inflation") or {}, _models(fam)
+                )
             )
             continue
         g = fam.geos[0]
@@ -435,7 +436,9 @@ def evaluate(level_rows: Sequence[Mapping[str, Any]], meeting_rows: Sequence[Map
                     "model": v["model"],
                     "h": v["h"],
                     "metric": v["metric"],
-                    "vs": {ref: {"ratio": x["ratio"], "p_better": x["p_better"], "n": x["n"]} for ref, x in refs.items()},
+                    "vs": {
+                        ref: {"ratio": x["ratio"], "p_better": x["p_better"], "n": x["n"]} for ref, x in refs.items()
+                    },
                 }
             )
     pooled = compare_pooled(level_rows, LEVEL_REF, "crps") + compare_pooled(
@@ -478,14 +481,22 @@ def run(
         "cell only if significantly better than every benchmark scored on it",
         "meeting_window_days": MEETING_WINDOW_DAYS,
         "families": {
-            c.family: {"models": list(c.models), "horizons": list(c.horizons), "target": c.target_kind,
-                       "first_day": c.series[0][0].isoformat() if c.series else None,
-                       "last_day": c.series[-1][0].isoformat() if c.series else None}
+            c.family: {
+                "models": list(c.models),
+                "horizons": list(c.horizons),
+                "target": c.target_kind,
+                "first_day": c.series[0][0].isoformat() if c.series else None,
+                "last_day": c.series[-1][0].isoformat() if c.series else None,
+            }
             for c in levels
-        } | {
-            c.family: {"models": list(c.models), "direction": c.fin["direction"],
-                       "first_day": c.history[0][0].isoformat() if c.history else None,
-                       "last_day": c.history[-1][0].isoformat() if c.history else None}
+        }
+        | {
+            c.family: {
+                "models": list(c.models),
+                "direction": c.fin["direction"],
+                "first_day": c.history[0][0].isoformat() if c.history else None,
+                "last_day": c.history[-1][0].isoformat() if c.history else None,
+            }
             for c in meetings
         },
         "n_level_replays": len(lrows),
@@ -520,7 +531,7 @@ def input_dataset_keys(specs: SpecSet, families: Sequence[str] | None = None) ->
         if fam.finance is None or fam.dataset_key is None or (families and fam.key not in families):
             continue
         keys.add(fam.dataset_key)
-        for inp in (fam.finance.get("inputs") or {}).values():
+        for inp in FN.used_inputs(fam.finance, _models(fam)).values():
             keys.add(inp["dataset_key"])
     return sorted(keys)
 
@@ -568,13 +579,18 @@ def run_recorded(
     with engine.begin() as conn:
         sha = repo.store_json_artifact(conn, store, manifest, "evaluation", schema_version="finance-backtest/1")
         act = repo.simple_activity(
-            "evaluation.finance_backtest", "evaluation", actor, {"label": LABEL, "sha256": sha, "disclaimer": DISCLAIMER}
+            "evaluation.finance_backtest",
+            "evaluation",
+            actor,
+            {"label": LABEL, "sha256": sha, "disclaimer": DISCLAIMER},
         )
         repo.record_activity(
             conn,
             act,
-            inputs=[(t["artifact_sha256"], {"role": "atlas_table", "dataset_key": k})
-                    for k, t in sorted(manifest["data"]["tables"].items())],
+            inputs=[
+                (t["artifact_sha256"], {"role": "atlas_table", "dataset_key": k})
+                for k, t in sorted(manifest["data"]["tables"].items())
+            ],
             outputs=[sha],
         )
         ctx = repo.create_context(conn, mode="evaluation", origin=origin, manifest_sha256=sha, knowledge_cutoff=cutoff)

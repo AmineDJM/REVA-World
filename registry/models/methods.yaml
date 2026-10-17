@@ -652,3 +652,100 @@ models:
     output_ports: [{name: point_forecast}]
     applicability: {frequencies: [A]}
     assumptions: [sum of monthly point predictions is not an expected annual total (VIEWS fits on the log scale)]
+  # --- PRED-ENERGY (V6): forecasters benchmarked against the EIA Short-Term Energy Outlook on STEO archive vintages
+  # (reva.models.forecasting.energy_models, reva.evaluation.energy_backtests). Candidates are issued to the registry
+  # only on (series, horizon) pairs where they significantly beat the random walk (registry/forecasts/energy_winners.yaml).
+  - model_key: forecast.energy_rw
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Energy benchmark: random walk (no change) on the information set of the STEO issue in force (history as then
+      published); log-normal spread for prices, Gaussian for quantities, sigma = sd of monthly (log) changes over 60
+      months times sqrt(k). Futures-free (no futures curve).
+    input_ports: [{name: steo_information_set, kind: atlas_vintage_steo}]
+    output_ports: [{name: point_forecast}, {name: predictive}]
+    applicability: {frequencies: [M], min_monthly_changes: 24}
+    assumptions: [no-change point; zero-mean (log) changes; history as published in the STEO issue in force]
+  - model_key: forecast.reference_eia_steo
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      External reference, attributed to the U.S. EIA: the Short-Term Energy Outlook projection for the reference month
+      in the STEO issue in force at issue (atlas.vintage_steo.steo_archive). Point only; REVA does not produce it.
+    input_ports: [{name: steo_projection_cell, kind: atlas_vintage_steo}]
+    output_ports: [{name: point_forecast}]
+    applicability: {frequencies: [M], question_types: [quantity]}
+    assumptions: [EIA projection as published; no distribution]
+  - model_key: forecast.energy_inventory
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Energy candidate (prices): direct k-step OLS of the log price change on the OECD commercial inventory gap (log
+      stocks minus the mean of the same month in the previous five years), as-of history, last 120 months.
+    input_ports: [{name: price, kind: atlas_vintage_steo}, {name: oecd_stocks, kind: atlas_vintage_steo}]
+    output_ports: [{name: point_forecast}, {name: predictive_lognormal}]
+    applicability: {frequencies: [M], min_train: 36}
+    assumptions: [linear association used for prediction, not a causal claim; residual sd as spread]
+  - model_key: forecast.energy_ardl
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Energy candidate (prices): direct k-step ARDL of the log price change on last month's and last quarter's log
+      price change, the 3-month log change of OECD stocks and the 3-month mean of EIA's implied world stock change.
+    input_ports: [{name: price, kind: atlas_vintage_steo}, {name: fundamentals, kind: atlas_vintage_steo}]
+    output_ports: [{name: point_forecast}, {name: predictive_lognormal}]
+    applicability: {frequencies: [M], min_train: 36}
+    assumptions: [associations used for prediction, not causal claims; as-of history only]
+  - model_key: forecast.energy_drift
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: Energy candidate (quantities) - random walk with the mean monthly change of the last 24 months as drift.
+    input_ports: [{name: series, kind: atlas_vintage_steo}]
+    output_ports: [{name: point_forecast}, {name: predictive_normal}]
+    applicability: {frequencies: [M], min_train: 25}
+    assumptions: [linear drift; random-walk spread]
+  - model_key: forecast.energy_seasonal
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Energy candidate (quantities) - last value plus the mean k-step change from the same calendar month in the last
+      five years (seasonal pattern of stocks and production).
+    input_ports: [{name: series, kind: atlas_vintage_steo}]
+    output_ports: [{name: point_forecast}, {name: predictive_normal}]
+    applicability: {frequencies: [M], min_years: 3}
+    assumptions: [stable seasonal changes; random-walk spread]
+  - model_key: forecast.energy_ar_diff
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: Energy candidate (quantities) - AR(p) on monthly changes (p <= 3 by AIC, last 120 months), iterated; psi-weight variance.
+    input_ports: [{name: series, kind: atlas_vintage_steo}]
+    output_ports: [{name: point_forecast}, {name: predictive_normal}]
+    applicability: {frequencies: [M], min_train: 48}
+    assumptions: [stationary changes; non-stationary fit abstains]
+  - model_key: forecast.energy_combo_steo_rw
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Energy candidate: REVA's equal-weight average of the EIA STEO projection and the random walk (logs for prices),
+      random-walk spread. Uses EIA's published number as an input; not an EIA forecast.
+    input_ports: [{name: steo_projection_cell, kind: atlas_vintage_steo}, {name: series, kind: atlas_vintage_steo}]
+    output_ports: [{name: point_forecast}, {name: predictive}]
+    applicability: {frequencies: [M]}
+    assumptions: [fixed equal weights chosen before the backtest]
+  - model_key: forecast.energy_combo_models
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: Energy candidate - equal-weight average of the REVA energy models available for the series (and the random walk).
+    input_ports: [{name: components, kind: forecast}]
+    output_ports: [{name: point_forecast}, {name: predictive}]
+    applicability: {frequencies: [M], min_components: 2}
+    assumptions: [fixed equal weights; mean component spread]

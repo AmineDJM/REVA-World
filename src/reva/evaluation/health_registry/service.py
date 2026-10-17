@@ -52,14 +52,19 @@ BACKTEST_LABELS = {
 REPLAY = {"as_of_vintages": "available_then_reconstruction", "final_vintage": "revised_data_retrospective"}
 
 
-def _clock(conn: Any, origin: str, at: datetime | None) -> datetime:
-    """The database clock; a fixed instant only for test_fixture runs."""
-    if at is not None:
-        if origin != "test_fixture":
-            raise ValidationProblem("a clock override is only allowed for test_fixture runs")
-        return at
+def _clock(conn: Any) -> datetime:
     now: datetime = conn.execute(text("SELECT clock_timestamp()")).scalar_one()
     return now
+
+
+def _today(origin: str, today: date | None, now: datetime) -> date:
+    """The calendar date that defines rounds and due questions: the database clock's, or a fixed date for
+    test_fixture runs only (time-independent tests). Table pins and seals always use the database clock."""
+    if today is None:
+        return now.date()
+    if origin != "test_fixture":
+        raise ValidationProblem("a calendar override is only allowed for test_fixture runs")
+    return today
 
 
 def _check_origin(origin: str) -> str:
@@ -310,6 +315,7 @@ def build_batch(
     issued_at: datetime,
     origin: str,
     already: set[str],
+    today: date | None = None,
 ) -> dict[str, Any]:
     """Pure: questions and frozen forecasts of the current round of each family."""
     questions: list[dict[str, Any]] = []
@@ -318,7 +324,7 @@ def build_batch(
     pending: list[dict[str, Any]] = []
     used: dict[str, dict[str, Any]] = {}
     fam_doc: dict[str, Any] = {}
-    today = issued_at.date()
+    today = today or issued_at.date()
     for fam in fams:
         pin = pins.get(fam.dataset_key)
         if pin is None:
@@ -393,15 +399,16 @@ def issue_round(
     families: Sequence[str] | None = None,
     specs: C.SpecSet | None = None,
     actor: str = "worker:health_registry",
-    at: datetime | None = None,
+    today: date | None = None,
 ) -> dict[str, Any]:
     """Generate, forecast and seal the current round's questions not issued yet (idempotent per round).
-    ``at`` replaces the database clock for test_fixture runs only (time-independent tests)."""
+    ``today`` replaces the calendar date for test_fixture runs only (time-independent tests)."""
     _check_origin(origin)
     specs = specs or C.load_specs()
     fams = _families(specs, families)
     with engine.connect() as conn:
-        issued_at = _clock(conn, origin, at)
+        issued_at = _clock(conn)
+        day = _today(origin, today, issued_at)
         mv = model_version_ids(conn)
         already = issued_question_keys(conn, origin)
         pins: dict[str, dict[str, Any] | None] = {}
@@ -413,7 +420,7 @@ def issue_round(
     cache = FrameCache(store, size=len(pins) + 1)
     frames = {p["artifact_sha256"]: cache.get(p["artifact_sha256"]) for p in pins.values() if p}
     manifest = C.finite(
-        build_batch(specs, fams, pins, frames, winners, issued_at=issued_at, origin=origin, already=already)
+        build_batch(specs, fams, pins, frames, winners, issued_at=issued_at, origin=origin, already=already, today=day)
     )
     report = {
         "origin": origin,
@@ -591,14 +598,15 @@ def resolve_due(
     *,
     origin: str = "live",
     actor: str = "worker:health_registry",
-    at: datetime | None = None,
+    today: date | None = None,
 ) -> dict[str, Any]:
-    """Resolve and score every sealed batch's ended questions not handled before (``at``: test_fixture clock)."""
+    """Resolve and score every sealed batch's ended questions not handled before (``today``: test_fixture date)."""
     _check_origin(origin)
     cache = FrameCache(store, size=4)
     out: list[dict[str, Any]] = []
     with engine.connect() as conn:
-        now = _clock(conn, origin, at)
+        now = _clock(conn)
+        day = _today(origin, today, now)
         batches = _batches(conn, origin)
         mv = model_version_ids(conn) if batches else {}
     for b in batches:
@@ -612,7 +620,7 @@ def resolve_due(
             due = [
                 q
                 for q in manifest["questions"]
-                if q["question_id"] not in handled and date.fromisoformat(q["period_end"]) <= now.date()
+                if q["question_id"] not in handled and date.fromisoformat(q["period_end"]) <= day
             ]
             if not due:
                 out.append({"batch_sha256": b["sha"], "status": "nothing_due"})
@@ -632,7 +640,7 @@ def resolve_due(
             fk: [(v, C.extract_series(cache.get(v["artifact_sha256"]), fams[fk])[0]) for v in versions[fk]]
             for fk in fks
         }
-        res = resolve_batch(manifest, handled, issue_series, later, fams, today=now.date())
+        res = resolve_batch(manifest, handled, issue_series, later, fams, today=day)
         if not res["outcomes"]:
             out.append({"batch_sha256": b["sha"], "status": "awaiting_outcomes", "due": len(due)})
             continue

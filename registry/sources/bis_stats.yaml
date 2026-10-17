@@ -28,3 +28,5 @@ metadata:
   notes: >-
     Most BIS data sets rely on national statistics communicated by central banks and other national
     authorities. The BIS ceased receiving data from public authorities in Russia after 28 February 2022.
+# V6FINDATA (2026-10-17): atlas.bis_fin (atlas_bis_fin.py) reads WS_LBS_D_PUB and WS_NA_SEC_DSS from this API
+# (?format=csv) -> bis.lbs_rep, bis.lbs_cp, bis.dsec_gov, and the terms page from data.bis.org.

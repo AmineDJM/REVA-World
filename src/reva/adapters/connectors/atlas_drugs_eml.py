@@ -244,7 +244,7 @@ def parse_recommendation(body: bytes, rid: str) -> Recommendation:
             code = c if ICD_CODE_RE.match(c) else None
             m = ICD_URI_RE.search(link.attrs.get("href", ""))
             uri = m.group(1) if m else None
-    fields = {
+    fields: dict[str, str] = {
         k: rows[k].text()[:1000]
         for k in (
             "INN",

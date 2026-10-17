@@ -154,7 +154,11 @@ archived raw bytes) inside the cap. §7 lists the owner options for full volume.
     seconds (default 60).
   * After 6 consecutive refusals the connector stops asking. Every theme it did not get is listed in
     `report.failed` and is never filled.
-* Expected rows for a full run: 22 themes × ~3,575 days × (2 + tone) ≈ 0.23 M.
+* **Gaps.** The API's timelines skip days, most likely GDELT processing outages. ECON_INFLATION for
+  2026-09-01..10-16 lists 30 of 46 days: 2026-09-14..19, 09-26, 10-03..05, 10-07, 10-09 and 10-11..14 are absent.
+  An absent day is no row and is never a zero. The same days are absent for every theme and in the 2017–2026
+  response, and the values are identical across the two windows.
+* Expected rows for a full run: 22 themes × ~3,500 listed days × (2 + tone) ≈ 0.23 M.
 
 ## 5. Live status
 
@@ -176,11 +180,12 @@ Probes of 2026-10-17, from the shared egress, with a generic UA and no personal 
     original member name. The manifest says "subset".
   * The about page as visible text.
   * The complete CAMEO lookup.
-* `atlas.gdelt_doc`: captured from the real API with the exact connector URLs, using `doc_start` 2026-09-01,
-  `end` 2026-10-16 and the themes ECON_INFLATION and ARMEDCONFLICT. Run options are in `run_options.json`. The
-  GKG theme lookup is an excerpt (the lines of the declared themes). If a capture could not be completed because
-  of the 429s, the DOC fixture test is skipped and the DOC parser is covered by a hand-written structural test,
-  which is clearly labelled as such.
+* `atlas.gdelt_doc`:
+  * Four complete real API responses, captured 2026-10-17 between 16:39 and 16:51 UTC with the exact connector
+    URLs: the themes ECON_INFLATION and ARMEDCONFLICT, modes `timelinevolraw` and `timelinetone`, `doc_start`
+    2026-09-01, `end` 2026-10-16 (`run_options.json`). Getting them took 11 requests, because 7 were answered 429.
+  * An excerpt of the GKG theme lookup: the 22 declared themes plus the first 5 lines, verbatim.
+  * The about page as visible text.
 
 ## 7. Gaps and owner decisions
 

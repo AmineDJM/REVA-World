@@ -30,6 +30,7 @@ from uuid import UUID
 from sqlalchemy import Engine, text
 
 from reva.evaluation.ledger import load_frozen_manifest, manifest_sha256
+from reva.evaluation.registry import energy as EN
 from reva.evaluation.registry import finance as FN
 from reva.evaluation.registry import periods as P
 from reva.evaluation.registry.data import FrameCache, latest_version, versions_between
@@ -232,6 +233,7 @@ def build_batch(
         skipped.extend(sk)
         fam_used = False
         fin_ctx: tuple[dict[str, Any], dict[str, list[tuple[date, float]]]] | None = None
+        en_ctx: dict[str, Any] | None = None  # energy families (PRED-ENERGY): STEO issue in force
         for q in qs:
             if q["question_key"] in already:
                 continue
@@ -243,6 +245,10 @@ def build_batch(
                     fin_ctx = _finance_context(fam, frame, pins, frames, extra_pins)
                 own = fin_ctx[1].get(q["geo"], [])
                 fcs.extend(FN.finance_forecasts(q, fam.finance, own, fin_ctx[0]))
+            if EN.block(fam) is not None:
+                if en_ctx is None:
+                    en_ctx = EN.energy_context(fam, pins, frames, extra_pins, issued_at)
+                fcs.extend(EN.energy_forecasts(q, fam, en_ctx))
             if not fcs or all(f["status"] == "abstained" for f in fcs):
                 skipped.append(
                     {
@@ -312,7 +318,7 @@ def _finance_context(
     daily series per geography (a missing input table leaves that input empty: its forecasters abstain)."""
     assert fam.finance is not None
     by_key: dict[str, Any] = {}
-    for inp in (fam.finance.get("inputs") or {}).values():
+    for inp in FN.used_inputs(fam.finance).values():
         p = pins.get(inp["dataset_key"])
         if p is not None:
             by_key[inp["dataset_key"]] = frames[p["artifact_sha256"]]
@@ -334,7 +340,7 @@ def finance_input_keys(fam: Family) -> list[str]:
     """Tables a finance family reads besides its own (inputs and the meeting calendar)."""
     if fam.finance is None:
         return []
-    keys = [inp["dataset_key"] for inp in (fam.finance.get("inputs") or {}).values()]
+    keys = [inp["dataset_key"] for inp in FN.used_inputs(fam.finance).values()]
     if fam.finance.get("calendar"):
         keys.append(fam.finance["calendar"]["dataset_key"])
     return keys
@@ -367,7 +373,7 @@ def issue_cycle(
         for fam in specs.families:
             if not fam.dataset_key or (families and fam.key not in families):
                 continue
-            for dk in (fam.dataset_key, *finance_input_keys(fam)):
+            for dk in (fam.dataset_key, *finance_input_keys(fam), *EN.input_keys(fam)):
                 if dk not in pins:
                     pins[dk] = latest_version(conn, dk, origin=origin, cutoff=issued_at)
     cache = FrameCache(store, size=len(pins) + 1)

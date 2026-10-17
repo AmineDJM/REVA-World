@@ -281,7 +281,7 @@ def build(
             descriptions={"en": f"ChEMBL molecule {mid} (max_phase {m.get('max_phase')}, {release})"},
             source_revision=release,
         )
-        sel = {"endpoint": "molecule", "molecule_chembl_id": mid}
+        sel: dict[str, Any] = {"endpoint": "molecule", "molecule_chembl_id": mid}
         if m.get("molecule_type"):
             st(qid, "chembl:molecule_type", raw=raw, value=dc.string_value(str(m["molecule_type"])), sel=sel)
         fa = m.get("first_approval")
@@ -330,8 +330,10 @@ def build(
     # ---------------------------------------------------------------- mechanisms
     target_ids: set[str] = set()
     for r in mechanisms:
-        mid, tid = r.get("molecule_chembl_id"), r.get("target_chembl_id")
-        if not isinstance(mid, str) or not CHEMBL_ID_RE.match(mid):
+        mid_: Any = r.get("molecule_chembl_id")
+        tid: Any = r.get("target_chembl_id")
+        mid = str(mid_) if isinstance(mid_, str) else ""
+        if not CHEMBL_ID_RE.match(mid):
             skipped["mechanism_bad_molecule"] += 1
             continue
         if not isinstance(tid, str) or not CHEMBL_ID_RE.match(tid):
@@ -340,6 +342,7 @@ def build(
         target_ids.add(tid)
         quals = {
             "action_type": r.get("action_type"),
+            "parent_molecule_chembl_id": r.get("parent_molecule_chembl_id"),
             "mechanism_of_action": r.get("mechanism_of_action"),
             "direct_interaction": r.get("direct_interaction"),
             "molecular_mechanism": r.get("molecular_mechanism"),
@@ -415,8 +418,8 @@ def build(
     mesh_conflicts = 0
     by_prefix: Counter[str] = Counter()
     for r in indications:
-        mid = r.get("molecule_chembl_id")
-        if not isinstance(mid, str) or not CHEMBL_ID_RE.match(mid):
+        mid = str(r.get("molecule_chembl_id") or "")
+        if not CHEMBL_ID_RE.match(mid):
             skipped["indication_bad_molecule"] += 1
             continue
         raw = str(r.get("_raw") or raws["indications"])

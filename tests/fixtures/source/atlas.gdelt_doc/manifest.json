@@ -1,0 +1,80 @@
+[
+  {
+    "request_fingerprint": "5bceb8682d793a042f680fec897046aaa3e10c0a1484a3c8485f510fe98f29d6",
+    "url": "https://api.gdeltproject.org/api/v2/doc/doc?query=theme:ECON_INFLATION&mode=timelinevolraw&format=json&startdatetime=20260901000000&enddatetime=20261016235959",
+    "file": "5bceb8682d793a04.json",
+    "sha256": "6022bd9e363df6a33e466ba247091d60f045593cb4eb6204bd03293fe5a8e3c8",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T16:45:00+00:00",
+    "licence": "GDELT Project terms of use (unlimited and unrestricted use; redistribution with citation and link to https://www.gdeltproject.org/)",
+    "excerpt": "the complete real API response downloaded 2026-10-17"
+  },
+  {
+    "request_fingerprint": "f4b7156aaa4f2aee538b26b32cecff647e54fbae7ade371546a43c2140a694ce",
+    "url": "https://api.gdeltproject.org/api/v2/doc/doc?query=theme:ECON_INFLATION&mode=timelinetone&format=json&startdatetime=20260901000000&enddatetime=20261016235959",
+    "file": "f4b7156aaa4f2aee.json",
+    "sha256": "0ca9bc2e40a95a144acd599ebfe890a0c569f9273a54bfc161e3a1ea88d578ab",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T16:45:00+00:00",
+    "licence": "GDELT Project terms of use (unlimited and unrestricted use; redistribution with citation and link to https://www.gdeltproject.org/)",
+    "excerpt": "the complete real API response downloaded 2026-10-17"
+  },
+  {
+    "request_fingerprint": "500c09d12ad845d860ae4d9ab2d77d90745b87d5d4a44c243cba3d59f7826965",
+    "url": "https://api.gdeltproject.org/api/v2/doc/doc?query=theme:ARMEDCONFLICT&mode=timelinevolraw&format=json&startdatetime=20260901000000&enddatetime=20261016235959",
+    "file": "500c09d12ad845d8.json",
+    "sha256": "ef024575cdfbc85fee7d9f98b4e452c4eb11bbcca7e5283002fe97b67bbbe515",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T16:45:00+00:00",
+    "licence": "GDELT Project terms of use (unlimited and unrestricted use; redistribution with citation and link to https://www.gdeltproject.org/)",
+    "excerpt": "the complete real API response downloaded 2026-10-17"
+  },
+  {
+    "request_fingerprint": "7a90327562311fb3fb163423af3b5cabc5b0dd283251c4cb25dbddfeb9a7b304",
+    "url": "https://api.gdeltproject.org/api/v2/doc/doc?query=theme:ARMEDCONFLICT&mode=timelinetone&format=json&startdatetime=20260901000000&enddatetime=20261016235959",
+    "file": "7a90327562311fb3.json",
+    "sha256": "a6c52ea3adae7f0f7593c62f105bde1b8f67e29d559173be0468ad4beee4c5f7",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T16:45:00+00:00",
+    "licence": "GDELT Project terms of use (unlimited and unrestricted use; redistribution with citation and link to https://www.gdeltproject.org/)",
+    "excerpt": "the complete real API response downloaded 2026-10-17"
+  },
+  {
+    "request_fingerprint": "718c60e5c443a3a9fa7c0deabefde88ed045caab30f5c6194e24931065a40846",
+    "url": "https://data.gdeltproject.org/api/v2/guides/LOOKUP-GKGTHEMES.TXT",
+    "file": "718c60e5c443a3a9.txt",
+    "sha256": "093882bb9f8fa6bdea6b95df6950522b28d60af91bc49e6c44033a6e5bbcdff5",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-17T16:45:00+00:00",
+    "licence": "GDELT Project terms of use (unlimited and unrestricted use; redistribution with citation and link to https://www.gdeltproject.org/)",
+    "excerpt": "excerpt of the real lookup downloaded 2026-10-17 (27 of 59315 lines kept verbatim: the declared themes and the first 5 lines)"
+  },
+  {
+    "request_fingerprint": "3f0b631e52e30e62c18b281ba46446c9c63ec7b7e3be1267f43ea72de5fb7962",
+    "url": "https://gdeltproject.org/about.html",
+    "file": "3f0b631e52e30e62.html",
+    "sha256": "82c2121d4c129e00a232d640d418ecb52d4e33bdb2524cbdceb8992ff17845dc",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:45:00+00:00",
+    "licence": "GDELT Project terms of use (unlimited and unrestricted use; redistribution with citation and link to https://www.gdeltproject.org/)",
+    "excerpt": "visible text of the real page downloaded 2026-10-17"
+  }
+]

@@ -39,6 +39,25 @@ DAILY_RULES = ("monthly_mean_of_daily", "month_end_of_daily", "month_end_spread_
 
 Ref = dict[str, Any]
 
+#: inputs each finance model reads (others are neither pinned nor loaded when only these models issue)
+MODEL_INPUTS: dict[str, tuple[str, ...]] = {
+    "fin.rw_histvol": (),
+    "fin.garch11": (),
+    "fin.fx_forward_cip": ("rate_base", "rate_quote"),
+    "fin.ust_eh_forward": ("curve",),
+    "fin.ns_dl": ("curve",),
+    "fin.ppp_reversion": ("cpi_base", "cpi_quote"),
+    "fin.meeting_base_rate": ("history",),
+    "fin.meeting_momentum": ("history",),
+    "fin.taylor_logit": ("history", "inflation"),
+}
+
+
+def used_inputs(fin: Mapping[str, Any], models: Sequence[str] | None = None) -> dict[str, Any]:
+    """The input specs read by ``models`` (default: the family's issuing forecasters)."""
+    want = {n for m in (models if models is not None else fin.get("forecasters") or []) for n in MODEL_INPUTS[m]}
+    return {k: v for k, v in (fin.get("inputs") or {}).items() if k in want}
+
 
 # --------------------------------------------------------------------------- frame reads
 
@@ -153,10 +172,13 @@ def month_end_series(daily: Sequence[tuple[date, float]]) -> list[tuple[int, flo
 # --------------------------------------------------------------------------- inputs at issue
 
 
-def load_inputs(fin: Mapping[str, Any], frames: Mapping[str, pl.DataFrame]) -> dict[str, Any]:
-    """Raw input series of a finance family from the pinned frames (``frames``: dataset_key -> frame)."""
+def load_inputs(
+    fin: Mapping[str, Any], frames: Mapping[str, pl.DataFrame], models: Sequence[str] | None = None
+) -> dict[str, Any]:
+    """Raw input series of a finance family from the pinned frames (``frames``: dataset_key -> frame), only those
+    read by ``models`` (default: the issuing forecasters)."""
     out: dict[str, Any] = {}
-    for name, spec in (fin.get("inputs") or {}).items():
+    for name, spec in used_inputs(fin, models).items():
         frame = frames.get(spec["dataset_key"])
         if frame is None:
             continue
@@ -348,6 +370,7 @@ def finance_forecasts(
 __all__ = [
     "DAILY_RULES",
     "FIN_KINDS",
+    "MODEL_INPUTS",
     "as_of",
     "curve_frame",
     "daily_cells",
@@ -365,4 +388,5 @@ __all__ = [
     "target_of",
     "taylor_feature",
     "to_floats",
+    "used_inputs",
 ]

@@ -1,0 +1,145 @@
+# 2018 U.S. trade war: variety-level import and export responses to tariffs (agent EFFECTS-MORE, V6).
+schema: reva-effects-literature/1
+id: fajgelbaum_goldberg_kennedy_khandelwal_2019
+source_key: effects.literature
+citation:
+  text: "Pablo D. Fajgelbaum, Pinelopi K. Goldberg, Patrick J. Kennedy, and Amit K. Khandelwal. The Return to Protectionism. NBER Working Paper No. 25638, March 2019, Revised October 2019."
+  text_basis: assembled from the title page of the version read (NBER working paper)
+  short: "Fajgelbaum, Goldberg, Kennedy & Khandelwal (2019), NBER WP 25638"
+  authors: [Pablo D. Fajgelbaum, Pinelopi K. Goldberg, Patrick J. Kennedy, Amit K. Khandelwal]
+  title: "The Return to Protectionism"
+  year: 2019
+  series: NBER Working Paper No. 25638
+  doi: null
+  url: http://www.nber.org/papers/w25638
+document:
+  url: https://www.nber.org/system/files/working_papers/w25638/w25638.pdf
+  media_type: application/pdf
+  sha256: c9479dd013c24029b299bde1114da77ab32b8f8e72b67c17e3642698dfd1c843
+  bytes: 2145863
+  version_read: "NBER Working Paper 25638, March 2019, revised October 2019 (the journal version may differ)"
+as_of: "2019-10-01"
+rights:
+  licence: "© 2019 by Pablo D. Fajgelbaum, Pinelopi K. Goldberg, Patrick J. Kennedy, and Amit K. Khandelwal. All rights reserved. Short sections of text, not to exceed two paragraphs, may be quoted without explicit permission provided that full credit, including © notice, is given to the source."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent EFFECTS-MORE
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  shock_profile: sustained
+  measure: elasticity
+  unit: ratio
+  method: panel_regression
+  point_kind: point
+  horizon: {kind: unspecified}
+  scope: {countries: [USA], period: {from: "2017-01", to: "2019-04"}, frequency: monthly,
+          sample_note: "Monthly variety-level (country × HS10 product) U.S. import / export data 2017:1-2019:4"}
+  identification: "First-differenced variety-level regressions on statutory tariff changes with product-time, country-time and country-sector fixed effects (standard errors clustered by country and HS-8); IV estimates of demand and supply elasticities using tariffs as instruments"
+estimates:
+- id: import_value
+  pdf_page: 46
+  cause: {kind: variable, id: trade.import_tariff_factor, transform: log_change, definition: 'statutory U.S. import tariff ∆ ln(1 + τigt) (monthly first differences, variety level)'}
+  effect: {kind: variable, id: trade.import_value, transform: log_change, definition: 'U.S. import values (p∗ m), variety level'}
+  point: -1.52
+  as_printed: '-1.52'
+  sign: negative
+  uncertainty: {se: 0.18, se_as_printed: '0.18', status: reported}
+  locator: Table IV, column (1), row ∆ ln(1 + τ) (pdf p.46)
+  quote: 'Table IV: Variety Import Demand (σ) and Foreign Export Supply (ω ∗ ) (1) (2) (3) (4) (5) (6) ∆ ln p∗igt migt ∆ ln migt ∆ ln p∗igt ∆ ln pigt ∆ ln p∗igt ∆ ln migt ∆ ln(1 + τigt ) -1.52∗∗∗ -1.47∗∗∗ 0.00 0.58∗∗∗ (0.18) (0.24) (0.08) (0.13) ∆ ln migt -0.00 (0.05) ∆ ln pigt -2.53∗∗∗ (0.26)'
+- id: import_quantity
+  pdf_page: 46
+  cause: {kind: variable, id: trade.import_tariff_factor, transform: log_change, definition: 'statutory U.S. import tariff ∆ ln(1 + τigt) (monthly first differences, variety level)'}
+  effect: {kind: variable, id: trade.import_quantity, transform: log_change, definition: 'U.S. import quantities (m), variety level'}
+  point: -1.47
+  as_printed: '-1.47'
+  sign: negative
+  uncertainty: {se: 0.24, se_as_printed: '0.24', status: reported}
+  locator: Table IV, column (2), row ∆ ln(1 + τ) (pdf p.46)
+  quote: 'Table IV: Variety Import Demand (σ) and Foreign Export Supply (ω ∗ ) (1) (2) (3) (4) (5) (6) ∆ ln p∗igt migt ∆ ln migt ∆ ln p∗igt ∆ ln pigt ∆ ln p∗igt ∆ ln migt ∆ ln(1 + τigt ) -1.52∗∗∗ -1.47∗∗∗ 0.00 0.58∗∗∗ (0.18) (0.24) (0.08) (0.13) ∆ ln migt -0.00 (0.05) ∆ ln pigt -2.53∗∗∗ (0.26)'
+- id: import_price_before_duty
+  pdf_page: 46
+  cause: {kind: variable, id: trade.import_tariff_factor, transform: log_change, definition: 'statutory U.S. import tariff ∆ ln(1 + τigt) (monthly first differences, variety level)'}
+  effect: {kind: variable, id: prices.import_price_before_duty, transform: log_change, definition: 'before-duty unit values (p∗), variety level'}
+  point: 0.0
+  as_printed: '0.00'
+  sign: zero
+  uncertainty: {se: 0.08, se_as_printed: '0.08', status: reported}
+  locator: Table IV, column (3), row ∆ ln(1 + τ) (pdf p.46)
+  quote: 'Table IV: Variety Import Demand (σ) and Foreign Export Supply (ω ∗ ) (1) (2) (3) (4) (5) (6) ∆ ln p∗igt migt ∆ ln migt ∆ ln p∗igt ∆ ln pigt ∆ ln p∗igt ∆ ln migt ∆ ln(1 + τigt ) -1.52∗∗∗ -1.47∗∗∗ 0.00 0.58∗∗∗ (0.18) (0.24) (0.08) (0.13) ∆ ln migt -0.00 (0.05) ∆ ln pigt -2.53∗∗∗ (0.26)'
+- id: import_price_duty_inclusive
+  pdf_page: 46
+  cause: {kind: variable, id: trade.import_tariff_factor, transform: log_change, definition: 'statutory U.S. import tariff ∆ ln(1 + τigt) (monthly first differences, variety level)'}
+  effect: {kind: variable, id: prices.import_price_duty_inclusive, transform: log_change, definition: 'duty-inclusive unit values (p), constructed with actual duties collected, variety level'}
+  point: 0.58
+  as_printed: '0.58'
+  sign: positive
+  uncertainty: {se: 0.13, se_as_printed: '0.13', status: reported}
+  locator: Table IV, column (4), row ∆ ln(1 + τ) (pdf p.46)
+  quote: 'Table IV: Variety Import Demand (σ) and Foreign Export Supply (ω ∗ ) (1) (2) (3) (4) (5) (6) ∆ ln p∗igt migt ∆ ln migt ∆ ln p∗igt ∆ ln pigt ∆ ln p∗igt ∆ ln migt ∆ ln(1 + τigt ) -1.52∗∗∗ -1.47∗∗∗ 0.00 0.58∗∗∗ (0.18) (0.24) (0.08) (0.13) ∆ ln migt -0.00 (0.05) ∆ ln pigt -2.53∗∗∗ (0.26)'
+- id: us_export_value
+  pdf_page: 49
+  cause: {kind: variable, id: trade.export_tariff_factor_abroad, transform: log_change, definition: retaliatory tariff of foreign countries on U.S. exports ∆ ln(1 + τ∗igt) (variety level)}
+  effect: {kind: variable, id: trade.export_value, transform: log_change, definition: 'U.S. export values (pX x), variety level'}
+  point: -0.99
+  as_printed: '-0.99'
+  sign: negative
+  uncertainty: {se: 0.28, se_as_printed: '0.28', status: reported}
+  locator: Table VII 'Foreign Import Demand σ∗', column (1), row ∆ ln(1 + τ) (pdf p.49)
+  quote: 'Table VII: Foreign Import Demand σ ∗ (1) (2) (3) (4) (5) (6) ∗ ∆ ln pX igt xigt ∆ ln xigt ∆ ln pXigt ∆ ln pX igt (1 + τigt ) ∆ ln pXigt ∆ ln xigt ∗ ∆ ln(1 + τigt ) -0.99∗∗∗ -1.00∗∗∗ -0.04 0.96 ∗∗∗ (0.28) (0.36) (0.16) (0.16) ∆ ln xigt 0.04 (0.16) ∗ ∆ ln pX igt (1 + τigt ) -1.04∗∗∗ (0.32)'
+- id: us_export_quantity
+  pdf_page: 49
+  cause: {kind: variable, id: trade.export_tariff_factor_abroad, transform: log_change, definition: retaliatory tariff of foreign countries on U.S. exports ∆ ln(1 + τ∗igt) (variety level)}
+  effect: {kind: variable, id: trade.export_quantity, transform: log_change, definition: 'U.S. export quantities (x), variety level'}
+  point: -1.0
+  as_printed: '-1.00'
+  sign: negative
+  uncertainty: {se: 0.36, se_as_printed: '0.36', status: reported}
+  locator: Table VII, column (2), row ∆ ln(1 + τ) (pdf p.49)
+  quote: 'Table VII: Foreign Import Demand σ ∗ (1) (2) (3) (4) (5) (6) ∗ ∆ ln pX igt xigt ∆ ln xigt ∆ ln pXigt ∆ ln pX igt (1 + τigt ) ∆ ln pXigt ∆ ln xigt ∗ ∆ ln(1 + τigt ) -0.99∗∗∗ -1.00∗∗∗ -0.04 0.96 ∗∗∗ (0.28) (0.36) (0.16) (0.16) ∆ ln xigt 0.04 (0.16) ∗ ∆ ln pX igt (1 + τigt ) -1.04∗∗∗ (0.32)'
+- id: us_export_price_before_duty
+  pdf_page: 49
+  cause: {kind: variable, id: trade.export_tariff_factor_abroad, transform: log_change, definition: retaliatory tariff of foreign countries on U.S. exports ∆ ln(1 + τ∗igt) (variety level)}
+  effect: {kind: variable, id: prices.export_price, transform: log_change, definition: 'U.S. export unit values before foreign duties (pX), variety level'}
+  point: -0.04
+  as_printed: '-0.04'
+  sign: negative
+  uncertainty: {se: 0.16, se_as_printed: '0.16', status: reported}
+  locator: Table VII, column (3), row ∆ ln(1 + τ) (pdf p.49)
+  quote: 'Table VII: Foreign Import Demand σ ∗ (1) (2) (3) (4) (5) (6) ∗ ∆ ln pX igt xigt ∆ ln xigt ∆ ln pXigt ∆ ln pX igt (1 + τigt ) ∆ ln pXigt ∆ ln xigt ∗ ∆ ln(1 + τigt ) -0.99∗∗∗ -1.00∗∗∗ -0.04 0.96 ∗∗∗ (0.28) (0.36) (0.16) (0.16) ∆ ln xigt 0.04 (0.16) ∗ ∆ ln pX igt (1 + τigt ) -1.04∗∗∗ (0.32)'
+- id: us_export_price_duty_inclusive
+  pdf_page: 49
+  cause: {kind: variable, id: trade.export_tariff_factor_abroad, transform: log_change, definition: retaliatory tariff of foreign countries on U.S. exports ∆ ln(1 + τ∗igt) (variety level)}
+  effect: {kind: variable, id: prices.export_price, transform: log_change, definition: 'U.S. export unit values including foreign duties (pX(1 + τ∗)), variety level'}
+  point: 0.96
+  as_printed: '0.96'
+  sign: positive
+  uncertainty: {se: 0.16, se_as_printed: '0.16', status: reported}
+  locator: Table VII, column (4), row ∆ ln(1 + τ) (pdf p.49)
+  quote: 'Table VII: Foreign Import Demand σ ∗ (1) (2) (3) (4) (5) (6) ∗ ∆ ln pX igt xigt ∆ ln xigt ∆ ln pXigt ∆ ln pX igt (1 + τigt ) ∆ ln pXigt ∆ ln xigt ∗ ∆ ln(1 + τigt ) -0.99∗∗∗ -1.00∗∗∗ -0.04 0.96 ∗∗∗ (0.28) (0.36) (0.16) (0.16) ∆ ln xigt 0.04 (0.16) ∗ ∆ ln pX igt (1 + τigt ) -1.04∗∗∗ (0.32)'
+- id: import_demand_elasticity_sigma
+  pdf_page: 46
+  method: iv
+  cause: {kind: variable, id: prices.import_price_duty_inclusive, transform: log_change, definition: duty-inclusive variety import price ∆ ln pigt (instrumented by the tariff)}
+  effect: {kind: variable, id: trade.import_quantity, transform: log_change, definition: variety import quantity ∆ ln migt (import demand elasticity σ)}
+  point: -2.53
+  as_printed: '-2.53'
+  sign: negative
+  uncertainty: {se: 0.26, se_as_printed: '0.26', status: reported}
+  shock_profile: contemporaneous_relation
+  locator: Table IV, column (6) (IV estimate of σ̂; first stage column 4; bootstrapped 90% CI [1.75, 3.02] for σ̂ = 2.53) (pdf p.46)
+  quote: 'Table IV: Variety Import Demand (σ) and Foreign Export Supply (ω ∗ ) (1) (2) (3) (4) (5) (6) ∆ ln p∗igt migt ∆ ln migt ∆ ln p∗igt ∆ ln pigt ∆ ln p∗igt ∆ ln migt ∆ ln(1 + τigt ) -1.52∗∗∗ -1.47∗∗∗ 0.00 0.58∗∗∗ (0.18) (0.24) (0.08) (0.13) ∆ ln migt -0.00 (0.05) ∆ ln pigt -2.53∗∗∗ (0.26)'
+  applicability: 'REVA note: the paper reports σ̂ = 2.53 as a positive elasticity of substitution; the regression coefficient printed in Table IV column (6) is -2.53 (the quantity response to the price), which is the number recorded.'
+- id: foreign_import_demand_elasticity_sigma_star
+  pdf_page: 49
+  method: iv
+  cause: {kind: variable, id: prices.export_price, transform: log_change, definition: duty-inclusive price of U.S. exports abroad ∆ ln pXigt(1 + τ∗igt) (instrumented by the retaliatory tariff)}
+  effect: {kind: variable, id: trade.export_quantity, transform: log_change, definition: U.S. export quantity ∆ ln xigt (foreign import demand elasticity σ∗)}
+  point: -1.04
+  as_printed: '-1.04'
+  sign: negative
+  uncertainty: {se: 0.32, se_as_printed: '0.32', status: reported}
+  shock_profile: contemporaneous_relation
+  locator: Table VII 'Foreign Import Demand σ∗', column (6) (pdf p.49)
+  quote: 'Table VII: Foreign Import Demand σ ∗ (1) (2) (3) (4) (5) (6) ∗ ∆ ln pX igt xigt ∆ ln xigt ∆ ln pXigt ∆ ln pX igt (1 + τigt ) ∆ ln pXigt ∆ ln xigt ∗ ∆ ln(1 + τigt ) -0.99∗∗∗ -1.00∗∗∗ -0.04 0.96 ∗∗∗ (0.28) (0.36) (0.16) (0.16) ∆ ln xigt 0.04 (0.16) ∗ ∆ ln pX igt (1 + τigt ) -1.04∗∗∗ (0.32)'

@@ -93,7 +93,9 @@ DFR = "FM.D.U2.EUR.4F.KR.DFR.LEV"
 
 
 def fx_values(days: list[date]) -> list[tuple[date, str]]:
-    return [(d, format(1.10 + 0.05 * math.sin(i / 37.0) + 0.002 * math.cos(i * 1.7), ".4f")) for i, d in enumerate(days)]
+    return [
+        (d, format(1.10 + 0.05 * math.sin(i / 37.0) + 0.002 * math.cos(i * 1.7), ".4f")) for i, d in enumerate(days)
+    ]
 
 
 def specs_subset(keys: tuple[str, ...]) -> SpecSet:
@@ -132,12 +134,22 @@ def test_finance_families_parse_and_validate() -> None:
                "questions": [{"type": "binary", "horizons": [1], "threshold_rule": "above_fixed"}]}  # fmt: skip
     bad = [
         {**meeting},  # meeting without finance block
-        {**meeting, "finance": {"kind": "meeting", "forecasters": ["fin.meeting_base_rate"], "direction": "up",
-                                "inputs": {"history": {"dataset_key": "atlas.ecb.key_rates", "indicator": DFR,
-                                                       "provider_geo": "U2"}}}},  # no calendar  # fmt: skip
+        {
+            **meeting,
+            "finance": {
+                "kind": "meeting",
+                "forecasters": ["fin.meeting_base_rate"],
+                "direction": "up",
+                "inputs": {"history": {"dataset_key": "atlas.ecb.key_rates", "indicator": DFR, "provider_geo": "U2"}},
+            },
+        },
         {**base, "value_rule": "month_end_spread_of_daily", "questions": [{"type": "quantity", "horizons": [1]}]},
-        {**base, "value_rule": "month_end_of_daily", "questions": [{"type": "quantity", "horizons": [1]}],
-         "finance": {"kind": "fx", "scale": "log", "forecasters": ["fin.oracle"]}},  # fmt: skip
+        {
+            **base,
+            "value_rule": "month_end_of_daily",
+            "questions": [{"type": "quantity", "horizons": [1]}],
+            "finance": {"kind": "fx", "scale": "log", "forecasters": ["fin.oracle"]},
+        },
         {**meeting, "threshold": None},
     ]
     for fam in bad:
@@ -155,7 +167,9 @@ def test_month_end_and_spread_series() -> None:
     s = extract_series(frame, fam)[0]["EUR-USD"]
     assert [P.label_of("M", c.idx) for c in s.observed] == ["2026-01", "2026-02"]  # March incomplete: excluded
     jan_last = max(d for d in days if d.month == 1)
-    assert s.observed[0].value == dict(fx_values(days))[jan_last] and s.observed[0].refs[0]["day"] == jan_last.isoformat()
+    assert (
+        s.observed[0].value == dict(fx_values(days))[jan_last] and s.observed[0].refs[0]["day"] == jan_last.isoformat()
+    )
 
     ten = [(d, "4.25") for d in days]
     two = [(d, "3.90") for d in days if d != date(2026, 2, 27)]  # 2 Yr missing on the last weekday of February

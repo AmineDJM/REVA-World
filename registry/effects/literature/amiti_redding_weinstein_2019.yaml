@@ -1,0 +1,121 @@
+# 2018 U.S. trade war: tariff pass-through to import prices and trade flows (agent EFFECTS-MORE, V6).
+schema: reva-effects-literature/1
+id: amiti_redding_weinstein_2019
+source_key: effects.literature
+citation:
+  text: "Mary Amiti, Stephen J. Redding, and David Weinstein. The Impact of the 2018 Trade War on U.S. Prices and Welfare. NBER Working Paper No. 25672, March 2019."
+  text_basis: assembled from the title page of the version read (NBER working paper)
+  short: "Amiti, Redding & Weinstein (2019), NBER WP 25672"
+  authors: [Mary Amiti, Stephen J. Redding, David Weinstein]
+  title: "The Impact of the 2018 Trade War on U.S. Prices and Welfare"
+  year: 2019
+  series: NBER Working Paper No. 25672
+  doi: null
+  url: http://www.nber.org/papers/w25672
+document:
+  url: https://www.nber.org/system/files/working_papers/w25672/w25672.pdf
+  media_type: application/pdf
+  sha256: 9049a4fabfcc8c96bc386e5afe0c830f1a47509f71543166a07659ffc434ad3c
+  bytes: 762914
+  version_read: "NBER Working Paper 25672, March 2019"
+as_of: "2019-03-01"
+rights:
+  licence: "© 2019 by Mary Amiti, Stephen J. Redding, and David Weinstein. All rights reserved. Short sections of text, not to exceed two paragraphs, may be quoted without explicit permission provided that full credit, including © notice, is given to the source."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent EFFECTS-MORE
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  shock_profile: sustained
+  measure: elasticity
+  unit: ratio
+  method: panel_regression
+  point_kind: point
+  horizon: {kind: at_horizon, value: 12, unit: month}
+  scope: {countries: [USA], period: {from: "2017-01", to: "2018-12"}, frequency: monthly,
+          sample_note: "HTS10-country-month observations, 12-month log changes, January 2017 to December 2018"}
+  identification: "Regressions of 12-month log changes of prices and quantities on 12-month changes in ln(1+tariff) with HTS10 product and country × year fixed effects; standard errors clustered at the HTS 8-digit level"
+  applicability: "REVA note: 2018 U.S. tariffs and foreign retaliation; elasticities with respect to one plus the tariff rate (a tariff of 10% is a log change of about 0.095)."
+estimates:
+- id: import_price_before_duty
+  pdf_page: 35
+  cause: {kind: variable, id: trade.import_tariff_factor, transform: log_change, definition: 'U.S. import tariff ∆ln(1+Tariff), 12-month log change'}
+  effect: {kind: variable, id: prices.import_price_before_duty, transform: log_change, definition: 'log change of prices (before U.S. duties are applied) charged by foreign exporters, 12 months'}
+  point: -0.003
+  as_printed: '-0.003'
+  sign: negative
+  uncertainty: {se: 0.024, se_as_printed: '0.024', status: reported}
+  locator: Table 1 'Impact of U.S. Tariffs on Importing', column (1) ∆ln(pijt) (printed p.33)
+  quote: 'Table 1: Impact of U.S. Tariffs on Importing (1) (2) (3) (4) (5) (6) ∆ln(pijt) ∆ln(mijt) ∆ln(mijt) ∆ln(pijt ́mijt) ∆ln(pijt ́mijt) ∆ln(pit ́mit) ∆ln(1+Tariffijt) -0.003 -1.299*** -6.026*** -1.380*** -6.466*** -3.757*** (0.024) (0.094) (0.597) (0.090) (0.791) (0.760)'
+- id: import_quantity
+  pdf_page: 35
+  cause: {kind: variable, id: trade.import_tariff_factor, transform: log_change, definition: 'U.S. import tariff ∆ln(1+Tariff), 12-month log change'}
+  effect: {kind: variable, id: trade.import_quantity, transform: log_change, definition: 'log change of U.S. import quantities, 12 months'}
+  point: -1.299
+  as_printed: '-1.299'
+  sign: negative
+  uncertainty: {se: 0.094, se_as_printed: '0.094', status: reported}
+  locator: Table 1, column (2) ∆ln(mijt) (printed p.33)
+  quote: 'Table 1: Impact of U.S. Tariffs on Importing (1) (2) (3) (4) (5) (6) ∆ln(pijt) ∆ln(mijt) ∆ln(mijt) ∆ln(pijt ́mijt) ∆ln(pijt ́mijt) ∆ln(pit ́mit) ∆ln(1+Tariffijt) -0.003 -1.299*** -6.026*** -1.380*** -6.466*** -3.757*** (0.024) (0.094) (0.597) (0.090) (0.791) (0.760)'
+- id: import_value
+  pdf_page: 35
+  cause: {kind: variable, id: trade.import_tariff_factor, transform: log_change, definition: 'U.S. import tariff ∆ln(1+Tariff), 12-month log change'}
+  effect: {kind: variable, id: trade.import_value, transform: log_change, definition: 'log change of U.S. import values, 12 months'}
+  point: -1.38
+  as_printed: '-1.380'
+  sign: negative
+  uncertainty: {se: 0.09, se_as_printed: '0.090', status: reported}
+  locator: Table 1, column (4) ∆ln(pijt×mijt) (printed p.33)
+  quote: 'Table 1: Impact of U.S. Tariffs on Importing (1) (2) (3) (4) (5) (6) ∆ln(pijt) ∆ln(mijt) ∆ln(mijt) ∆ln(pijt ́mijt) ∆ln(pijt ́mijt) ∆ln(pit ́mit) ∆ln(1+Tariffijt) -0.003 -1.299*** -6.026*** -1.380*** -6.466*** -3.757*** (0.024) (0.094) (0.597) (0.090) (0.791) (0.760)'
+- id: us_export_price
+  pdf_page: 37
+  cause: {kind: variable, id: trade.export_tariff_factor_abroad, transform: log_change, definition: 'foreign retaliatory tariff on U.S. exports ∆ln(1+Tariff), 12-month log change'}
+  effect: {kind: variable, id: prices.export_price, transform: log_change, definition: 'log change of prices (excluding the tariff) charged by U.S. exporters, 12 months'}
+  point: 0.083
+  as_printed: '0.083'
+  sign: positive
+  uncertainty: {se: 0.036, se_as_printed: '0.036', status: reported}
+  locator: Table 3 'Impact of Foreign Tariffs on U.S. Exporting', column (1) ∆ln(piUSt) (printed p.35)
+  quote: 'Table 3: Impact of Foreign Tariffs on U.S. Exporting (1) (2) (3) (4) (5) ∆ln(piUSt) ∆ln(miUSt) ∆ln(miUSt) ∆ln(piUSt ́miUSt) ∆ln(piUSt ́miUSt) ∆ln(1+Tariffijt) 0.083** -1.239*** -3.459*** -1.100*** -3.898*** (0.036) (0.152) (0.742) (0.132) (0.870)'
+- id: us_export_quantity
+  pdf_page: 37
+  cause: {kind: variable, id: trade.export_tariff_factor_abroad, transform: log_change, definition: 'foreign retaliatory tariff on U.S. exports ∆ln(1+Tariff), 12-month log change'}
+  effect: {kind: variable, id: trade.export_quantity, transform: log_change, definition: 'log change of U.S. export quantities, 12 months'}
+  point: -1.239
+  as_printed: '-1.239'
+  sign: negative
+  uncertainty: {se: 0.152, se_as_printed: '0.152', status: reported}
+  locator: Table 3, column (2) ∆ln(miUSt) (printed p.35)
+  quote: 'Table 3: Impact of Foreign Tariffs on U.S. Exporting (1) (2) (3) (4) (5) ∆ln(piUSt) ∆ln(miUSt) ∆ln(miUSt) ∆ln(piUSt ́miUSt) ∆ln(piUSt ́miUSt) ∆ln(1+Tariffijt) 0.083** -1.239*** -3.459*** -1.100*** -3.898*** (0.036) (0.152) (0.742) (0.132) (0.870)'
+- id: us_export_value
+  pdf_page: 37
+  cause: {kind: variable, id: trade.export_tariff_factor_abroad, transform: log_change, definition: 'foreign retaliatory tariff on U.S. exports ∆ln(1+Tariff), 12-month log change'}
+  effect: {kind: variable, id: trade.export_value, transform: log_change, definition: 'log change of U.S. export values, 12 months'}
+  point: -1.1
+  as_printed: '-1.100'
+  sign: negative
+  uncertainty: {se: 0.132, se_as_printed: '0.132', status: reported}
+  locator: Table 3, column (4) ∆ln(piUSt×miUSt) (printed p.35)
+  quote: 'Table 3: Impact of Foreign Tariffs on U.S. Exporting (1) (2) (3) (4) (5) ∆ln(piUSt) ∆ln(miUSt) ∆ln(miUSt) ∆ln(piUSt ́miUSt) ∆ln(piUSt ́miUSt) ∆ln(1+Tariffijt) 0.083** -1.239*** -3.459*** -1.100*** -3.898*** (0.036) (0.152) (0.742) (0.132) (0.870)'
+- id: common_goods_price_index_duty_inclusive
+  pdf_page: 38
+  cause: {kind: variable, id: trade.import_tariff_factor, transform: log_change, definition: 'U.S. import tariff ∆ln(1+Tariff), HS6 level, 12-month change'}
+  effect: {kind: variable, id: prices.import_price_duty_inclusive, transform: log_change, definition: 'log change of the tariff-inclusive common goods import price index (HS6), 12 months'}
+  point: 0.995
+  as_printed: '0.995'
+  sign: positive
+  uncertainty: {se: 0.04, se_as_printed: '0.040', status: reported}
+  locator: Table 4 'Import Price Indexes and Tariffs', column (1) ∆ln(Common Goods Price Index) (printed p.36)
+  quote: 'Table 4: Import Price Indexes and Tariffs (1) (2) (3) ∆ln(Common Goods Price ln(Variety ∆ln(Price Indexjt) Adjustmentjt) Indexjt) ∆ln(1+Tariffj,t) 0.995*** 0.049*** 1.044*** (0.040) (0.009) (0.041)'
+- id: price_index_with_variety_duty_inclusive
+  pdf_page: 38
+  cause: {kind: variable, id: trade.import_tariff_factor, transform: log_change, definition: 'U.S. import tariff ∆ln(1+Tariff), HS6 level, 12-month change'}
+  effect: {kind: variable, id: prices.import_price_duty_inclusive, transform: log_change, definition: 'log change of the tariff-inclusive import price index including the variety adjustment (HS6, elasticity of substitution set to 6), 12 months'}
+  point: 1.044
+  as_printed: '1.044'
+  sign: positive
+  uncertainty: {se: 0.041, se_as_printed: '0.041', status: reported}
+  locator: Table 4, column (3) ∆ln(Price Index) (printed p.36)
+  quote: 'Table 4: Import Price Indexes and Tariffs (1) (2) (3) ∆ln(Common Goods Price ln(Variety ∆ln(Price Indexjt) Adjustmentjt) Indexjt) ∆ln(1+Tariffj,t) 0.995*** 0.049*** 1.044*** (0.040) (0.009) (0.041)'

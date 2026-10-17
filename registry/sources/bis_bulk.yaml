@@ -25,3 +25,5 @@ metadata:
   authentication: none
   cadence: "replaced at each BIS release (release calendar https://data.bis.org/release-calendar); weekly check"
   revision_policy: "not stated per observation; bulk files are replaced at each release (Last-Modified archived)"
+# V6FINDATA (2026-10-17): atlas.bis_fin_bulk (atlas_bis_fin.py) reads WS_CBTA_csv_flat.zip (2.5 MB) and
+# WS_GLI_csv_flat.zip (0.26 MB) -> bis.cbta, bis.gli.

@@ -353,7 +353,7 @@ families:
     value_rule: cell
     unit: "dollars per barrel"
     questions:
-      - {type: quantity, horizons: [1, 3, 6, 12]}
+      - {type: quantity, horizons: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
       - {type: interval, horizons: [1, 3, 6, 12]}
       - {type: binary, horizons: [3, 6, 12], threshold_rule: above_last_observed}
     publication_lag_days: 45
@@ -362,6 +362,158 @@ families:
     resolution_note: >-
       First EIA STEO release (atlas.eia_steo steo_observed) registered after sealing in which the month is a
       historical period (STEO lastHistoricalPeriod); STEO forecast cells are never an outcome.
+    # V6 PRED-ENERGY: STEO archive information set, EIA's projection (attributed) and backtest winners only.
+    energy: {code: BREPUUS, vintage_table: atlas.vintage_steo.steo_archive, winners: forecasts/energy_winners.yaml}
+
+  # ------------------------------------------------------------------ V6 PRED-ENERGY: EIA STEO families
+  # Each family: the registry baselines + forecast.energy_rw (random walk on the STEO issue in force) + the EIA STEO
+  # projection of that issue (forecast.reference_eia_steo, attributed, point only) + the REVA candidates listed as
+  # significant winners for that series and horizon in registry/forecasts/energy_winners.yaml (STEO archive backtest).
+  - key: eia.wti_monthly
+    concept_id: null
+    labels: {fr: "Prix du WTI (moyenne mensuelle, $/baril)", en: "WTI crude oil spot price (monthly average, $/barrel)"}
+    definition: "EIA Short-Term Energy Outlook series WTIPUUS ('West Texas Intermediate Spot Average'), monthly, historical periods only (steo_observed)."
+    definition_source: src/reva/adapters/connectors/atlas_eia_steo.py
+    dataset_key: atlas.eia_steo.steo_observed
+    indicator: STEO.WTIPUUS.M
+    owner_agent: PRED-ENERGY
+    # EIA's STEO `geography` for WTIPUUS is "USA" (verbatim).
+    geos: [{provider_geo: USA, key: WTI-STEO, label_fr: "WTI (série STEO de l'EIA)", label_en: "WTI (EIA STEO series)"}]
+    frequency: M
+    value_rule: cell
+    unit: "dollars per barrel"
+    questions:
+      - {type: quantity, horizons: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
+      - {type: interval, horizons: [1, 3, 6, 12]}
+      - {type: binary, horizons: [3, 6, 12], threshold_rule: above_last_observed}
+    publication_lag_days: 45
+    void_after_days: 365
+    backtest_lag_periods: 1
+    resolution_note: >-
+      First EIA STEO release (atlas.eia_steo steo_observed) registered after sealing in which the month is a
+      historical period (STEO lastHistoricalPeriod); STEO forecast cells are never an outcome.
+    energy: {code: WTIPUUS, vintage_table: atlas.vintage_steo.steo_archive, winners: forecasts/energy_winners.yaml}
+
+  - key: eia.henry_hub_monthly
+    concept_id: null
+    labels: {fr: "Prix du gaz naturel Henry Hub (moyenne mensuelle, $/MMBtu)", en: "Henry Hub natural gas spot price (monthly average, $/MMBtu)"}
+    definition: "EIA Short-Term Energy Outlook series NGHHUUS ('Henry Hub Spot (dollars per million Btu)'), monthly, historical periods only (steo_observed)."
+    definition_source: src/reva/adapters/connectors/atlas_eia_steo.py
+    dataset_key: atlas.eia_steo.steo_observed
+    indicator: STEO.NGHHUUS.M
+    owner_agent: PRED-ENERGY
+    geos: [{provider_geo: USA, key: HENRY-HUB-STEO, label_fr: "Henry Hub (série STEO de l'EIA)", label_en: "Henry Hub (EIA STEO series)"}]
+    frequency: M
+    value_rule: cell
+    unit: "dollars per million Btu"
+    questions:
+      - {type: quantity, horizons: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
+      - {type: interval, horizons: [1, 3, 6, 12]}
+      - {type: binary, horizons: [3, 6, 12], threshold_rule: above_last_observed}
+    publication_lag_days: 45
+    void_after_days: 365
+    backtest_lag_periods: 1
+    resolution_note: >-
+      First EIA STEO release (atlas.eia_steo steo_observed) registered after sealing in which the month is a
+      historical period (STEO lastHistoricalPeriod); STEO forecast cells are never an outcome.
+    energy: {code: NGHHUUS, vintage_table: atlas.vintage_steo.steo_archive, winners: forecasts/energy_winners.yaml}
+
+  - key: eia.us_crude_production
+    concept_id: null
+    labels: {fr: "Production de pétrole brut des États-Unis (Mb/j)", en: "U.S. crude oil production (million barrels per day)"}
+    definition: "EIA Short-Term Energy Outlook series COPRPUS ('U.S. total crude oil production'), monthly, historical periods only (steo_observed)."
+    definition_source: src/reva/adapters/connectors/atlas_eia_steo.py
+    dataset_key: atlas.eia_steo.steo_observed
+    indicator: STEO.COPRPUS.M
+    owner_agent: PRED-ENERGY
+    geos: [{provider_geo: USA, key: USA, label_fr: "États-Unis", label_en: "United States"}]
+    frequency: M
+    value_rule: cell
+    unit: "million barrels per day"
+    questions:
+      - {type: quantity, horizons: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
+      - {type: interval, horizons: [1, 3, 6, 12]}
+      - {type: binary, horizons: [3, 6, 12], threshold_rule: above_last_observed}
+    publication_lag_days: 45
+    void_after_days: 400
+    backtest_lag_periods: 1
+    resolution_note: >-
+      First EIA STEO release (atlas.eia_steo steo_observed) registered after sealing in which the month is a
+      historical period (STEO lastHistoricalPeriod); later revisions do not change the score.
+    energy: {code: COPRPUS, vintage_table: atlas.vintage_steo.steo_archive, winners: forecasts/energy_winners.yaml}
+
+  - key: eia.world_liquids_production
+    concept_id: null
+    labels: {fr: "Production mondiale de pétrole et autres liquides (Mb/j)", en: "World petroleum and other liquids production (million barrels per day)"}
+    definition: "EIA Short-Term Energy Outlook series PAPR_WORLD (Table 3a 'World total' production of petroleum and other liquid fuels), monthly, historical periods only (steo_observed)."
+    definition_source: src/reva/adapters/connectors/atlas_eia_steo.py
+    dataset_key: atlas.eia_steo.steo_observed
+    indicator: STEO.PAPR_WORLD.M
+    owner_agent: PRED-ENERGY
+    # EIA gives no geography for world totals (provider_geo not_stated); the code says WORLD.
+    geos: [{provider_geo: not_stated, key: WORLD, label_fr: "Monde", label_en: "World"}]
+    frequency: M
+    value_rule: cell
+    unit: "million barrels per day"
+    questions:
+      - {type: quantity, horizons: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
+      - {type: interval, horizons: [1, 3, 6, 12]}
+      - {type: binary, horizons: [3, 6, 12], threshold_rule: above_last_observed}
+    publication_lag_days: 120
+    void_after_days: 540
+    backtest_lag_periods: 4
+    resolution_note: >-
+      First EIA STEO release (atlas.eia_steo steo_observed) registered after sealing in which the month is a
+      historical period (EIA declares world production history ~3-4 months after the month).
+    energy: {code: PAPR_WORLD, vintage_table: atlas.vintage_steo.steo_archive, winners: forecasts/energy_winners.yaml}
+
+  - key: eia.world_crude_production
+    concept_id: null
+    labels: {fr: "Production mondiale de pétrole brut (Mb/j)", en: "World crude oil production (million barrels per day)"}
+    definition: "EIA Short-Term Energy Outlook series COPR_WORLD (Table 3a 'World total' crude oil production), monthly, historical periods only (steo_observed)."
+    definition_source: src/reva/adapters/connectors/atlas_eia_steo.py
+    dataset_key: atlas.eia_steo.steo_observed
+    indicator: STEO.COPR_WORLD.M
+    owner_agent: PRED-ENERGY
+    geos: [{provider_geo: not_stated, key: WORLD, label_fr: "Monde", label_en: "World"}]
+    frequency: M
+    value_rule: cell
+    unit: "million barrels per day"
+    questions:
+      - {type: quantity, horizons: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
+      - {type: interval, horizons: [1, 3, 6, 12]}
+      - {type: binary, horizons: [3, 6, 12], threshold_rule: above_last_observed}
+    publication_lag_days: 120
+    void_after_days: 540
+    backtest_lag_periods: 4
+    resolution_note: >-
+      First EIA STEO release (atlas.eia_steo steo_observed) registered after sealing in which the month is a
+      historical period (EIA declares world production history ~3-4 months after the month).
+    energy: {code: COPR_WORLD, vintage_table: atlas.vintage_steo.steo_archive, winners: forecasts/energy_winners.yaml}
+
+  - key: eia.oecd_commercial_stocks
+    concept_id: null
+    labels: {fr: "Stocks commerciaux de pétrole de l'OCDE (fin de mois, millions de barils)", en: "OECD commercial petroleum inventories (end of month, million barrels)"}
+    definition: "EIA Short-Term Energy Outlook series PASC_OECD_T3 (Table 3a 'OECD total' commercial inventory, million barrels, end-of-period), monthly, historical periods only (steo_observed)."
+    definition_source: src/reva/adapters/connectors/atlas_eia_steo.py
+    dataset_key: atlas.eia_steo.steo_observed
+    indicator: STEO.PASC_OECD_T3.M
+    owner_agent: PRED-ENERGY
+    geos: [{provider_geo: not_stated, key: OECD, label_fr: "OCDE", label_en: "OECD"}]
+    frequency: M
+    value_rule: cell
+    unit: "million barrels, end-of-period"
+    questions:
+      - {type: quantity, horizons: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
+      - {type: interval, horizons: [1, 3, 6, 12]}
+      - {type: binary, horizons: [3, 6, 12], threshold_rule: above_last_observed}
+    publication_lag_days: 120
+    void_after_days: 540
+    backtest_lag_periods: 4
+    resolution_note: >-
+      First EIA STEO release (atlas.eia_steo steo_observed) registered after sealing in which the month is a
+      historical period (EIA declares OECD inventory history ~3-4 months after the month).
+    energy: {code: PASC_OECD_T3, vintage_table: atlas.vintage_steo.steo_archive, winners: forecasts/energy_winners.yaml}
 
   # ------------------------------------------------------------------ V4ECON / PRED-HF daily and monthly price tables
   - key: fao.food_price_index

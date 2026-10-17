@@ -33,3 +33,5 @@ metadata:
   upstream_lineages:
     weo: [national_statistical_offices, central_banks, imf_staff]
     imts: [national_customs, imf_staff_partner_estimates]
+# V6FINDATA (2026-10-17): atlas.imf_fin (atlas_imf_fin.py) reads IMF.STA:COFER, IMF.FAD:GDD (debt ratios),
+# IMF.FAD:HPD -> imf.cofer, imf.gdd, imf.hpd (same pending licence review).

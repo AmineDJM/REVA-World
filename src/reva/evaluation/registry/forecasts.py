@@ -140,8 +140,15 @@ def conflict_models() -> dict[str, tuple[str, str]]:
     return {k: (v, f"{kind}: {d}") for k, (v, kind, d) in CONFLICT_MODELS.items()}
 
 
+def energy_models() -> dict[str, tuple[str, str]]:
+    """Energy forecasters vs the EIA STEO (V6 PRED-ENERGY): random walk, attributed STEO reference, candidates."""
+    from reva.evaluation.registry.energy import energy_models as _em
+
+    return _em()
+
+
 def all_models() -> dict[str, tuple[str, str]]:
-    return {**BASELINES, **REFERENCE_MODELS, **finance_models(), **conflict_models()}
+    return {**BASELINES, **REFERENCE_MODELS, **finance_models(), **conflict_models(), **energy_models()}
 
 
 __all__ = [

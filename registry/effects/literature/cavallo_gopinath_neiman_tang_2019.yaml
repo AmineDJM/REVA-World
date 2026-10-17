@@ -1,0 +1,87 @@
+# Tariff pass-through at the border (U.S.-China trade war) (agent EFFECTS-MORE, V6).
+schema: reva-effects-literature/1
+id: cavallo_gopinath_neiman_tang_2019
+source_key: effects.literature
+citation:
+  text: "Alberto Cavallo, Gita Gopinath, Brent Neiman, and Jenny Tang. Tariff Passthrough at the Border and at the Store: Evidence from US Trade Policy. NBER Working Paper No. 26396, October 2019."
+  text_basis: assembled from the title page of the version read (NBER working paper)
+  short: "Cavallo, Gopinath, Neiman & Tang (2019), NBER WP 26396"
+  authors: [Alberto Cavallo, Gita Gopinath, Brent Neiman, Jenny Tang]
+  title: "Tariff Passthrough at the Border and at the Store: Evidence from US Trade Policy"
+  year: 2019
+  series: NBER Working Paper No. 26396
+  doi: null
+  url: http://www.nber.org/papers/w26396
+document:
+  url: https://www.nber.org/system/files/working_papers/w26396/w26396.pdf
+  media_type: application/pdf
+  sha256: 3e7f530633867fb3274a9eaa8b93fac96aa65feb2ba27946f44c2e7a025be002
+  bytes: 1881594
+  version_read: "NBER Working Paper 26396, October 2019"
+as_of: "2019-10-01"
+rights:
+  licence: "© 2019 by Alberto Cavallo, Gita Gopinath, Brent Neiman, and Jenny Tang. All rights reserved. Short sections of text, not to exceed two paragraphs, may be quoted without explicit permission provided that full credit, including © notice, is given to the source."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent EFFECTS-MORE
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  shock_profile: sustained
+  method: panel_regression
+  point_kind: point
+  horizon: {kind: cumulative, value: 12, unit: month}
+  scope: {countries: [USA], period: {from: "2005-01", to: "2019-08"}, frequency: monthly,
+          sample_note: "BLS import (export) price micro data, monthly, January 2005 to August 2019"}
+  identification: "Product-level monthly regressions of log price changes on the current and 11 lagged tariff changes (sum = cumulative 12-month effect), exchange rates and producer prices, with sector fixed effects; robust standard errors"
+estimates:
+- id: chinese_import_price_ex_tariff_per_pp_tariff
+  pdf_page: 13
+  cause: {kind: variable, id: trade.import_tariff_rate, transform: pp_change, definition: U.S. import tariff level on goods from China in the sector (cumulative impact of 12 months of tariffs)}
+  effect: {kind: variable, id: prices.import_price_before_duty, transform: log_change, definition: 'ex-tariff import price of goods from China (log), 12 months'}
+  measure: semi_elasticity
+  unit: percent_per_pp
+  point: -0.079
+  as_printed: '-0.079'
+  sign: negative
+  uncertainty: {se: 0.026, se_as_printed: '0.026', status: reported}
+  locator: Table 1 'Regression Analysis of Chinese Import Tariffs Using Monthly Data', column (1), row 'Tariffs 1 yr.' (SE 0.026 in the table) and its reading in the text (printed p.11)
+  quote: "Tariffs 1 yr. l=0 γCN,l -0.079*** -0.076*** -0.018 (0.026) (0.028) (0.030) \x10P \x11 11 I,S ERPT 1 yr. l=0 βl 0.219*** 0.221*** (0.027) (0.027) \x10P \x11 11 I,X PPI PT 1 yr."
+  applicability: 'REVA note: the coefficient is the log price response per unit of tariff (as a fraction), i.e. percent per percentage point; the authors read it as ''a 10 percent tariff would be associated with a 0.8 percent lower ex-tariff price and a 9.2 percent higher overall price faced by the importer''.'
+- id: import_price_erpt_1y
+  pdf_page: 13
+  measure: pass_through
+  unit: ratio
+  cause: {kind: variable, id: exchange_rate.bilateral_depreciation, transform: log_change, definition: 'change in the bilateral exchange rate (depreciation of the dollar), current month plus 11 lags'}
+  effect: {kind: variable, id: prices.import_price_before_duty, transform: log_change, definition: 'U.S. import prices (log), exchange rate passthrough after one year'}
+  point: 0.219
+  as_printed: '0.219'
+  sign: positive
+  uncertainty: {se: 0.027, se_as_printed: '0.027', status: reported}
+  locator: Table 1, column (3), row 'ERPT 1 yr.' (printed p.11)
+  quote: "Tariffs 1 yr. l=0 γCN,l -0.079*** -0.076*** -0.018 (0.026) (0.028) (0.030) \x10P \x11 11 I,S ERPT 1 yr. l=0 βl 0.219*** 0.221*** (0.027) (0.027) \x10P \x11 11 I,X PPI PT 1 yr."
+- id: us_export_price_per_pp_retaliatory_tariff
+  pdf_page: 33
+  measure: semi_elasticity
+  unit: percent_per_pp
+  cause: {kind: variable, id: trade.import_tariff_rate, transform: pp_change, definition: foreign retaliatory tariff on U.S. exports of the product (cumulative impact of 12 months of tariffs)}
+  effect: {kind: variable, id: prices.export_price, transform: log_change, definition: 'U.S. export price (log, excluding the foreign tariff), 12 months'}
+  point: -0.541
+  as_printed: '-0.541'
+  sign: negative
+  uncertainty: {se: 0.107, se_as_printed: '0.107', status: reported}
+  locator: Table 5 'Regression Analysis of Retaliatory US Export Tariffs, Monthly Data', column (1), row 'Tariffs 1 yr.' (printed p.31)
+  quote: "Tariffs 1 yr. l=0 γl -0.541*** -0.525*** -0.481*** (0.107) (0.111) (0.111) \x10P \x11 11 E,CN China Tariffs 1 yr. l=0 γl -0.628*** (0.152)"
+- id: us_export_price_per_pp_china_retaliatory_tariff
+  pdf_page: 33
+  measure: semi_elasticity
+  unit: percent_per_pp
+  cause: {kind: variable, id: trade.import_tariff_rate, transform: pp_change, definition: Chinese retaliatory tariff on U.S. exports of the product (cumulative impact of 12 months of tariffs)}
+  effect: {kind: variable, id: prices.export_price, transform: log_change, definition: 'U.S. export price (log, excluding the foreign tariff), 12 months'}
+  point: -0.628
+  as_printed: '-0.628'
+  sign: negative
+  uncertainty: {se: 0.152, se_as_printed: '0.152', status: reported}
+  locator: Table 5, row 'China Tariffs 1 yr.' (printed p.31)
+  quote: "Tariffs 1 yr. l=0 γl -0.541*** -0.525*** -0.481*** (0.107) (0.111) (0.111) \x10P \x11 11 E,CN China Tariffs 1 yr. l=0 γl -0.628*** (0.152)"

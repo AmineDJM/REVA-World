@@ -1,0 +1,40 @@
+# Budget request from agent V6FINDATA (V6, 2026-10-17). Merged by `python -m reva.atlas.budget_merge --write`.
+# Finance connectors (docs/dev/v6_findata.md); one full run each per day at most, plus one retry, on top of the
+# other agents' runs sharing these keys (max-merge, not sum: the limits below cover both).
+agent: V6FINDATA
+requests:
+  - source_key: bis.stats
+    # atlas.bis_fin: 3 compact CSVs (~11 MB) + terms page = 4; A-FISCAL atlas.bis uses 7 on the same key
+    daily_requests: 24
+    expected_bytes_per_day: 30000000
+    reason: "4 requests (~11 MB) per full run plus retry, alongside A-FISCAL's 7; BIS, no key"
+  - source_key: bis.bulk
+    # atlas.bis_fin_bulk: WS_CBTA + WS_GLI flat zips (2.7 MB) + terms page = 3; PRED-HF atlas.bis_daily uses 3
+    daily_requests: 14
+    expected_bytes_per_day: 8000000
+    reason: "3 requests (~3 MB) per full run plus retry, alongside PRED-HF's 3; BIS bulk downloads, no key"
+  - source_key: ecb.stats
+    # atlas.ecb_fin: ILM (15.7 MB) + IRS (5.7 MB) + YC (12.7 MB) CSVs + 4 pages (~0.45 MB) = 7; PRED-HF uses 6
+    daily_requests: 28
+    expected_bytes_per_day: 70000000
+    reason: "7 requests (~35 MB) per full run plus retry, alongside PRED-HF's 6; ECB, no key"
+  - source_key: boe.iadb
+    # atlas.boe_balance: 2 IADB CSVs (~55 kB) + legal + weekly-report page = 4; PRED-HF uses 3
+    daily_requests: 16
+    expected_bytes_per_day: 1000000
+    reason: "4 requests (~0.3 MB) per full run plus retry, alongside PRED-HF's 3; Bank of England Database, no key"
+  - source_key: frb.releases
+    # atlas.frb_h41: release data zip (9.1 MB) + about + disclaimer pages = 3
+    daily_requests: 8
+    expected_bytes_per_day: 20000000
+    reason: "3 requests (~9.3 MB) per full run plus retry; Federal Reserve Board, public domain"
+  - source_key: kfrench.library
+    # atlas.ff_factors: 4 zips (~0.2 MB) + library page (0.25 MB) = 5
+    daily_requests: 12
+    expected_bytes_per_day: 1000000
+    reason: "5 small requests per full run plus retry; Kenneth R. French Data Library"
+  - source_key: imf.sdmx
+    # atlas.imf_fin: COFER (0.2 MB) + GDD debt ratios (11.5 MB) + HPD (0.7 MB) = 3; other agents use up to 76
+    daily_requests: 80
+    expected_bytes_per_day: 25000000
+    reason: "3 requests (~12.4 MB) per full run plus retry, alongside A-IMF / V4ECON / PRED-VINTAGE; IMF, no key"

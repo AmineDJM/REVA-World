@@ -24,3 +24,5 @@ metadata:
   publication: >-
     SONIA for the previous London business day is published by authorised distributors at 9am. It is made freely
     available, via our Database by 10am on the business day after it is first published.
+# V6FINDATA (2026-10-17): atlas.boe_balance (atlas_cb_balance.py) reads the Weekly Report (RPW*) and consolidated
+# balance sheet (RPQ*) series -> boe.weekly_w, boe.bs_q.

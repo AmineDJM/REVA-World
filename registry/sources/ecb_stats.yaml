@@ -27,3 +27,5 @@ metadata:
     Reference rates: none stated ("published for information purposes only"). €STR (ECB methodology and policies
     PDF): "If errors are detected following standard publication that affect the published €STR by more than 2 basis
     points, the €STR is revised and republished on the same day, no later than 11:00 CET." Key rates: none stated.
+# V6FINDATA (2026-10-17): atlas.ecb_fin (atlas_cb_balance.py) reads ILM (weekly financial statement), IRS
+# (long-term interest rates) and YC (yield curve) -> ecb.wfs_w, ecb.lty_m, ecb.yc_d. Publication quotes in the module.
