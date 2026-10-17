@@ -15,8 +15,9 @@ outcomes). Outcomes are therefore the final (revised) vintage of the *target*, w
 published at the origin — stated in every result (``outcome_basis``). A target month later than the last declared
 history month is not scored (counted).
 
-**Scores and tests.** CRPS (proper; a point forecast's CRPS is its absolute error, so EIA's point forecasts and
-REVA's densities are compared on the same scale), squared error, absolute error, log score and PIT for densities.
+**Scores and tests.** CRPS (proper; a point forecast's CRPS is its absolute error, which a density centred on the same
+point always beats: EIA's point forecasts are therefore compared with the random walk on point losses — absolute and
+squared error of the point — and CRPS is used between densities), squared error, absolute error, log score and PIT for densities.
 Pairwise comparisons per (variable, horizon) on the origins where both forecasters issued: Diebold-Mariano with the
 Harvey-Leybourne-Newbold small-sample correction (rectangular HAC with ``k - 1`` lags, ``k`` = overlap of the
 ``h``-month forecasts in origin steps; Bartlett weights if that variance is not positive), Student-t with ``n - 1``
@@ -295,6 +296,9 @@ def _summaries(
                     s_m = statistics.fmean(by[(code, h, m)][o]["se"] for o in common)
                     s_b = statistics.fmean(bench[o]["se"] for o in common)
                     row["mse_ratio_vs_rw"] = s_m / s_b if s_b > 0 else None
+                    a_m = statistics.fmean(by[(code, h, m)][o]["ae"] for o in common)
+                    a_b = statistics.fmean(bench[o]["ae"] for o in common)
+                    row["mae_ratio_vs_rw"] = a_m / a_b if a_b > 0 else None
                 summary.append(row)
             for m in em.models_for(code):
                 if m == em.BENCHMARK:
@@ -305,7 +309,7 @@ def _summaries(
                     b = by.get((code, h, bname), {})
                     mine = by.get((code, h, m), {})
                     common = sorted(o for o in mine if o in b)
-                    for loss in ("crps", "se"):
+                    for loss in ("crps", "se", "ae"):
                         d = [mine[o][loss] - b[o][loss] for o in common]
                         t = dm_hln(d, overlap_steps(h))
                         tests.append({"code": code, "h": h, "challenger": m, "benchmark": bname, "loss": loss, **t})
