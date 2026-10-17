@@ -52,7 +52,7 @@ from reva.adapters.connectors import findata_common as fd
 from reva.adapters.connectors import hf_daily_common as hc
 from reva.atlas.sources import AtlasSourceSpec
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB from an earlier working-tree state
 PARSER_VERSION = "atlas_cb_balance/1"
 ECB_NAME, FRB_NAME, BOE_NAME = "atlas.ecb_fin", "atlas.frb_h41", "atlas.boe_balance"
 ECB_DATASETS = ("wfs_w", "lty_m", "yc_d")

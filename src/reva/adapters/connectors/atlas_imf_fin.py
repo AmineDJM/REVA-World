@@ -49,7 +49,7 @@ from reva.adapters.connectors import hf_daily_common as hc
 from reva.atlas.sources import AtlasSourceSpec
 
 NAME = "atlas.imf_fin"
-VERSION = "1.0.0"
+VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB from an earlier working-tree state
 PARSER_VERSION = "atlas_imf_fin/1"
 ATLAS_SOURCE = "imf"
 SOURCE_KEY = imf.SOURCE_KEY

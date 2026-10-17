@@ -59,7 +59,7 @@ from reva.atlas.sources import AtlasSourceSpec
 
 API_NAME = "atlas.bis_fin"
 BULK_NAME = "atlas.bis_fin_bulk"
-VERSION = "1.0.0"
+VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB from an earlier working-tree state
 PARSER_VERSION = "atlas_bis_fin/1"
 ATLAS_SOURCE = "bis"
 GEO_SCHEME = "iso2"

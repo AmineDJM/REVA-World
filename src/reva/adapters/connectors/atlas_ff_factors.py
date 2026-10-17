@@ -43,7 +43,7 @@ from reva.adapters.connectors import hf_daily_common as hc
 from reva.atlas.sources import AtlasSourceSpec
 
 NAME = "atlas.ff_factors"
-VERSION = "1.0.0"
+VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB from an earlier working-tree state
 PARSER_VERSION = "atlas_ff_factors/1"
 SOURCE_KEY = "kfrench.library"
 ATLAS_SOURCE = "kfrench"
