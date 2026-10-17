@@ -73,12 +73,13 @@ units:
     - name: share_pct_of_total
       unit_regex: '(?i)^%( \(share\))? of (the )?(total|population|households|women|men|adults|female|male|rural|urban|children|cohort|relevant age group|labou?r force|employment|deaths|land area|a day)'
       # a ratio to another aggregate ("% of total reserves", "% of exports") is not a share of a whole
-      unit_exempt_regex: '(?i)(reserves|exports|imports|gni|gdp|revenue|of total external debt service|relevant age group|age group immediately following)'
+      unit_exempt_regex: '(?i)(reserves|exports|imports|gni|gdp|revenue|of total external debt service|relevant age group|age group immediately following|deposits and liabilities|population aged 20-64)'
       # gross ratios (enrolment, intake, completion) are % of an age group and legitimately exceed 100
       min: 0
       max: 100
     - name: fraction_0_1
       unit_regex: '(?i)(\(0-1\)|^index 0-1$|fraction of total)'
+      indicator_exempt_regex: '(?i)weal'   # net wealth can be negative: bottom-group shares < 0, wealth Gini > 1
       min: 0
       max: 1
     - name: index_0_100
@@ -87,13 +88,14 @@ units:
       max: 100
     - name: index_0_10
       unit_regex: '(?i)\(0-10\)'
+      indicator_exempt_regex: '(?i)residual'   # a decomposition component, not the bounded score itself
       min: 0
       max: 10
     - name: share_concept_pct
       # catalog concepts in plain '%' whose id says share/prevalence/coverage/rate of a population
       unit_regex: '(?i)^(%|percent|percentage)$'
       concept_regex: '(?i)(share|prevalence|coverage|literacy|immuni[sz]ation|_pct$|proportion|access_|attendance)'
-      concept_exempt_regex: '(?i)(growth|change|gross_enrol|enrolment_gross|_ger|gdp|gni|ratio|yield|inflation|trade_)'
+      concept_exempt_regex: '(?i)(growth|change|gross_enrol|enrolment_gross|_ger|gdp|gni|ratio|yield|inflation|trade_|net_)'
       min: 0
       max: 100
   bounded_tolerance: 1.0e-9
@@ -138,6 +140,11 @@ time:
     _m: [28, 31]
     _q: [90, 92]
     _a: [365, 366]
+  # Tables of scheduled future events (dates announced in advance, no value observed): not future observations.
+  future_ok_tables: [cbcal.meetings]
+  # estimate_kind / flag words that mean "not observed" but are not in the atlas projection rule
+  # (reva.atlas.query.PROJECTION_SQL): such cells escape every observation filter.
+  projection_word_regex: '(?i)(forecast|project|predict|outlook|scenario|nowcast)'
   # KG predicates whose values are legitimately future dates (scheduled expiries, planned end dates).
   kg_future_ok_predicates: [eusanctionsmap:expires, P582, P3001]
 
@@ -164,5 +171,7 @@ provenance:
 causal:
   # Words that make a non-causal layer read as causation (KG predicate ids, family / link-type labels).
   wording_regex: '(?i)(\bcaus|\beffect of\b|\bleads? to\b|\bdrives?\b|\bdriver\b|\btrigger|\bresults? in\b|\bdue to\b|\bprovoqu|\bentra[iî]n|\bcause\b)'
+  # A label that says what a relation is NOT ("an association is not a cause") is a disclaimer, not a leak.
+  negation_regex: '(?i)(\bnot (a|an)( [a-z]+)? caus|\bnot caus|n.est pas une cause|pas une (cause|relation causale)|non causal|not an estimated caus|pas un effet)'
   # Claim relations whose wording is reviewed apart (the AUDIT3 H1 disruption axioms).
   source_relations_review: ['RO:0004021', 'RO:0004020', 'RO:0004030']

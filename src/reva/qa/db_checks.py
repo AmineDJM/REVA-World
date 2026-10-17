@@ -611,6 +611,11 @@ def causal_checks(
 
     reg = load_registry()
     rx = re.compile(c.get("wording_regex") or r"(?i)\bcaus")
+    neg = re.compile(c["negation_regex"]) if c.get("negation_regex") else None
+
+    def worded(txt: str) -> bool:
+        return bool(rx.search(txt)) and not (neg and neg.search(txt))
+
     leaks: list[dict[str, Any]] = []
     for pid, n in sorted(kg_pids.items()):
         m = reg.mappings.get(pid)
@@ -633,7 +638,7 @@ def causal_checks(
         if getattr(fam, "causal", False):
             continue
         for lang, txt in [*fam.label.items(), *fam.inverse_label.items(), *fam.description.items()]:
-            if rx.search(txt or ""):
+            if worded(txt or ""):
                 labels.append({"family": fid, "lang": lang, "text": txt[:160]})
     lt = REPO_ROOT / "registry" / "links" / "link_types.yaml"
     if lt.exists():
@@ -645,7 +650,7 @@ def causal_checks(
                 continue
             for field_ in ("labels", "honesty"):
                 for lang, txt in (t.get(field_) or {}).items():
-                    if isinstance(txt, str) and rx.search(txt):
+                    if isinstance(txt, str) and worded(txt):
                         labels.append({"link_type": t.get("id"), "field": field_, "lang": lang, "text": txt[:160]})
     mapped_leaks = [x for x in leaks if x["family"]]
     out.append(

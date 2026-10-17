@@ -134,6 +134,7 @@ class ImtsReport:
     update_dates: set[str] = field(default_factory=set)
     periods: tuple[str, str] | None = None
     requests: int = 0
+    failed_chunks: list[str] = field(default_factory=list)
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -153,6 +154,7 @@ class ImtsReport:
             "partners": len(self.partners),
             "unmapped_partners": sorted(p for p in self.partners if country_iso3(p, GEO_SCHEME) is None),
             "periods": list(self.periods) if self.periods else None,
+            "failed_chunks": self.failed_chunks,
         }
 
 
@@ -259,7 +261,7 @@ def frame(cols: Mapping[str, list[Any]], dataset: str, rep: ImtsReport) -> pl.Da
 def coverage_note(dataset: str, rep: ImtsReport, start: str) -> str:
     d = rep.as_dict()
     return (
-        f"{TITLES[dataset]}. IMF IMF.STA:{FLOW} '{'International Trade in Goods (by partner country)'}' ({rep.flow_ref};"
+        f"{TITLES[dataset]}. IMF IMF.STA:{FLOW} 'International Trade in Goods (by partner country)' ({rep.flow_ref};"
         f" dataset UPDATE_DATE {', '.join(d['update_dates'])}); startPeriod {start}; {rep.requests} request(s);"
         f" {rep.series} series, {rep.cells} cells ({rep.no_value} observations without a value are not cells),"
         f" {len(rep.reporters)} reporters, {len(rep.partners)} partners, periods {d['periods']}."
@@ -267,7 +269,8 @@ def coverage_note(dataset: str, rep: ImtsReport, start: str) -> str:
         " (flags.display_scale is the IMF display scale, not applied). Seasonal adjustment not stated by the provider."
         f" Exports FOB as reported by the exporter and imports CIF as reported by the importer are mirror flows,"
         f" never reconciled here. Unmapped reporters (aggregates, kept): {', '.join(d['unmapped_reporters']) or 'none'}."
-        f" Licence: {LICENCE}."
+        + (f" INCOMPLETE: reporter chunks that failed: {', '.join(rep.failed_chunks)}." if rep.failed_chunks else "")
+        + f" Licence: {LICENCE}."
     )[:4000]
 
 
@@ -363,9 +366,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             try:
                 df = frame(cols_b, "imts_m", rep_b)
                 built["imts_m"] = (df, rep_b, shas, start)
-                if failed:
-                    rep_b.update_dates.add("(incomplete: failed chunks " + "; ".join(
-                        f"{p[0]}-{p[-1]}" for p in failed) + ")")
+                rep_b.failed_chunks = [f"{p[0]}-{p[-1]}" for p in failed]
             except Exception as e:
                 out["errors"].append({"dataset": "imts_m", "error": type(e).__name__, "message": str(e)[:300]})
 

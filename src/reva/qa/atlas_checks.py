@@ -91,7 +91,7 @@ def atlas_tables(be: QaBackend, origin: str) -> list[AtlasTable]:
 
 def projection_frame(df: pl.DataFrame) -> pl.DataFrame:
     """Adds ``is_proj`` (bool) and ``available_at`` (date or null) parsed only where the flags mention them."""
-    has = pl.col("flags").str.contains("estimate_kind|projection|period_after_vintage|available_at")
+    has = pl.col("flags").str.contains("estimate_kind|projection|period_after_vintage|available_at|flag_meaning")
     df = df.with_row_index("_r")
     sub = (
         df.filter(has)
@@ -100,6 +100,7 @@ def projection_frame(df: pl.DataFrame) -> pl.DataFrame:
             pl.col("flags").str.json_path_match("$.estimate_kind").alias("_ek"),
             pl.col("flags").str.json_path_match("$.projection").alias("_pj"),
             pl.col("flags").str.json_path_match("$.period_after_vintage").alias("_pav"),
+            pl.col("flags").str.json_path_match("$.flag_meaning").alias("_fm"),
             pl.col("flags")
             .str.json_path_match("$.available_at")
             .str.slice(0, 10)
@@ -113,7 +114,12 @@ def projection_frame(df: pl.DataFrame) -> pl.DataFrame:
                 | (pl.col("_pav") == "true").fill_null(False)
             ).alias("is_proj")
         )
-        .select("_r", "is_proj", "available_at")
+        .select(
+            "_r",
+            "is_proj",
+            "available_at",
+            pl.concat_str(["_ek", "_fm"], separator=" ", ignore_nulls=True).alias("kind_words"),
+        )
     )
     return df.join(sub, on="_r", how="left").with_columns(pl.col("is_proj").fill_null(False)).drop("_r")
 
@@ -171,6 +177,8 @@ class AtlasScan:
         self.identities = u.get("identities") or []
         self.grace = int(t.get("future_grace_days") or 0)
         self.proj_tables = set(t.get("projection_tables") or [])
+        self.future_ok = set(t.get("future_ok_tables") or [])
+        self.proj_words = t.get("projection_word_regex")
         self.suffixes = {k: tuple(v) for k, v in (t.get("precision_suffixes") or {}).items()}
         # series -> (catalog concept id, unit)
         self.series_concept: dict[tuple[str, str, str], tuple[str, str]] = {}
@@ -339,8 +347,15 @@ class AtlasScan:
         limit = today + timedelta(days=self.grace)
         a = self.acc["time.future_observation"]
         a.checked += obs.height
-        fut = obs.filter(pl.col("period_start") > limit)
-        a.add(t.key, fut.height, [_cell(t.key, r, "flags") for r in fut.head(2).iter_rows(named=True)])
+        if t.key not in self.future_ok:
+            fut = obs.filter(pl.col("period_start") > limit)
+            a.add(t.key, fut.height, [_cell(t.key, r, "flags") for r in fut.head(2).iter_rows(named=True)])
+        if self.proj_words:
+            a = self.acc["time.projection_word_unflagged"]
+            kw = obs.filter(pl.col("kind_words").is_not_null())
+            a.checked += kw.height
+            bad = kw.filter(pl.col("kind_words").str.contains(self.proj_words))
+            a.add(t.key, bad.height, [_cell(t.key, r, "kind_words") for r in bad.head(2).iter_rows(named=True)])
         a = self.acc["time.period_not_ended"]
         a.checked += obs.height
         cur = obs.filter((pl.col("period_start") <= limit) & (pl.col("period_end") > limit + timedelta(days=1)))
@@ -643,6 +658,10 @@ class AtlasScan:
             "units.negative_count": ("negative values in count-like units", "warn"),
             "time.future_observation": ("non-projection cells starting after today", "fail"),
             "time.period_not_ended": ("non-projection cells for a period that has not ended", "info"),
+            "time.projection_word_unflagged": (
+                "non-projection cells whose estimate kind / flag says forecast or projection",
+                "fail",
+            ),
             "time.forecast_as_observation": ("non-projection cells starting at/after their availability date", "fail"),
             "time.period_open_at_publication": (
                 "non-projection cells whose period was still open when published",
