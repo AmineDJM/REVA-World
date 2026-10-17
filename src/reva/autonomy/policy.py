@@ -108,9 +108,12 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   HTTP 429 are retried after a cooldown, worst case 222 per run); same caps.
 # * budgets.yaml -> budgets-1.3.29 (2026-10-17, merge run by V6CULTURE, pinned by V6SIGNALS): 1.3.28 plus v6culture.yaml
 #   (new musicbrainz.stats 4/day, openlibrary.api 500/day); same caps.
+# * budgets.yaml -> budgets-1.3.30 (2026-10-17, merge run and pinned by V6INFRA): 1.3.29 plus v6infra.yaml (new
+#   unece.unlocode 10/day, imf.portwatch 80/day; nga.wpi 3 -> 6, ourairports.data 6 -> 10, eurostat.dissemination
+#   116 -> 140) and the requests pending at merge time (pred_fin, pred_health, v6drugs, v6conflict); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "472077cd9b57101984527fc9dbf6640cfd9c7adbcc7d11f74660f9dbf0453f3c",
+    "budgets.yaml": "399fb1de488f77e1c658ee9155a2bd8a0f43ec7fbc4bde4143c49e18548fc003",
 }
 
 

@@ -43,10 +43,22 @@ PARSER_VERSION = "atlas_eurostat_transport/1"
 _NUTS_FIX = ("FR", "FR10", "FRL0", "NL", "NL33", "BE21", "EU27_2020")
 
 QUERIES: tuple[em.EsQuery, ...] = (
-    em.EsQuery("transport_rail_goods", "rail_go_total", "Goods transported (rail)", "unit=THS_T&unit=MIO_TKM", "A",
-               reference="calendar-year flow"),  # fmt: skip
-    em.EsQuery("transport_rail_pass", "rail_pa_total", "Passengers transported (rail)", "unit=THS_PAS&unit=MIO_PKM", "A",
-               reference="calendar-year flow"),  # fmt: skip
+    em.EsQuery(
+        "transport_rail_goods",
+        "rail_go_total",
+        "Goods transported (rail)",
+        "unit=THS_T&unit=MIO_TKM",
+        "A",
+        reference="calendar-year flow",
+    ),
+    em.EsQuery(
+        "transport_rail_pass",
+        "rail_pa_total",
+        "Passengers transported (rail)",
+        "unit=THS_PAS&unit=MIO_PKM",
+        "A",
+        reference="calendar-year flow",
+    ),
     em.EsQuery(
         "transport_road_goods",
         "road_go_ta_tott",

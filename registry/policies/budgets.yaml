@@ -1,4 +1,4 @@
-policy_version: "budgets-1.3.29"
+policy_version: "budgets-1.3.30"
 daily:
   http_requests_total: 20000
   http_bytes_total: 3221225472
@@ -6,7 +6,7 @@ per_source_daily_requests:
   worldbank.wdi: 200
   un.comtrade.public_preview: 100
   crossref.works: 50
-  eurostat.dissemination: 116
+  eurostat.dissemination: 140
   # 1.2.0 (V2 step 3a, agent POP): built-in connector eurostat.demography; one full run is
   # 31 countries x 3 tables x 3 time windows + 3 EUROPOP2023 tables = 282 small requests
   # (resumable via its cursor).
@@ -27,16 +27,22 @@ per_source_daily_requests:
   boe.iadb: 8
   # carbonbrief.attribution: requested by V4CLIMATE (v4climate.yaml)
   carbonbrief.attribution: 6
+  # cbcal.calendars: requested by PRED-FIN (pred_fin.yaml)
+  cbcal.calendars: 14
   # cbs.opendata: requested by GAPHUNT (gaphunt.yaml)
   cbs.opendata: 12
   # ccp.data: requested by A-LAW (a_law.yaml)
   ccp.data: 10
+  # cdc.resp_hubs: requested by PRED-HEALTH (pred_health.yaml)
+  cdc.resp_hubs: 600
   # cdpd.dataverse: requested by A-SOCIETY (a_society.yaml)
   cdpd.dataverse: 6
   # cepii.baci: requested by A-TRADE (a_trade.yaml)
   cepii.baci: 40
   # chebi.release: requested by V4CHEM (v4chem.yaml)
   chebi.release: 8
+  # chembl.api: requested by V6DRUGS (v6drugs.yaml)
+  chembl.api: 120
   # climate.global_indices: requested by V4CLIMATE (v4climate.yaml)
   climate.global_indices: 80
   # clingen.gene_validity: requested by V4HEALTH (v4health.yaml)
@@ -55,6 +61,8 @@ per_source_daily_requests:
   cow.terrchange: 6
   # cshapes.cran: requested by KGGEOPOL (kggeopol.yaml)
   cshapes.cran: 8
+  # ctgov.api: requested by V6DRUGS (v6drugs.yaml)
+  ctgov.api: 2200
   # dbnomics.api: requested by PRED-VINTAGE (pred_vintage.yaml)
   dbnomics.api: 80
   # doid.obo: requested by V4HEALTH (v4health.yaml)
@@ -63,6 +71,8 @@ per_source_daily_requests:
   ecb.data_api: 6
   # ecb.stats: requested by PRED-HF (pred_hf.yaml)
   ecb.stats: 12
+  # ecdc.erviss: requested by PRED-HEALTH (pred_health.yaml)
+  ecdc.erviss: 10
   # effects.literature: requested by PRED-EFFECT (pred_effect.yaml)
   effects.literature: 40
   # eia.dnav: requested by PRED-HF (pred_hf.yaml)
@@ -137,6 +147,8 @@ per_source_daily_requests:
   idmc.gidd: 12
   # ilostat.rplumber: requested by A-ILO (a_ilo.yaml), SIMWORLD (simworld.yaml), V4MIND (v4mind.yaml)
   ilostat.rplumber: 75
+  # imf.portwatch: requested by V6INFRA (v6infra.yaml)
+  imf.portwatch: 80
   # imf.sdmx: requested by A-IMF (a_imf.yaml), PRED-VINTAGE (pred_vintage.yaml), V4ECON (v4econ.yaml)
   imf.sdmx: 76
   # insee.bdm: requested by GAPHUNT (gaphunt.yaml)
@@ -163,8 +175,8 @@ per_source_daily_requests:
   naturalearth.admin1_10m: 2
   # ncbi.datasets: requested by V4BIO (v4bio.yaml)
   ncbi.datasets: 30
-  # nga.wpi: requested by A-INFRA (a_infra.yaml)
-  nga.wpi: 3
+  # nga.wpi: requested by A-INFRA (a_infra.yaml), V6INFRA (v6infra.yaml)
+  nga.wpi: 6
   # nist.codata: requested by V4CHEM (v4chem.yaml)
   nist.codata: 4
   # noaa.ghcnm: requested by V4CLIMATE (v4climate.yaml)
@@ -185,12 +197,14 @@ per_source_daily_requests:
   openalex.api: 700
   # openalex.snapshot: requested by V4MIND (v4mind.yaml)
   openalex.snapshot: 30
+  # openfda.api: requested by V6DRUGS (v6drugs.yaml)
+  openfda.api: 900
   # openflights.data: requested by A-INFRA (a_infra.yaml)
   openflights.data: 10
   # openlibrary.api: requested by V6CULTURE (v6culture.yaml)
   openlibrary.api: 500
-  # ourairports.data: requested by A-INFRA (a_infra.yaml)
-  ourairports.data: 6
+  # ourairports.data: requested by A-INFRA (a_infra.yaml), V6INFRA (v6infra.yaml)
+  ourairports.data: 10
   # owid.compilations: requested by A-QOL (a_qol.yaml)
   owid.compilations: 50
   # parlgov.dataverse: requested by A-SOCIETY (a_society.yaml)
@@ -229,6 +243,8 @@ per_source_daily_requests:
   uberon.obo: 8
   # ucdp.downloads: requested by CAUSDATA (causdata.yaml), FIXB (fixb.yaml), KGGEOPOL (kggeopol.yaml)
   ucdp.downloads: 40
+  # ucdp.ged: requested by V6CONFLICT (v6conflict.yaml)
+  ucdp.ged: 40
   # un.desa_ims: requested by A-UN (a_un.yaml)
   un.desa_ims: 5
   # un.psdata: requested by A-MILITARY (a_military.yaml)
@@ -243,6 +259,8 @@ per_source_daily_requests:
   unctad.bulk: 15
   # undp.hdr: requested by A-QOL (a_qol.yaml)
   undp.hdr: 10
+  # unece.unlocode: requested by V6INFRA (v6infra.yaml)
+  unece.unlocode: 10
   # unesco.ich: requested by A-CULTURE (a_culture.yaml)
   unesco.ich: 4
   # unesco.uis: requested by A-CULTURE (a_culture.yaml), A-HEALTHEDU (a_healthedu.yaml)
@@ -251,6 +269,8 @@ per_source_daily_requests:
   unesco.whc: 4
   # unhcr.population: requested by A-UN (a_un.yaml)
   unhcr.population: 150
+  # unichem.mapping: requested by V6DRUGS (v6drugs.yaml)
+  unichem.mapping: 10
   # uniprot.rest: requested by V4BIO (v4bio.yaml)
   uniprot.rest: 200
   # unsd.ama: requested by A-FACTBOOK (a_factbook.yaml)
@@ -271,6 +291,10 @@ per_source_daily_requests:
   views.api: 60
   # wals.cldf: requested by KGLANG (kglang.yaml)
   wals.cldf: 6
+  # who.eeml: requested by V6DRUGS (v6drugs.yaml)
+  who.eeml: 2000
+  # who.flunet: requested by PRED-HEALTH (pred_health.yaml)
+  who.flunet: 80
   # who.ghe: requested by V4HEALTH (v4health.yaml)
   who.ghe: 400
   # who.gho: requested by A-HEALTHEDU (a_healthedu.yaml), A-SOCIETY (a_society.yaml), V4MIND (v4mind.yaml)

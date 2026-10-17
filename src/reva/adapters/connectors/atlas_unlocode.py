@@ -169,7 +169,7 @@ def check_pages(publications: bytes, terms: bytes) -> str:
     tags = sorted(set(RELEASE_LINK_RE.findall(pub)))
     if len(tags) != 1:
         raise _err(f"UN/LOCODE publications page links {len(tags)} official release packages: {tags}")
-    return tags[0]
+    return str(tags[0])
 
 
 def release_url(tag: str) -> str:

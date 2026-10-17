@@ -35,6 +35,8 @@ from typing import Any
 from reva.adapters.connectors import atlas_ghcnm as gh
 from reva.adapters.connectors import atlas_infra_common as ic
 
+__all__ = ["gh", "ic"]
+
 NE_URL = gh.URLS["ne_admin1"]
 NE_HOST = gh.NE_HOST
 NE_NAME = "ne_10m_admin_1_states_provinces.zip"
@@ -193,15 +195,15 @@ def place_facility(
         if ISO_3166_2_RE.match(code) and code in idx.usable:
             if country_iso2 and code[:2] != country_iso2:
                 return Placement(None, None, "published_code_other_country")
-            a = idx.by_code[code]
+            rec = idx.by_code[code]
             return Placement(code, "published_code", "published_code",
                              {"basis": "published_code", "published_code": published_code,
-                              "ne_adm1_code": a.adm1_code})  # fmt: skip
+                              "ne_adm1_code": rec.adm1_code})  # fmt: skip
     if lat is None or lon is None:
         return Placement(None, None, "published_code_not_an_ne_adm1_and_no_coordinates" if published_code
                          else "no_code_no_coordinates")  # fmt: skip
-    a = idx.place(lat, lon)
-    basis, extra = "point_in_polygon", {}
+    a: gh.Adm1 | None = idx.place(lat, lon)
+    basis, extra = "point_in_polygon", dict[str, Any]()
     if a is None and coastal_deg:
         near = idx.nearest(lat, lon, coastal_deg)
         if near is None:
