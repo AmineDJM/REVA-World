@@ -66,6 +66,22 @@ by a named source and graded, and missing data stays missing.
 | **Questions**: `POST /v1/ask` (French/English), answers only from cited KG, atlas, links and causal evidence | `/v1/ask` | The LLM planner is not verified live (no credits); the deterministic keyword planner runs |
 | **UI "Planète"** (`/v3`): Neurones, Chemin, Frise, Atlas, Dossier pays, Pays ↔ Pays, Causes & conséquences, Demander | — | Same API, same labels |
 
+### V4 / V5 "the world model and measured prediction" (2026-10-17; report [docs/final_report_v4_v5.md](docs/final_report_v4_v5.md))
+
+V4 adds universal relation families (23, none causal) over chemistry, biology, health, ecology, climate, energy,
+economy (monthly/quarterly, NUTS/OECD regions), industry, mind & society and cross-domain bridges, read through the
+Fiche (`/v3/fiche`). V5 adds effect estimates (`/v1/effects`, migration head `0019_effect_estimates`), event studies,
+a sealed forecast registry, vintages, daily markets and a decision engine (`/v3/decision`) whose scenarios are
+attributed and unvalidated. Skill is measured by the registry, never promised. Next: [V6 plan](docs/roadmap/v6_plan.md).
+
+```sh
+uv run reva forecasts status                        # sealed questions / forecasts (also: issue, resolve, backtest)
+uv run reva estimate --help                         # event studies / local projections on atlas panels
+uv run python -m reva.predict.run --reference all   # the 5 reference decisions (read-only)
+uv run reva links prune                             # drop stale materialised links (lead operation)
+uv run reva objects compress --dry-run              # V6 DISKZ: verified zstd compression of the raw archive
+```
+
 ## Run it locally
 
 Requirements: Docker (PostGIS), [uv](https://docs.astral.sh/uv/) with Python
@@ -102,7 +118,7 @@ Checks:
 
 ### V3 quick start (atlas, graph, links, causality)
 
-Run these after `make bootstrap` (migrations to head `0018_retraction_reasons`). Ingests are
+Run these after `make bootstrap` (migrations to head `0019_effect_estimates`). Ingests are
 budget-metered: the daily cap is 3 GiB in all, so run big sources one at a time and
 keep at least 5 GB of disk free. Resume notes are in
 [docs/dev/HANDOFF_V3.md](docs/dev/HANDOFF_V3.md).

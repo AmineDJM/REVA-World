@@ -61,6 +61,7 @@ def vintage_replay(*args: Any, **kwargs: Any) -> dict[str, Any]:
 
     return _vr(*args, **kwargs)
 
+
 HONESTY = {
     OPERATIONAL: (
         "Reproduces what REVA actually had published at the cutoff, from the original release manifest "
