@@ -91,7 +91,54 @@ without an Event ID are their own events (keyed by a sha256 of their fields — 
 episodes 64901, 70901, 72202, 83203, 83306, 88201, 1179801 have several terminal rows (the last is used) and 53801
 has no outcome; PA-X UCDP ids 1113 (4 agreements) and 1070 (2) are ambiguous for same_as.
 
-DEVDB_SECTION
+## 5. Dev database load (2026-10-17, `flock /tmp/reva-devdb.lock`, one source at a time, live, budget-metered)
+
+| Source | Requests | KG entities / statements inserted (rejected) | Claims loaded (rejected, unknown endpoints) |
+|---|---|---|---|
+| `atlas.cowwars` 1.0.0 | 8 | 1,288 / 7,701 (0) | 892 (0, 0) — cow_inter 337, cow_extra 161, cow_intra 332, cow_nonstate 62 |
+| `atlas.pax` 1.0.0, then 1.1.0 | 2 + 2 | 2,440 / 24,440 (0) | 1.0.0: 3,334 `reaction_to`; 1.1.0: **all 3,334 retracted** (empty complete delivery), 0 current |
+| `atlas.idmc` 1.0.0 | 2 | 43,786 / 156,002 (0) | 22,108 (0, 0) |
+| `atlas.ucdp_dyadterm` 1.0.0 | 2 | 1,900 / 10,209 (0) | 915 (0, 0) |
+
+All codebook checks matched the pinned documents (four COW PDFs, PA-X v10 PDF, UCDP termination PDF; IDMC README:
+all six definitions found verbatim). The 1.1.0 PA-X run reported 3,334 `statements_conflicting`: the first 1.1.0 build
+added an explanatory qualifier under the same source revision; the loader kept the 1.0.0 content (it never overwrites
+a revision silently) and the committed 1.1.0 code emits exactly that content again, so the KG and the code agree.
+`reva db bootstrap` registered the new connector versions; `reva causal refresh --origin live` afterwards (Wikidata
+claims unchanged, everything graded).
+
+**New current T1 claims: 23,915** (live dev DB total after the refresh: 52,376, including other agents' loads).
+
+| Dataset | Relation | Claims | Grade B consistent | B overlapping | B undetermined | E inconsistent |
+|---|---|---:|---:|---:|---:|---:|
+| cow_inter | coded_outcome | 337 | 337 | 0 | 0 | 0 |
+| cow_extra | coded_outcome | 161 | 159 | 2 | 0 | 0 |
+| cow_intra | coded_outcome | 332 | 328 | 2 | 2 | 0 |
+| cow_nonstate | coded_outcome | 62 | 56 | 6 | 0 | 0 |
+| idmc_disasters | has_effect | 22,108 | 16 | 22,091 | 0 | 1 |
+| term_dyad | coded_outcome | 915 | 632 | 282 | 0 | 1 |
+
+No grade A: none of these claims is asserted by a second independent source on the same (cause, effect). IDMC claims
+are mostly `overlapping` because the displacement is dated by its reporting year and the event by its start day in
+that year. The two `inconsistent` claims are source inconsistencies, kept and shown, never corrected:
+
+* claim 37214, `idmc:event:1632` -> `idmc:displacement:1632:AFG:2017`: the event's "Date of Event (start)" is
+  2018-03-29, the displacement is reported for 2017.
+* claim 55075, `ucdp:dyadepisode:44001` -> `…:termination`: dyad start (`start_date2`) 1977-06-01 (day), termination
+  1977-05 (month precision).
+
+Examples (dev DB ids):
+
+* claim 31965 `cow:war:139` (World War II) -> `cowwar:outcome:139:2:1` (United States: Winner), `coded_outcome`,
+  grade B (`tier.T1, temporal.consistent, corroboration.single, contest.none, grade.B.expert`).
+* claim 32159 `cow:war:327` (Uruguay War, extra-state) -> `cowwar:outcome:327` ("The war was transformed into another type of war"), and the
+  context statements `cow.data:cwt:327:19:extra:TransTo` and `cow.data:cwt:327:19:inter:TransFrom`
+  (`cowwar:transformed_into` war 327 -> inter-state war 19, coded by both files) — the transformation is context.
+* claim 32688 `idmc:event:1` (China southern provinces floods, June 2016) -> `idmc:displacement:1:CHN:2016`,
+  `has_effect` (promotes), grade B.
+* `cow:war:856` (Eighth Colombia, intra-state v4.1) has outcome 5 "ongoing as of 12/31/2007": an attribute, no claim;
+  PA-X links 241 agreements to it as `pax:cow_war` context.
+
 
 ## 6. Rejected or deferred candidates, and why
 
