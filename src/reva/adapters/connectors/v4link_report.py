@@ -109,7 +109,7 @@ def bridge_report(conn: Connection, origin: str = "live", with_paths: bool = Fal
     ).all()
     places = conn.execute(
         text("""SELECT count(DISTINCT s.subject_qid) FROM kg.statement_current s
-                WHERE s.property_pid = 'P17' AND s.origin = :o AND s.statement_key LIKE 'wikidata.wdqs:v4xref:places:c:%'"""),
+                WHERE s.property_pid = 'P17' AND s.origin = :o AND s.statement_key LIKE '%:v4xref:places:c:%'"""),
         o,
     ).scalar_one()
     out: dict[str, Any] = {

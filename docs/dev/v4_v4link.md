@@ -54,7 +54,24 @@ two digits of BACI's product code). Sections (I..XXI) are BACI's own grouping: n
 
 ## 3. Wikidata identifier bridges
 
-WDQS_RESULTS_PLACEHOLDER
+**Endpoint.** WDQS throttled the shared egress all afternoon (429 with `Retry-After` 900–1,030 s, repeatedly,
+machine-wide cool-down in `var/locks/wikidata.state.json`), and waiting held the dev-DB lock. The same packs are
+therefore read from **QLever** (`https://qlever.dev/api/wikidata`, University of Freiburg: the complete Wikidata TTL
+dump of 2026-08-10, "updated LIVE"; index name archived each run) through a second source spec,
+`atlas.v4link_qlever` (source key `qlever.wikidata`, 60/day, budgets-1.3.24, fetched with `run.get`, raw archived).
+Same statements and statement ids as WDQS (QLever writes `q42-GUID`; normalised to `Q42$GUID`). Two QLever defects
+found and avoided: `FILTER(?rank != wikibase:DeprecatedRank)` and numeric `FILTER(?sl >= n)` returned partial,
+non-deterministic results (71 / 161 / 305 rows instead of 9,044; 0 items) — ranks are filtered in Python and huge
+packs are bounded by `ORDER BY DESC(sitelinks) LIMIT N` (`max_items`) instead.
+
+Rules (`registry/kg/identity_rules_v4.yaml`, engine `v4link_common.derive_bridges`): best rank only (preferred if
+any); a value held by several items = ambiguous (never linked); an item holding several values of an identity
+property = ambiguous holder (never linked); value format checked, never repaired; for bounded packs a whole-Wikidata
+duplicate query per property completes the ambiguity check. Keys follow the owners' entity ids as loaded in the dev
+DB (`iso3166_2:<code>`, `nuts:<code>`, `chebi:<n>`, `pubchem:cid:<n>`, `gbif:<key>`, `ncbitaxon:<n>`, `hgnc:<n>`,
+`mondo:<7 digits>`, `doid:<as stated>`, `uberon:<7 digits>`, `lei:<LEI>`).
+
+PACKS_TABLE
 
 ## 4. Relation families
 
