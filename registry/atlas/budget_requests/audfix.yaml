@@ -34,6 +34,12 @@ requests:
     daily_requests: 16
     expected_bytes_per_day: 3000000
     reason: "atlas.ties 1.1.0: + TIES users manual; same-day re-run"
+  - source_key: noaa.ncei_hazards
+    # 239 requests / 20.4 MB per full run (planned 260). Two runs on 2026-10-17 (A-HAZARDS load, AUDFIX 1.1.0) used 478;
+    # a corrective third run (registry label quoting fix, 3 cause-code-5 claims) needs 260 more: 800.
+    daily_requests: 800
+    expected_bytes_per_day: 62000000
+    reason: "atlas.noaa_hazards 1.1.0: corrective same-day re-run (source_validity labels)"
 daily_totals_increase:
   http_requests_total: "+0 (existing keys)"
   http_bytes_total: "+0"

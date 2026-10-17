@@ -29,22 +29,22 @@ source_validity:
     eventValidity:
       codelist: NCEI descriptor tsunami/validity
       codes:
-        -1: {label: Erroneous entry, exclude: true}
-        0: {label: Event that only caused a seiche, certainty: doubtful}
-        1: {label: Very Doubtful Tsunami, certainty: doubtful}
-        2: {label: Questionable Tsunami, certainty: doubtful}
-        3: {label: Probable Tsunami, certainty: definite_or_probable}
-        4: {label: Definite Tsunami, certainty: definite_or_probable}
+        -1: {label: 'Erroneous entry', exclude: true}
+        0: {label: 'Event that only caused a seiche', certainty: doubtful}
+        1: {label: 'Very Doubtful Tsunami', certainty: doubtful}
+        2: {label: 'Questionable Tsunami', certainty: doubtful}
+        3: {label: 'Probable Tsunami', certainty: definite_or_probable}
+        4: {label: 'Definite Tsunami', certainty: definite_or_probable}
     causeCode:
       codelist: NCEI descriptor tsunami/causes
       codes:
-        1: {label: Earthquake, certainty: definite_or_probable}
-        2: {label: Questionable Earthquake, certainty: doubtful}
-        3: {label: Earthquake and Landslide, certainty: definite_or_probable}
-        4: {label: Volcano and Earthquake, certainty: definite_or_probable}
-        5: {label: Volcano, Earthquake and Landslide, certainty: definite_or_probable}
-        6: {label: Volcano, certainty: definite_or_probable}
-        7: {label: Volcano and Landslide, certainty: definite_or_probable}
+        1: {label: 'Earthquake', certainty: definite_or_probable}
+        2: {label: 'Questionable Earthquake', certainty: doubtful}
+        3: {label: 'Earthquake and Landslide', certainty: definite_or_probable}
+        4: {label: 'Volcano and Earthquake', certainty: definite_or_probable}
+        5: {label: 'Volcano, Earthquake and Landslide', certainty: definite_or_probable}
+        6: {label: 'Volcano', certainty: definite_or_probable}
+        7: {label: 'Volcano and Landslide', certainty: definite_or_probable}
 documents:
   icb1_codebook:
     title: International Crisis Behavior Data Codebook, Version 16 - Dataset ICB 1 (System Level)

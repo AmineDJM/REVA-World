@@ -1,6 +1,6 @@
-policy_version: "budgets-1.3.11"
+policy_version: "budgets-1.3.12"
 daily:
-  http_requests_total: 12984
+  http_requests_total: 13184
   http_bytes_total: 3221225472
 per_source_daily_requests:
   worldbank.wdi: 200
@@ -107,8 +107,8 @@ per_source_daily_requests:
   naturalearth.admin0_10m: 12
   # nga.wpi: requested by A-INFRA (a_infra.yaml)
   nga.wpi: 3
-  # noaa.ncei_hazards: requested by A-HAZARDS (a_hazards.yaml)
-  noaa.ncei_hazards: 600
+  # noaa.ncei_hazards: requested by A-HAZARDS (a_hazards.yaml), AUDFIX (audfix.yaml)
+  noaa.ncei_hazards: 800
   # nobelprize.api: requested by A-SCI (a_sci.yaml)
   nobelprize.api: 5
   # oecd.sdmx: requested by A-FISCAL (a_fiscal.yaml), A-ILO (a_ilo.yaml), A-SOCIETY (a_society.yaml), A-TRADE (a_trade.yaml)

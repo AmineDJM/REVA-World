@@ -394,6 +394,15 @@ def test_claims_carry_ncei_validity_codes_verbatim() -> None:
     assert defs["cause_code:2"] == 'causeCode 2 = "Questionable Earthquake" (NCEI descriptor tsunami/causes)'
 
 
+def test_validity_registry_labels_equal_the_archived_descriptors() -> None:
+    """Every registry label is the NCEI descriptor label verbatim (a mismatch would make the code "unclassified")."""
+    desc = {k: hz.parse_descriptor(b) for k, b in _descriptors().items()}
+    reg = hz.validity_registry()
+    for fld, key in hz.VALIDITY_FIELDS.items():
+        for code, entry in reg[fld]["codes"].items():
+            assert desc[key][str(code)] == entry["label"], (fld, code)
+
+
 def test_changed_validity_label_is_unclassified_not_guessed() -> None:
     eq = {"id": 10, "year": 1900, "tsunamiEventId": 20, "country": "JAPAN"}
     ts = [{"id": 20, "year": 1900, "earthquakeEventId": 10, "causeCode": 1, "eventValidity": 3, "country": "JAPAN"}]
