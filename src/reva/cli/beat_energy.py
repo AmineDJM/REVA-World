@@ -75,12 +75,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
     with eng.connect() as conn:
         res = load_and_run(conn, get_store(), origin=a.origin)
-    if a.w3:
-        res = run_w3(eng, get_store(), res, origin=a.origin)
     res["protocol_check"] = pinned
     reloc = pinned.get("code_relocation")
     if reloc and res["digest"] != reloc["preregistered_run_digest"]:
         raise SystemExit(f"relocated code gives digest {res['digest']}, not the pre-registered run's: refusing")
+    if a.w3:
+        res = run_w3(eng, get_store(), res, origin=a.origin) | {"protocol_check": pinned}
     with open(a.out, "w", encoding="utf-8") as fh:
         json.dump(res, fh, indent=1, default=str)
     if a.summary:
@@ -146,7 +146,6 @@ def run_w3(engine: Any, store: Any, base: dict[str, Any], *, origin: str = "live
     """W3 on the pinned WPSR table; the protocol's Holm family recomputed with W3's evaluated p-values."""
     from datetime import UTC, datetime
 
-    import polars as pl  # noqa: F401
     from sqlalchemy import text
 
     from reva.adapters.connectors.atlas_vintage_steo import PAGE_URL, parse_archive_page

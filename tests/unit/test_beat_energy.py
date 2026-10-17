@@ -79,3 +79,21 @@ def test_seal_only_inside_the_registered_window_and_on_existing_questions() -> N
     found = bs.find_questions(mans, "2027-01")
     assert set(found) == set(bs.WIN_CODES.values()) and all(m is mans[1] for m, _ in found.values())
     assert bs.find_questions(mans, "2026-10") == {}
+
+
+def test_w3_weekly_nowcast_and_family_merge() -> None:
+    from reva.evaluation import beat_energy_w3 as w3
+
+    weekly = {date(2026, 10, 2): 13.0, date(2026, 10, 9): 14.0, date(2026, 10, 16): 15.0}
+    # 2026-10-17: only the weeks ending 10-02 and 10-09 are published (week end + 7 days); Oct has 5 Fridays
+    p = w3.wpsr_point(weekly, date(2026, 10, 17), _idx(2026, 10))
+    assert p == (13.0 + 14.0 * 4) / 5
+    assert w3.wpsr_point(weekly, date(2026, 10, 17), _idx(2026, 11)) == 14.0
+    base = [
+        {"window": w, "code": c, "h": h, "challenger": ch, "p_challenger_better": 0.5 if w != "W3" else 1.0}
+        for w, c, h, ch, _b, _l in be.declared_tests()
+    ]
+    tests = [{"code": c, "h": h, "window": "W3", "challenger": "wpsr_nowcast", "p_challenger_better": 1e-9}
+             for c, h in be.W3_TESTS]  # fmt: skip
+    fam = w3.merged_family(base, tests)
+    assert fam["family_size"] == 127 and len(fam["wins"]) == 4
