@@ -1,0 +1,856 @@
+# V7 BEAT-ENERGY pre-registration. Committed before any evaluation of W1/W2/W3. Do not edit.
+schema: reva-beat-energy-protocol/1
+agent: BEAT-ENERGY (V7)
+written_at: '2026-10-17T21:52:16.006378+00:00'
+statement: 'Pre-registered before any of these windows is evaluated. Binding: docs/roadmap/v7_beat_official.md.
+  Only the tests listed under `family` can produce a win; ONE Holm-Bonferroni family over all of them (alpha 0.05,
+  one-sided DM-HLN p for ''challenger has the lower expected loss''); a declared test that cannot be evaluated counts
+  with p = 1. Point forecasts are compared with EIA''s STEO point on absolute error; densities with STEO''s fair
+  density on CRPS; never point vs density. Wins and losses are reported exactly in docs/dev/v7_beat_energy.md.'
+code_sha256: 9724ad8eb75d67ddebfe56f3e389dda389f6beead7c95b43e933197eea99632f
+code_path: src/reva/evaluation/beat_energy.py
+runner: uv run python -m reva.cli.beat_energy --out <full.json> --summary docs/dev/v7_beat_energy_result.json
+what_v6_used: 'V6 PRED-ENERGY: 54 quarterly STEO issues at their availability instant (release + 1 day), series
+  BREPUUS WTIPUUS NGHHUUS COPRPUS PAPR_WORLD COPR_WORLD PASC_OECD_T3, h = 1..12, STEO vs a monthly random walk.'
+windows:
+  W1:
+    name: timeliness (between-STEO dates), prices
+    series:
+      BREPUUS: EIA daily spot RBRTE (atlas.eia.spot_d)
+      WTIPUUS: EIA daily spot RWTC (atlas.eia.spot_d)
+      NGHHUUS: EIA daily spot RNGWHHD (atlas.eia.spot_d)
+    origins: each archived STEO issue's availability instant + [7, 14, 21, 28] days, kept only if the origin day
+      is strictly before the release date of the NEXT STEO issue (monthly releases read from the archived STEO archive
+      page, raw bytes in evidence.acquisition) -> the issue is the latest STEO available at the origin
+    new_vs_v6: 'origins after the V6 origin date (between-STEO dates) and target h = 0 (issue month) are new; the
+      target months of h = 1, 2 coincide with V6''s h = 1, 2 targets (disclosed: same outcomes, different origin
+      dates and a different REVA forecaster)'
+    horizons:
+    - 0
+    - 1
+    - 2
+    information_set: 'EIA daily spot prices with period day d <= origin day - 9 days (conservative weekly-release
+      availability: EIA''s data browser is released weekly, the release covers data to the previous day, + 2 days
+      margin); daily market prices treated as unrevised (current table as of its release)'
+    candidates:
+      daily_rw: monthly-mean forecast = (known trading-day prices of the target month + last known daily price for
+        each remaining weekday) / count
+      combo_steo_daily: exp(w log STEO + (1-w) log daily_rw), w = inverse-MSE weight from both forecasters' log
+        errors on up to 20 past issues at the same (series, h, offset) whose target month was fully known in the
+        daily data at the origin; at least 8 errors, else abstain
+      daily_rw_ln: log-normal, median daily_rw, sigma = RMS of daily_rw's past log errors (same window/rule)
+    benchmarks:
+      steo: STEO point of the issue in force (attributed to EIA)
+      steo_fair_ln: log-normal, median STEO point, sigma = RMS of STEO's past log errors (same window/rule)
+    aggregation: 'per issue, mean of the loss differentials over the offsets 7/14/21/28 present; DM-HLN over issues,
+      k = 1 (h <= 2, issues 3 months apart: no overlapping targets)'
+    informational_not_in_family: offset 0 (= V6 origin date) and per-offset ratios
+    outcome: latest atlas.eia_steo.steo_observed (declared history only; final vintage of the target month)
+  W2:
+    name: bias correction and combination, quantities not used in V6
+    series:
+      COPR_OPEC: REVA component ar_diff
+      PAPR_NONOPEC: REVA component ar_diff
+      NGPRPUS: REVA component ar_diff
+      PATC_WORLD: REVA component seasonal
+      PATC_US: REVA component seasonal
+      NGWGPUS: REVA component seasonal
+      PASC_US: REVA component seasonal
+      COSXPUS: REVA component seasonal
+    origins: the 54 archived quarterly STEO issues' availability instants (as V6), on series V6 did not evaluate
+    horizons:
+    - 1
+    - 3
+    - 6
+    - 12
+    candidates:
+      steo_bc: STEO + mean of STEO's errors on up to 12 most recent past issues at the same h whose target month
+        is already published in the origin's information set (real-time values); at least 8
+      combo_steo_reva: w STEO + (1-w) REVA component (ar_diff = V6 AR on monthly changes; seasonal = last value
+        + mean same-month k-step change of the last 5 years), w inverse-MSE from the same past errors
+      steo_bc_n: normal, mean steo_bc, sd = sample sd of those STEO errors
+    benchmarks:
+      steo: STEO point
+      steo_fair_n: normal, mean STEO point, sd = RMS of the same STEO errors
+    aggregation: one loss differential per issue; DM-HLN with k = ceil(h/3) overlap
+    outcome: latest atlas.eia_steo.steo_observed (final vintage)
+  W3:
+    name: weekly data (EIA Weekly Petroleum Status Report)
+    status_at_registration: 'NOT EVALUABLE: atlas.eia_wpsr not ingested (free disk < 5 GB); tests count with p =
+      1 in this family'
+    series:
+      COPRPUS: weekly U.S. field production of crude oil (WCRFPUS2)
+      COSXPUS: weekly U.S. ending stocks excluding SPR of crude oil (WCESTUS1)
+    candidate: 'wpsr_nowcast: mean of the weekly values of the target month published at the origin (WPSR week ending
+      Friday, available Wednesday + 1 day) carried forward'
+    origins: same between-STEO origins as W1
+    horizons:
+    - 0
+    - 1
+alpha: 0.05
+family_size: 127
+family:
+- window: W1
+  code: BREPUUS
+  h: 0
+  challenger: daily_rw
+  benchmark: steo
+  loss: ae
+- window: W1
+  code: BREPUUS
+  h: 0
+  challenger: combo_steo_daily
+  benchmark: steo
+  loss: ae
+- window: W1
+  code: BREPUUS
+  h: 0
+  challenger: daily_rw_ln
+  benchmark: steo_fair_ln
+  loss: crps
+- window: W1
+  code: BREPUUS
+  h: 1
+  challenger: daily_rw
+  benchmark: steo
+  loss: ae
+- window: W1
+  code: BREPUUS
+  h: 1
+  challenger: combo_steo_daily
+  benchmark: steo
+  loss: ae
+- window: W1
+  code: BREPUUS
+  h: 1
+  challenger: daily_rw_ln
+  benchmark: steo_fair_ln
+  loss: crps
+- window: W1
+  code: BREPUUS
+  h: 2
+  challenger: daily_rw
+  benchmark: steo
+  loss: ae
+- window: W1
+  code: BREPUUS
+  h: 2
+  challenger: combo_steo_daily
+  benchmark: steo
+  loss: ae
+- window: W1
+  code: BREPUUS
+  h: 2
+  challenger: daily_rw_ln
+  benchmark: steo_fair_ln
+  loss: crps
+- window: W1
+  code: WTIPUUS
+  h: 0
+  challenger: daily_rw
+  benchmark: steo
+  loss: ae
+- window: W1
+  code: WTIPUUS
+  h: 0
+  challenger: combo_steo_daily
+  benchmark: steo
+  loss: ae
+- window: W1
+  code: WTIPUUS
+  h: 0
+  challenger: daily_rw_ln
+  benchmark: steo_fair_ln
+  loss: crps
+- window: W1
+  code: WTIPUUS
+  h: 1
+  challenger: daily_rw
+  benchmark: steo
+  loss: ae
+- window: W1
+  code: WTIPUUS
+  h: 1
+  challenger: combo_steo_daily
+  benchmark: steo
+  loss: ae
+- window: W1
+  code: WTIPUUS
+  h: 1
+  challenger: daily_rw_ln
+  benchmark: steo_fair_ln
+  loss: crps
+- window: W1
+  code: WTIPUUS
+  h: 2
+  challenger: daily_rw
+  benchmark: steo
+  loss: ae
+- window: W1
+  code: WTIPUUS
+  h: 2
+  challenger: combo_steo_daily
+  benchmark: steo
+  loss: ae
+- window: W1
+  code: WTIPUUS
+  h: 2
+  challenger: daily_rw_ln
+  benchmark: steo_fair_ln
+  loss: crps
+- window: W1
+  code: NGHHUUS
+  h: 0
+  challenger: daily_rw
+  benchmark: steo
+  loss: ae
+- window: W1
+  code: NGHHUUS
+  h: 0
+  challenger: combo_steo_daily
+  benchmark: steo
+  loss: ae
+- window: W1
+  code: NGHHUUS
+  h: 0
+  challenger: daily_rw_ln
+  benchmark: steo_fair_ln
+  loss: crps
+- window: W1
+  code: NGHHUUS
+  h: 1
+  challenger: daily_rw
+  benchmark: steo
+  loss: ae
+- window: W1
+  code: NGHHUUS
+  h: 1
+  challenger: combo_steo_daily
+  benchmark: steo
+  loss: ae
+- window: W1
+  code: NGHHUUS
+  h: 1
+  challenger: daily_rw_ln
+  benchmark: steo_fair_ln
+  loss: crps
+- window: W1
+  code: NGHHUUS
+  h: 2
+  challenger: daily_rw
+  benchmark: steo
+  loss: ae
+- window: W1
+  code: NGHHUUS
+  h: 2
+  challenger: combo_steo_daily
+  benchmark: steo
+  loss: ae
+- window: W1
+  code: NGHHUUS
+  h: 2
+  challenger: daily_rw_ln
+  benchmark: steo_fair_ln
+  loss: crps
+- window: W2
+  code: COPR_OPEC
+  h: 1
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: COPR_OPEC
+  h: 1
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: COPR_OPEC
+  h: 1
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: COPR_OPEC
+  h: 3
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: COPR_OPEC
+  h: 3
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: COPR_OPEC
+  h: 3
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: COPR_OPEC
+  h: 6
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: COPR_OPEC
+  h: 6
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: COPR_OPEC
+  h: 6
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: COPR_OPEC
+  h: 12
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: COPR_OPEC
+  h: 12
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: COPR_OPEC
+  h: 12
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: PAPR_NONOPEC
+  h: 1
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PAPR_NONOPEC
+  h: 1
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PAPR_NONOPEC
+  h: 1
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: PAPR_NONOPEC
+  h: 3
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PAPR_NONOPEC
+  h: 3
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PAPR_NONOPEC
+  h: 3
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: PAPR_NONOPEC
+  h: 6
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PAPR_NONOPEC
+  h: 6
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PAPR_NONOPEC
+  h: 6
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: PAPR_NONOPEC
+  h: 12
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PAPR_NONOPEC
+  h: 12
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PAPR_NONOPEC
+  h: 12
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: NGPRPUS
+  h: 1
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: NGPRPUS
+  h: 1
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: NGPRPUS
+  h: 1
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: NGPRPUS
+  h: 3
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: NGPRPUS
+  h: 3
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: NGPRPUS
+  h: 3
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: NGPRPUS
+  h: 6
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: NGPRPUS
+  h: 6
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: NGPRPUS
+  h: 6
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: NGPRPUS
+  h: 12
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: NGPRPUS
+  h: 12
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: NGPRPUS
+  h: 12
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: PATC_WORLD
+  h: 1
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PATC_WORLD
+  h: 1
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PATC_WORLD
+  h: 1
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: PATC_WORLD
+  h: 3
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PATC_WORLD
+  h: 3
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PATC_WORLD
+  h: 3
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: PATC_WORLD
+  h: 6
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PATC_WORLD
+  h: 6
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PATC_WORLD
+  h: 6
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: PATC_WORLD
+  h: 12
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PATC_WORLD
+  h: 12
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PATC_WORLD
+  h: 12
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: PATC_US
+  h: 1
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PATC_US
+  h: 1
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PATC_US
+  h: 1
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: PATC_US
+  h: 3
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PATC_US
+  h: 3
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PATC_US
+  h: 3
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: PATC_US
+  h: 6
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PATC_US
+  h: 6
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PATC_US
+  h: 6
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: PATC_US
+  h: 12
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PATC_US
+  h: 12
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PATC_US
+  h: 12
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: NGWGPUS
+  h: 1
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: NGWGPUS
+  h: 1
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: NGWGPUS
+  h: 1
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: NGWGPUS
+  h: 3
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: NGWGPUS
+  h: 3
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: NGWGPUS
+  h: 3
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: NGWGPUS
+  h: 6
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: NGWGPUS
+  h: 6
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: NGWGPUS
+  h: 6
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: NGWGPUS
+  h: 12
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: NGWGPUS
+  h: 12
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: NGWGPUS
+  h: 12
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: PASC_US
+  h: 1
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PASC_US
+  h: 1
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PASC_US
+  h: 1
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: PASC_US
+  h: 3
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PASC_US
+  h: 3
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PASC_US
+  h: 3
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: PASC_US
+  h: 6
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PASC_US
+  h: 6
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PASC_US
+  h: 6
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: PASC_US
+  h: 12
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PASC_US
+  h: 12
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: PASC_US
+  h: 12
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: COSXPUS
+  h: 1
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: COSXPUS
+  h: 1
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: COSXPUS
+  h: 1
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: COSXPUS
+  h: 3
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: COSXPUS
+  h: 3
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: COSXPUS
+  h: 3
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: COSXPUS
+  h: 6
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: COSXPUS
+  h: 6
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: COSXPUS
+  h: 6
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W2
+  code: COSXPUS
+  h: 12
+  challenger: steo_bc
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: COSXPUS
+  h: 12
+  challenger: combo_steo_reva
+  benchmark: steo
+  loss: ae
+- window: W2
+  code: COSXPUS
+  h: 12
+  challenger: steo_bc_n
+  benchmark: steo_fair_n
+  loss: crps
+- window: W3
+  code: COPRPUS
+  h: 0
+  challenger: wpsr_nowcast
+  benchmark: steo
+  loss: ae
+- window: W3
+  code: COPRPUS
+  h: 1
+  challenger: wpsr_nowcast
+  benchmark: steo
+  loss: ae
+- window: W3
+  code: COSXPUS
+  h: 0
+  challenger: wpsr_nowcast
+  benchmark: steo
+  loss: ae
+- window: W3
+  code: COSXPUS
+  h: 1
+  challenger: wpsr_nowcast
+  benchmark: steo
+  loss: ae
+sealing_rule: Only a Holm win may be sealed as a prospective forecast (registry, under flock); W1 h = 0 wins are
+  timeliness wins stated as such; EIA-derived combinations are labelled 'combination with EIA STEO'.
