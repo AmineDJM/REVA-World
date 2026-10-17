@@ -258,6 +258,9 @@ DB tests used throwaway databases (`reva_test_*`, `reva_e2e_*`, dropped afterwar
 | FIX3: same, after the files that polluted the shared DB in the sweep | the same files preceded by `test_causal_{api,ops,store,wikidata_demo}.py`, `test_kg_{api,import_harvest_db,lang_ingest,paths,polity_ingest,store}.py`, `test_atlas_treaties_ingest.py`, `test_events_view.py` | **260 passed, 0 failed** (5 min 7 s). The synthetic `czapi` claims and other `same_as` / materialisation / property loads are in the DB before the fixed tests run |
 | FIX3: UI unit tests, typecheck, build | `npx vitest run`, `npm run typecheck`, `npm run build` | **225 passed, 1 skipped** (+4: `src/v3/screens.test.ts` 3, `CommandPalette.test.tsx` 1); typecheck **pass**; build **pass** |
 | FIX3: palette e2e | `uv run python scripts/e2e_stack.py --run --v3-fixtures -- e2e/v2_runs.spec.ts e2e/v3_live_stack.spec.ts` | **15 passed, 0 failed, 4 skipped** (41 s). "⌘K palette" passes; `v3_live_stack` 13/13 (incl. `/v1/links/path` "Chemin advanced options"). The 4 skipped are V2 runs specs that need `--v2-fixtures` |
+| **SWEEP2 (2026-10-17): pytest offline, whole suite in 5 sequential sessions** | `uv run pytest -m "not live and not perf" -p no:cacheprovider` over unit/invariants/property/contracts/scientific/replay/review, security/chaos/e2e, and integration in 3 file groups | **4,256 passed, 0 failed, 34 skipped, 66 deselected**. Fixed (`docs/dev/v3_sweep2.md`): the demo-workflow gate rejection (the template closure changed by a `safe_client.py` edit; reviewed bytes restored, digest not re-pinned), `atlas.cowwars` 1.1.1 (its derived war dates had been shown as source-reported), equal-cost link-path ties ranked by node ids instead of row order, and 3 test-order dependences |
+| SWEEP2: static checks | `ruff check .`, `ruff format --check .`, `mypy`, `verify_imports.py`, `export_contracts.py --check` | all pass; **`ruff format`: 17 → 0 files**. 14 atlas specs got a patch bump because their source-derived code digest changed |
+| SWEEP2: UI | `npx vitest --run`, `npm run typecheck`, `npm run build`; `uv run python scripts/e2e_stack.py --run --v3-fixtures` | vitest **248 passed, 1 skipped**; typecheck and build pass. e2e **80 passed, 2 failed, 8 skipped**: 2 causal specs expected the pre-UICHECK candidate-panel label. After the spec fix, the causal specs give **13 passed** |
 
 **The 12 pytest failures.** None of them is a stale version or count in a test. **Status after FIX3:** the 3 link
 failures and the UI palette defect are fixed in the product, and the 4 isolation failures are fixed in the tests.
@@ -326,6 +329,8 @@ See the FIX3 rows above.
     *not* reformatted: a reformat changes the connector code digest, and the code-identity check would then refuse
     the registered version until it is bumped. WDRUN is also editing the two Wikidata files.
   * Code blocks in three `docs/dev` reports (`v3_a_imf.md`, `v3_atlas_interface.md`, `v3_causal_interface.md`).
+  * **Fixed (SWEEP2):** all 17 formatted. The 14 atlas specs whose digest changed were bumped (1.0.1 → 1.0.2,
+    `atlas.unesco_whc` 1.0.0 → 1.0.1), see `docs/dev/v3_sweep2.md` §2.3.
 
 ## 4. Live source coverage
 
@@ -638,6 +643,9 @@ maintainer licence review (`docs/dev/HANDOFF_V3.md` and the agents' reports):
    * duplicate ⌘K palette key (`v2_runs` e2e failure);
    * four integration tests depend on test order (shared session database);
    * 17 files are not `ruff format`-clean.
+
+   All four were fixed by FIX3 / SWEEP2. SWEEP2 then had the whole offline suite green (4,256 passed, 0 failed).
+   Remaining dev-DB steps: re-ingest `atlas.cowwars` 1.1.1 and run `reva db seed` for the 14 bumped atlas versions.
 
 ## 10. What this report did not verify
 

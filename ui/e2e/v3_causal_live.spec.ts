@@ -98,8 +98,8 @@ test('candidate space is off by default and separate when on', async ({ page }) 
   await expect(toggle).not.toBeChecked(SLOW);
   await toggle.check();
   const panel = page.getByTestId('candidates-panel');
-  await expect(panel).toContainText('candidats extraits de textes — non sourcés, non vérifiés');
-  if (cand.length === 0) await expect(panel).toContainText('Aucun candidat extrait pour cet événement.', SLOW);
+  await expect(panel).toContainText('non sourcé — candidats (extraits de textes ou proposés par un modèle, non vérifiés)');
+  if (cand.length === 0) await expect(panel).toContainText('Aucun candidat (non sourcé) n’a été extrait pour cet événement.', SLOW);
   else await expect(panel.getByTestId('candidate')).toHaveCount(cand.length, SLOW);
 });
 

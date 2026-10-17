@@ -128,7 +128,7 @@ test('candidate space: OFF by default (never requested), labelled and visually d
   expect(calls.some((c) => c.includes('/v1/causal/candidates'))).toBe(false);
   await toggle.check();
   const panel = page.getByTestId('candidates-panel');
-  await expect(panel).toContainText('candidats extraits de textes — non sourcés, non vérifiés');
+  await expect(panel).toContainText('non sourcé — candidats (extraits de textes ou proposés par un modèle, non vérifiés)');
   await expect(panel.getByTestId('candidate')).toHaveCount(2);
   await expect(panel.getByTestId('grade-badge')).toHaveCount(0);
   expect(await panel.evaluate((el) => getComputedStyle(el).borderTopStyle)).toBe('dashed');
