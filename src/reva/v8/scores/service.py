@@ -33,7 +33,7 @@ def _calendar(doc: Mapping[str, Any], sealed: Mapping[str, int] | None) -> list[
         when = res.get("date") or res.get("not_before") or res.get("month")
         k = (r["track"], f"{when}|{res.get('note_fr')}")
         g = groups.setdefault(k, {
-            "kind": "track", "track": r["track"], "date": res.get("date"), "not_before": res.get("not_before"),
+            "id": f"{r['track']}:{when}", "kind": "track", "track": r["track"], "date": res.get("date"), "not_before": res.get("not_before"),
             "month": res.get("month"), "sort": when or "9999", "note_fr": res.get("note_fr"), "quote": res.get("quote"),
             "rows": [], "forecasters": set(), "sealed": None,
         })  # fmt: skip

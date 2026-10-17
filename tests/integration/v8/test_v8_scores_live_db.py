@@ -39,8 +39,11 @@ def test_live_state_matches_sql_and_is_cached(ctx: dict[str, Any]) -> None:
     svc = LiveService()
     t0 = time.perf_counter()
     st = svc.get(ctx["engine"], ctx["store"], "live")
+    while st is not None and st.get("partial") and time.perf_counter() - t0 < 300:  # cold: partial first
+        time.sleep(0.5)
+        st = svc.get(ctx["engine"], ctx["store"], "live")
     cold = time.perf_counter() - t0
-    assert st is not None
+    assert st is not None and not st["partial"]
     with ctx["engine"].connect() as c:
         n_batches = c.execute(
             text(
@@ -61,3 +64,16 @@ def test_live_state_matches_sql_and_is_cached(ctx: dict[str, Any]) -> None:
     warm = (time.perf_counter() - t1) / 20
     print(f"live state: cold {cold * 1000:.0f} ms, warm {warm * 1000:.2f} ms")
     assert warm < 0.3
+
+
+def test_cold_live_state_answers_a_partial_state_without_waiting(ctx: dict[str, Any], monkeypatch: Any) -> None:
+    from reva.v8.scores import live as L
+
+    monkeypatch.setattr(L, "COLD_WAIT_S", 0.0)
+    monkeypatch.setattr(L, "_SUMMARIES", {})  # force a slow full computation
+    svc = L.LiveService()
+    t0 = time.perf_counter()
+    st = svc.get(ctx["engine"], ctx["store"], "live")
+    assert st is not None and st["partial"] is True and st["upcoming"] == []
+    assert set(st["totals"]) == {"sealed_batches", "questions", "forecasts"}  # no invented resolution counts
+    assert time.perf_counter() - t0 < 2.0

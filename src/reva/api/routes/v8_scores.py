@@ -144,12 +144,15 @@ class LiveState(s.OpenModel):
     compute_ms: float
     origin: str | None
     registries: list[dict[str, Any]]
-    totals: dict[str, int]
+    totals: dict[str, int] = Field(description="Counts; resolution statuses are absent when partial")
     next_resolution: str | None
     upcoming: list[dict[str, Any]]
     upcoming_total: int
     overdue_groups: int
     refreshing: bool
+    partial: bool = Field(
+        False, description="True while a cold cache is computed: totals only (resolution statuses and calendar absent)"
+    )
     ensemble: dict[str, Any] | None
 
 

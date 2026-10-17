@@ -23,6 +23,7 @@ from sqlalchemy import text
 LOG = logging.getLogger(__name__)
 SCOPES = ("forecast_registry", "forecast_registry_health")
 FINGERPRINT_TTL_S = 30.0
+COLD_WAIT_S = 2.5  # a cold /live waits this long for the full state, then answers the quick (partial) one
 OFFICIAL_REFERENCES = {
     "forecast.reference_imf_weo": "imf_weo",
     "forecast.reference_eia_steo": "eia_steo",
@@ -267,6 +268,50 @@ def compute_live(conn: Any, store: Any, origin: str | None, *, today: date | Non
         "upcoming_total": len(upcoming),
         "ensemble": _ensemble_summary(conn, store, origin),
         "refreshing": False,
+        "partial": False,
+    }
+
+
+def quick_state(conn: Any, origin: str | None) -> dict[str, Any]:
+    """Counts readable from the evaluation rows alone (no manifest read), served while the full state is computed:
+    batches, questions, forecasts and handled questions; no per-question calendar (``partial``)."""
+    oc = " AND task_scope->>'origin' = :o" if origin else ""
+    prm = {"o": origin} if origin else {}
+    q = conn.execute(
+        text(
+            f"""SELECT metrics->>'kind' AS k, count(DISTINCT evaluation_manifest_sha256) AS b,
+                       count(DISTINCT evaluation_manifest_sha256) FILTER (WHERE task_scope->>'supplement_of' IS NULL) AS ob,
+                       max(metrics->>'issued_at') AS last
+                FROM model.evaluation WHERE metrics->>'kind' IN ('registry_issue', 'health_issue'){oc} GROUP BY 1"""
+        ),
+        prm,
+    ).mappings()
+    by = {r["k"]: r for r in q}
+    nq = conn.execute(
+        text(
+            f"""SELECT coalesce(sum(n), 0) FROM (SELECT DISTINCT ON (evaluation_manifest_sha256)
+                       (metrics->>'n_questions')::int AS n FROM model.evaluation
+                WHERE metrics->>'kind' IN ('registry_issue', 'health_issue')
+                  AND task_scope->>'supplement_of' IS NULL{oc}) x"""
+        ),
+        prm,
+    ).scalar_one()
+    forecasts = sum(sealed_models(conn, origin).values())
+    batches = sum(int(r["b"]) for r in by.values())
+    return {
+        "computed_at": datetime.now(UTC).isoformat(),
+        "compute_ms": 0.0,
+        "origin": origin,
+        "registries": [],
+        "totals": {"sealed_batches": batches, "questions": int(nq), "forecasts": forecasts},
+        "next_resolution": None,
+        "overdue_groups": 0,
+        "upcoming": [],
+        "upcoming_total": 0,
+        "ensemble": None,
+        "refreshing": True,
+        "partial": True,
+        "last_sealed_at": max((str(r["last"]) for r in by.values() if r["last"]), default=None),
     }
 
 
@@ -327,10 +372,21 @@ class LiveService:
                 return hit[2]
             self._background(engine, store, origin)
             return {**hit[2], "refreshing": True}
+        self._background(engine, store, origin)
         if not wait:
-            self._background(engine, store, origin)
             return None
-        return self._recompute(engine, store, origin)
+        deadline = time.monotonic() + COLD_WAIT_S
+        while time.monotonic() < deadline:
+            with self._lock:
+                hit = self._d.get(origin)
+                running = origin in self._running
+            if hit:
+                return hit[2]
+            if not running:  # the background computation failed: compute here (raises with its error)
+                return self._recompute(engine, store, origin)
+            time.sleep(0.05)
+        with _ro(engine) as conn:
+            return quick_state(conn, origin)
 
     def clear(self) -> None:
         with self._lock:
