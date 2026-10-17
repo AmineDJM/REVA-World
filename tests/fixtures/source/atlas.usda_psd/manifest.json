@@ -1,0 +1,34 @@
+[
+ {
+  "request_fingerprint": "31108abb76aeb5378ec9932dcc6e28e065c6b04ad8db0b4e044049e738086a9c",
+  "url": "https://apps.fas.usda.gov/psdonline/downloads/psd_grains_pulses_csv.zip",
+  "file": "psd_grains_pulses_csv.zip",
+  "sha256": "ee2a474d85611aadcf96265b43713894bb3fa5a4a25df08628aa96ce2419f4d4",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed",
+   "last-modified": "Fri, 09 Oct 2026 15:40:43 GMT"
+  },
+  "retrieved_at": "2026-10-17T20:30:00+00:00",
+  "licence": "Public domain (U.S. Government work)",
+  "live_sha256": "7047570ee818e79154d0af1d92ecdb5b6a0343900793a0b22fa4b4e55e3cd1ae",
+  "live_bytes": 2873599,
+  "excerpt": "zip rebuilt with the single real member psd_grains_pulses.csv: header + 4050 verbatim lines (countries ['BM', 'BR', 'CH', 'E4', 'EG', 'IN', 'PK', 'TH', 'US', 'VM'], commodities ['0410000', '0422110', '0440000'], market years >= 2018) of the live file"
+ },
+ {
+  "request_fingerprint": "138215fce1fc7ddccb0e7c76bbfec067980a6387e4191a3906272a6cc062bb06",
+  "url": "https://apps.fas.usda.gov/psdonline/downloads/psd_oilseeds_csv.zip",
+  "file": "psd_oilseeds_csv.zip",
+  "sha256": "580dfe01b2e474aaa7416c1ffd85f4ada2b973447c6d101f5eb5c9e7dc043292",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed",
+   "last-modified": "Fri, 09 Oct 2026 15:40:43 GMT"
+  },
+  "retrieved_at": "2026-10-17T20:30:00+00:00",
+  "licence": "Public domain (U.S. Government work)",
+  "live_sha256": "c5b770f5a515c59d1239c15704dc70cec64317f0eb56889df2f48ac1ad7bce4e",
+  "live_bytes": 3844435,
+  "excerpt": "zip rebuilt with the single real member psd_oilseeds.csv: header + 3600 verbatim lines (countries ['BM', 'BR', 'CH', 'E4', 'EG', 'IN', 'PK', 'TH', 'US', 'VM'], commodities ['0813100', '2222000', '4243000'], market years >= 2018) of the live file"
+ }
+]

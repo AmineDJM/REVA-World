@@ -338,6 +338,7 @@ def test_atlas_specs() -> None:
         "atlas.gbif_backbone",
         "atlas.col_checklist",
         "atlas.bio_wikidata",
+        "atlas.bio_qlever",
         "atlas.hgnc",
         "atlas.uniprot",
         "atlas.ensembl_genomes",
@@ -348,3 +349,4 @@ def test_atlas_specs() -> None:
         man = json.loads((FIX / s.name / "manifest.json").read_text())
         assert man and all(m["licence"] and "trimmed" in m["fixture_note"] for m in man)
     assert specs["atlas.bio_wikidata"].source_key == "wikidata.wdqs"
+    assert specs["atlas.bio_qlever"].source_key == "qlever.wikidata"  # WDOPS: same bridges, read from QLever

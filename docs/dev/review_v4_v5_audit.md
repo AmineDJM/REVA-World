@@ -311,3 +311,31 @@ GloBI partners (ids GloBI returns), ClinGen / Mondo / DOID / UBERON ids, NUTS / 
    preference; re-run the five reference decisions.
 3. M6, M7 (V4ENERGY, A-IMF owner / PRED-REGISTRY): projection flag, fiscal mapping, resolution notes on 5 questions.
 4. M8, L1 (V4INDUSTRY), L2 (V4CORE API), the Low items as convenient.
+
+## 8. Fix status
+
+One row per defect; each fixing agent updates its own rows (append-only data fixes: new revisions, retractions,
+appended resolutions — nothing edited).
+
+| ID | Status | By | Where |
+|---|---|---|---|
+| H1 | open | — | |
+| H2 | open | — | |
+| M1 | open | — | |
+| M2 | open | — | |
+| M3 | **fixed** (5 new estimate revisions on level variables; loader + engine refuse level/growth inconsistency; 0/301 current rows violate) | FIX4B | `docs/dev/v6_fix4b.md` §M3 |
+| M4 | **fixed** (declared variant preference `registry/predict/estimate_preferences.yaml`; residual ties → gap `unresolved_tie`, never alphabetical) | FIX4B | `v6_fix4b.md` §M4, `v5_pred_engine.md` §7c |
+| M5 | **fixed** (a: h = 0 = onset year, profile estimate; b: growth variable `output.real_gdp_per_capita_growth`; c: `panel_member` / "membership not checked") | FIX4B | `v6_fix4b.md` §M5 |
+| M6 | **fixed** (`PROJECTION_SQL` + engine baseline: `unknown_boundary` never an observation; 1,978 cells / 16 series) | FIX4B | `v6_fix4b.md` §M6 |
+| M7 | **fixed in code; 5 sealed questions void** (`fiscal_year_basis_mismatch`, appended resolution `39b404b0…`); `atlas.imf` 1.3.0 parser keeps the fiscal basis — WEO_STATUS_PLACEHOLDER | FIX4B | `v6_fix4b.md` §M7 |
+| M8 | open | — | |
+| M9 | open | — | |
+| L1 | open | — | |
+| L2 | open | — | |
+| L3 | **fixed** (`shock_profile = one_time_impulse` on the 5 run estimates, new revisions) | FIX4B | `v6_fix4b.md` |
+| L4 | open | — | |
+| L5 | open | — | |
+| L6 | open | — | |
+| L7 | open | — | |
+| L8 | open | — | |
+| L9 | open | — | |

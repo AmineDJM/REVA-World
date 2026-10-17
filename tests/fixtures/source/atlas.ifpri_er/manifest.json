@@ -1,0 +1,49 @@
+[
+ {
+  "request_fingerprint": "126f4dbfd3dd236cd2fe9a19b9263d6245d5d2b685062cb0e6929ee26961d938",
+  "url": "https://www.foodsecurityportal.org/node/25",
+  "file": "tracker_page.html",
+  "sha256": "b2432ab8d134347f5a35094dcc1d102afa3d20ea0d4ee8f128a2d79e8c732633",
+  "status": 200,
+  "headers": {
+   "content-type": "text/html; charset=UTF-8"
+  },
+  "retrieved_at": "2026-10-17T20:30:00+00:00",
+  "licence": "Food Security Portal page (IFPRI)",
+  "live_sha256": "b2432ab8d134347f5a35094dcc1d102afa3d20ea0d4ee8f128a2d79e8c732633",
+  "live_bytes": 91092,
+  "excerpt": "the live page, verbatim"
+ },
+ {
+  "request_fingerprint": "ef967ff59ff4ef7fdd08a12f0c3b4a3c8a688d6916bce37f104ecd4d1de3b4ea",
+  "url": "https://www.foodsecurityportal.org/sites/default/files/2022-04/Export%20Restrictions%20Food%20Products%20%28IFPRI%29%20-%20PublicVersion_IFPRI_ExpRestrictions_Covid19_0.xlsx",
+  "file": "covid19.xlsx",
+  "sha256": "4b743abeda6b4bfb3c976afe5a5a056b422458fbf61be8c9a661f8890817c4f9",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+   "last-modified": "Tue, 10 Feb 2026 03:57:31 GMT"
+  },
+  "retrieved_at": "2026-10-17T20:30:00+00:00",
+  "licence": "ODC-By (stated in the workbook)",
+  "live_sha256": "4b743abeda6b4bfb3c976afe5a5a056b422458fbf61be8c9a661f8890817c4f9",
+  "live_bytes": 31925,
+  "excerpt": "the live workbook, verbatim"
+ },
+ {
+  "request_fingerprint": "73666903bbf1424fbe30defb40796d2ed34d32faf3545b2683982830f8eeb76d",
+  "url": "https://www.foodsecurityportal.org/sites/default/files/2022-04/Export%20Restrictions%20Food%20Products%20%28IFPRI%29%20-%20PublicVersion_IFPRI_ExpRestrictions_UKRRUS.xlsx",
+  "file": "ukrrus.xlsx",
+  "sha256": "3d0d45a73281c71972926fc2e5468d9341497caaad6047ed390449ab3850599b",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+   "last-modified": "Tue, 10 Feb 2026 03:57:31 GMT"
+  },
+  "retrieved_at": "2026-10-17T20:30:00+00:00",
+  "licence": "ODC-By (stated in the workbook)",
+  "live_sha256": "3d0d45a73281c71972926fc2e5468d9341497caaad6047ed390449ab3850599b",
+  "live_bytes": 24342,
+  "excerpt": "the live workbook, verbatim"
+ }
+]

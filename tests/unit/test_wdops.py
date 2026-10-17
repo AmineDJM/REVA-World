@@ -129,3 +129,40 @@ def test_qlever_pack_rows_are_parsed_deduplicated_and_never_doubled() -> None:
     assert st.qualifiers["_revision"]["wikidata_revision"] == "unknown"
     assert st.references[0]["wikidata_references"] == "unknown (not read)"
     assert [e.qid for e in ents] == ["Q1"]  # Q10 already known, Q4 not loaded (snapshot holds its statement)
+
+
+def test_bio_qlever_strips_rank_filter_drops_deprecated_and_normalises_statement_ids() -> None:
+    import json
+    from datetime import UTC, datetime
+    from types import SimpleNamespace
+    from urllib.parse import parse_qs
+
+    from reva.adapters.connectors import atlas_bio_taxonomy as tx
+
+    sent: dict[str, Any] = {}
+    e = "http://www.wikidata.org/entity/"
+    body = {
+        "head": {"vars": ["item", "st", "gbif", "rk"]},
+        "results": {
+            "bindings": [
+                {"item": {"value": e + "Q729"}, "st": {"value": e + "statement/q729-abc"}, "gbif": {"value": "1"},
+                 "rk": {"value": "http://wikiba.se/ontology#NormalRank"}},
+                {"item": {"value": e + "Q1"}, "st": {"value": e + "statement/q1-x"}, "gbif": {"value": "2"},
+                 "rk": {"value": "http://wikiba.se/ontology#DeprecatedRank"}},
+            ]
+        },
+    }  # fmt: skip
+
+    class Run:
+        async def post(self, url: str, **kw: Any) -> Any:
+            sent.update(url=url, **kw)
+            return SimpleNamespace(body=json.dumps(body).encode(), retrieved_at=datetime(2026, 10, 17, tzinfo=UTC))
+
+        def archive(self, acq: Any) -> str:
+            return "s" * 64
+
+    res = asyncio.run(tx.qlever_sparql(Run(), tx.wd_rank_query("Q36732"), "gbif_rank:kingdom"))
+    q = parse_qs(sent["content"].decode())["query"][0]
+    assert sent["url"] == tx.QL_URL and "DeprecatedRank" not in q and q.startswith("PREFIX wd:")
+    assert [b["st"]["value"] for b in res.bindings] == [e + "statement/Q729-abc"]
+    assert res.raw_sha256 == "s" * 64

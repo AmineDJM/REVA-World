@@ -1,0 +1,34 @@
+[
+ {
+  "request_fingerprint": "4b444821ed4b467e0297a35108bc787ff75155468adb719536592004228c7971",
+  "url": "https://www.usda.gov/sites/default/files/documents/oce-wasde-report-data-2026-05-V2.csv",
+  "file": "oce-wasde-report-data-2026-05-V2.csv",
+  "sha256": "6230928d636229f20e25b0d0909a8228293e0838d877953c15ea359f0ae10761",
+  "status": 200,
+  "headers": {
+   "content-type": "text/csv",
+   "last-modified": "Wed, 13 May 2026 15:04:58 GMT"
+  },
+  "retrieved_at": "2026-10-17T20:30:00+00:00",
+  "licence": "Public domain (U.S. Government work)",
+  "live_sha256": "95bb5b04c02c174442c399c3be5785b181bc6e9606f0cbd44cd59e45d9422973",
+  "live_bytes": 957471,
+  "excerpt": "header + 723 verbatim lines of the live CSV (World Rice, U.S. Quarterly Animal Product Production and Reliability of United States projections tables)"
+ },
+ {
+  "request_fingerprint": "d9d1b7ad3be20bc6bae7e1919af94c8adf743ee4efd2086e9751b7a5e8c9d1f4",
+  "url": "https://www.usda.gov/sites/default/files/documents/oce-wasde-report-data-2026-10.csv",
+  "file": "oce-wasde-report-data-2026-10.csv",
+  "sha256": "47d177ccb3382b0f4564eaf22c2fe62f3ac21951862aa977e8e5b5d6ec6280c8",
+  "status": 200,
+  "headers": {
+   "content-type": "text/csv",
+   "last-modified": "Fri, 09 Oct 2026 16:10:12 GMT"
+  },
+  "retrieved_at": "2026-10-17T20:30:00+00:00",
+  "licence": "Public domain (U.S. Government work)",
+  "live_sha256": "8695eab7454f9a445ae3c23d699c8f9bb681461839c1ea038bd15d45f7037638",
+  "live_bytes": 998693,
+  "excerpt": "header + 723 verbatim lines of the live CSV (World Rice, U.S. Quarterly Animal Product Production and Reliability of United States projections tables)"
+ }
+]

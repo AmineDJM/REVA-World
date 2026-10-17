@@ -13,6 +13,7 @@ import polars as pl
 import pytest
 
 from reva.adapters.connectors import (
+    atlas_usda_wasde,
     atlas_vintage_ecb_spf,
     atlas_vintage_oecd,
     atlas_vintage_philfed,
@@ -32,6 +33,7 @@ SPECS = [
     atlas_vintage_ecb_spf.atlas_source(),
     atlas_vintage_oecd.atlas_source(),
     atlas_vintage_steo.atlas_source(),
+    atlas_usda_wasde.atlas_source(),
 ]
 ORIGINS = ("test_fixture",)
 
