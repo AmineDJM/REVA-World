@@ -19,6 +19,7 @@ No probability is produced; these are point-forecast accuracy comparisons (MAE, 
 from __future__ import annotations
 
 import math
+import statistics
 from collections import Counter, defaultdict
 from collections.abc import Sequence
 from datetime import UTC, date, datetime
@@ -63,6 +64,9 @@ def _scores(pairs: list[tuple[float, float, float]]) -> dict[str, Any]:
         "relative_mae": round(mae_f / mae_b, 4) if mae_b else None,
         "share_forecast_closer": round(sum(abs(a) < abs(b) for a, b in zip(ef, eb, strict=True)) / n, 4),
         "mean_error_forecast": round(sum(ef) / n, 4),
+        # medians: robust to hyperinflation / collapse outliers that dominate means in cross-country panels
+        "median_ae_forecast": round(statistics.median(abs(e) for e in ef), 4),
+        "median_ae_baseline": round(statistics.median(abs(e) for e in eb), 4),
     }
 
 
