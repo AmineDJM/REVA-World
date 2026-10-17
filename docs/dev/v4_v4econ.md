@@ -13,8 +13,11 @@ consumer price indices, domain CP), `atlas_ilo.py` + `atlas_wages_gapfill.py` (m
 
 * **Code, fixtures, tests: done and committed.** 5 atlas sources, 1 KG layer module, 1 catalog file, 1 relation
   drop-in, budget request merged (budgets-1.3.17, digest re-pinned).
-* **Live ingest: not run.** Free disk fell to 4.7 GB (< 5 GB rule) right before the live run (other agents'
-  loads). Connector versions are registered in the dev DB (`reva seed`). Commands to finish are at the end.
+* **Live ingest: done in the dev DB `reva` (2026-10-17)**: 5 sources, 22 atlas tables, **1,300,766 cells**;
+  KG 5,628 region entities + 6 `data_series` entities, 27,793 statements; raw archived **117 MB** (IMF 60.6 MB,
+  OECD 38.8 MB, ICP 12.3 MB, Eurostat 5.3 MB, FAO 0.1 MB). Connector versions 1.0.1 (1.0.0 had been registered
+  from an earlier working-tree state by a concurrent seed). Not done (lead): `reva atlas snapshot`,
+  `reva links materialise`.
 * Tests: `tests/unit/test_v4econ_parsers.py` (32 passed), `tests/integration/test_v4econ_ingest.py` (7 passed:
   fixture ingest of every table, idempotent re-run, region KG edges in a throwaway DB); ruff / ruff format /
   mypy clean on all V4ECON files; `python -m reva.kg.families check` OK.
@@ -25,30 +28,30 @@ All requests go through `run.get` (budget-metered live client or fixture client)
 (`run.archive`) before parsing. Sizes "live" were measured on 2026-10-17 with the exact live requests (the
 probe responses were deleted afterwards; nothing was loaded). Raw archive of one full V4ECON run ≈ 110 MB.
 
-| connector (`atlas.*`) | table | provider request | licence | live size | cells (exact = parsed probe; ~ = estimate from size) |
+| connector (`atlas.*`) | table | provider request | licence | live size | cells loaded (countries with a crosswalk key) |
 |---|---|---|---|---|---|
-| `imf_hf` | `imf.cpi_m` | IMF.STA:CPI `.CPI._T.IX+YOY_PCH_PA_PT.M` | IMF terms (© IMF, citation; review pending as for A-IMF) | ~12 MB | ~170 k (192 economies) |
-| | `imf.qnea_q` | IMF.STA:QNEA `.B1GQ.Q+V..XDC+YOY_PCH_PT+POP_PCH_PT.Q` (every S_ADJUSTMENT variant) | idem | ~7 MB | 39,997 (115 economies) |
+| `imf_hf` | `imf.cpi_m` | IMF.STA:CPI `.CPI._T.IX+YOY_PCH_PA_PT.M` | IMF terms (© IMF, citation; review pending as for A-IMF) | ~12 MB | 131,444 (191 economies with a crosswalk key) |
+| | `imf.qnea_q` | IMF.STA:QNEA `.B1GQ.Q+V..XDC+YOY_PCH_PT+POP_PCH_PT.Q` (every S_ADJUSTMENT variant) | idem | ~7 MB | 39,997 (114) |
 | | `imf.ls_mq` | IMF.STA:LS `.U+UP.PT+PE.M+Q` | idem | 4.4 MB | 62,427 (122) |
-| | `imf.pi_m` | IMF.STA:PI `.IND+C.IX+SA_IX.M` | idem | 5.7 MB | 71,397 (80) |
-| | `imf.er_m` | IMF.STA:ER `.XDC_USD.PA_RT.M` | idem | ~11 MB | ~140 k |
-| | `imf.mfs_ir_m` | IMF.STA:MFS_IR policy / money-market / T-bill / bond, `.M` | idem | 3.9 MB | 58,095 (117) |
-| | `imf.bop_q` | IMF.STA:BOP `.NETCD_T.CAB+GS.USD.Q` | idem | 6.0 MB | 38,597 (161) |
-| | `imf.qgfs_q` | IMF.STA:QGFS S13/S1311 revenue, expense, net lending, gross debt (market value) | idem | 1.1 MB | 15,143 (49) |
-| `eurostat_macro` | `eurostat.hicp_m` | `prc_hicp_minr` TOTAL, I25 / RCH_M / RCH_A | Eurostat reuse policy (CC BY 4.0) | ~1 MB | ~43 k |
-| | `eurostat.une_m` | `une_rt_m` total, NSA / SA / TC | idem | 0.5 MB | 42,287 (38) |
-| | `eurostat.gdp_q` | `namq_10_gdp` B1GQ, CP_MEUR / CLV_PCH_PRE / CLV_PCH_SM, NSA/SA/CA/SCA | idem | 0.5 MB | 32,742 (45) |
-| | `eurostat.gov_debt_q` | `gov_10q_ggdebt` S13 GD, MIO_EUR / PC_GDP | idem | 0.1 MB | 6,933 (32) |
-| | `eurostat.ip_m` | `sts_inpr_m` B-D PRD I21, SCA / NSA | idem | ~0.4 MB | ~25 k |
-| | `eurostat.nuts_gdp` | `nama_10r_3gdp` MIO_EUR / EUR_HAB / PPS_EU27_2020_HAB, NUTS 0-3 | idem | ~2 MB | ~126 k (1,814 geos) |
-| | `eurostat.nuts_une` | `lfst_r_lfu3rt` 15-74, NUTS 0-2 | idem | 0.2 MB | 11,967 (510) |
-| | `eurostat.nuts_pop` | `demo_r_pjanaggr3` population 1 January, NUTS 0-3 | idem | 1.0 MB | 55,318 (2,195) |
-| `oecd_macro` | `oecd.kei_mq` | DSD_KEI@DF_KEI UNEMP, IR3TIB, IRLT, CA_GDP, B1GQ_Q, M+Q, from 1990 (code-only CSV) | OECD T&C, CC BY 4.0 default since 2024-07 | ~9 MB | ~84 k (54 areas) |
-| | `oecd.reg_gdp` | DSD_REG_ECO@DF_GDP GDP current prices, XDC + USD_PPP_PS, TL2/TL3/CTRY | idem | ~15 MB | ~123 k |
-| | `oecd.reg_une` | DSD_REG_LAB@DF_RATES UNE_RATE 15-64, TL2/TL3/CTRY | idem | ~4.5 MB | ~38 k |
-| | `oecd.reg_pop` | DSD_REG_DEMO@DF_POP_BROAD POP total, TL2/TL3/CTRY | idem | 9.9 MB | 103,828 (3,375 geos) |
+| | `imf.pi_m` | IMF.STA:PI `.IND+C.IX+SA_IX.M` | idem | 5.7 MB | 71,397 (77) |
+| | `imf.er_m` | IMF.STA:ER `.XDC_USD.PA_RT.M` | idem | ~11 MB | 157,246 (214) |
+| | `imf.mfs_ir_m` | IMF.STA:MFS_IR policy / money-market / T-bill / bond, `.M` | idem | 3.9 MB | 58,095 (114) |
+| | `imf.bop_q` | IMF.STA:BOP `.NETCD_T.CAB+GS.USD.Q` | idem | 6.0 MB | 38,597 (158) |
+| | `imf.qgfs_q` | IMF.STA:QGFS S13/S1311 revenue, expense, net lending, gross debt (market value) | idem | 1.1 MB | 15,143 (48) |
+| `eurostat_macro` | `eurostat.hicp_m` | `prc_hicp_minr` TOTAL, I25 / RCH_M / RCH_A | Eurostat reuse policy (CC BY 4.0) | ~1 MB | 43,547 (39) |
+| | `eurostat.une_m` | `une_rt_m` total, NSA / SA / TC | idem | 0.5 MB | 42,287 (36) |
+| | `eurostat.gdp_q` | `namq_10_gdp` B1GQ, CP_MEUR / CLV_PCH_PRE / CLV_PCH_SM, NSA/SA/CA/SCA | idem | 0.5 MB | 32,742 (39) |
+| | `eurostat.gov_debt_q` | `gov_10q_ggdebt` S13 GD, MIO_EUR / PC_GDP | idem | 0.1 MB | 6,933 (28) |
+| | `eurostat.ip_m` | `sts_inpr_m` B-D PRD I21, SCA / NSA | idem | ~0.4 MB | 25,530 (36) |
+| | `eurostat.nuts_gdp` | `nama_10r_3gdp` MIO_EUR / EUR_HAB / PPS_EU27_2020_HAB, NUTS 0-3 | idem | ~2 MB | 126,340 (34 countries; 1,814 geographies) |
+| | `eurostat.nuts_une` | `lfst_r_lfu3rt` 15-74, NUTS 0-2 | idem | 0.2 MB | 11,967 (36) |
+| | `eurostat.nuts_pop` | `demo_r_pjanaggr3` population 1 January, NUTS 0-3 | idem | 1.0 MB | 55,318 (37; 2,195 geographies) |
+| `oecd_macro` | `oecd.kei_mq` | DSD_KEI@DF_KEI UNEMP, IR3TIB, IRLT, CA_GDP, B1GQ_Q, M+Q, from 1990 (code-only CSV) | OECD T&C, CC BY 4.0 default since 2024-07 | ~9 MB | 84,054 (47) |
+| | `oecd.reg_gdp` | DSD_REG_ECO@DF_GDP GDP current prices, XDC + USD_PPP_PS, TL2/TL3/CTRY | idem | ~15 MB | 123,434 (54) |
+| | `oecd.reg_une` | DSD_REG_LAB@DF_RATES UNE_RATE 15-64, TL2/TL3/CTRY | idem | ~4.5 MB | 37,976 (46) |
+| | `oecd.reg_pop` | DSD_REG_DEMO@DF_POP_BROAD POP total, TL2/TL3/CTRY | idem | 9.9 MB | 103,828 (55; 3,375 geos) |
 | | (KG only) | codelist `OECD/CL_REGIONAL/latest` (names en/fr, parents, TL family) | idem | 5.6 MB | 4,944 codes |
-| `wb_icp` | `wb.icp2021` | API v2 source 90, all series × PX.WL + PPPGlob, 2021 + 2017 (revised) | CC BY 4.0 | 12.3 MB | 29,818 (207 geos, 48 headings; 9,926 nulls not stored) |
+| `wb_icp` | `wb.icp2021` | API v2 source 90, all series × PX.WL + PPPGlob, 2021 + 2017 (revised) | CC BY 4.0 | 12.3 MB | 29,818 (193) |
 | `fao_ffpi` | `fao_ffpi.ffpi_m` | FFPI page + `food_price_indices_data.csv` | FAO website terms: **non-commercial** | 0.11 MB | 2,646 (1990-01 → 2026-09) |
 
 Budget keys: `imf.sdmx` 76/day, `oecd.sdmx` 92, `eurostat.dissemination` 116, `worldbank.atlas` 42 (shared
@@ -85,8 +88,8 @@ carried the code).
 
 | entity | kind | id authority | count (live probe) |
 |---|---|---|---|
-| `nuts:<code>` | `nuts_region` | Eurostat NUTS code (levels 1-3) | ~2,150 (union of the three NUTS tables) |
-| `oecdreg:<code>` | `oecd_region` | OECD `CL_REGIONAL` code (TL2 / TL3) | ~3,320 (741 TL2, 2,577 TL3) |
+| `nuts:<code>` | `nuts_region` | Eurostat NUTS code (levels 1-3) | 2,211 (loaded) |
+| `oecdreg:<code>` | `oecd_region` | OECD `CL_REGIONAL` code (TL2 / TL3) | 3,417 (loaded) |
 | `atlas:<source>.<dataset>` | `data_series` | REVA atlas table key | 6 |
 
 Predicates (registered with `register_properties`; families in `registry/kg/relations_v4.d/v4econ.yaml`):
@@ -100,17 +103,22 @@ Predicates (registered with `register_properties`; families in `registry/kg/rela
 | `econ:measured_by` | `measured_by` | the atlas table holding the region's cells (qualifiers `table`, `provider_geo`) |
 | `nuts:level`, `oecdreg:territorial_level` | (literal) | code length / `TERRITORIAL_LEVEL` |
 
-Live-probe counts for `oecd.reg_pop` alone: 3,318 regions, 2,394 regional parents, 924 parents that are the
-country itself (carried by `in_country`), 3,318 `measured_by`.
+Loaded statements (dev DB): `nuts:part_of` 2,057, `nuts:in_country` 2,211, `nuts:level` 2,211,
+`oecdreg:part_of` 2,470 (947 OECD regions whose CL_REGIONAL parent is the country itself get no part_of),
+`oecdreg:in_country` 3,417, `oecdreg:territorial_level` 3,417, `econ:measured_by` 12,010; 0 rejections,
+0 missing country QIDs.
 
-Examples (ids as loaded in the integration test from real fixture bytes):
+Examples (ids as loaded in the dev DB):
 
 * `nuts:FR101` (Paris) → `nuts:part_of` → `nuts:FR10` (Île-de-France, NUTS 2) → `nuts:part_of` → `nuts:FR1`
   (NUTS 1); `nuts:FR10` → `nuts:in_country` → `Q142` (France); `nuts:FR101` → `econ:measured_by` →
   `atlas:eurostat.nuts_gdp` (GDP, EUR per inhabitant, PPS per inhabitant, NUTS 3, 2000-2024).
 * `oecdreg:FRL04` (Bouches-du-Rhône, TL3) → `oecdreg:part_of` → `oecdreg:FRL` (Provence-Alpes-Côte d'Azur,
   TL2) → `oecdreg:in_country` → `Q142`; `oecdreg:FRL04` → `econ:measured_by` → `atlas:oecd.reg_pop`.
-* `nuts:EL303` → `nuts:in_country` → Greece (`EL` = Eurostat code for GRC).
+* `nuts:DE212` (München, Kreisfreie Stadt) → `nuts:part_of` → `nuts:DE21` (Oberbayern); `nuts:DE212` →
+  `nuts:in_country` → `Q183` (Germany).
+* `oecdreg:JPD13` (Tokyo) → `oecdreg:part_of` → `oecdreg:JPD` (Southern-Kanto) → `oecdreg:in_country` → `Q17`;
+  `oecdreg:US06` (California) → `econ:measured_by` → `atlas:oecd.reg_gdp`, `atlas:oecd.reg_pop`, `atlas:oecd.reg_une`.
 
 Never merged: `nuts:FR101` and `oecdreg:FR101` are distinct entities (neither source publishes the
 equivalence). Wikidata holds NUTS codes (P605); a `same_as` bridge through that external id is V4LINK's job.
@@ -153,12 +161,12 @@ concepts), themes `economy` / `prices`. Sub-annual concepts note "not attached t
 2. **Global Data Lab**: account creation and acceptance of the non-commercial licence.
 3. **IMF terms**: same pending review as A-IMF (`registry/sources/imf.yaml`).
 
-## Commands to finish (dev DB, when `df -h /` shows ≥ 5 GB free; ~110 MB raw + ~40 MB Parquet)
+## Commands (re-run / another machine; needs ≥ 5 GB free, ~117 MB raw + Parquet)
 
 ```bash
 cd /home/user/REVA-World
 df -h /                                                    # >= 5 GB free, else stop
-flock /tmp/reva-devdb.lock uv run reva seed                # already done 2026-10-17 (connector versions)
+flock /tmp/reva-devdb.lock uv run reva seed                # registers the connector versions
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.fao_ffpi
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.eurostat_macro   # + NUTS KG layer
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.wb_icp
