@@ -6,10 +6,10 @@ title: Philadelphia Fed Real-Time Data Set for Macroeconomists and Survey of Pro
 provider_url: https://www.philadelphiafed.org/surveys-and-data/real-time-data-research
 lineage_family: philfed
 rights:
-  licence: "Federal Reserve Bank of Philadelphia public data (no explicit open licence on the data pages)"
-  terms_url: https://www.philadelphiafed.org/privacy-and-terms-of-use
+  licence: "no data licence stated on the data pages; site footer: 'Copyright 2026. All rights reserved. Federal Reserve Bank of Philadelphia'"
+  restriction: "free public download; redistribution terms not stated (owner decision before republishing values)"
   attribution: "Federal Reserve Bank of Philadelphia, Real-Time Data Set for Macroeconomists; Survey of Professional Forecasters"
-  open_licence: null
+  open_licence: false
 metadata:
   allowed_hosts: [www.philadelphiafed.org]
   files:

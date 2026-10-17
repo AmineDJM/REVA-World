@@ -50,6 +50,12 @@ URL = f"https://{HOST}/service/data/SPF/Q.U2.HICP+RGDP+UNEM.POINT..Q.AVG?format=
 TOPICS = {"HICP": "hicp_inflation", "RGDP": "real_gdp_growth", "UNEM": "unemployment_rate"}
 LT_RULE = "5 calendar years ahead in SPF Q3 and Q4 rounds and 4 calendar years ahead in SPF Q1 and Q2 rounds"
 MAX_BYTES = 10_000_000
+TERMS_URL = "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
+TERMS_QUOTE = (
+    "Subject to the exception below, users of this website may make free use of the information obtained directly "
+    "from it subject to the following conditions: When such information is distributed or reproduced, it must "
+    "appear accurately and the ECB must be cited as the source."
+)
 _ROUND = re.compile(r"^(\d{4})-Q([1-4])$")
 
 
@@ -69,8 +75,8 @@ def atlas_source() -> AtlasSourceSpec:
         source_key=SOURCE_KEY,
         atlas_source=ATLAS_SOURCE,
         provider="European Central Bank, Survey of Professional Forecasters (ECB Data Portal)",
-        licence="ECB statistics reuse: free of charge with source acknowledgement "
-        "(https://www.ecb.europa.eu/stats/ecb_statistics/governance_and_quality_framework/html/usage_policy.en.html)",
+        licence="ECB website copyright: free use provided the information appears accurately and the ECB is cited "
+        "as the source (https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html)",
         allowed_hosts=(HOST,),
         datasets=(DS,),
         dataset_ids=("ECB:SPF(1.0)",),
@@ -87,11 +93,12 @@ def atlas_source() -> AtlasSourceSpec:
 
 def rights() -> dict[str, Any]:
     return {
-        "licence": "ECB statistics: reuse free of charge provided the source is acknowledged",
-        "licence_url": "https://www.ecb.europa.eu/stats/ecb_statistics/governance_and_quality_framework/html/usage_policy.en.html",
+        "licence": "ECB website copyright: free use provided the information appears accurately and the ECB is cited",
+        "licence_url": TERMS_URL,
+        "terms_quote": TERMS_QUOTE,
         "attribution": "Source: European Central Bank, Survey of Professional Forecasters (ECB Data Portal)",
-        "commercial_use": "permitted",
         "open_licence": None,
+        "restriction": "documents that are sold must tell buyers the information is available free of charge (ECB terms)",
         "licence_checked": "2026-10-17",
     }
 

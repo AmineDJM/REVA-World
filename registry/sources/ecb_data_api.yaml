@@ -1,12 +1,18 @@
 # V5 (agent PRED-VINTAGE): ECB Data Portal SDMX API (Survey of Professional Forecasters).
 # Connector src/reva/adapters/connectors/atlas_vintage_ecb_spf.py (atlas.vintage_ecb_spf -> vintage_ea.ecb_spf).
+# Same host as PRED-HF's ecb.stats (daily statistics); a separate key keeps the two budgets apart.
 source_key: ecb.data_api
 title: ECB Data Portal SDMX API (Survey of Professional Forecasters, dataflow ECB:SPF)
 provider_url: https://data.ecb.europa.eu/data/datasets/SPF
 lineage_family: ecb
 rights:
-  licence: "ECB statistics: reuse free of charge provided the source is acknowledged"
-  licence_url: https://www.ecb.europa.eu/stats/ecb_statistics/governance_and_quality_framework/html/usage_policy.en.html
+  licence: "ECB website copyright: free use provided the information appears accurately and the ECB is cited as the source"
+  licence_url: https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html
+  terms_quote: >-
+    Subject to the exception below, users of this website may make free use of the information obtained directly
+    from it subject to the following conditions: When such information is distributed or reproduced, it must appear
+    accurately and the ECB must be cited as the source.
+  licence_checked: "2026-10-17"
   attribution: "Source: European Central Bank, Survey of Professional Forecasters"
 metadata:
   allowed_hosts: [data-api.ecb.europa.eu]

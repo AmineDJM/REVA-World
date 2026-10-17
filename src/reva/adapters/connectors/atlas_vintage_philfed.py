@@ -71,7 +71,7 @@ SPF_FILES = {"level": "medianLevel.xlsx", "growth": "medianGrowth.xlsx"}
 XLSX_MEDIA = ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/octet-stream")
 MAX_BYTES = 5_000_000
 GEO = "USA"
-TERMS_URL = "https://www.philadelphiafed.org/privacy-and-terms-of-use"
+FOOTER_QUOTE = "Copyright 2026. All rights reserved. Federal Reserve Bank of Philadelphia"
 
 #: RTDSM file -> (column root, REVA variable, unit as documented, observation frequency).
 RTDSM_FILES: dict[str, tuple[str, str, str, str]] = {
@@ -128,9 +128,9 @@ def atlas_source() -> AtlasSourceSpec:
         atlas_source=ATLAS_SOURCE,
         provider="Federal Reserve Bank of Philadelphia (Real-Time Data Set for Macroeconomists; Survey of "
         "Professional Forecasters)",
-        licence="Federal Reserve Bank of Philadelphia public data downloads; no explicit open licence (site terms: "
-        + TERMS_URL
-        + "); cite the source",
+        licence="Federal Reserve Bank of Philadelphia public downloads; no data licence stated (site footer: '"
+        + FOOTER_QUOTE
+        + "')",
         allowed_hosts=(HOST,),
         datasets=(DS_RTDSM, DS_SPF),
         dataset_ids=tuple(RTDSM_FILES) + tuple(SPF_FILES.values()),
@@ -150,12 +150,12 @@ def atlas_source() -> AtlasSourceSpec:
 
 def rights() -> dict[str, Any]:
     return {
-        "licence": "Federal Reserve Bank of Philadelphia public data (no explicit open licence)",
-        "terms_url": TERMS_URL,
+        "licence": "no data licence stated; site footer: " + FOOTER_QUOTE,
         "attribution": "Federal Reserve Bank of Philadelphia, Real-Time Data Set for Macroeconomists / Survey of "
         "Professional Forecasters",
-        "open_licence": None,
-        "restriction": "no explicit licence statement on the data pages; redistribution terms not verified",
+        "open_licence": False,
+        "restriction": "all rights reserved (site footer); free public download, redistribution terms not stated: "
+        "owner decision before republishing values",
         "licence_checked": "2026-10-17",
     }
 
