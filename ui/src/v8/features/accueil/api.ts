@@ -14,6 +14,25 @@ import { getForecastQuestions } from '../../../v3/api/forecasts';
 
 const Int = z.number().int();
 
+/**
+ * One request shared by the panels that need the same read during one page view (the glance strip and the
+ * panels): the promise is reused for `ttlMs`; a failure is not kept. Callers' abort signals do not cancel it.
+ */
+export function shared<T>(fn: () => Promise<T>, ttlMs = 15_000): () => Promise<T> {
+  let p: Promise<T> | null = null;
+  let at = 0;
+  return () => {
+    if (!p || Date.now() - at > ttlMs) {
+      at = Date.now();
+      p = fn();
+      p.catch(() => {
+        p = null;
+      });
+    }
+    return p;
+  };
+}
+
 export const ChangeItem = z.looseObject({
   id: z.string(),
   kind: z.string(),
@@ -98,7 +117,7 @@ export interface CalendarView {
   sample: { n: number; total: number } | null;
 }
 
-export async function getCalendar(signal?: AbortSignal): Promise<CalendarView> {
+export async function fetchCalendar(signal?: AbortSignal): Promise<CalendarView> {
   try {
     const [live, cal] = await Promise.all([
       v3get('/v1/v8/scores/live', envelopeOf(LiveState), undefined, signal),
@@ -169,7 +188,7 @@ async function raw<S extends z.ZodType>(path: string, schema: S, query?: Record<
   return parseWith(schema, body && typeof body === 'object' && 'data' in body ? body.data : body, path);
 }
 
-export const getDecisions = (signal?: AbortSignal) => raw('/v1/v8/coverage/decisions', DecisionsView, undefined, signal);
+export const fetchDecisions = (signal?: AbortSignal) => raw('/v1/v8/coverage/decisions', DecisionsView, undefined, signal);
 
 export const CoverageMeta = z.looseObject({
   computed_at: z.string(),
@@ -200,4 +219,8 @@ export type CoverageRow = z.output<typeof CoverageRow>;
 export const CoverageGlance = z.looseObject({ meta: CoverageMeta, rows: z.array(CoverageRow) });
 export type CoverageGlance = z.output<typeof CoverageGlance>;
 
-export const getCoverage = (signal?: AbortSignal) => raw('/v1/v8/coverage/matrix', CoverageGlance, { level: 'region' }, signal);
+export const fetchCoverage = (signal?: AbortSignal) => raw('/v1/v8/coverage/matrix', CoverageGlance, { level: 'region' }, signal);
+
+export const getCalendar = shared(() => fetchCalendar());
+export const getDecisions = shared(() => fetchDecisions());
+export const getCoverage = shared(() => fetchCoverage());
