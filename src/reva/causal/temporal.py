@@ -206,6 +206,8 @@ def temporal_detail(
 
 def claim_time_window(period: Mapping[str, Any] | None) -> Window | None:
     """The claim's own time qualifier (``scope.period`` of a KG claim): P585 point in time, else P580 start."""
+    if not isinstance(period, Mapping):  # dataset claims may carry a textual period (e.g. "1990-1995"): no window
+        return None
     for key, pid in (("pit", "P585"), ("start", "P580")):
         p = (period or {}).get(key)
         if isinstance(p, Mapping) and isinstance(p.get("time"), str) and isinstance(p.get("precision"), int):
