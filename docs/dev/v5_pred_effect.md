@@ -53,7 +53,7 @@ attributed numbers). Contract for other agents: `docs/dev/v5_effect_interface.md
 | `bobasu_ciccarelli_notarpietro_2025` | Bobasu, Ciccarelli & Notarpietro (eds.), *Monetary policy transmission: a reference guide through ESCB models and empirical benchmarks*, ECB OP 377 (2025, doi:10.2866/0318025), https://www.ecb.europa.eu/pub/pdf/scpops/ecb.op377en.pdf | 7,546,684 | © ECB, all rights reserved | 10: meta-analysis (409 studies) of an unexpected +25 bp policy-rate shock: output peak −0.25 % mean / −0.15 % median after ~2 years, price level −0.18 / −0.11 % after ~4 years, inflation −0.05 / −0.03 pp after ~3 years, publication-bias corrected output −0.14 / −0.08 %, price level −0.08 / −0.05 % |
 | `gutmann_neuenkirch_neumeier_2022` | Gutmann, Neuenkirch & Neumeier, *The Economic Effects of International Sanctions: An Event Study*, Trier Research Papers in Economics 3/21 (version 23 Dec 2022), https://www.uni-trier.de/fileadmin/fb4/prof/VWL/EWF/Research_Papers/2021-03.pdf | 945,852 | no licence statement (treated as all rights reserved) | 3: sanction episode (`event_type:sanction_episode`) → GDP per capita growth −1.32 pp (year 1), −1.50 pp (year 2), GDP per capita level −2.82 % over the first two years (158 countries, 1960-2016) |
 
-Raw archive: 10 PDFs, 17.5 MB (budget ≤ 100 MB). The PDFs are not redistributable; they live only in the raw
+Raw archive: 9 PDFs archived through the connector, 16.3 MB (the IMF PDF was refused) (budget ≤ 100 MB). The PDFs are not redistributable; they live only in the raw
 store (provenance) and are **not** committed (fixture tests use a synthetic CC0 text document).
 
 ## Load (dev DB)
@@ -84,7 +84,7 @@ Dev DB `reva` (migration applied with `flock /tmp/reva-devdb.lock uv run reva db
   (growth rate) → effect `atlas_concept:imf.unemployment_rate` (pp change): −0.405 (SE 0.029), so PRED-ENGINE can
   propagate directly between atlas concepts.
 * `pub:effects.literature:choi_furceri_loungani_mishra_poplawski_ribeiro_2017:headline_inflation_impact_10pct_oil` —
-  `variable:oil_price.global` +10 % → `atlas_concept:imf.inflation_cpi_avg` +0.4 pp on impact (no SE: `basis: null`).
+  `variable:oil_price.global` +10 % → `atlas_concept:imf.inflation_cpi_avg` +0.4 pp on impact (no SE: `basis: null`) — curated and validated, **not loaded live** (IMF HTTP 403).
 * `pub:effects.literature:head_mayer_2013:trade_elasticity_tariff_identified_structural` — trade elasticity −5.03
   (median of 435 estimates, s.d. across estimates 9.3).
 * `pub:effects.literature:ramey_zubairy_2014:linear_2y` — U.S. government purchases multiplier 0.76 (SE 0.102),
