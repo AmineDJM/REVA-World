@@ -34,7 +34,19 @@ strawman's over-wide spread; the registered densities are about as good as the o
 
 ## DB (dev DB `reva`, origin `live`, under `flock /tmp/reva-devdb.lock`)
 
-DB_RESULTS_PLACEHOLDER
+All in one `flock` session (21:58–21:59 UTC; free disk 4.8 GB, no ingest):
+
+| Action | Result |
+|---|---|
+| `reva seed` | `forecast.weo_error_fan@1.0.0` registered (model.version) |
+| Annotation of `6d76937c…` (energy) | artifact `66a98c1b413583570e6850a014ba80ca602d7f7812b8f496c9e5850fce4f5b98` — kind `eia_derived_winner_excluded`, 18 `combo_steo_rw` forecasts listed |
+| Annotation of `ef57141a…` (conflict) | artifact `430eedac81f6f8bccd1bff19deb280b8ec243b9c591ee89d05f37498d61c2509` — kind `near_nowcast_questions`, 765 questions on 2026 (elapsed 0.79), 765 on 2027 = forecasts |
+| Annotation of `0ab8fcc2…` (health) | artifact `305cdafc5b65afbe54b4f6c3b6071d347e4b402a3846b4a829eea347963ad9b8` — kind `final_vintage_admission` (FluNet `blend`; GHE `blend`, `log_drift`: 612 + 504 candidate forecasts) |
+| `issue_supplements` | supplementary sealed batch `b873b655d25d7227280567141190f6ecab42b1e61bfa0a25ca6bf67c085fff4e` (supplement of `96c6ad48…`, 21:59:13 UTC): **19 `forecast.weo_error_fan` forecasts** on the 19 `weo.gdp_growth` h0 questions that carry the registered WEO densities — the prospective fair comparison is now sealed |
+
+Each annotation is a content-addressed `evaluation` artifact (schema `reva-forecast-registry-annotation/1`) with a
+provenance activity `evaluation.forecast_registry_annotate` whose input is the sealed batch; the batches were
+verified (`load_frozen_manifest`) and not modified.
 
 ## Tests
 
