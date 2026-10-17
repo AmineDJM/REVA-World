@@ -32,6 +32,7 @@ import hashlib
 import inspect
 from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -41,12 +42,24 @@ from reva.adapters.connectors.v4link_common import P_CLASSIFIED_AS, P_WIKIDATA_I
 from reva.atlas.sources import AtlasSourceSpec
 
 NAME = "atlas.v4link_wikidata"
-VERSION = "1.0.0"
+QL_NAME = "atlas.v4link_qlever"
+VERSION = "1.1.0"
 PARSER_VERSION = "atlas_v4link_wikidata/1"
 SOURCE_KEY = "wikidata.wdqs"
 ATLAS_SOURCE = "v4link"
 DATASET = "wikidata_bridges"
 WD_HOST = "query.wikidata.org"
+QL_HOST = "qlever.dev"
+QL_SOURCE_KEY = "qlever.wikidata"
+QL_URL = f"https://{QL_HOST}/api/wikidata"
+QL_PREFIXES = """PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+"""
+SPARQL_JSON = "application/sparql-results+json"
 DAY = 86400
 MAX_WD_BYTES = 60_000_000
 PREFIX = "v4xref:"
@@ -142,6 +155,7 @@ def bridge_statements(
     query_sha256: str,
     retrieved_at: datetime,
     global_duplicates: Mapping[str, set[str]] | None = None,
+    stated_in: str = "Wikidata",
 ) -> tuple[list[Any], dict[str, Any]]:
     from reva.kg.model import KgStatement
 
@@ -172,7 +186,7 @@ def bridge_statements(
                 object_qid=obj,
                 qualifiers=quals,
                 rank=h.rank,
-                references=[{"stated_in": f"Wikidata ({h.property} {rule.label})", "query_sha256": query_sha256}],
+                references=[{"stated_in": f"{stated_in} ({h.property} {rule.label})", "query_sha256": query_sha256}],
                 statement_id=f"{PREFIX}{pack.id}:{h.statement_id}",
                 source_revision=revision,
                 raw_sha256=raw_sha256,
@@ -259,31 +273,130 @@ def item_entities(
 
 
 # ============================================================================================== atlas protocol
-def atlas_source() -> AtlasSourceSpec:
+def atlas_source() -> list[AtlasSourceSpec]:
     rules = common.load_rules()
-    return AtlasSourceSpec(
-        name=NAME,
-        version=VERSION,
-        source_key=SOURCE_KEY,
-        budget_key=SOURCE_KEY,
-        atlas_source=ATLAS_SOURCE,
-        provider="Wikidata (WDQS), community-edited; external-identifier statements",
-        licence="CC0-1.0 (https://www.wikidata.org/wiki/Wikidata:Licensing)",
-        allowed_hosts=(WD_HOST,),
-        datasets=(DATASET,),
-        dataset_ids=tuple(f"wikidata:{p}" for p in sorted(rules.rules)),
-        cadence_seconds=30 * DAY,
-        planned_requests=2 * len(rules.packs) + len(rules.rules) + 4,
-        max_response_bytes=MAX_WD_BYTES,
-        min_interval_seconds=2.0,
-        parser_version=PARSER_VERSION,
-        code_digest=code_digest(),
-        field_mappings={
+    common_kw: dict[str, Any] = {
+        "version": VERSION,
+        "atlas_source": ATLAS_SOURCE,
+        "licence": "CC0-1.0 (https://www.wikidata.org/wiki/Wikidata:Licensing)",
+        "datasets": (DATASET,),
+        "dataset_ids": tuple(f"wikidata:{p}" for p in sorted(rules.rules)),
+        "cadence_seconds": 30 * DAY,
+        "planned_requests": 2 * len(rules.packs) + len(rules.rules) + 4,
+        "max_response_bytes": MAX_WD_BYTES,
+        "parser_version": PARSER_VERSION,
+        "code_digest": code_digest(),
+        "field_mappings": {
             "identity": "<scheme>:<value> v4link:wikidata_item Q",
             "classification": "Q v4link:classified_as <scheme>:<code>",
         },
-        notes="KG only (no atlas table): V4 identifier bridges through Wikidata items (registry/kg/identity_rules_v4.yaml).",
-    )
+    }
+    return [
+        AtlasSourceSpec(
+            name=NAME,
+            source_key=SOURCE_KEY,
+            budget_key=SOURCE_KEY,
+            provider="Wikidata (WDQS), community-edited; external-identifier statements",
+            allowed_hosts=(WD_HOST,),
+            min_interval_seconds=2.0,
+            notes="KG only: V4 identifier bridges through Wikidata items (registry/kg/identity_rules_v4.yaml), via WDQS.",
+            **common_kw,
+        ),
+        AtlasSourceSpec(
+            name=QL_NAME,
+            source_key=QL_SOURCE_KEY,
+            budget_key=QL_SOURCE_KEY,
+            provider=(
+                "Wikidata (community-edited) as indexed by QLever (University of Freiburg, qlever.dev): the complete "
+                "Wikidata RDF dump, updated live; same statements and statement ids as WDQS"
+            ),
+            allowed_hosts=(QL_HOST,),
+            min_interval_seconds=3.0,
+            notes=(
+                "Same packs and rules as atlas.v4link_wikidata, read from the QLever mirror when WDQS throttles the "
+                "shared egress (429 with Retry-After ~1000 s on 2026-10-17); the index name/date is archived per run."
+            ),
+            **common_kw,
+        ),
+    ]
+
+
+@dataclass
+class Sparql:
+    bindings: list[dict[str, Any]]
+    raw_sha256: str
+    query_sha256: str
+    retrieved_at: datetime
+    bytes: int
+
+    def column(self, var: str) -> list[str | None]:
+        return [b.get(var, {}).get("value") for b in self.bindings]
+
+
+class WdqsFetcher:
+    """WDHARVEST's locked, paced, archived WDQS client."""
+
+    source_key = SOURCE_KEY
+
+    def __init__(self, client: Any) -> None:
+        self.client = client
+
+    async def sparql(self, query: str, purpose: str) -> Sparql:
+        r = await self.client.sparql(query, meta={"purpose": purpose, "connector": NAME})
+        return Sparql(list(r.bindings), r.raw_sha256, r.query_sha256, r.retrieved_at, r.bytes)
+
+    def stats(self) -> dict[str, Any]:
+        return dict(self.client.stats.as_dict())
+
+
+class QleverFetcher:
+    """QLever's Wikidata endpoint through the run's budget-metered client (``run.get``, raw archived)."""
+
+    source_key = QL_SOURCE_KEY
+
+    def __init__(self, run: Any) -> None:
+        self.run = run
+        self.requests = 0
+
+    async def get_json(self, url: str, key: str) -> tuple[Any, str, datetime, int]:
+        import json as _json
+
+        from reva.kernel.errors import SourceResponseError
+
+        acq = await self.run.get(
+            url, key=key, media_types=(SPARQL_JSON, "application/json"), headers={"Accept": SPARQL_JSON}
+        )
+        self.requests += 1
+        try:
+            doc = _json.loads(acq.body)
+        except ValueError as e:
+            raise SourceResponseError(f"QLever {key}: not JSON", retryable=False) from e
+        return doc, self.run.archive(acq), acq.retrieved_at, len(acq.body)
+
+    async def index_info(self) -> dict[str, Any]:
+        doc, sha, _t, _n = await self.get_json(f"{QL_URL}?cmd=stats", "qlever_stats")
+        return {
+            "name_index": str(doc.get("name-index", ""))[:300],
+            "version_server": doc.get("version-server"),
+            "raw_sha256": sha,
+        }
+
+    async def sparql(self, query: str, purpose: str) -> Sparql:
+        import hashlib as _h
+        from urllib.parse import urlencode
+
+        from reva.kernel.errors import SourceResponseError
+
+        q = (QL_PREFIXES + query.strip()).strip()
+        doc, sha, t, n = await self.get_json(f"{QL_URL}?{urlencode({'query': q})}", purpose)
+        try:
+            bindings = list(doc["results"]["bindings"])
+        except (KeyError, TypeError) as e:
+            raise SourceResponseError(f"QLever {purpose}: not SPARQL JSON results", retryable=False) from e
+        return Sparql(bindings, sha, _h.sha256(q.encode()).hexdigest(), t, n)
+
+    def stats(self) -> dict[str, Any]:
+        return {"requests": self.requests}
 
 
 async def global_duplicates(
@@ -306,7 +419,7 @@ async def global_duplicates(
             check[pid] = "complete (all holders fetched)"
             continue
         try:
-            res = await client.sparql(duplicates_query(pid), meta={"purpose": f"v4link_dups_{pid}", "connector": NAME})
+            res = await client.sparql(duplicates_query(pid), f"v4link_dups_{pid}")
         except (
             SourceResponseError,
             WikidataError,
@@ -344,70 +457,78 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     rules = common.load_rules()
     out: dict[str, Any] = {"rules_version": rules.version, "packs": {}}
     with tempfile.TemporaryDirectory(prefix="reva-v4link-lock-") as tmp:
-        lock = MachineLock(Path(tmp), min_interval=0.0) if run.origin != "live" else None
-        client = WikidataClient(run.http, archive=Archive(run.store), lock=lock, max_retries=6)
+        fetcher: WdqsFetcher | QleverFetcher
+        if run.spec.name == QL_NAME:
+            fetcher = QleverFetcher(run)
+            out["qlever_index"] = await fetcher.index_info()
+        else:
+            lock = MachineLock(Path(tmp), min_interval=0.0) if run.origin != "live" else None
+            fetcher = WdqsFetcher(WikidataClient(run.http, archive=Archive(run.store), lock=lock, max_retries=6))
         for pack in _selected_packs(run, rules):
-            res = await client.sparql(pack_query(pack), meta={"purpose": f"v4link_{pack.id}", "connector": NAME})
-            held, labels, skipped = held_rows(res.bindings)
-            raws = [res.raw_sha256]
-            dups, dup_check = await global_duplicates(client, rules, pack, raws)
-            sts, brep = bridge_statements(
-                held,
-                rules,
-                pack,
-                raw_sha256=res.raw_sha256,
-                query_sha256=res.query_sha256,
-                retrieved_at=res.retrieved_at,
-                global_duplicates=dups,
-            )
-            brep["global_ambiguity_check"] = dup_check
-            crep: dict[str, Any] | None = None
-            if pack.with_country:
-                cres = await client.sparql(
-                    country_query(pack), meta={"purpose": f"v4link_{pack.id}_country", "connector": NAME}
-                )
-                csts, crep = country_statements(
-                    cres.bindings,
-                    pack,
-                    raw_sha256=cres.raw_sha256,
-                    query_sha256=cres.query_sha256,
-                    retrieved_at=cres.retrieved_at,
-                )
-                sts.extend(csts)
-                raws.append(cres.raw_sha256)
-            linked_items = {s.object_qid if s.property_pid == P_WIKIDATA_ITEM else s.subject_qid for s in sts}
-            linked = [h for h in held if h.item in linked_items]
-            known = common.existing_entities(run.engine, sorted(linked_items), run.origin)
-            ents = item_entities(labels, linked, rules, known)
-            kg = common.load_kg(
-                run.engine,
-                run.store,
-                entities=ents,
-                statements=sts,
-                source_key=SOURCE_KEY,
-                raw_sha256s=raws,
-                retrieved_at=res.retrieved_at,
-                origin=run.origin,
-                parameters={
-                    "connector": NAME,
-                    "parser": PARSER_VERSION,
-                    "pack": pack.id,
-                    "query_sha256": res.query_sha256,
-                    "rules_version": rules.version,
-                },
-                retract_prefix=f"{PREFIX}{pack.id}:",
-            )
-            out["packs"][pack.id] = {
-                "raw_sha256": res.raw_sha256,
-                "bytes": res.bytes,
-                "rows": len(res.bindings),
-                "statements_read": len(held),
-                "items": len({h.item for h in held}),
-                "skipped": dict(skipped),
-                "bridges": brep,
-                "country": crep,
-                "entities_new": len(ents),
-                "kg": kg,
-            }
-        out["client"] = client.stats.as_dict()
+            out["packs"][pack.id] = await ingest_pack(run, fetcher, rules, pack)
+        out["client"] = fetcher.stats()
     return out
+
+
+async def ingest_pack(run: Any, fetcher: Any, rules: Rules, pack: Pack) -> dict[str, Any]:
+    res = await fetcher.sparql(pack_query(pack), f"v4link_{pack.id}")
+    held, labels, skipped = held_rows(res.bindings)
+    raws = [res.raw_sha256]
+    dups, dup_check = await global_duplicates(fetcher, rules, pack, raws)
+    sts, brep = bridge_statements(
+        held,
+        rules,
+        pack,
+        raw_sha256=res.raw_sha256,
+        query_sha256=res.query_sha256,
+        retrieved_at=res.retrieved_at,
+        global_duplicates=dups,
+        stated_in="Wikidata via QLever" if fetcher.source_key == QL_SOURCE_KEY else "Wikidata",
+    )
+    brep["global_ambiguity_check"] = dup_check
+    crep: dict[str, Any] | None = None
+    if pack.with_country:
+        cres = await fetcher.sparql(country_query(pack), f"v4link_{pack.id}_country")
+        csts, crep = country_statements(
+            cres.bindings,
+            pack,
+            raw_sha256=cres.raw_sha256,
+            query_sha256=cres.query_sha256,
+            retrieved_at=cres.retrieved_at,
+        )
+        sts.extend(csts)
+        raws.append(cres.raw_sha256)
+    linked_items = {s.object_qid if s.property_pid == P_WIKIDATA_ITEM else s.subject_qid for s in sts}
+    linked = [h for h in held if h.item in linked_items]
+    known = common.existing_entities(run.engine, sorted(linked_items), run.origin)
+    ents = item_entities(labels, linked, rules, known)
+    kg = common.load_kg(
+        run.engine,
+        run.store,
+        entities=ents,
+        statements=sts,
+        source_key=fetcher.source_key,
+        raw_sha256s=raws,
+        retrieved_at=res.retrieved_at,
+        origin=run.origin,
+        parameters={
+            "connector": run.spec.name,
+            "parser": PARSER_VERSION,
+            "pack": pack.id,
+            "query_sha256": res.query_sha256,
+            "rules_version": rules.version,
+        },
+        retract_prefix=f"{PREFIX}{pack.id}:",
+    )
+    return {
+        "raw_sha256": res.raw_sha256,
+        "bytes": res.bytes,
+        "rows": len(res.bindings),
+        "statements_read": len(held),
+        "items": len({h.item for h in held}),
+        "skipped": dict(skipped),
+        "bridges": brep,
+        "country": crep,
+        "entities_new": len(ents),
+        "kg": kg,
+    }

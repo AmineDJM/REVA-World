@@ -1,0 +1,18 @@
+# V4 (agent V4LINK): Wikidata read through the QLever SPARQL endpoint (University of Freiburg), used when WDQS
+# throttles the shared egress. Connector: src/reva/adapters/connectors/atlas_v4link_wikidata.py (atlas.v4link_qlever).
+source_key: qlever.wikidata
+title: Wikidata via QLever (qlever.dev/api/wikidata), complete Wikidata RDF dump updated live
+provider_url: https://qlever.dev/wikidata
+lineage_family: wikidata
+rights:
+  licence: CC0 1.0 (Wikidata data); the endpoint is a public research service of the University of Freiburg
+  licence_url: https://www.wikidata.org/wiki/Wikidata:Licensing
+  attribution: >-
+    Wikidata contributors (CC0), queried through QLever (Hannah Bast et al., University of Freiburg,
+    https://qlever.dev). The index name/date answered by ?cmd=stats is archived with every run.
+metadata:
+  allowed_hosts: [qlever.dev]
+  authentication: none
+  note: >-
+    Same data model and statement ids as WDQS (the full Wikidata TTL dump incl. p:/ps:/wikibase:rank). Community-edited:
+    every statement is labelled with source key qlever.wikidata and the Wikidata statement id.

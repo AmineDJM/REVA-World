@@ -192,8 +192,9 @@ def test_held_rows_parses_wdqs_bindings() -> None:
 def test_sources_declared() -> None:
     s = uc.atlas_source()
     assert s.allowed_hosts == ("unstats.un.org",) and s.planned_requests == len(uc.FILES)
-    w = wd.atlas_source()
+    w, q = wd.atlas_source()
     assert w.budget_key == "wikidata.wdqs" and w.allowed_hosts == ("query.wikidata.org",)
+    assert q.name == "atlas.v4link_qlever" and q.allowed_hosts == ("qlever.dev",) and q.source_key == "qlever.wikidata"
 
 
 def test_atlas_dimension_declaration_points_at_loaded_codes(parsed: uc.Parsed) -> None:

@@ -9,8 +9,13 @@ requests:
     daily_requests: 30
     expected_bytes_per_day: 12000000
     reason: "atlas.unsd_classif: 10 files per run (classification structures + concordances); 30/day = 3 runs incl. retries"
+  - source_key: qlever.wikidata
+    # qlever.dev/api/wikidata: 1 stats + 8 pack queries + 1 country query + up to 9 duplicate checks per run (~40 MB).
+    daily_requests: 60
+    expected_bytes_per_day: 120000000
+    reason: "atlas.v4link_qlever: the Wikidata identifier bridges read from QLever while WDQS throttles the shared egress (429, Retry-After ~1000 s, 2026-10-17); 60/day = 3 runs"
 daily_totals_increase:
-  http_requests_total: "+30"
-  http_bytes_total: "+12_000_000"
+  http_requests_total: "+90"
+  http_bytes_total: "+132_000_000"
 notes: >-
   unstats.un.org answered every file with 200 on 2026-10-17; the files change rarely (Last-Modified 2008-2022).

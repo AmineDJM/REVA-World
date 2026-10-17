@@ -98,9 +98,11 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   (effects.literature 40/day); same caps.
 # * budgets.yaml -> budgets-1.3.23 (2026-10-17, PRED-HF): merge of pred_hf.yaml (new daily-series sources ecb.stats
 #   12/day, bis.bulk 6/day, ustreasury.rates 130/day, eia.dnav 32/day, boe.iadb 8/day, nyfed.markets 12/day); same caps.
+# * budgets.yaml -> budgets-1.3.24 (2026-10-17, V4LINK): new qlever.wikidata 60/day (atlas.v4link_qlever, the
+#   Wikidata identifier bridges read from QLever while WDQS throttles the shared egress); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "adefe498cca5fa868b66bdbf76fe4e3ed9597fa71bed1a89563d17d631717093",
+    "budgets.yaml": "d317af43b591b7ab46415c0428b955cb424376477f1c563627020e2098e28a5e",
 }
 
 

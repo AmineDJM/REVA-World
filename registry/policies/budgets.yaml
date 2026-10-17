@@ -1,6 +1,6 @@
-policy_version: "budgets-1.3.23"
+policy_version: "budgets-1.3.24"
 daily:
-  http_requests_total: 19843
+  http_requests_total: 19903
   http_bytes_total: 3221225472
 per_source_daily_requests:
   worldbank.wdi: 200
@@ -193,6 +193,8 @@ per_source_daily_requests:
   powell_thyne.coups: 6
   # pubchem.pug: requested by V4CHEM (v4chem.yaml)
   pubchem.pug: 300
+  # qlever.wikidata: requested by V4LINK (v4link.yaml)
+  qlever.wikidata: 60
   # rcs_dem.osf: requested by A-SOCIETY (a_society.yaml)
   rcs_dem.osf: 12
   # reign.leaderlist: requested by A-COUPS (a_coups.yaml)
