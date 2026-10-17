@@ -61,7 +61,7 @@ def zipped(member: str, data: bytes) -> bytes:
 def pick_ged(rows: list[dict[str, str]]) -> list[dict[str, str]]:
     out: dict[str, dict[str, str]] = {}
 
-    def take(pred, n):  # noqa: ANN001
+    def take(pred, n):
         k = 0
         for r in rows:
             if k >= n:
@@ -93,9 +93,17 @@ def main(src: str, out: str) -> None:
         sha = hashlib.sha256(body).hexdigest()
         name = f"{sha[:16]}{ext}"
         (o / name).write_bytes(body)
-        e: dict[str, object] = {"request_fingerprint": fp(url), "url": url, "file": name, "sha256": sha, "status": 200,
-                                "headers": {"content-type": ctype}, "retrieved_at": RETRIEVED, "licence": LIC,
-                                "note": note}
+        e: dict[str, object] = {
+            "request_fingerprint": fp(url),
+            "url": url,
+            "file": name,
+            "sha256": sha,
+            "status": 200,
+            "headers": {"content-type": ctype},
+            "retrieved_at": RETRIEVED,
+            "licence": LIC,
+            "note": note,
+        }
         if derived:
             e["derived"] = derived
         man.append(e)
@@ -108,14 +116,24 @@ def main(src: str, out: str) -> None:
             man.append(e)
     add(BASE, (s / "downloads.html").read_bytes(), ".html", "text/html", "real downloads page (2026-10-17)")
     add(BASE + "ged/ged261.pdf", (s / "ged261.pdf").read_bytes(), ".pdf", "application/pdf", "real GED 26.1 codebook")
-    add(BASE + "candidateged/ucdp-candidate-codebook1.5.pdf", (s / "ucdp-candidate-codebook1.5.pdf").read_bytes(),
-        ".pdf", "application/pdf", "real Candidate codebook 1.5")
+    add(
+        BASE + "candidateged/ucdp-candidate-codebook1.5.pdf",
+        (s / "ucdp-candidate-codebook1.5.pdf").read_bytes(),
+        ".pdf",
+        "application/pdf",
+        "real Candidate codebook 1.5",
+    )
 
     z = zipfile.ZipFile(s / "ged261-csv.zip")
     fields, rows = read(z.read("GEDEvent_v26_1.csv").decode("utf-8"))
     g = pick_ged(rows)
-    add(BASE + "ged/ged261-csv.zip", zipped("GEDEvent_v26_1.csv", write(fields, g).encode()), ".zip",
-        "application/x-zip-compressed", f"slice of ged261-csv.zip: {len(g)} of {len(rows)} events, values unchanged")
+    add(
+        BASE + "ged/ged261-csv.zip",
+        zipped("GEDEvent_v26_1.csv", write(fields, g).encode()),
+        ".zip",
+        "application/x-zip-compressed",
+        f"slice of ged261-csv.zip: {len(g)} of {len(rows)} events, values unchanged",
+    )
     conflicts = {r["conflict_new_id"] for r in g}
 
     cand = {}
@@ -125,19 +143,26 @@ def main(src: str, out: str) -> None:
     overlap = set()
     names = list(cand)
     for i, a in enumerate(names):
-        for b in names[i + 1:]:
+        for b in names[i + 1 :]:
             overlap |= ids[a] & ids[b]
     for name, (f, rs) in cand.items():
         keep = [r for r in rs if r["id"] in overlap]
         keep += [r for r in rs if r["country_id"] in ("700", "666", "625", "652") and r["id"] not in overlap][:30]
         keep += [r for r in rs if r["date_start"][:4] == "2025"][:2]
         keep.sort(key=lambda r: int(r["id"]))
-        add(BASE + "candidateged/" + name, write(f, keep).encode(), ".csv", "text/csv",
-            f"slice of {name}: {len(keep)} of {len(rs)} events (all ids shared with another release kept)")
+        add(
+            BASE + "candidateged/" + name,
+            write(f, keep).encode(),
+            ".csv",
+            "text/csv",
+            f"slice of {name}: {len(keep)} of {len(rs)} events (all ids shared with another release kept)",
+        )
 
     used_actors: set[str] = set()
-    for fname, member, key in (("ucdp-nonstate-261-csv.zip", "NonState_v26_1.csv", "nonstate"),
-                               ("ucdp-onesided-261-csv.zip", "OneSided_v26_1.csv", "onesided")):
+    for fname, member, key in (
+        ("ucdp-nonstate-261-csv.zip", "NonState_v26_1.csv", "nonstate"),
+        ("ucdp-onesided-261-csv.zip", "OneSided_v26_1.csv", "onesided"),
+    ):
         zz = zipfile.ZipFile(s / fname)
         f, rs = read(zz.read(member).decode("utf-8-sig"))
         keep = [r for r in rs if r["conflict_id"] in conflicts]
@@ -148,13 +173,23 @@ def main(src: str, out: str) -> None:
         else:
             for r in keep:
                 used_actors.add(r["actor_id"])
-        add(BASE + "nsos/" + fname, zipped(member, write(f, keep).encode("utf-8")), ".zip",
-            "application/x-zip-compressed", f"slice of {fname}: {len(keep)} of {len(rs)} rows, values unchanged")
+        add(
+            BASE + "nsos/" + fname,
+            zipped(member, write(f, keep).encode("utf-8")),
+            ".zip",
+            "application/x-zip-compressed",
+            f"slice of {fname}: {len(keep)} of {len(rs)} rows, values unchanged",
+        )
     za = zipfile.ZipFile(s / "actor.zip")
     f, rs = read(za.read("Actor_v26_1.csv").decode("cp1252"))
     keep = [r for r in rs if r["ActorId"] in used_actors]
-    add(BASE + "actor/ucdp-actor-261-csv.zip", zipped("Actor_v26_1.csv", write(f, keep).encode("cp1252")), ".zip",
-        "application/x-zip-compressed", f"slice of ucdp-actor-261-csv.zip: {len(keep)} of {len(rs)} rows (cp1252)")
+    add(
+        BASE + "actor/ucdp-actor-261-csv.zip",
+        zipped("Actor_v26_1.csv", write(f, keep).encode("cp1252")),
+        ".zip",
+        "application/x-zip-compressed",
+        f"slice of ucdp-actor-261-csv.zip: {len(keep)} of {len(rs)} rows (cp1252)",
+    )
 
     nb = (s / "ne_admin1.zip").read_bytes()
     nz = zipfile.ZipFile(io.BytesIO(nb))
@@ -170,16 +205,30 @@ def main(src: str, out: str) -> None:
             w.record(*sr.record)
             n += 1
     w.close()
-    note = {"kind": "derived_excerpt", "by": "tests/fixtures/source/atlas.ucdp_ged/cut_fixture.py",
-            "source_sha256": hashlib.sha256(nb).hexdigest(), "iso_a2": list(NE_ISO_A2), "features": n}
+    note = {
+        "kind": "derived_excerpt",
+        "by": "tests/fixtures/source/atlas.ucdp_ged/cut_fixture.py",
+        "source_sha256": hashlib.sha256(nb).hexdigest(),
+        "iso_a2": list(NE_ISO_A2),
+        "features": n,
+    }
     zb = io.BytesIO()
     with zipfile.ZipFile(zb, "w", zipfile.ZIP_DEFLATED) as zo:
         for ext, b in ((".shp", shp), (".shx", shx), (".dbf", dbf)):
-            zo.writestr(zipfile.ZipInfo("ne_10m_admin_1_states_provinces" + ext, date_time=(2026, 10, 17, 0, 0, 0)),
-                        b.getvalue(), compress_type=zipfile.ZIP_DEFLATED)
+            zo.writestr(
+                zipfile.ZipInfo("ne_10m_admin_1_states_provinces" + ext, date_time=(2026, 10, 17, 0, 0, 0)),
+                b.getvalue(),
+                compress_type=zipfile.ZIP_DEFLATED,
+            )
         zo.writestr(zipfile.ZipInfo("REVA_EXCERPT.json", date_time=(2026, 10, 17, 0, 0, 0)), json.dumps(note))
-    add("https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_1_states_provinces.zip", zb.getvalue(), ".zip",
-        "application/zip", f"derived excerpt: {n} Natural Earth admin-1 features", derived=note)
+    add(
+        "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_1_states_provinces.zip",
+        zb.getvalue(),
+        ".zip",
+        "application/zip",
+        f"derived excerpt: {n} Natural Earth admin-1 features",
+        derived=note,
+    )
     for e in man:
         if e["url"].startswith("https://naciscdn.org"):
             e["licence"] = "Public domain (Natural Earth)"
