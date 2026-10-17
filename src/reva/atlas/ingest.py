@@ -452,12 +452,30 @@ def fixture_http(connector_name: str) -> Any:
     return FixtureHttp(connector_name)
 
 
+#: Non-standard ``Content-Encoding`` labels some atlas providers send for an unencoded body
+#: (www.peaceagreements.org sends ``none``). Read as ``identity``: no decoding, same byte bound.
+#: This lives here, not in ``safe_client.py``: that file is in the digest-pinned autonomy template closure
+#: (``registry/policies/promotion.yaml`` ``template_sha256``), so the safe client itself still refuses ``none``.
+IDENTITY_CODING_ALIASES = frozenset({"none"})
+#: Header recording the label the provider actually sent, kept with the archived response headers.
+ORIGINAL_CODING_HEADER = "x-reva-original-content-encoding"
+
+
+async def _identity_coding_alias(response: Any) -> None:
+    """httpx response hook: a lone alias label in ``IDENTITY_CODING_ALIASES`` becomes ``identity``."""
+    values = response.headers.get_list("content-encoding")
+    codings = [c.strip().lower() for v in values for c in v.split(",") if c.strip()]
+    if len(codings) == 1 and codings[0] in IDENTITY_CODING_ALIASES:
+        response.headers[ORIGINAL_CODING_HEADER] = codings[0]
+        response.headers["content-encoding"] = "identity"
+
+
 def _live_client(spec: AtlasSourceSpec, settings: Any) -> Any:
     from reva.adapters.http.rate_limit import HostPolicy, RateLimiter
     from reva.adapters.http.safe_client import SafeHttpClient
 
     policy = HostPolicy(min_interval_seconds=spec.min_interval_seconds, max_concurrency=1)
-    return SafeHttpClient(
+    client = SafeHttpClient(
         allowed_hosts=spec.allowed_hosts,
         timeout_seconds=max(float(settings.reva_http_timeout_seconds), 120.0),  # bulk files
         max_bytes=spec.max_response_bytes,
@@ -465,6 +483,8 @@ def _live_client(spec: AtlasSourceSpec, settings: Any) -> Any:
         rate_limiter=RateLimiter({h: policy for h in spec.allowed_hosts}, default=policy),
         proxy_mode=settings.reva_http_proxy_mode,
     )
+    client._client.event_hooks = {"request": [], "response": [_identity_coding_alias]}
+    return client
 
 
 async def run_atlas_ingest(

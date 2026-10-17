@@ -198,7 +198,9 @@ claim hops come from two different sources (A→B in one, B'→C in another) doe
 `registry/events/same_as_rules.yaml`, `registry/events/_recorded/wikidata_property_search.json`,
 `src/reva/api/routes/causal.py` (chain hop `kind`, `same_as`, `identity_hops`, `cross_source`),
 `contracts/openapi.json`, `src/reva/cli/main.py` (`reva events same-as`), `src/reva/adapters/http/safe_client.py`
-(`Content-Encoding: none`, sent by peaceagreements.org, read as identity — same byte bound),
+(`Content-Encoding: none`, sent by peaceagreements.org, read as identity — same byte bound; **moved by SWEEP2** to
+an httpx response hook of the atlas live client, `reva.atlas.ingest._live_client`, because `safe_client.py` is in
+the digest-pinned autonomy template closure and the edit had disabled T1 promotion — see `docs/dev/v3_sweep2.md`),
 `ui/src/v3/causal/{api.ts,model.ts,ChainFinder.tsx,fixtures.ts,causal.test.tsx}`; tests
 `tests/unit/causal/test_causal_identity.py`, `tests/integration/test_causal_sameas.py`,
 `tests/unit/test_safe_client_codings.py`.
