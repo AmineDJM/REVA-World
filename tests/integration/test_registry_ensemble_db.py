@@ -175,6 +175,8 @@ def test_02_resolution_scores_the_ensemble_and_weights_use_only_resolved_scores(
     env: Env, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setattr(svc, "period_ended", lambda q, today: True)
+    real_extract = svc.extract_series  # time has passed: the later versions' cells are no longer future-dated (FIX5)
+    monkeypatch.setattr(svc, "extract_series", lambda frame, fam, recorded=None: real_extract(frame, fam, None))
     lm = last_month(env)
     data = history(lm)
     for geo in ("FRA", "DEU"):

@@ -104,19 +104,31 @@ def evaluate(which: str) -> dict[str, Any]:
         if datetime.now(UTC).date() < not_before:
             raise SystemExit(f"holdout H1 may be evaluated once, on or after {not_before}")
     alpha = float(proto["decision_rule"]["alpha"])
-    start = str(proto["holdouts"]["H1"]["first_reference_date"])
+    h1 = proto["holdouts"]["H1"]
+    h2 = proto["holdouts"]["H2"]
+
+    def sets(key: str, refs: list[str]) -> dict[str, set[str]]:
+        if which == "dev":
+            return {"dev": {r for r in refs if r < str(h1["first_reference_date"])}}
+        out = {"H1": {r for r in refs if str(h1["first_reference_date"]) <= r <= str(h1["last_reference_date"])}}
+        if key in h2["families"]:
+            out["H2"] = {r for r in refs if str(h2["first_reference_date"]) <= r <= str(h2["last_reference_date"])}
+        return out
+
     results: dict[str, Any] = {}
     tests: dict[str, Any] = {}
     for key in FAMILIES:
         p, meta, _ = load_family(key)
         fc, chosen = B.run_candidates(p)
-        rounds = {r for r in p.refs if (r < start if which == "dev" else r >= start)}
-        cmp = {
-            t: B.compare(p, {**fc, "reva.blend_alone": p.blend}, t, rounds) for t in B.TRUTHS
-        }
-        results[key] = {**meta, "comparisons": cmp, "chosen_parameters": chosen}
-        for c in B.CANDIDATES:
-            tests[f"{which}|{key}|{c}"] = cmp[str(proto["decision_rule"]["primary_truth"])]["models"][c]
+        results[key] = {**meta, "chosen_parameters": chosen, "comparisons": {}}
+        for sname, rounds in sets(key, p.refs).items():
+            cmp = {t: B.compare(p, {**fc, "reva.blend_alone": p.blend}, t, rounds) for t in B.TRUTHS}
+            results[key]["comparisons"][sname] = cmp
+            for c in B.CANDIDATES:
+                tests[f"{sname}|{key}|{c}"] = cmp[str(proto["decision_rule"]["primary_truth"])]["models"][c]
+    if which == "holdout":  # the family is fixed in advance: a declared test that cannot run counts as p = 1
+        for t in proto["decision_rule"]["family"]:
+            tests.setdefault(t, {"status": "not_run"})
     return {
         "schema": "reva-beat-health-result/1",
         "set": which,

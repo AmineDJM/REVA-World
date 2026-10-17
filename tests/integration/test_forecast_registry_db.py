@@ -167,6 +167,8 @@ def test_02_resolution_waits_then_scores_from_a_later_version(env: Env, monkeypa
     first = svc.resolve_due(env.worker, env.store, origin="test_fixture")
     assert [b["status"] for b in first["batches"]] == ["nothing_due"]  # reference periods have not ended
     monkeypatch.setattr(svc, "period_ended", lambda q, today: True)
+    real_extract = svc.extract_series  # time has passed: the later versions' cells are no longer future-dated (FIX5)
+    monkeypatch.setattr(svc, "extract_series", lambda frame, fam, recorded=None: real_extract(frame, fam, None))
     pending = svc.resolve_due(env.worker, env.store, origin="test_fixture")
     assert pending["batches"][0]["status"] == "awaiting_outcomes"  # no version after the seal yet
     lm = last_month(env)
