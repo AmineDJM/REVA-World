@@ -162,9 +162,17 @@ archived raw bytes) inside the cap. §7 lists the owner options for full volume.
 
 ## 5. Live status
 
-**Nothing was ingested live.** The rule is no live ingest below 5 GB free disk, and free disk was 4.9 GB, then
-4.7 GB, then 4.3 GB during this session. The connector, fixtures and tests are complete. Connector versions are
-registered in the dev DB (`reva seed`, see §8) so the lead can run the ingest later.
+**Nothing was ingested live so far.** The rule is no live ingest below 5 GB free disk. Free disk read 4.9, 4.7,
+4.3, 5.3, 5.1, 4.8 and 4.6 GB during this session, as other agents wrote to it.
+
+* A first live attempt, while free disk was 5.3 GB, was refused by `_check_registered`. Another agent's
+  `reva seed` had registered 1.0.0 from an earlier draft of this module. The connector was then bumped to 1.0.1
+  and re-seeded.
+* A guarded run is queued on the dev-DB lock:
+  `flock /tmp/reva-devdb.lock sh -c '<free disk >= 5120 MB> && uv run reva atlas ingest atlas.gdelt_events --option days=730 --option end=2026-10-16'`.
+  It re-checks free disk *after* it gets the lock and skips the run below 5 GB. Its log is
+  `/tmp/claude-0/-home-user-REVA-World/a82f628c-2790-54df-b0b4-28930bdc7a97/scratchpad/ingest_events.log`.
+* `atlas.gdelt_doc` was not run live.
 
 Probes of 2026-10-17, from the shared egress, with a generic UA and no personal data:
 
