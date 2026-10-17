@@ -377,3 +377,13 @@ taken after 02:03 may differ.
 * `reva links prune --keep 1 --vacuum full`: materialisation 1 (snapshot `1d9b950f…`, 1,147,110 rows) pruned
   because free disk fell to 4.4 GB; it is preserved in the `reva-data-20261017-*` dump. DB 5.88 → 4.47 GB;
   free disk 5.9 GB.
+
+## 10. After the test sweep (lead, 2026-10-17)
+
+* `reva seed` registered the 14 atlas connector versions bumped by SWEEP's `ruff format` pass.
+* `reva atlas ingest atlas.cowwars` (1.1.1): 7,701 statements, 1,302 new revisions carrying the `derivation`
+  qualifier (war intervals derived from participation spells), 0 conflicting, 0 retractions.
+* `reva atlas ingest atlas.pax`: live run, 2 requests, 4.45 MB — the `Content-Encoding: none` response hook
+  works against the real server; 0 causal claims (context only, as designed).
+* `reva causal refresh --origin live`: nothing new; 50,245 current claims graded with rules v3
+  (B 47,765 / C 158 / D 2,262 / E 60 / A 0); 915 same_as identity links.
