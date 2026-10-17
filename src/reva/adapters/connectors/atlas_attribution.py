@@ -61,7 +61,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.attribution_cb"
-VERSION = "1.0.0"
+VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB from an in-flight snapshot (different code)
 SOURCE_KEY = "carbonbrief.attribution"
 ATLAS_SOURCE = "attribution_cb"
 DATASET = "findings"

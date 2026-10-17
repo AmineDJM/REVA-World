@@ -61,7 +61,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.cckp_series"
-VERSION = "1.0.0"
+VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB from an in-flight snapshot (different code)
 SOURCE_KEY = cl.SOURCE_KEY  # worldbank.cckp (same provider / licence as the V3 climatologies)
 ATLAS_SOURCE = "cckp_ts"
 PARSER_VERSION = "atlas-cckp-series/1"

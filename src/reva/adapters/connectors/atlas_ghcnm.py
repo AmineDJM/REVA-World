@@ -63,7 +63,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.ghcnm"
-VERSION = "1.0.0"
+VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB from an in-flight snapshot (different code)
 SOURCE_KEY = "noaa.ghcnm"
 NE_SOURCE_KEY = "naturalearth.admin1_10m"
 ATLAS_SOURCE = "ghcnm"
