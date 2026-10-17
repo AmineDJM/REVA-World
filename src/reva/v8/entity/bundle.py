@@ -602,7 +602,7 @@ def sources_summary(b: Mapping[str, Any]) -> list[dict[str, Any]]:
     def add(src: Mapping[str, Any] | None) -> None:
         if not src or not src.get("source"):
             return
-        k = str(src["source"]).split(".")[0] if str(src.get("source", "")).startswith(("wb.", "imf.", "un_", "eia.")) else str(src["source"])
+        k = str(src["source"])
         e = acc.setdefault(k, {"source": k, "label": src.get("label") or k, "n_values": 0, "licences": [], "restricted": False,
                                "non_commercial": False, "verification": src.get("verification")})  # fmt: skip
         e["n_values"] += 1

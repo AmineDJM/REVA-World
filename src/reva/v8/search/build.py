@@ -192,14 +192,16 @@ def _short(s: str | None, n: int = 110) -> str:
 # ------------------------------------------------------------------------------------------------ writer
 SCHEMA = """
 CREATE TABLE meta (k TEXT PRIMARY KEY, v TEXT NOT NULL);
+CREATE TABLE strs (sid INTEGER PRIMARY KEY, s TEXT NOT NULL UNIQUE);
 CREATE TABLE doc (
-  rid INTEGER PRIMARY KEY, kind TEXT NOT NULL, id TEXT NOT NULL, label_fr TEXT, label_en TEXT,
-  sublabel TEXT, href TEXT, entity_kind TEXT, source TEXT, origin TEXT NOT NULL, prior REAL NOT NULL,
-  extra TEXT
+  rid INTEGER PRIMARY KEY, kind INTEGER NOT NULL, id TEXT NOT NULL, label_fr TEXT, label_en TEXT,
+  sublabel TEXT, href TEXT, ek INTEGER, src INTEGER, origin INTEGER NOT NULL, prior REAL NOT NULL, extra TEXT
 );
 CREATE TABLE name (nid INTEGER PRIMARY KEY, rid INTEGER NOT NULL, norm TEXT NOT NULL, raw TEXT,
-  code INTEGER NOT NULL, pop INTEGER NOT NULL);
+  pop INTEGER NOT NULL);
+CREATE TABLE code (norm TEXT NOT NULL, rid INTEGER NOT NULL, raw TEXT, PRIMARY KEY (norm, rid)) WITHOUT ROWID;
 """
+ORIGINS = ("live", "test_fixture")
 
 
 class IndexWriter:
@@ -216,6 +218,15 @@ class IndexWriter:
         self.counts: dict[str, int] = {}
         self._docs: list[tuple[Any, ...]] = []
         self._names: list[tuple[Any, ...]] = []
+        self._codes: list[tuple[Any, ...]] = []
+        self.strs: dict[str, int] = {}
+
+    def sid(self, v: str | None) -> int | None:
+        if v is None:
+            return None
+        if v not in self.strs:
+            self.strs[v] = len(self.strs) + 1
+        return self.strs[v]
 
     def add(self, d: Doc) -> None:
         self.rid += 1
@@ -224,15 +235,15 @@ class IndexWriter:
         self._docs.append(
             (
                 self.rid,
-                d.kind,
+                SEARCH_KINDS.index(d.kind),
                 d.id,
                 label_fr,
                 d.label_en,
                 d.sublabel or None,
                 None if d.compact else d.href,
-                d.entity_kind,
-                d.source,
-                d.origin,
+                self.sid(d.entity_kind),
+                self.sid(d.source),
+                ORIGINS.index(d.origin),
                 round(d.prior, 4),
                 None if d.compact or not d.extra else json.dumps(d.extra, ensure_ascii=False, separators=(",", ":")),
             )
@@ -245,35 +256,38 @@ class IndexWriter:
             if n and (n, 0) not in seen:
                 seen.add((n, 0))
                 self.nid += 1
-                self._names.append((self.nid, self.rid, n, raw[:MAX_NAME] if pop else None, 0, pop))
+                self._names.append((self.nid, self.rid, n, raw[:MAX_NAME] if pop else None, pop))
         for raw in d.codes:
             n = norm_code(raw)[:MAX_NAME] if raw else ""
             if n and (n, 1) not in seen:
                 seen.add((n, 1))
-                self.nid += 1
-                self._names.append((self.nid, self.rid, n, None if raw.lower() == n else raw[:MAX_NAME], 1, pop))
+                self._codes.append((n, self.rid, None if raw.lower() == n else raw[:MAX_NAME]))
         self.counts[d.kind] = self.counts.get(d.kind, 0) + 1
         if len(self._docs) >= 20000:
             self.flush()
 
     def flush(self) -> None:
         self.db.executemany("INSERT INTO doc VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", self._docs)
-        self.db.executemany("INSERT INTO name VALUES (?,?,?,?,?,?)", self._names)
+        self.db.executemany("INSERT INTO name VALUES (?,?,?,?,?)", self._names)
+        self.db.executemany("INSERT OR IGNORE INTO code VALUES (?,?,?)", self._codes)
         self._docs.clear()
         self._names.clear()
+        self._codes.clear()
 
     def finish(self, meta: dict[str, Any]) -> Path:
         self.flush()
         db = self.db
         db.executescript(
             """
-            CREATE INDEX name_norm ON name(norm, code);
+            CREATE INDEX name_norm ON name(norm);
             CREATE VIRTUAL TABLE name_fts USING fts5(norm, content='', tokenize='trigram', detail='full');
-            INSERT INTO name_fts(rowid, norm) SELECT nid, norm FROM name WHERE code = 0;
+            INSERT INTO name_fts(rowid, norm) SELECT nid, norm FROM name;
             INSERT INTO name_fts(name_fts) VALUES ('optimize');
             """
         )
-        meta = {**meta, "documents": self.rid, "names": self.nid, "kinds": self.counts}
+        db.executemany("INSERT INTO strs VALUES (?, ?)", [(i, v) for v, i in self.strs.items()])
+        codes = db.execute("SELECT count(*) FROM code").fetchone()[0]
+        meta = {**meta, "documents": self.rid, "names": self.nid, "codes": codes, "kinds": self.counts}
         db.executemany("INSERT INTO meta VALUES (?, ?)", [(k, json.dumps(v, default=str)) for k, v in meta.items()])
         db.commit()
         db.execute("VACUUM")
@@ -442,7 +456,7 @@ def kg_entities(conn: Connection, origin: str | None, skip: set[str]) -> Iterato
             id=qid,
             label_fr=label_fr,
             label_en=label_en,
-            sublabel=_short(desc, 70) if desc else "",
+            sublabel=_short(desc, 56) if desc else "",
             href="",
             entity_kind=kind,
             source=c["source_key"],

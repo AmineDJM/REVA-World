@@ -20,7 +20,7 @@ from typing import Any
 import numpy as np
 
 from reva.v8.search import hrefs
-from reva.v8.search.build import GROUP_ORDER, GROUPS, SEARCH_KINDS, index_path, kind_fr
+from reva.v8.search.build import GROUP_ORDER, GROUPS, ORIGINS, SEARCH_KINDS, index_path, kind_fr
 from reva.v8.search.normalize import norm_code, norm_text, trigrams
 
 TIER_BASE = {"id": 0.85, "exact": 0.75, "prefix": 0.55, "word": 0.45, "trigram": 0.25}
@@ -62,16 +62,16 @@ class SearchIndex:
         self._local = threading.local()
         db = self._db()
         self.meta = {k: json.loads(v) for k, v in db.execute("SELECT k, v FROM meta")}
+        self.strs = dict(db.execute("SELECT sid, s FROM strs").fetchall())
         # popular names in memory: sorted norms (prefix), trigram postings (fuzzy / substring candidates)
         rows = db.execute(
             "SELECT n.nid, n.rid, n.norm, n.raw, d.prior, d.kind FROM name n JOIN doc d ON d.rid = n.rid "
-            "WHERE n.pop = 1 AND n.code = 0"
+            "WHERE n.pop = 1"
         ).fetchall()
         self.pop_rid = np.array([r[1] for r in rows], dtype=np.int64)
         self.pop_norm = [r[2] for r in rows]
         self.pop_raw = [r[3] for r in rows]
         self.pop_prior = np.array([r[4] for r in rows], dtype=np.float32)
-        self.pop_kind = [r[5] for r in rows]
         order = sorted(range(len(rows)), key=lambda i: self.pop_norm[i])
         self.sorted_norms = [self.pop_norm[i] for i in order]
         self.sorted_idx = order
@@ -139,20 +139,18 @@ class SearchIndex:
         # 1. identifiers / codes, 2. exact labels
         for key in {qc, qn.replace(" ", "")} - {""}:
             for rid, raw in db.execute(
-                "SELECT rid, COALESCE(raw, upper(norm)) FROM name WHERE norm = ? AND code = 1 LIMIT 100", (key,)
+                "SELECT rid, COALESCE(raw, upper(norm)) FROM code WHERE norm = ? LIMIT 100", (key,)
             ):
                 put(rid, "id", raw)
         if qn:
-            for rid, raw in db.execute(
-                "SELECT rid, COALESCE(raw, norm) FROM name WHERE norm = ? AND code = 0 LIMIT 300", (qn,)
-            ):
+            for rid, raw in db.execute("SELECT rid, COALESCE(raw, norm) FROM name WHERE norm = ? LIMIT 300", (qn,)):
                 put(rid, "exact", raw)
         if qn:
             self._pop_prefix_word(qn, put)
             # long tail: alphabetical prefix range + FTS substring
             hi = qn + "\U0010ffff"
             for rid, raw in db.execute(
-                "SELECT rid, COALESCE(raw, norm) FROM name WHERE norm > ? AND norm < ? AND code = 0 LIMIT ?",
+                "SELECT rid, COALESCE(raw, norm) FROM name WHERE norm > ? AND norm < ? LIMIT ?",
                 (qn, hi, SQL_PREFIX_LIMIT),
             ):
                 put(rid, "prefix", raw)
@@ -242,11 +240,20 @@ class SearchIndex:
         for i in range(0, len(rids), 900):
             chunk = rids[i : i + 900]
             for row in db.execute(
-                f"SELECT rid, kind, id, label_fr, label_en, sublabel, href, entity_kind, source, origin, prior, "
+                f"SELECT rid, kind, id, label_fr, label_en, sublabel, href, ek, src, origin, prior, "
                 f"extra FROM doc WHERE rid IN ({','.join('?' * len(chunk))})",
                 chunk,
             ):
-                docs[row[0]] = row
+                docs[row[0]] = (
+                    row[0],
+                    SEARCH_KINDS[row[1]],
+                    *row[2:7],
+                    self.strs.get(row[7]),
+                    self.strs.get(row[8]),
+                    ORIGINS[row[9]],
+                    row[10],
+                    row[11],
+                )
         out = []
         for h in hits:
             d = docs.get(h.rid)

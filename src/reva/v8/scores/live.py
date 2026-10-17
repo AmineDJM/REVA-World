@@ -66,35 +66,81 @@ def sealed_models(conn: Any, origin: str | None) -> dict[str, int]:
     return dict(out)
 
 
+_SUMMARIES: dict[str, dict[str, Any]] = {}  # sealed manifest sha256 -> extracted summary (immutable content)
+_SUM_LOCK = Lock()
+
+
+def _manifest_summary(store: Any, sha: str) -> dict[str, Any]:
+    """Questions (id, family, label, expected date), issued-forecast count and official references of one sealed
+    manifest. The manifest is verified once (``load_frozen_manifest``); its content is immutable, so the summary is
+    kept for the life of the process."""
+    with _SUM_LOCK:
+        hit = _SUMMARIES.get(sha)
+    if hit is not None:
+        return hit
+    from reva.evaluation.ledger import load_frozen_manifest
+
+    m = load_frozen_manifest(store, sha)
+    refs: dict[str, set[str]] = defaultdict(set)
+    n = 0
+    for f in m.get("forecasts", []):
+        if f.get("status") == "issued":
+            n += 1
+            fid = OFFICIAL_REFERENCES.get(_base(f.get("model")))
+            if fid:
+                refs[f["question_id"]].add(fid)
+    qs = []
+    for q in m.get("questions", []):
+        res = q.get("resolution") or {}
+        qs.append({
+            "id": q["question_id"], "family": q["family"], "label_fr": q.get("label_fr") or q["family"],
+            "expected": res.get("expected_date") or res.get("expected_after") or q.get("period_end"),
+        })  # fmt: skip
+    out = {
+        "questions": qs,
+        "n_forecasts": n,
+        "refs": {k: sorted(v) for k, v in refs.items()},
+        "issued_at": m.get("issued_at"),
+        "outcomes": {o["question_id"]: o.get("status") for o in m.get("outcomes", []) if isinstance(o, Mapping)},
+    }
+    with _SUM_LOCK:
+        _SUMMARIES[sha] = out
+    return out
+
+
+def _collect(summaries: list[dict[str, Any]], status: Mapping[str, str]) -> tuple[list[dict[str, Any]], int]:
+    by: dict[str, dict[str, Any]] = {}
+    n = 0
+    for sm in summaries:
+        n += sm["n_forecasts"]
+        for q in sm["questions"]:
+            e = by.get(q["id"])
+            if e is None:
+                e = by[q["id"]] = {**q, "status": status.get(q["id"], "pending"), "officials": set()}
+            e["officials"] |= set(sm["refs"].get(q["id"], ()))
+        for qid, refs in sm["refs"].items():
+            if qid in by:
+                by[qid]["officials"] |= set(refs)
+    return list(by.values()), n
+
+
 def _main_registry(conn: Any, store: Any, origin: str | None) -> dict[str, Any]:
     from reva.evaluation.registry import read as R
+    from reva.evaluation.registry.service import SCOPE_KIND, SCORE_KIND
 
     batches = R.batches(conn, origin)
-    oc_all = R.outcomes(conn, store, origin)
-    seen: set[str] = set()
-    questions: list[dict[str, Any]] = []
-    n_forecasts = 0
-    for b in batches:
-        m = R.CACHE.get(store, b["batch_sha256"])
-        refs: dict[str, set[str]] = defaultdict(set)
-        for f in m["forecasts"]:
-            if f["status"] == "issued":
-                n_forecasts += 1
-                fid = OFFICIAL_REFERENCES.get(_base(f.get("model")))
-                if fid:
-                    refs[f["question_id"]].add(fid)
-        for q in m["questions"]:
-            qid = q["question_id"]
-            if qid in seen:
-                if refs.get(qid):
-                    next(x for x in questions if x["id"] == qid)["officials"] |= refs[qid]
-                continue
-            seen.add(qid)
-            questions.append({
-                "id": qid, "family": q["family"], "label_fr": q.get("label_fr") or q["family"],
-                "expected": q["resolution"]["expected_date"],
-                "status": (oc_all.get(qid) or {}).get("status", "pending"), "officials": set(refs.get(qid, ())),
-            })  # fmt: skip
+    oc = " AND task_scope->>'origin' = :o" if origin else ""
+    res_shas = conn.execute(
+        text(
+            f"""SELECT DISTINCT metrics->>'resolution_sha256' FROM model.evaluation
+                WHERE metrics->>'kind' = :k AND task_scope->>'kind' = :sk{oc}"""
+        ),
+        {"k": SCORE_KIND, "sk": SCOPE_KIND, **({"o": origin} if origin else {})},
+    ).scalars()
+    status: dict[str, str] = {}
+    for sha in sorted(x for x in res_shas if x):
+        status.update({k: v for k, v in _manifest_summary(store, sha)["outcomes"].items() if v})
+    questions, n_forecasts = _collect([_manifest_summary(store, b["batch_sha256"]) for b in batches], status)
     return {
         "registry": "forecast",
         "batches": len(batches),
@@ -107,8 +153,6 @@ def _main_registry(conn: Any, store: Any, origin: str | None) -> dict[str, Any]:
 
 
 def _health_registry(conn: Any, store: Any, origin: str | None) -> dict[str, Any]:
-    from reva.evaluation.ledger import load_frozen_manifest
-
     oc = " AND task_scope->>'origin' = :o" if origin else ""
     shas = [
         r[0]
@@ -133,24 +177,9 @@ def _health_registry(conn: Any, store: Any, origin: str | None) -> dict[str, Any
         st = {o.get("question_id"): o.get("status") for o in outcomes if isinstance(o, Mapping)}
         for qid in r["q"] or []:
             handled[qid] = st.get(qid) or "resolved"
-    questions: list[dict[str, Any]] = []
-    n_forecasts, issued_at = 0, []
-    for sha in shas:
-        m = load_frozen_manifest(store, sha)
-        issued_at.append(str(m.get("issued_at") or ""))
-        refs: dict[str, set[str]] = defaultdict(set)
-        for f in m.get("forecasts", []):
-            if f.get("status") == "issued":
-                n_forecasts += 1
-                fid = OFFICIAL_REFERENCES.get(_base(f.get("model")))
-                if fid:
-                    refs[f["question_id"]].add(fid)
-        for q in m.get("questions", []):
-            questions.append({
-                "id": q["question_id"], "family": q["family"], "label_fr": q.get("label_fr") or q["family"],
-                "expected": q["resolution"].get("expected_after") or q.get("period_end"),
-                "status": handled.get(q["question_id"], "pending"), "officials": refs.get(q["question_id"], set()),
-            })  # fmt: skip
+    sums = [_manifest_summary(store, sha) for sha in shas]
+    questions, n_forecasts = _collect(sums, handled)
+    issued_at = [str(x["issued_at"]) for x in sums if x.get("issued_at")]
     return {
         "registry": "health",
         "batches": len(shas),
@@ -158,7 +187,7 @@ def _health_registry(conn: Any, store: Any, origin: str | None) -> dict[str, Any
         "supplement_batches": 0,
         "forecasts": n_forecasts,
         "questions": questions,
-        "last_sealed_at": max((x for x in issued_at if x), default=None),
+        "last_sealed_at": max(issued_at, default=None),
     }
 
 

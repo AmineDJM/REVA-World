@@ -370,3 +370,50 @@ def dated_statements(conn: Connection, qid: str, origin: str | None, skip_props:
         )
     out.sort(key=lambda r: r["x"] if r["x"] is not None else -1e9)
     return out[-limit:]
+
+
+# ------------------------------------------------------------------------------------------------ relation pages
+def relation_page(
+    conn: Connection, qid: str, family: str, origin: str | None, *, limit: int = 50, after_id: int | None = None
+) -> dict[str, Any]:
+    """One page of a family's relations (the bundle shows the first items; this pages the rest)."""
+    reg = fq.registry()
+    if family not in reg.families:
+        raise ValueError(f"unknown relation family {family}")
+    pids = sorted(reg.pids_for([family]))
+    res = kq.neighbours(conn, qid, direction="both", properties=pids, limit=limit, after_id=after_id, origin=origin)
+    rows = [{"raw_sha256": e["provenance"]["raw_sha256"], "source_key": e["provenance"]["source_key"]} for e in res["edges"]]
+    rights = fq.rights_for(conn, rows)
+    items = []
+    for e in res["edges"]:
+        d = e.get("direction") or ("out" if e["subject"]["qid"] == qid else "in")
+        ef = reg.edge_family(e["property"]["pid"], d)
+        if ef is None or ef.family != family:
+            continue
+        other = e["object"] if d == "out" else e["subject"]
+        if other is None:
+            continue
+        r = rights.get(str(e["provenance"]["raw_sha256"])) if e["provenance"]["raw_sha256"] else None
+        if kq.is_community_edited(e["provenance"]["source_key"]):
+            r = fq.WIKIDATA_RIGHTS
+        items.append(
+            {
+                "ref": C.kg_ref(other),
+                "reading_fr": ef.label.get("fr") or ef.label.get("en") or family,
+                "property": e["property"]["pid"],
+                "property_label": e["property"].get("label_fr") or e["property"].get("label_en"),
+                "period": C.statement_period(e),
+                "share": None,
+                "share_unit": None,
+                "identity": family == IDENTITY_FAMILY,
+                "via": None,
+                "source": C.kg_source(e, r, C.statement_period(e)),
+            }
+        )
+    fam = reg.families[family]
+    return {
+        "family": family,
+        "label_fr": fam.label.get("fr") or fam.label.get("en") or family,
+        "items": items,
+        "next_after_id": res["next_after_id"],
+    }
