@@ -50,9 +50,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     ap.add_argument("--origin", default="live")
     ap.add_argument("--out", required=True, help="full JSON (records included)")
     ap.add_argument("--summary", help="slim JSON without records (committed next to the report)")
+    ap.add_argument("--seal", action="store_true", help="seal the protocol's winners (run under flock)")
     a = ap.parse_args(argv)
     pinned = check_protocol(Path.cwd())
     eng = make_engine("api", get_settings())
+    if a.seal:
+        from reva.evaluation.beat_energy_seal import seal
+
+        out = seal(eng, get_store(), origin=a.origin)
+        with open(a.out, "w", encoding="utf-8") as fh:
+            json.dump(out, fh, indent=1, default=str)
+        print(json.dumps(out, default=str)[:3000])
+        return 0
     with eng.connect() as conn:
         res = be.load_and_run(conn, get_store(), origin=a.origin)
     res["protocol_check"] = pinned
