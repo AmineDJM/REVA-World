@@ -48,6 +48,22 @@
 #        (fact corroboration.via_same_as). Records joined by a link declared `independent_sources: false` (one
 #        record derived from the other, e.g. EUSANCT cases taken over from TIES) share the upstream key
 #        `lineage:<link>` and count once. Section `identity` below.
+#   3  (2026-10-17, FIXA, second audit docs/dev/review_v3_causal_audit2.md; report docs/dev/v3_fixa.md):
+#      * sourcing circumstances (audit2 N2): a Wikidata claim qualified "sourcing circumstances" (P1480: presumably,
+#        possibly, ...; values kept verbatim, shown with their KG label or "Qn (libellé non chargé)", never
+#        interpreted) is hedged by Wikidata itself: grade capped at D (grade.D.sourcing_hedged, fact
+#        nature.sourcing_circumstances) and kept out of chain composition, like P3680 / P5102. Scope qualifiers
+#        P518 / P1001 / P1011 / P1012 / P1013 are worded "(applies to: ...)" (fact scope.qualified; grade unchanged).
+#      * coded outcomes dated by the cause's own end (audit2 N7): when a relation of the `outcome` lane links a record
+#        to its outcome and the outcome's date window equals the cause's end window, the order "start before end" is
+#        true by construction: the temporal detail says `reason: effect_dated_by_cause_end` (fact
+#        temporal.effect_dated_by_cause_end) and such a "consistent" check does not count toward A (condition
+#        effect_dated_by_cause_end: false on grade.A.expert_consistent_corroborated). The check value is kept.
+#      * Wikidata DOI references (audit2 N11; docs/roadmap/v3_causality.md: T2 = "scholarly reference with a citation
+#        stored verbatim — only when such a reference arrives through a source's own references"): the tier stays T2,
+#        but a community-edited statement whose only evidence is that reference is not an expert finding — REVA has
+#        not checked that the cited work asserts the link. Uncorroborated it is capped at C (grade.C.t2_wikidata_single,
+#        fact tier.T2.wikidata_reference); corroborated by an independent source group it follows the T1/T2 rules.
 #
 # Inputs of a claim:
 #   tier            T1..T4 (T5/T6 never reach this table: candidates are not graded)
@@ -57,7 +73,10 @@
 #   attributed      a P3680 "statement supported by" qualifier (version 2)
 #   nature_qualified a P5102 "nature of statement" qualifier (version 2)
 #   doubtful        scope.source_validity has an entry with certainty: doubtful (version 2)
-version: "2"
+#   hedged          a P1480 "sourcing circumstances" qualifier (version 3)
+#   effect_dated_by_cause_end  an outcome-lane claim whose effect window equals the cause's end window (version 3)
+#   community_edited the claim restates a community-edited (Wikidata) statement (version 3)
+version: "3"
 corroborated_min: 2
 
 # Event identity used by corroboration (reva.causal.identity): the grader reads the current `events:same_as`
@@ -94,15 +113,27 @@ rules:
     reason:
       en: "Wikidata qualifies the nature of this statement (P5102: e.g. alleged, hypothetical, rare); REVA does not grade it above D."
       fr: "Wikidata qualifie la nature de cette déclaration (P5102 : par ex. allégation, hypothèse, rareté) ; REVA ne la note pas au-dessus de D."
+  - id: grade.D.sourcing_hedged
+    grade: D
+    when: {hedged: true}
+    reason:
+      en: "Wikidata itself hedges this statement (P1480 sourcing circumstances: e.g. presumably, possibly); REVA does not grade it above D."
+      fr: "Wikidata nuance lui-même cette déclaration (P1480 circonstances de la source : par ex. vraisemblablement, peut-être) ; REVA ne la note pas au-dessus de D."
   - id: grade.D.source_doubtful
     grade: D
     when: {doubtful: true}
     reason:
       en: "The source itself codes the event or the link as doubtful (its own validity / certainty code)."
       fr: "La source elle-même code l'événement ou le lien comme douteux (son propre code de validité / certitude)."
+  - id: grade.C.t2_wikidata_single
+    grade: C
+    when: {tier: [T2], community_edited: true, corroborated: false}
+    reason:
+      en: "A Wikidata statement citing a scholarly work (DOI/ISBN), not corroborated: REVA has not checked that the work asserts this link, so it is not graded like an expert dataset."
+      fr: "Déclaration Wikidata citant un travail savant (DOI/ISBN), non corroborée : REVA n'a pas vérifié que ce travail affirme ce lien ; elle n'est donc pas notée comme un jeu de données expert."
   - id: grade.A.expert_consistent_corroborated
     grade: A
-    when: {tier: [T1, T2], temporal_check: [consistent], corroborated: true}
+    when: {tier: [T1, T2], temporal_check: [consistent], corroborated: true, effect_dated_by_cause_end: false}
     reason:
       en: "Expert-coded or scholarly source, consistent in time, corroborated by an independent source."
       fr: "Source experte (jeu de données codé ou référence savante), cohérente dans le temps, corroborée par une source indépendante."
@@ -181,6 +212,18 @@ facts:
   nature.qualified:
     en: "Wikidata qualifies the nature of this statement (P5102); the qualifier is shown verbatim."
     fr: "Wikidata qualifie la nature de cette déclaration (P5102) ; le qualificatif est montré tel quel."
+  nature.sourcing_circumstances:
+    en: "Wikidata qualifies the sourcing circumstances of this statement (P1480, e.g. presumably, possibly); the value is shown verbatim and the claim is not composed into chains."
+    fr: "Wikidata qualifie les circonstances de la source de cette déclaration (P1480, par ex. vraisemblablement, peut-être) ; la valeur est montrée telle quelle et l'affirmation n'est pas composée dans une chaîne."
+  scope.qualified:
+    en: "Wikidata restricts the scope of this statement (P518 applies to part, P1001 jurisdiction, P1011 excluding, P1012 including, P1013 criterion); the restriction is worded with the claim."
+    fr: "Wikidata restreint la portée de cette déclaration (P518 s'applique à la partie, P1001 juridiction, P1011 à l'exclusion de, P1012 y compris, P1013 critère) ; la restriction est énoncée avec l'affirmation."
+  temporal.effect_dated_by_cause_end:
+    en: "The outcome is dated by the cause's own end date: \"the cause starts before the effect\" holds by construction and is not independent temporal evidence (it does not count toward grade A)."
+    fr: "L'issue est datée par la date de fin de la cause elle-même : « la cause commence avant l'effet » est vrai par construction et n'est pas une preuve temporelle indépendante (ne compte pas pour la note A)."
+  tier.T2.wikidata_reference:
+    en: "The scholarly work (DOI/ISBN) is cited in a reference of a community-edited Wikidata statement; REVA has not checked that the work asserts this link."
+    fr: "Le travail savant (DOI/ISBN) est cité dans une référence d'une déclaration Wikidata communautaire ; REVA n'a pas vérifié que ce travail affirme ce lien."
   certainty.doubtful:
     en: "The source codes the event or the link as doubtful; its code and label are shown."
     fr: "La source code l'événement ou le lien comme douteux ; son code et son libellé sont montrés."

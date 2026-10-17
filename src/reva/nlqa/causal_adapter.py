@@ -97,7 +97,14 @@ def claim_from_json(d: Mapping[str, Any]) -> CausalClaim | None:
         tier=tier,
         cause_labels=_labels(cause),
         effect_labels=_labels(effect),
-        lane=d.get("lane") if isinstance(d.get("lane"), str) else None,
+        # a claim with a class endpoint is a generic statement (why lane "generic"), never a cause of the event (M1)
+        lane="generic"
+        if isinstance(d.get("generic"), Mapping)
+        else (d.get("lane") if isinstance(d.get("lane"), str) else None),
+        generic_ends=_strs((d.get("generic") or {}).get("class_endpoints"))
+        if isinstance(d.get("generic"), Mapping)
+        else (),
+        rights=src.get("rights") if isinstance(src.get("rights"), Mapping) else None,
         stance="denies" if d.get("stance") == "denies" else "asserts",
         polarity=d.get("polarity") if isinstance(d.get("polarity"), str) else None,
         dataset=src.get("dataset"),
@@ -154,11 +161,20 @@ def _attribution(a: Any) -> dict[str, Any]:
         return {}
     who = tuple(str(x.get("label") or x.get("id")) for x in a.get("supported_by") or () if isinstance(x, Mapping))
     note = {k: str(a[f"note_{k}"]) for k in ("en", "fr") if isinstance(a.get(f"note_{k}"), str) and a[f"note_{k}"]}
+    scope = []
+    for x, ref in zip(
+        [x for x in a.get("scope_qualifiers") or () if isinstance(x, Mapping) and (x.get("id") or x.get("label"))],
+        _refs(a.get("scope_qualifiers")),
+        strict=True,
+    ):
+        scope.append({**ref, "property": str(x.get("property") or "")})
     return {
         "supported_by": who,
         "attribution_note": note,
         "supported_by_refs": _refs(a.get("supported_by")),
         "nature_of_statement": _refs(a.get("nature_of_statement")),
+        "sourcing_circumstances": _refs(a.get("sourcing_circumstances")),
+        "scope_qualifiers": tuple(scope),
     }
 
 

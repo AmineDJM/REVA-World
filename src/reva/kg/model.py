@@ -38,7 +38,11 @@ at which that content was first recorded); a batch retrieved *before* the stored
 ``stale`` and not stored; the same key and revision with different content is a ``conflicting`` source and is
 not stored. Deprecated-rank statements are rejected; if an earlier version of the same statement is stored,
 a retraction (``deprecated_at_source``) removes it from the current view. ``retract_keys`` records
-statements the source removed (``removed_at_source``). Nothing is ever updated or deleted.
+statements absent from the delivery; their reason is derived, never assumed (audit2 N1, migration
+``0018_retraction_reasons``): ``reclassified_by_reva`` when the statement's raw artifact is in this delivery (same
+bytes: the source still has it, the connector no longer emits it), else ``retract_reason`` when the caller verified
+it (``removed_at_source``), else ``absent_from_delivery``; ``detail`` records the basis. Nothing is ever updated
+or deleted.
 
 Reinstatement (review V3, KG-1; migration ``0011_kg_fixes``): a source without revision ids
 (``source_revision`` NULL) that re-asserts a statement whose latest stored row is retracted — by a
@@ -758,8 +762,14 @@ def load_batch(
     origin: str,
     retract_keys: Iterable[str] = (),
     parameters: Mapping[str, Any] | None = None,
+    retract_reason: str | None = None,
 ) -> LoadReport:
-    """Load one bounded batch in one transaction (see the module docstring for the semantics)."""
+    """Load one bounded batch in one transaction (see the module docstring for the semantics).
+
+    ``retract_reason``: ``removed_at_source`` only when the caller verified that the source no longer has the
+    ``retract_keys`` statements; by default the reason is derived (``reclassified_by_reva`` / ``absent_from_delivery``)."""
+    if retract_reason not in (None, "removed_at_source"):
+        raise ValidationProblem("retract_reason must be None (derived) or removed_at_source (verified by the caller)")
     t0 = time.perf_counter()
     raws = _check_batch_params(source_key, raw_sha256s, retrieved_at, origin)
     ents = list(entities)
@@ -802,7 +812,9 @@ def load_batch(
         rep.labels_skipped += skipped
         ent_rows.append(row)
 
-    retract_rows: list[tuple[str, str, str | None]] = [(k, "removed_at_source", None) for k in retract]
+    retract_rows: list[tuple[str, str, str | None]] = [
+        (k, retract_reason or "absent_from_delivery", None) for k in retract
+    ]
     with engine.begin() as conn:
         conn.execute(text("SELECT pg_advisory_xact_lock(hashtextextended(:k, 0))"), {"k": "reva:kg:load:" + source_key})
         # Bulk statements: JIT compilation costs ~1 s per staging statement and buys nothing here.
@@ -876,7 +888,7 @@ def load_batch(
         if chunk:
             _load_statements(conn, chunk, bind, rep)
         if retract_rows:
-            _load_retractions(conn, retract_rows, bind, rep, source_key)
+            _load_retractions(conn, retract_rows, {**bind, "raws": raws}, rep, source_key)
 
     for reason, n in counts.items():
         rep.rejected_counts[reason] = rep.rejected_counts.get(reason, 0) + n
@@ -1029,13 +1041,25 @@ def _load_retractions(
     for chunk in _chunks(good):
         n = conn.execute(
             text("""INSERT INTO kg.statement_retraction(load_id, statement_row_id, statement_key, origin, reason,
-                                                        source_revision)
-        SELECT DISTINCT ON (lt.id) :load, lt.id, lt.statement_key, :o, sr.reason, sr.source_revision
+                                                        source_revision, detail)
+        SELECT DISTINCT ON (lt.id) :load, lt.id, lt.statement_key, :o, d.reason, sr.source_revision,
+               jsonb_build_object('basis', d.basis, 'raw_sha256', lt.raw_sha256,
+                                  'source_revision_from', lt.source_revision, 'source_revision_to', sr.source_revision)
           FROM (SELECT x->>0 AS statement_key, x->>1 AS reason, x->>2 AS source_revision
                   FROM jsonb_array_elements(CAST(:rows AS jsonb)) x) sr
-          CROSS JOIN LATERAL (SELECT s.id, s.statement_key, s.retrieved_at FROM kg.statement s
+          CROSS JOIN LATERAL (SELECT s.id, s.statement_key, s.retrieved_at, s.raw_sha256, s.source_revision
+                                FROM kg.statement s
                                WHERE s.statement_key = sr.statement_key AND s.origin = :o
                                ORDER BY s.id DESC LIMIT 1) lt
+          CROSS JOIN LATERAL (SELECT CASE
+              WHEN sr.reason = 'deprecated_at_source' THEN 'deprecated_at_source'
+              WHEN lt.raw_sha256 = ANY(CAST(:raws AS text[])) THEN 'reclassified_by_reva'
+              ELSE sr.reason END AS reason,
+            CASE
+              WHEN sr.reason = 'deprecated_at_source' THEN 'deprecated_rank_in_delivery'
+              WHEN lt.raw_sha256 = ANY(CAST(:raws AS text[])) THEN 'raw_unchanged'
+              WHEN sr.reason = 'removed_at_source' THEN 'removal_verified_by_caller'
+              ELSE 'raw_changed_row_not_checked' END AS basis) d
          WHERE lt.retrieved_at <= :ret
            AND NOT EXISTS (SELECT 1 FROM kg.statement_retraction r WHERE r.statement_row_id = lt.id)
          ORDER BY lt.id"""),

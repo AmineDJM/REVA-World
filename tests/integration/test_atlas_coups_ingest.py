@@ -114,7 +114,7 @@ async def test_archigos_ingest_with_coup_links(db: Any) -> None:
     assert _scalar(db, "SELECT count(*) FROM kg.statement WHERE statement_key = :k", k=old_statement) == 1
     assert (
         _scalar(db, "SELECT reason FROM kg.causal_claim_retraction WHERE claim_key = :k", k=old_claim)
-        == "removed_at_source"
+        == "absent_from_delivery"  # the seeded 1.0.0 raw is not the 1.1.0 delivery's: removal not checked (N1)
     )
     assert s["archigos"]["rows"] == 165
     assert s["archigos"]["encoding_fallbacks"], "the Honduras row is Windows-1252 in Archigos 4.1"

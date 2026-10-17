@@ -191,6 +191,7 @@
     "origin": "test_fixture",
     "supported_by": [],
     "attribution": null,
+    "generic": null,
     "citation": {
      "source": "wikidata",
      "tier": "T3",
@@ -215,7 +216,8 @@
       }
      ],
      "origin": "test_fixture",
-     "status": "community_edited"
+     "status": "community_edited",
+     "rights": null
     }
    },
    {
@@ -261,6 +263,7 @@
     "origin": "test_fixture",
     "supported_by": [],
     "attribution": null,
+    "generic": null,
     "citation": {
      "source": "icb.data",
      "tier": "T1",
@@ -279,7 +282,8 @@
      },
      "references": [],
      "origin": "test_fixture",
-     "status": "source_reported"
+     "status": "source_reported",
+     "rights": null
     }
    },
    {
@@ -325,6 +329,7 @@
     "origin": "test_fixture",
     "supported_by": [],
     "attribution": null,
+    "generic": null,
     "citation": {
      "source": "wikidata",
      "tier": "T4",
@@ -343,7 +348,8 @@
      "codebook": null,
      "references": [],
      "origin": "test_fixture",
-     "status": "community_edited"
+     "status": "community_edited",
+     "rights": null
     }
    },
    {
@@ -391,6 +397,7 @@
     "origin": "test_fixture",
     "supported_by": [],
     "attribution": null,
+    "generic": null,
     "citation": {
      "source": "wikidata",
      "tier": "T3",
@@ -415,7 +422,8 @@
       }
      ],
      "origin": "test_fixture",
-     "status": "community_edited"
+     "status": "community_edited",
+     "rights": null
     }
    },
    {
@@ -461,6 +469,7 @@
     "origin": "test_fixture",
     "supported_by": [],
     "attribution": null,
+    "generic": null,
     "citation": {
      "source": "fixture.refs",
      "tier": "T2",
@@ -479,7 +488,8 @@
      },
      "references": [],
      "origin": "test_fixture",
-     "status": "source_reported"
+     "status": "source_reported",
+     "rights": null
     }
    },
    {
@@ -525,6 +535,7 @@
     "origin": "test_fixture",
     "supported_by": [],
     "attribution": null,
+    "generic": null,
     "citation": {
      "source": "wikidata",
      "tier": "T4",
@@ -543,7 +554,8 @@
      "codebook": null,
      "references": [],
      "origin": "test_fixture",
-     "status": "community_edited"
+     "status": "community_edited",
+     "rights": null
     }
    }
   ],
@@ -747,6 +759,7 @@
     "origin": "test_fixture",
     "supported_by": [],
     "attribution": null,
+    "generic": null,
     "citation": {
      "source": "wikidata",
      "tier": "T3",
@@ -771,7 +784,8 @@
       }
      ],
      "origin": "test_fixture",
-     "status": "community_edited"
+     "status": "community_edited",
+     "rights": null
     }
    },
    {
@@ -817,6 +831,7 @@
     "origin": "test_fixture",
     "supported_by": [],
     "attribution": null,
+    "generic": null,
     "citation": {
      "source": "wikidata",
      "tier": "T3",
@@ -841,7 +856,8 @@
       }
      ],
      "origin": "test_fixture",
-     "status": "community_edited"
+     "status": "community_edited",
+     "rights": null
     }
    }
   ],

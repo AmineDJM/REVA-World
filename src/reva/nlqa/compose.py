@@ -159,7 +159,17 @@ def temporal_text(c: Any, lang: str) -> str:
     )
 
 
-LANE_ORDER = ("immediate", "underlying", "contributing", "coded", "general", "reaction", "prevention", "outcome")
+LANE_ORDER = (
+    "immediate",
+    "underlying",
+    "contributing",
+    "coded",
+    "general",
+    "reaction",
+    "prevention",
+    "generic",
+    "outcome",
+)
 _RELATION_LANE = {
     "immediate_cause": "immediate",
     "precipitated": "immediate",
@@ -474,7 +484,7 @@ class Composer:
         fr = self.fr()
         by: dict[tuple[str, str], tuple[Mapping[str, Any], list[str]]] = {}
         for item in self.x.evidence.items:
-            if item.get("kind") != "atlas_cell":
+            if item.get("kind") not in ("atlas_cell", "causal_claim"):  # causal sources too (audit2 N9)
                 continue
             c = item.get("citation") or {}
             r = c.get("rights")
@@ -1108,7 +1118,13 @@ class Composer:
             core = f"{effect} {EFFECT_SIDE[lang].get(c.relation, c.relation)} {cause}"
         selon = self.selon(c)
         if getattr(c, "supported_by", ()):  # Wikidata records who makes the claim: never "according to Wikidata"
-            who = (" et " if fr else " and ").join(c.supported_by)
+            refs = getattr(c, "supported_by_refs", ()) or ()
+            names = (
+                [str((x.get("label_fr") if fr else None) or x.get("label") or x.get("id")) for x in refs]
+                if refs
+                else list(c.supported_by)
+            )
+            who = (" et " if fr else " and ").join(names)
             selon = (
                 f"{selon}, qui attribue cette affirmation à {who} (Wikidata ne l'affirme pas lui-même)"
                 if fr
@@ -1117,6 +1133,16 @@ class Composer:
         note = (getattr(c, "attribution_note", None) or {}).get(lang)
         if note:
             core = f"{core} ({note})"
+        ends = getattr(c, "generic_ends", ()) or ()
+        if ends:  # audit M1: a class endpoint makes it a statement about a kind of event, not about this event
+            side_fr = {"cause": "la cause", "effect": "l'effet"}
+            side_en = {"cause": "the cause", "effect": "the effect"}
+            who_g = (" et " if fr else " and ").join((side_fr if fr else side_en).get(x, x) for x in ends)
+            core = (
+                f"{core} (énoncé générique : {who_g} est une classe, un type d'événement, pas un événement)"
+                if fr
+                else f"{core} (generic statement: {who_g} is a class, a kind of event, not an event)"
+            )
         if c.stance == "denies":
             head = (
                 f"{selon[0].upper()}{selon[1:]}, il est faux que « {core} » (la source conteste ce lien)"
@@ -1162,13 +1188,23 @@ class Composer:
             key=lambda r: (LANE_ORDER.index(claim_lane(r[0])), _grade_rank(r[0].grade), int(r[1][1:])),
         )
         effects = d["direction"] == "effects"
-        # coded outcomes (how an event ended, according to a dataset) are listed, never counted as causes/effects
+        # coded outcomes (how an event ended, according to a dataset) are listed, never counted as causes/effects;
+        # generic statements (a class endpoint: a kind of event) likewise (audit M1)
         k = sum(1 for c, _ in rows if claim_lane(c) == "outcome")
-        n = len(rows) - k
+        gen = sum(1 for c, _ in rows if claim_lane(c) == "generic")
+        n = len(rows) - k - gen
         what = ("conséquences" if effects else "causes") if fr else ("consequences" if effects else "causes")
         outc = ""
+        if gen:
+            outc += (
+                f" ; s'y ajoutent {gen} énoncé(s) générique(s) (classe : la cause ou l'effet est un type d'événement), "
+                f"qui ne sont pas des {what} de cet événement"
+                if fr
+                else f"; plus {gen} generic statement(s) (class level: the cause or effect is a kind of event), which "
+                f"are not {what} of this event"
+            )
         if k:
-            outc = (
+            outc += (
                 f" ; s'y ajoutent {k} issue(s) codée(s) par des jeux de données (comment l'événement s'est terminé), "
                 f"qui ne sont pas des {what}"
                 if fr

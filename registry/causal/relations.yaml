@@ -22,6 +22,10 @@ lanes:
   coded: {en: "dataset-coded triggers", fr: "déclencheurs codés par des jeux de données"}
   reaction: {en: "reactions", fr: "réactions"}
   prevention: {en: "prevented or delayed", fr: "empêché ou retardé"}
+  # FIXA (audit M1 remainder): a claim whose cause or effect is a class by the KG's own statements (P279, or a P31
+  # target without P31) is a generic statement about a kind of event; "why" files it here, apart from the causes.
+  generic: {en: "generic statements (class level; not causes of this event)",
+            fr: "énoncés génériques (classe) ; pas des causes de cet événement"}
   # APIFIX: a dataset's coded outcome is how the event ended, never a cause; it has its own lane and its own count
   # bucket (`outcome`) in the API, and every relation of this lane must be in `chain_excluded` (checked on load).
   outcome: {en: "coded outcomes (how the event ended according to a dataset; not causes)",

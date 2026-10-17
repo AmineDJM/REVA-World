@@ -14,6 +14,7 @@
  * is drawn. A candidate (T5/T6) never parses as a claim, a claim never parses as a candidate, and a candidate
  * never carries a grade.
  */
+import type { AtlasLicence } from '../api/atlas';
 import { z } from 'zod';
 import { JsonRecord, parseWith, warningsFr } from '../api/common';
 import { request, type Query } from '../../api/http';
@@ -142,6 +143,10 @@ const reasonFr = (r: string | null) => (r ? (TEMPORAL_REASON_FR.find(([re]) => r
 export interface Attribution {
   supportedBy: NodeRef[];
   nature: NodeRef[];
+  /** P1480 sourcing circumstances (presumably, possibly…): Wikidata hedges the statement itself (audit2 N2) */
+  hedges: NodeRef[];
+  /** P518 / P1001 / P1011 / P1012 / P1013: the scope the statement is restricted to */
+  scope: (NodeRef & { property: string })[];
   doubtful: { code: string | null; label: string | null; field: string | null }[];
   note: string | null;
 }
@@ -159,8 +164,9 @@ function attributionOf(o: Rec): Attribution | null {
       const k = JSON.stringify(x);
       return seen.has(k) ? false : (seen.add(k), true);
     });
-  const out = { supportedBy: refs(a.supported_by), nature: refs(a.nature_of_statement), doubtful, note: optStr(a.note_fr) ?? optStr(a.note_en) };
-  return out.supportedBy.length || out.nature.length || out.doubtful.length || out.note ? out : null;
+  const scopeRefs = (Array.isArray(a.scope_qualifiers) ? a.scope_qualifiers : []).filter(isRec).map((x) => ({ ...nodeRefOf(x), property: optStr(x.property) ?? '' })).filter((r) => r.id);
+  const out = { supportedBy: refs(a.supported_by), nature: refs(a.nature_of_statement), hedges: refs(a.sourcing_circumstances), scope: scopeRefs, doubtful, note: optStr(a.note_fr) ?? optStr(a.note_en) };
+  return out.supportedBy.length || out.nature.length || out.hedges.length || out.scope.length || out.doubtful.length || out.note ? out : null;
 }
 
 /** The asserting source of a claim (nested `source` / `asserting_source` object, or flat fields of the claim). */
@@ -179,6 +185,28 @@ export interface AssertingSource {
   verification: string | null;
   /** Wikidata property the statement was made with (P828, P1542, P1478, P1536 …), from the selector */
   property: string | null;
+  /** licence of the source as the causal API serves it (`source.rights`, normalised like atlas cells; audit2 N9) */
+  rights: AtlasLicence | null;
+}
+
+/** `source.rights` of a causal claim (server-normalised) → the atlas licence shape; null when absent or unreadable. */
+function rightsOf(key: string, v: unknown): AtlasLicence | null {
+  if (!isRec(v) || typeof v.licence !== 'string' || !v.licence) return null;
+  const b = (x: unknown) => x === true;
+  return {
+    source: key,
+    licence: v.licence,
+    licence_url: optStr(v.licence_url),
+    attribution: optStr(v.attribution),
+    commercial_use: optStr(v.commercial_use) ?? 'unknown',
+    non_commercial: b(v.non_commercial),
+    share_alike: b(v.share_alike),
+    no_derivatives: b(v.no_derivatives),
+    open_licence: typeof v.open_licence === 'boolean' ? v.open_licence : null,
+    restricted: b(v.restricted),
+    basis: optStr(v.basis) ?? 'causal_api',
+    restriction: optStr(v.restriction),
+  };
 }
 
 /** {"doi": "10.1/x"} → "doi: 10.1/x"; {"file": "a.csv", "row": 4} → "file: a.csv · row: 4". */
@@ -222,6 +250,7 @@ function sourceOf(o: Rec): AssertingSource | null {
     references: Array.isArray(refs) ? refs.length : typeof refs === 'number' ? refs : null,
     verification: pick('verification'),
     property: isRec(s.selector) ? optStr(s.selector.property) : null,
+    rights: rightsOf(key, s.rights),
   };
 }
 
@@ -256,7 +285,8 @@ function baseOf(o: Rec, ctx: z.RefinementCtx) {
     cause,
     effect,
     relation,
-    lane: optStr(o.lane),
+    // /why files a claim with a class endpoint in the 'generic' lane (a statement about a kind of event, M1)
+    lane: isRec(o.generic) ? 'generic' : optStr(o.lane),
     relationLabel: optStr(o.relation_label_fr) ?? (isRec(rl) ? (optStr(rl.fr) ?? optStr(rl.en)) : optStr(rl)),
     polarity: optStr(o.polarity),
     stance: (o.stance === 'denies' ? 'denies' : 'asserts') as 'asserts' | 'denies',
@@ -560,7 +590,7 @@ export async function getCausalClaims(id: string, direction: 'causes' | 'effects
 
 // ------------------------------------------------------------------ why
 
-export const WHY_GROUPS = ['immediate', 'underlying', 'contributing', 'coded', 'general', 'reaction', 'prevention', 'outcome'] as const;
+export const WHY_GROUPS = ['immediate', 'underlying', 'contributing', 'coded', 'general', 'reaction', 'prevention', 'generic', 'outcome'] as const;
 export type WhyGroup = (typeof WHY_GROUPS)[number];
 
 const WHY_KEYS: Record<WhyGroup, string[]> = {
@@ -571,6 +601,8 @@ const WHY_KEYS: Record<WhyGroup, string[]> = {
   general: ['general', 'other', 'has_cause'],
   reaction: ['reaction', 'reaction_to'],
   prevention: ['prevention', 'prevented_or_delayed'],
+  // class-level statements (the cause or effect is a kind of event): never causes of this event (audit M1)
+  generic: ['generic'],
   outcome: ['outcome', 'coded_outcome'],
 };
 
@@ -662,7 +694,7 @@ export interface ChainResult {
   /** identical paths the server returned more than once, merged here (counted, never hidden) */
   duplicatesMerged: number;
   /** what the search skipped, as the server reports it (class items, quarantined claims, low grades…) */
-  skipped: { classNodes: number; quarantined: number; belowMinGrade: number; ungraded: number; classSample: string[] };
+  skipped: { classNodes: number; quarantined: number; belowMinGrade: number; ungraded: number; classSample: string[]; unloaded: number; unloadedSample: string[] };
   minGrade: Grade | null;
 }
 
@@ -752,6 +784,9 @@ export async function getCausalChain(from: string, to: string, opts: { max_hops?
       belowMinGrade: num(search.below_min_grade_skipped),
       ungraded: num(search.ungraded_skipped),
       classSample: Array.isArray(search.class_nodes_sample) ? search.class_nodes_sample.map((x) => (isRec(x) ? String(x.label ?? x.id ?? '') : String(x))).filter(Boolean) : [],
+      // entities the knowledge graph has not loaded are never intermediate nodes (audit M2)
+      unloaded: num(search.unloaded_nodes_skipped),
+      unloadedSample: Array.isArray(search.unloaded_nodes_sample) ? search.unloaded_nodes_sample.map(String).filter(Boolean) : [],
     },
     minGrade: gradeOf(search.min_grade),
   };

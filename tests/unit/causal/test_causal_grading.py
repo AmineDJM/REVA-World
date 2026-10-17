@@ -22,12 +22,13 @@ RULES = gr.load_rules()
 
 # ---------------------------------------------------------------------------------------------- rules
 def test_rule_table_is_versioned_and_complete() -> None:
-    assert RULES.version == "2" and len(RULES.sha256) == 64 and RULES.corroborated_min == 2
+    assert RULES.version == "3" and len(RULES.sha256) == 64 and RULES.corroborated_min == 2
     flags = (False, True)
-    for tier, tc, corr, contested, att, nat, doubt in itertools.product(
-        gr.TIERS, gr.TEMPORAL, (1, 2, 3), flags, flags, flags, flags
+    for tier, tc, corr, contested, att, nat, doubt, hedged, same, comm in itertools.product(
+        gr.TIERS, gr.TEMPORAL, (1, 2, 3), flags, flags, flags, flags, flags, flags, flags
     ):
-        g = gr.decide(gr.GradeInputs(tier, tc, corr, contested, att, nat, doubt), RULES)
+        inp = gr.GradeInputs(tier, tc, corr, contested, att, nat, doubt, hedged, same, comm)
+        g = gr.decide(inp, RULES)
         assert g.grade in gr.GRADES and len(g.rule_ids) == 5
         assert all(r["en"] and r["fr"] for r in g.reasons)
 

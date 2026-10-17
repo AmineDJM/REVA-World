@@ -21,6 +21,7 @@ from reva.causal.model import _json, _new_load
 from reva.causal.temporal import DATE_PIDS, EventDates, claim_time_window, dates_from_rows, temporal_detail
 from reva.causal.vocab import vocabulary
 from reva.kernel.errors import ValidationProblem
+from reva.kg.query import is_community_edited
 
 GRADER_SOURCE = "reva.causal.grader"
 MAX_CLAIMS_GRADED = 1_000_000
@@ -90,6 +91,32 @@ def _qualified(c: Mapping[str, Any]) -> tuple[bool, bool, bool]:
     return bool(q.get(gr.SUPPORTED_BY_PID)), bool(q.get(gr.NATURE_OF_STATEMENT_PID)), doubtful
 
 
+def _hedged(c: Mapping[str, Any]) -> bool:
+    """P1480 "sourcing circumstances" qualifier present (audit2 N2, grading.yaml v3)."""
+    return bool((c.get("qualifiers") or {}).get(gr.SOURCING_CIRCUMSTANCES_PID))
+
+
+def _scope_qualified(c: Mapping[str, Any]) -> bool:
+    q = c.get("qualifiers") or {}
+    return any(q.get(p) for p in gr.SCOPE_QUALIFIER_PIDS)
+
+
+EFFECT_DATED_BY_CAUSE_END = "effect_dated_by_cause_end"
+
+
+def outcome_dated_by_cause_end(
+    c: Mapping[str, Any], cause: EventDates | None, effect: EventDates | None, outcome_relations: Iterable[str]
+) -> dict[str, Any] | None:
+    """The cause's end window and the effect's start window when a coded outcome is dated by its cause's own end
+    (the two windows are equal): "the cause starts before the effect" is then true by construction (audit2 N7)."""
+    if c.get("relation") not in set(outcome_relations) or cause is None or effect is None:
+        return None
+    end, start = cause.end, effect.start
+    if end is None or start is None or (end.lo, end.hi) != (start.lo, start.hi):
+        return None
+    return {"cause_end": end.as_dict(), "effect_start": start.as_dict()}
+
+
 def structural_flags(claims: Sequence[Mapping[str, Any]], excluded_relations: Iterable[str] = ()) -> dict[int, str]:
     """``{claim row id: fact}`` for self-loops (``consistency.self_loop``) and for asserted causal claims whose
     cause and effect lie in the same strongly connected component (``consistency.cycle``) — audit L7. Such claims
@@ -140,7 +167,9 @@ def compute(
     are resolved to their clusters: two sources coding the same pair of events under their own record ids assert the
     same link. Records joined by a link declared not independent share a ``lineage:`` upstream key (count once)."""
     ident = identity if (identity is not None and rules.resolve_same_as) else None
-    flags = structural_flags(claims, vocabulary().chain_excluded)
+    vocab = vocabulary()
+    flags = structural_flags(claims, vocab.chain_excluded)
+    outcome_rels = vocab.outcome_relations
 
     def canon(x: str) -> str:
         return ident.canon(x) if ident is not None else x
@@ -190,23 +219,43 @@ def compute(
         if tcheck == "undetermined" and isinstance(missing, Mapping) and missing.get("kind") == "missing":
             # the source codes no date for the effect: typed missing, never a date copied from the cause (M3)
             tdetail = {**tdetail, "effect_time_missing": dict(missing)}
+        same_record = outcome_dated_by_cause_end(c, dates.get(c["cause_id"]), dates.get(c["effect_id"]), outcome_rels)
+        if same_record is not None:
+            tdetail = {**tdetail, "reason": EFFECT_DATED_BY_CAUSE_END, EFFECT_DATED_BY_CAUSE_END: same_record}
         notes = _notes(c, tdetail)
         if via_identity:
             notes.append("corroboration.via_same_as")
         attributed, nature, doubtful = _qualified(c)
+        hedged = _hedged(c)
+        community = bool(c.get("statement_key")) or is_community_edited(c["source_key"])
         notes += [
             f
             for f, on in (
                 ("attribution.supported_by", attributed),
                 ("nature.qualified", nature),
+                ("nature.sourcing_circumstances", hedged),
+                ("scope.qualified", _scope_qualified(c)),
                 ("certainty.doubtful", doubtful),
+                ("temporal.effect_dated_by_cause_end", same_record is not None),
+                ("tier.T2.wikidata_reference", c["source_tier"] == "T2" and community),
             )
             if on
         ]
         if c["id"] in flags:
             notes.append(flags[c["id"]])
         g = gr.decide(
-            gr.GradeInputs(c["source_tier"], tcheck, corr.count, bool(contested), attributed, nature, doubtful),
+            gr.GradeInputs(
+                c["source_tier"],
+                tcheck,
+                corr.count,
+                bool(contested),
+                attributed,
+                nature,
+                doubtful,
+                hedged=hedged,
+                effect_dated_by_cause_end=same_record is not None,
+                community_edited=community,
+            ),
             rules,
             notes,
         )

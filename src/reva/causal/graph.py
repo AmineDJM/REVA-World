@@ -26,7 +26,8 @@ from sqlalchemy import Connection, text
 from reva.causal import grading as gr
 from reva.causal import identity as idn
 from reva.causal.grader import fetch_event_dates
-from reva.causal.vocab import FAMILIES, LANES, OUTCOME_LANE, RELATIONS, Vocabulary, vocabulary
+from reva.causal.labels import QUALIFIER_ITEM_PIDS, unloaded_label
+from reva.causal.vocab import FAMILIES, GENERIC_LANE, LANES, OUTCOME_LANE, RELATIONS, Vocabulary, vocabulary
 from reva.kernel.errors import ValidationProblem
 from reva.kg.model import QID_RE
 from reva.kg.query import is_community_edited, kinds_for, labels_for, verification_of
@@ -141,20 +142,39 @@ def attribution_of(r: Mapping[str, Any], labels: Mapping[str, Mapping[str, str]]
     statement), and the source's own doubtful certainty codes (``scope.source_validity``) — audit H3 / H4. ``None``
     when the claim carries none of them."""
     sup, nat = _qual_items(r, gr.SUPPORTED_BY_PID), _qual_items(r, gr.NATURE_OF_STATEMENT_PID)
+    hedge = _qual_items(r, gr.SOURCING_CIRCUMSTANCES_PID)
+    scope = [(p, q) for p in gr.SCOPE_QUALIFIER_PIDS for q in _qual_items(r, p)]
     validity = [
         x for x in (r.get("scope") or {}).get("source_validity") or [] if isinstance(x, Mapping) and x.get("certainty")
     ]
     doubtful = [x for x in validity if x.get("certainty") == "doubtful"]
-    if not (sup or nat or doubtful):
+    if not (sup or nat or hedge or scope or doubtful):
         return None
     sup_refs, nat_refs = [_ref(q, labels, {}) for q in sup], [_ref(q, labels, {}) for q in nat]
+    hedge_refs = [_ref(q, labels, {}) for q in hedge]
+    scope_refs = [{"property": p, **_ref(q, labels, {})} for p, q in scope]
     en, fr = [], []
+    if hedge_refs:  # audit2 N2: Wikidata hedges the statement itself (P1480), verbatim value
+        en.append(
+            "Wikidata qualifies: " + _and([x["label"] for x in hedge_refs], False) + " (sourcing circumstances, P1480)"
+        )
+        fr.append(
+            "Wikidata qualifie : "
+            + _and([x["label_fr"] or x["label"] for x in hedge_refs], True)
+            + " (circonstances de la source, P1480)"
+        )
     if nat_refs:
         en.append("Wikidata qualifies the nature of this statement as: " + _and([x["label"] for x in nat_refs], False))
         fr.append(
             "Wikidata qualifie la nature de cette déclaration : "
             + _and([x["label_fr"] or x["label"] for x in nat_refs], True)
         )
+    for p in gr.SCOPE_QUALIFIER_PIDS:  # audit2 N2: the scope the statement is restricted to, worded
+        vals = [x for x in scope_refs if x["property"] == p]
+        if vals:
+            w_en, w_fr = gr.SCOPE_QUALIFIER_WORDS[p]
+            en.append(f"{w_en}: " + _and([x["label"] for x in vals], False))
+            fr.append(f"{w_fr} : " + _and([x["label_fr"] or x["label"] for x in vals], True))
     for x in doubtful:
         code = f"{x.get('field')} = {x.get('code')}"
         en.append(f"the source codes it as doubtful: {x.get('label')} ({code})")
@@ -162,6 +182,8 @@ def attribution_of(r: Mapping[str, Any], labels: Mapping[str, Mapping[str, str]]
     return {
         "supported_by": sup_refs,
         "nature_of_statement": nat_refs,
+        "sourcing_circumstances": hedge_refs,
+        "scope_qualifiers": scope_refs,
         "source_validity": validity,
         "note_en": "; ".join(en) or None,
         "note_fr": " ; ".join(fr) or None,
@@ -213,11 +235,15 @@ def _wording(
 
 
 def _ref(q: str, labels: Mapping[str, Mapping[str, str]], kinds: Mapping[str, str], lang: str = "en") -> dict[str, Any]:
+    """An item as shown: its KG label, else ``Q7747 (label not loaded)`` / ``(libellé non chargé)`` — never a bare id
+    standing in for a name, never a label written by hand (audit2 N3)."""
     lab = labels.get(q, {})
+    name = lab.get(lang) or lab.get("en") or lab.get("fr")
     return {
         "id": q,
-        "label": lab.get(lang) or lab.get("en") or lab.get("fr") or q,
-        "label_fr": lab.get("fr"),
+        "label": name or unloaded_label(q, "en"),
+        "label_fr": lab.get("fr") or (None if name else unloaded_label(q, "fr")),
+        "label_loaded": bool(name),
         "kind": kinds.get(q),
     }
 
@@ -250,6 +276,7 @@ def claim_out(
     kinds: Mapping[str, str],
     v: Vocabulary,
     rules: gr.Rules,
+    rights: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     rel = v.relation(r["relation"])
     cause, effect = _ref(r["cause_id"], labels, kinds), _ref(r["effect_id"], labels, kinds)
@@ -284,6 +311,7 @@ def claim_out(
             "codebook": r["codebook"],
             "verification": verification,
             "retrieved_at": r["retrieved_at"],
+            "rights": (rights or {}).get(r["source_key"]) or (rights or {}).get("sha:" + str(r["raw_sha256"])),
         },
         "mechanism": r["mechanism"],
         "scope": r["scope"],
@@ -351,10 +379,76 @@ def _claims(
 
 def _render(conn: Connection, rows: Sequence[Mapping[str, Any]], extra_ids: Iterable[str] = ()) -> list[dict[str, Any]]:
     ids = {r["cause_id"] for r in rows} | {r["effect_id"] for r in rows} | set(extra_ids)
-    ids |= {q for r in rows for p in (gr.SUPPORTED_BY_PID, gr.NATURE_OF_STATEMENT_PID) for q in _qual_items(r, p)}
+    ids |= {q for r in rows for p in QUALIFIER_ITEM_PIDS for q in _qual_items(r, p)}
     labels, kinds = labels_for(conn, ids), kinds_for(conn, ids)
     v, rules = vocabulary(), gr.load_rules()
-    return [claim_out(r, labels, kinds, v, rules) for r in rows]
+    rights = source_rights(conn, rows)
+    return [claim_out(r, labels, kinds, v, rules, rights) for r in rows]
+
+
+RIGHTS_SQL = """SELECT src.source_key, COALESCE(m.rights, src.rights) AS rights
+  FROM evidence.source src
+  LEFT JOIN LATERAL (SELECT v.rights FROM evidence.source_metadata_version v
+                      WHERE v.source_id = src.id ORDER BY v.version DESC LIMIT 1) m ON true
+ WHERE src.source_key = ANY(:k)"""
+
+
+def source_rights(conn: Connection, rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """Licence of each asserting source (audit2 N9), as ``/v1/sources`` records it (latest source metadata version,
+    else the source row) and normalised with the atlas rule (``reva.atlas.snapshot.normalise_rights``: explicit
+    flags first, then the licence text; ``restricted`` for non-commercial / share-alike / no-derivatives / not-open
+    terms). A source without registry rights falls back to the rights recorded with the claim's raw artifact
+    (``meta.artifact.rights``, key ``sha:<raw sha256>``). Unknown terms are ``None``, never "open"."""
+    from reva.atlas.snapshot import normalise_rights
+
+    keys = sorted({str(r["source_key"]) for r in rows})
+    if not keys:
+        return {}
+    out: dict[str, Any] = {}
+    for k, raw in conn.execute(text(RIGHTS_SQL), {"k": keys}).all():
+        n = normalise_rights(raw, basis="source_registry")
+        if n is not None:
+            out[k] = n
+    need = sorted({str(r["raw_sha256"]) for r in rows if r["source_key"] not in out and r.get("raw_sha256")})
+    if need:
+        for sha, raw in conn.execute(
+            text("SELECT sha256, rights FROM meta.artifact WHERE sha256 = ANY(:s)"), {"s": need}
+        ).all():
+            n = normalise_rights(raw, basis="raw_artifact")
+            if n is not None:
+                out["sha:" + sha] = n
+    return out
+
+
+def licence_warning(claims: Iterable[Mapping[str, Any]]) -> dict[str, str] | None:
+    """One ``licence_restricted`` warning naming every restricted licence among the claims' sources (as LIC-1)."""
+    seen: dict[str, Mapping[str, Any]] = {}
+    for c in claims:
+        rr = (c.get("source") or {}).get("rights")
+        if isinstance(rr, Mapping) and rr.get("restricted"):
+            seen.setdefault(str(c["source"]["source_key"]), rr)
+    if not seen:
+        return None
+    parts = []
+    for k, x in sorted(seen.items()):
+        terms = [
+            t
+            for t, on in (
+                ("non-commercial", x.get("non_commercial")),
+                ("share-alike", x.get("share_alike")),
+                ("no derivatives", x.get("no_derivatives")),
+                ("no charging for access", x.get("commercial_use") == "restricted"),
+                ("not an open licence", x.get("open_licence") is False),
+            )
+            if on
+        ]
+        parts.append(f"{k}: {x.get('licence')} ({', '.join(terms)})")
+    return {
+        "code": "licence_restricted",
+        "message": (
+            "Some claims come from sources under restricted terms; reuse must respect them: " + "; ".join(parts)
+        )[:1000],
+    }
 
 
 # ---------------------------------------------------------------------------------------------- event
@@ -489,14 +583,20 @@ def why(conn: Connection, qid: str, *, origin: str | None = None, min_grade: str
     rows, truncated = _claims(conn, "c.effect_id = :q", {"q": qid}, origin=origin, min_grade=min_grade)
     out = _render(conn, rows, [qid])
     v = vocabulary()
+    # audit M1 remainder: a claim with a class endpoint (by the KG's own P279 / P31 statements) is a generic statement
+    # about a kind of event, not a cause of this event: filed in its own lane, counted apart.
+    classes = class_nodes(conn, {c["cause"]["id"] for c in out} | {qid}, origin)
     lanes: dict[str, list[dict[str, Any]]] = {lane: [] for lane in LANES}
     dissent = []
     mechanisms = []
     for c in out:
+        ends = [side for side in ("cause", "effect") if c[side]["id"] in classes]
+        if ends:
+            c["generic"] = {"class_endpoints": ends, "rule": CLASS_NODE_RULE}
         if c["stance"] == "denies":
             dissent.append(c)
             continue
-        lanes[c["lane"]].append(c)
+        lanes[GENERIC_LANE if ends and c["lane"] != OUTCOME_LANE else c["lane"]].append(c)
         if c["grade"] and c["grade"]["contested_by"]:
             dissent.append(c)
         if c["mechanism"]:
@@ -507,7 +607,20 @@ def why(conn: Connection, qid: str, *, origin: str | None = None, min_grade: str
     lab = labels.get(qid, {})
     name_en, name_fr = lab.get("en") or lab.get("fr") or qid, lab.get("fr") or lab.get("en") or qid
     k = len(lanes[OUTCOME_LANE])  # this record is the coded outcome of k events: how they ended, not caused by them
-    n = sum(len(x) for lane, x in lanes.items() if lane != OUTCOME_LANE)
+    gen = len(lanes[GENERIC_LANE])
+    n = sum(len(x) for lane, x in lanes.items() if lane not in (OUTCOME_LANE, GENERIC_LANE))
+    gen_en = (
+        f" {gen} generic statement(s) (class level: the cause or the effect is a kind of event, not an event) are "
+        "listed apart; they are not causes of this event."
+        if gen
+        else ""
+    )
+    gen_fr = (
+        f" {gen} énoncé(s) générique(s) (classe : la cause ou l'effet est un type d'événement, pas un événement) "
+        "listé(s) à part ; ce ne sont pas des causes de cet événement."
+        if gen
+        else ""
+    )
     out_en = (
         f" {k} coded outcome claim(s): a dataset codes {name_en} as how an event ended; an outcome is not a cause."
         if k
@@ -530,11 +643,14 @@ def why(conn: Connection, qid: str, *, origin: str | None = None, min_grade: str
         "truncated": truncated,
         "causal_claims": n,
         "outcome_claims": k,
+        "generic_claims": gen,
         "summary": f"{n} sourced causal claim(s) about {name_en}; each is attributed to its source. "
         + ("No cause is asserted by any loaded source." if n == 0 else CLAIM_NOTE)
+        + gen_en
         + out_en,
         "summary_fr": f"{n} affirmation(s) causale(s) sourcée(s) sur {name_fr} ; chacune est attribuée à sa source."
         + (" Aucune cause n'est affirmée par les sources chargées." if n == 0 else " REVA n'établit pas de causalité.")
+        + gen_fr
         + out_fr,
         "note": CLAIM_NOTE,
     }
@@ -571,6 +687,29 @@ CLASS_NODE_RULE = (
     "intermediate nodes exclude classes: items with a P279 (subclass of) statement, or items that are only "
     "targets of P31 (instance of) and have no P31 of their own (KG statements, not names)"
 )
+
+
+UNLOADED_NODE_RULE = (
+    "intermediate nodes exclude entities not loaded in the knowledge graph (no kg.entity row and no statement about "
+    "them: no label, kind or dates, so REVA cannot say what they are); the endpoints asked for are kept"
+)
+
+
+def unloaded_nodes(conn: Connection, ids: Iterable[str]) -> set[str]:
+    """The ids the KG knows nothing about — no ``kg.entity`` row and no statement about them, the loader's
+    ``unknown_endpoint_claims`` rule (audit M2): never traversed as intermediate chain nodes."""
+    qs = sorted(set(ids))
+    if not qs:
+        return set()
+    return {
+        q
+        for (q,) in conn.execute(
+            text("""SELECT q.id FROM unnest(CAST(:q AS text[])) q(id)
+                     WHERE NOT EXISTS (SELECT 1 FROM kg.entity e WHERE e.qid = q.id)
+                       AND NOT EXISTS (SELECT 1 FROM kg.statement s WHERE s.subject_qid = q.id)"""),
+            {"q": qs},
+        ).all()
+    }
 
 
 def class_nodes(conn: Connection, ids: Iterable[str], origin: str | None = None) -> set[str]:
@@ -634,7 +773,9 @@ def chain(
         "quarantined_skipped": 0,
         "class_nodes_skipped": 0,
         "class_nodes_sample": [],
-        "node_rule": CLASS_NODE_RULE,
+        "unloaded_nodes_skipped": 0,
+        "unloaded_nodes_sample": [],
+        "node_rule": CLASS_NODE_RULE + "; " + UNLOADED_NODE_RULE,
         "truncated": False,
         "truncation_reasons": [],
         "time_budget_ms": int(time_budget_s * 1000),
@@ -643,6 +784,8 @@ def chain(
     meet: set[str] = set()
     is_class: dict[str, bool] = {}
     skipped_classes: set[str] = set()
+    is_unloaded: dict[str, bool] = {}
+    skipped_unloaded: set[str] = set()
     # Identity hops: records of the same event joined by evidenced same_as links (reva.causal.identity) are
     # crossed at no causal cost, so a chain can continue from one source's record of an event to another's.
     ident = idn.load(conn, origin=origin)
@@ -711,11 +854,16 @@ def chain(
                 usable.add((a, b))
         reached = {(b if side == 0 else a) for a, b in usable} - {frm, to} - set(is_class)
         found = class_nodes(conn, reached, origin)
+        missing = unloaded_nodes(conn, reached - found)
         is_class.update({q: q in found for q in reached})
+        is_unloaded.update({q: q in missing for q in reached})
         for a, b in usable:
             u, w = (a, b) if side == 0 else (b, a)
             if is_class.get(w):  # an intermediate class node (endpoints as asked are kept)
                 skipped_classes.add(w)
+                continue
+            if is_unloaded.get(w):  # audit M2: an entity the KG has not loaded is never an intermediate node
+                skipped_unloaded.add(w)
                 continue
             if w not in dist[side]:
                 dist[side][w] = d + 1
@@ -732,6 +880,8 @@ def chain(
             break
     search["class_nodes_skipped"] = len(skipped_classes)
     search["class_nodes_sample"] = sorted(skipped_classes)[:20]
+    search["unloaded_nodes_skipped"] = len(skipped_unloaded)
+    search["unloaded_nodes_sample"] = sorted(skipped_unloaded)[:20]
     search["elapsed_ms"] = int((time.perf_counter() - t0) * 1000)
     labels_ids = {frm, to}
     if best_len is None:
@@ -740,9 +890,15 @@ def chain(
         if search["truncated"] or search["ungraded_skipped"] or search["below_min_grade_skipped"]:
             reason += " (bounds, ungraded claims or the grade filter may hide one)"
         if search["quarantined_skipped"]:
-            reason += " (claims in cycles, self-loops, or attributed/qualified by Wikidata are not composed)"
+            reason += " (claims in cycles, self-loops, or attributed/qualified/hedged by Wikidata are not composed)"
         if skipped_classes:
             reason += f" ({len(skipped_classes)} class node(s) were not traversed)"
+        if skipped_unloaded:
+            reason += (
+                f" ({len(skipped_unloaded)} entit(y/ies) not loaded in the knowledge graph were not traversed: "
+                + ", ".join(sorted(skipped_unloaded)[:5])
+                + ")"
+            )
         outcome_ends = _outcome_records(conn, [frm, to], origin)
         if outcome_ends:
             reason = (

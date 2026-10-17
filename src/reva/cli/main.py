@@ -620,6 +620,52 @@ def causal_refresh_cmd(
     _out({"status": "completed", "origin": p["origin"], **out})
 
 
+@causal_app.command("annotate-retractions")
+def causal_annotate_retractions_cmd(
+    origin: str = typer.Option("any", help="live, test_fixture or any"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="derive and count, write nothing"),
+) -> None:
+    """Append corrected reasons (kg.retraction_annotation, migration 0018) for the claim / statement retractions
+    stored as removed_at_source although the retracting load had the same raw bytes (audit2 N1). The retraction
+    rows are never edited; idempotent (worker credentials)."""
+    from reva.adapters.postgres.engine import make_engine
+    from reva.causal.retractions import annotate_retraction_reasons
+    from reva.settings import get_settings
+
+    if origin not in ("live", "test_fixture", "any"):
+        typer.echo("--origin must be live, test_fixture or any", err=True)
+        raise typer.Exit(2)
+    eng = make_engine("worker", get_settings())
+    _out(annotate_retraction_reasons(eng, origin=None if origin == "any" else origin, apply=not dry_run))
+
+
+@causal_app.command("queue-labels")
+def causal_queue_labels_cmd(
+    origin: str = typer.Option("live", help="live or test_fixture"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="list, do not touch the harvester state"),
+) -> None:
+    """Put the Wikidata items named by causal claims that the KG cannot label yet (P3680 parties, P5102 / P1480
+    values, scope qualifiers, endpoints) at tier 1 of the causal harvester's queue (audit2 N3). No network."""
+    from sqlalchemy import text as text_sql
+
+    from reva.adapters.postgres.engine import make_engine
+    from reva.causal.labels import queue_for_harvest, unlabelled_items
+    from reva.settings import get_settings
+
+    eng = make_engine("api", get_settings())
+    with eng.connect() as conn:
+        conn.execute(text_sql("SET statement_timeout = 0"))
+        items = unlabelled_items(conn, origin=origin)
+    groups: dict[str, int] = {}
+    for v in items.values():
+        groups[v["group"]] = groups.get(v["group"], 0) + 1
+    out: dict[str, Any] = {"origin": origin, "unlabelled": len(items), "by_group": groups}
+    out["qualifier_items"] = {k: v for k, v in items.items() if v["group"] == "qualifier"}
+    if not dry_run:
+        out["queue"] = queue_for_harvest(items)
+    _out(out)
+
+
 # --------------------------------------------------------------------------- kg (V3, LOADALL)
 @kg_app.command("import-harvest")
 def kg_import_harvest_cmd(

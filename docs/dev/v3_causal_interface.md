@@ -13,7 +13,8 @@ against time, counts independent corroboration, keeps dissent, and grades it A�
 |---|---|
 | `kg.causal_load` | One row per write batch (`kind`: `kg_statements`, `dataset`, `grading`, `candidates`): source key, origin, raw sha256s (each a verified `meta.artifact`), retrieval time, loader version, parameters (codebook, rules version...). Server `recorded_at`/`recorded_by`. Rows of the tables below must be inserted in the transaction that created their load. |
 | `kg.causal_claim` | Append-only claim versions (a changed claim = a new row). |
-| `kg.causal_claim_retraction` | A source dropped a claim: it leaves the current view. Nothing is deleted. |
+| `kg.causal_claim_retraction` | A claim left the current view (nothing is deleted). Reason, derived since FIXA (migration `0018_retraction_reasons`): `reclassified_by_reva` (the retracting load has the claim's raw bytes: the source still has the row), `removed_at_source` (row verified absent from a new revision), `absent_from_delivery` (raw changed, not checked), `no_longer_causal` / `source_statement_retracted` (KG claims); `detail` names the basis. |
+| `kg.retraction_annotation`, `kg.retraction_reason_current` | Append-only corrected reasons of older retraction rows (claim and KG statement retractions), with evidence; the view gives each retraction's `effective_reason`. Written by `reva causal annotate-retractions`. |
 | `kg.causal_grade` | Grades as their own rows: claim row, grading-rules version + sha256, grade A–E, rule ids, temporal check, corroboration, contesting claims, inputs sha256. A recompute writes rows only when the inputs changed. |
 | `kg.causal_candidate` | Quarantined T5/T6 candidates (text-mined / model-proposed). Never mixed with claims. |
 | `kg.causal_review` | Maintainer reviews (claims and candidates). **No runtime role may insert**: agents cannot record reviews. |
@@ -105,7 +106,10 @@ rep = load_dataset_claims(
         ),
     ],
     complete=True,   # the delivery is the whole dataset: claims of (source_key, dataset) absent from it
-                     # are retracted (removed_at_source). False = partial delivery, nothing retracted.
+                     # are retracted; reason derived (FIXA): reclassified_by_reva when its raw artifact is in this
+                     # delivery, else source_row_present(stored claim) -> False removed_at_source / True
+                     # reclassified_by_reva, else absent_from_delivery. False = partial delivery, nothing retracted.
+    source_row_present=None,  # optional callable(stored claim: selector, raw_sha256, ...) -> bool | None
 )
 rep.as_dict()  # {"load_id", "inserted", "new_revision", "unchanged", "reinstated", "retracted",
                #  "rejected_counts", "rejected_sample", "unknown_entities", ...}
@@ -174,9 +178,14 @@ Dataset agents call `grade_claims` (or `refresh`) after their loads, or leave it
   doubtful` cap the grade at D and are worded (claim JSON `attribution`); self-loops and cycle members carry
   `consistency.self_loop` / `consistency.cycle`; chains skip those, class items (P279 / P31-only targets) and
   `coded_outcome` (relations.yaml `chain_excluded`).
+* **Version 3** (FIXA, `docs/dev/v3_fixa.md`): P1480 (*sourcing circumstances*) caps at D, is worded ("Wikidata
+  qualifie : …") and is never chained (`nature.sourcing_circumstances`); P518/P1001/P1011/P1012/P1013 are worded
+  (`scope.qualified`); a coded outcome dated by its cause's own end carries `temporal.reason =
+  effect_dated_by_cause_end` and its `consistent` does not count toward A; a Wikidata T2 (DOI/ISBN reference)
+  claim alone is capped at C (`grade.C.t2_wikidata_single`, `tier.T2.wikidata_reference`).
 * **Grade**, first matching rule: E (temporal inconsistent) · E (contested, not corroborated) · D (attributed,
-  nature-qualified, source-doubtful; v2) · A (T1/T2 +
-  consistent + corroborated) · B (T1/T2) · B (T3 corroborated) · C (T3) · D (T4). Every grade row carries
+  nature-qualified, sourcing-hedged, source-doubtful) · C (Wikidata T2, not corroborated; v3) · A (T1/T2 +
+  consistent + corroborated, not dated by the cause's own end) · B (T1/T2) · B (T3 corroborated) · C (T3) · D (T4). Every grade row carries
   the rule ids (tier, temporal, corroboration, contest, grade rule) and en/fr reasons.
 
 ## HTTP API (`read` scope, RFC 9457 problems, envelope as `/v1/kg`)
@@ -246,6 +255,15 @@ Real example (fixture `tests/unit/causal/fixtures/wikidata_causal_fixture.json`,
   "load_id": 1
 }
 ```
+
+Since FIXA (`docs/dev/v3_fixa.md`): every ref (`cause`, `effect`, attribution values) has `label_loaded`; without a
+KG label `label` is `"Q7747 (label not loaded)"` and `label_fr` `"Q7747 (libellé non chargé)"` (never a bare id,
+never a hand-written label). `source.rights` is the asserting source's licence (registry rights, normalised like atlas
+cells; `null` = no terms recorded) and the envelope adds a `licence_restricted` warning naming restricted sources.
+`attribution` also carries `sourcing_circumstances` (P1480) and `scope_qualifiers` (P518/P1001/P1011/P1012/P1013,
+each with its `property`). In `/why`, a claim whose cause or effect is a class carries `generic` and sits in the lane
+`generic` (counted in `generic_claims`, not in `causal_claims`). Chain `search` adds `unloaded_nodes_skipped` /
+`unloaded_nodes_sample`: entities the KG knows nothing about are never intermediate nodes.
 
 `relation_label` reads cause → effect, `relation_inverse_label` effect → cause; the wording uses the side the
 source wrote it on (`asserted_on`). `grade` is `null` until the grader has run on that claim row. Dates are

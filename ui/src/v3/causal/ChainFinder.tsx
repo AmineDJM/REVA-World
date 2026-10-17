@@ -214,7 +214,8 @@ function SkippedNote({ r }: { r: ChainResult }) {
   const s = r.skipped;
   const parts = [
     s.classNodes > 0 ? `${s.classNodes} élément(s) de type classe (« guerre », « traité »…) non traversé(s)${s.classSample.length ? ` : ${s.classSample.slice(0, 5).join(', ')}` : ''}` : '',
-    s.quarantined > 0 ? `${s.quarantined} affirmation(s) en boucle ou auto-référente(s) écartée(s)` : '',
+    s.quarantined > 0 ? `${s.quarantined} affirmation(s) en boucle, auto-référente(s), ou attribuée(s), qualifiée(s) ou nuancée(s) par Wikidata écartée(s)` : '',
+    s.unloaded > 0 ? `${s.unloaded} entité(s) non chargée(s) dans le graphe de connaissances non traversée(s)${s.unloadedSample.length ? ` : ${s.unloadedSample.slice(0, 5).join(', ')}` : ''}` : '',
     s.belowMinGrade > 0 ? `${s.belowMinGrade} affirmation(s) sous le grade minimal${r.minGrade ? ` ${r.minGrade}` : ''} écartée(s)` : '',
     s.ungraded > 0 ? `${s.ungraded} affirmation(s) non gradée(s) écartée(s)` : '',
   ].filter(Boolean);

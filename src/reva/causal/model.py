@@ -716,8 +716,14 @@ def load_kg_claims(
                     )
                     return "no_longer_causal", {"basis": "value_not_an_item", "statement_key": lt["statement_key"]}
                 if lt["statement_key"] in _cur:
-                    return "no_longer_causal", {"basis": "statement_current_no_claim", "statement_key": lt["statement_key"]}
-                return "source_statement_retracted", {"basis": "statement_not_current", "statement_key": lt["statement_key"]}
+                    return "no_longer_causal", {
+                        "basis": "statement_current_no_claim",
+                        "statement_key": lt["statement_key"],
+                    }
+                return "source_statement_retracted", {
+                    "basis": "statement_not_current",
+                    "statement_key": lt["statement_key"],
+                }
 
             if sks is None:
                 prefixes = ["kg:"]
@@ -904,6 +910,35 @@ def _dataset_row(
     return row
 
 
+def dataset_retraction_reason(
+    lt: Mapping[str, Any],
+    *,
+    raws: set[str],
+    dataset_revision: str,
+    parameters: Mapping[str, Any],
+    source_row_present: Callable[[Mapping[str, Any]], bool | None] | None = None,
+) -> tuple[str, dict[str, Any]]:
+    """Reason and detail of the retraction of a stored dataset claim absent from a complete delivery (N1)."""
+    detail: dict[str, Any] = {
+        "raw_sha256": lt.get("raw_sha256"),
+        "source_revision_from": lt.get("source_revision"),
+        "source_revision_to": dataset_revision,
+        "claim_load_id": lt.get("load_id"),
+    }
+    for k in ("connector", "connector_version", "connector_version_from"):
+        if parameters.get(k) is not None:
+            detail[k] = parameters[k]
+    if lt.get("raw_sha256") in raws:
+        return "reclassified_by_reva", {"basis": "raw_unchanged", **detail}
+    present = source_row_present(lt) if source_row_present is not None else None
+    detail["raw_sha256s_delivery"] = sorted(raws)[:20]
+    if present is False:
+        return "removed_at_source", {"basis": "row_absent_from_new_revision", **detail}
+    if present is True:
+        return "reclassified_by_reva", {"basis": "row_present_in_new_revision", **detail}
+    return "absent_from_delivery", {"basis": "raw_changed_row_not_checked", **detail}
+
+
 def load_dataset_claims(
     engine: Engine,
     store: Any,
@@ -918,8 +953,17 @@ def load_dataset_claims(
     codebook: Codebook | None = None,
     complete: bool = True,
     parameters: Mapping[str, Any] | None = None,
+    source_row_present: Callable[[Mapping[str, Any]], bool | None] | None = None,
 ) -> ClaimLoadReport:
-    """Load T1/T2 claims of one dataset delivery in one transaction (see the interface doc)."""
+    """Load T1/T2 claims of one dataset delivery in one transaction (see the interface doc).
+
+    Retraction reasons (audit2 N1, migration 0018): a claim absent from a ``complete`` delivery is retracted as
+    ``reclassified_by_reva`` when its raw artifact is in this delivery (same bytes: the source row is still there,
+    REVA's connector or mapping no longer yields the claim); otherwise ``source_row_present`` (given the stored
+    claim: ``selector``, ``raw_sha256``, ``source_revision``, ``claim_key``) decides — ``False`` =
+    ``removed_at_source`` (verified absent from the new revision), ``True`` = ``reclassified_by_reva``; without
+    it (or ``None``) the reason is ``absent_from_delivery`` (not checked). The detail names the basis, the raw
+    sha256 and the source revision / connector from -> to."""
     t0 = time.perf_counter()
     raws = _check_common(source_key, raw_sha256s, retrieved_at, origin)
     if not isinstance(dataset, str) or not DATASET_RE.match(dataset):
@@ -1006,6 +1050,7 @@ def load_dataset_claims(
                             ),
                             "unknown_endpoint_claims": rep.unknown_endpoint_claims,
                             "relations_sha256": vocab.sha256,
+                            "retraction_reasons": dict(rep.retraction_reasons),
                         },
                     )
                 )
@@ -1018,7 +1063,13 @@ def load_dataset_claims(
             prefix=f"ds:{source_key}:{dataset}:",
             rows=rows,
             retract_missing=complete,
-            retract_reason=lambda _lt: "removed_at_source",
+            retract_reason=lambda lt: dataset_retraction_reason(
+                lt,
+                raws=raw_set,
+                dataset_revision=dataset_revision,
+                parameters=parameters or {},
+                source_row_present=source_row_present,
+            ),
             batch_retrieved_at=retrieved_at,
             rep=rep,
         )

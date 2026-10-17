@@ -153,7 +153,9 @@ def test_attributed_claims_are_worded_with_their_claimant_and_not_composed(cf) -
     with cf.api.connect() as conn:
         claims = cg.causes(conn, b, origin="test_fixture")["claims"]
         att = next(x for x in claims if x["source"]["statement_id"] == "ATT")
-        assert att["wording"].startswith("Wikidata (") and f"records that {ns}:party asserts that" in att["wording"]
+        # the party has no KG label: named "<id> (label not loaded)", never a bare id (FIXA, audit2 N3)
+        assert att["wording"].startswith("Wikidata (")
+        assert f"records that {ns}:party (label not loaded) asserts that" in att["wording"]
         assert "According to" not in att["wording"] and att["attribution"]["supported_by"][0]["id"] == f"{ns}:party"
         nat = next(x for x in cg.effects(conn, b, origin="test_fixture")["claims"] if x["claim_key"].endswith("NAT"))
         assert f"nature of this statement as: {ns}:allegation" in nat["wording"]

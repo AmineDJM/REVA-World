@@ -4854,7 +4854,7 @@
                 "type": "null"
               }
             ],
-            "description": "Who Wikidata records as making the claim (P3680 statement supported by), the nature qualifier (P5102) and the source's doubtful certainty codes; the wording names them (grading.yaml v2)",
+            "description": "Who Wikidata records as making the claim (P3680 statement supported by), the nature qualifier (P5102), the sourcing circumstances (P1480: presumably, possibly ...), the scope qualifiers (P518, P1001, P1011, P1012, P1013) and the source's doubtful certainty codes; the wording names them (grading.yaml v3)",
             "title": "Attribution"
           },
           "cause": {
@@ -4889,6 +4889,19 @@
             ],
             "title": "Family",
             "type": "string"
+          },
+          "generic": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Set in /why when the cause or effect is a class (KG P279 / P31-only target): a generic statement about a kind of event, filed in the 'generic' lane, not a cause of the event",
+            "title": "Generic"
           },
           "grade": {
             "anyOf": [
@@ -5019,6 +5032,7 @@
           "contests",
           "disputed_by",
           "attribution",
+          "generic",
           "grade",
           "review_status",
           "wording",
@@ -6084,7 +6098,7 @@
             "title": "Kind"
           },
           "label": {
-            "description": "English label, else French, else the id itself",
+            "description": "English label, else French; without a KG label '<id> (label not loaded)' (never a bare id)",
             "title": "Label",
             "type": "string"
           },
@@ -6097,13 +6111,21 @@
                 "type": "null"
               }
             ],
+            "description": "French label; '<id> (libellé non chargé)' when the KG has no label",
             "title": "Label Fr"
+          },
+          "label_loaded": {
+            "default": true,
+            "description": "False: the KG has no en/fr label for this item yet",
+            "title": "Label Loaded",
+            "type": "boolean"
           }
         },
         "required": [
           "id",
           "label",
           "label_fr",
+          "label_loaded",
           "kind"
         ],
         "title": "CausalRef",
@@ -6171,6 +6193,19 @@
             "format": "date-time",
             "title": "Retrieved At",
             "type": "string"
+          },
+          "rights": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Licence of the asserting source as the source registry (/v1/sources) records it, normalised like atlas cells (licence, licence_url, commercial_use, non_commercial, share_alike, no_derivatives, open_licence, restricted, basis); null when no terms are recorded (never assumed open)",
+            "title": "Rights"
           },
           "selector": {
             "additionalProperties": true,
@@ -6260,7 +6295,8 @@
           "citation",
           "codebook",
           "verification",
-          "retrieved_at"
+          "retrieved_at",
+          "rights"
         ],
         "title": "CausalSource",
         "type": "object"
@@ -6364,7 +6400,7 @@
         "properties": {
           "causal_claims": {
             "default": 0,
-            "description": "Claims in the causal lanes (every lane but 'outcome')",
+            "description": "Claims in the causal lanes (every lane but 'generic' and 'outcome')",
             "title": "Causal Claims",
             "type": "integer"
           },
@@ -6374,6 +6410,12 @@
             },
             "title": "Dissent",
             "type": "array"
+          },
+          "generic_claims": {
+            "default": 0,
+            "description": "Claims in the 'generic' lane: the cause or effect is a class (a kind of event), not an event",
+            "title": "Generic Claims",
+            "type": "integer"
           },
           "id": {
             "title": "Id",
@@ -6428,6 +6470,7 @@
           "dissent",
           "truncated",
           "causal_claims",
+          "generic_claims",
           "outcome_claims",
           "summary",
           "summary_fr",
@@ -6936,6 +6979,20 @@
           "ungraded_skipped": {
             "title": "Ungraded Skipped",
             "type": "integer"
+          },
+          "unloaded_nodes_sample": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "title": "Unloaded Nodes Sample",
+            "type": "array"
+          },
+          "unloaded_nodes_skipped": {
+            "default": 0,
+            "description": "Entities with no KG entity row (no label, kind or dates) not traversed as intermediate nodes",
+            "title": "Unloaded Nodes Skipped",
+            "type": "integer"
           }
         },
         "required": [
@@ -6948,6 +7005,8 @@
           "quarantined_skipped",
           "class_nodes_skipped",
           "class_nodes_sample",
+          "unloaded_nodes_skipped",
+          "unloaded_nodes_sample",
           "node_rule",
           "identity",
           "duplicate_paths_merged",
@@ -23898,7 +23957,7 @@
             "type": "object"
           },
           "lane": {
-            "description": "immediate / underlying / contributing / general / coded (triggers) / reaction / prevention / outcome (coded outcomes: not causes)",
+            "description": "immediate / underlying / contributing / general / coded (triggers) / reaction / prevention / generic (class-level statements: not causes of the event) / outcome (coded outcomes: not causes)",
             "title": "Lane",
             "type": "string"
           }

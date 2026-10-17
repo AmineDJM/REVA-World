@@ -443,6 +443,14 @@ class CausalClaim:
     temporal_reason: str | None = None
     temporal_entity_sides: tuple[str, ...] = ()
     temporal_undated_sides: tuple[str, ...] = ()
+    #: P1480 sourcing-circumstances values (``{"id", "label"[, "label_fr"]}``): Wikidata hedges the claim (audit2 N2)
+    sourcing_circumstances: tuple[Mapping[str, str], ...] = ()
+    #: P518 / P1001 / P1011 / P1012 / P1013 scope restrictions (``{"property", "id", "label"}``), worded in the note
+    scope_qualifiers: tuple[Mapping[str, str], ...] = ()
+    #: the asserting source's licence (CAUSCORE ``source.rights``, normalised like atlas cells; audit2 N9)
+    rights: Mapping[str, Any] | None = None
+    #: sides that are classes (``generic`` lane of ``why``: a statement about a kind of event, not a cause; M1)
+    generic_ends: tuple[str, ...] = ()
 
     def cause_label(self, lang: str) -> str:
         return pick_label(self.cause_labels, lang, self.cause_id)

@@ -40,7 +40,9 @@ GRADING_FILE = REPO_ROOT / "registry" / "causal" / "grading.yaml"
 GRADES = ("A", "B", "C", "D", "E")
 TIERS = ("T1", "T2", "T3", "T4")
 TEMPORAL = ("consistent", "overlapping", "inconsistent", "undetermined")
-_CONDITION_KEYS = {"tier", "temporal_check", "corroborated", "contested", "attributed", "nature_qualified", "doubtful"}
+#: Boolean grade inputs a rule may test (version 3 adds hedged, effect_dated_by_cause_end, community_edited).
+FLAG_KEYS = ("attributed", "nature_qualified", "hedged", "doubtful", "effect_dated_by_cause_end", "community_edited")
+_CONDITION_KEYS = {"tier", "temporal_check", "corroborated", "contested", *FLAG_KEYS}
 #: Reference properties that identify a scholarly work verbatim (T2 when they arrive in a source's references).
 DOI_PIDS = ("P356",)
 ISBN_PIDS = ("P212", "P957")
@@ -60,6 +62,18 @@ QUOTE_PIDS = ("P1683",)
 #: hypothetically, rarely ...). Their values are kept verbatim and shown; the grade is capped (grading.yaml).
 SUPPORTED_BY_PID = "P3680"
 NATURE_OF_STATEMENT_PID = "P5102"
+#: "sourcing circumstances" (P1480: presumably, possibly, circa ...): Wikidata hedges the statement itself
+#: (audit2 N2, grading.yaml version 3). Values kept verbatim and shown; grade capped at D; never chained.
+SOURCING_CIRCUMSTANCES_PID = "P1480"
+#: Qualifiers that restrict the claim's scope, worded "(applies to: ...)" (audit2 N2): property -> en / fr wording.
+SCOPE_QUALIFIER_PIDS = ("P518", "P1001", "P1011", "P1012", "P1013")
+SCOPE_QUALIFIER_WORDS: dict[str, tuple[str, str]] = {
+    "P518": ("applies to part", "s'applique à la partie"),
+    "P1001": ("applies to jurisdiction", "s'applique à la juridiction"),
+    "P1011": ("excluding", "à l'exclusion de"),
+    "P1012": ("including", "y compris"),
+    "P1013": ("criterion used", "critère utilisé"),
+}
 #: KG source keys whose statements were read without their references (WDQS listings select statement id,
 #: object and rank only; ``reva.kg.harvest`` stores them with ``references=[]``): "references unknown", never
 #: "unreferenced". Their tier is left pending until an entity snapshot of the statement is loaded.
@@ -85,7 +99,7 @@ class Rule:
             return False
         if "corroborated" in w and (inp.corroboration >= corroborated_min) != bool(w["corroborated"]):
             return False
-        for key in ("attributed", "nature_qualified", "doubtful"):
+        for key in FLAG_KEYS:
             if key in w and bool(getattr(inp, key)) != bool(w[key]):
                 return False
         if "contested" in w and inp.contested != bool(w["contested"]):
@@ -167,13 +181,24 @@ NOTE_FACTS = (
     "corroboration.via_same_as",
     "attribution.supported_by",
     "nature.qualified",
+    "nature.sourcing_circumstances",
+    "scope.qualified",
     "certainty.doubtful",
+    "temporal.effect_dated_by_cause_end",
+    "tier.T2.wikidata_reference",
     "consistency.self_loop",
     "consistency.cycle",
 )
 #: Facts that keep a claim out of chain composition (reva.causal.graph.chain): a self-loop or a cycle member
-#: (audit L7), a claim Wikidata attributes to a named party or qualifies by its nature (audit H3).
-CHAIN_QUARANTINE_FACTS = ("consistency.self_loop", "consistency.cycle", "attribution.supported_by", "nature.qualified")
+#: (audit L7), a claim Wikidata attributes to a named party or qualifies by its nature (audit H3) or hedges by its
+#: sourcing circumstances (audit2 N2, version 3).
+CHAIN_QUARANTINE_FACTS = (
+    "consistency.self_loop",
+    "consistency.cycle",
+    "attribution.supported_by",
+    "nature.qualified",
+    "nature.sourcing_circumstances",
+)
 
 
 @lru_cache(maxsize=4)
@@ -199,6 +224,12 @@ class GradeInputs:
     nature_qualified: bool = False
     #: the source codes the event / link as doubtful (``scope.source_validity[].certainty``, audit H4)
     doubtful: bool = False
+    #: P1480 "sourcing circumstances" qualifier present (audit2 N2, version 3)
+    hedged: bool = False
+    #: a coded outcome dated by its cause's own end date: "consistent" is true by construction (audit2 N7, v3)
+    effect_dated_by_cause_end: bool = False
+    #: the claim comes from a community-edited (Wikidata) statement (audit2 N11, version 3)
+    community_edited: bool = False
 
 
 @dataclass(frozen=True)

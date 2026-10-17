@@ -33,7 +33,11 @@ RELATIONS = (
     "coded_outcome",
 )
 FAMILIES = ("cause", "prevention")
-LANES = ("immediate", "underlying", "contributing", "general", "coded", "reaction", "prevention", "outcome")
+LANES = ("immediate", "underlying", "contributing", "general", "coded", "reaction", "prevention", "generic", "outcome")
+#: Lane of claims with a class endpoint (audit M1 / audit2): generic statements about a kind of event ("war",
+#: "human"), shown apart in "why", never counted as causes of the event. Assigned by reva.causal.graph.why from the
+#: KG's own P279 / P31 statements (graph.class_nodes); no relation has this lane.
+GENERIC_LANE = "generic"
 #: Lane of the dataset-coded outcomes (how an event ended): never causes, counted apart, never chained.
 OUTCOME_LANE = "outcome"
 POLARITIES = ("promotes", "inhibits")

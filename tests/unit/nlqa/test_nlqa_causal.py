@@ -371,7 +371,8 @@ def test_causal_evidence_carries_attribution_and_temporal_reason() -> None:
     )
     assert e["temporal"]["entity_dated_by_inception"] == ["effect"] and "inception" in e["temporal"]["reason"]
     s = next(s.text for s in out.sentences if s.kind == "causal")
-    assert "qui attribue cette affirmation à party one (Wikidata ne l'affirme pas lui-même)" in s
+    # the French answer names the party by its French label (FIXA)
+    assert "qui attribue cette affirmation à partie un (Wikidata ne l'affirme pas lui-même)" in s
     assert "l'effet : entité datée par sa création (P571), pas un événement" in s
     assert "dates manquantes" not in s and "date absente" not in s
 

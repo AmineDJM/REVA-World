@@ -43,8 +43,11 @@ COMMUNITY_WARNING = s.ApiWarning(
 # ---------------------------------------------------------------------------------------------- models
 class CausalRef(s.ApiModel):
     id: str
-    label: str = Field(description="English label, else French, else the id itself")
-    label_fr: str | None
+    label: str = Field(
+        description="English label, else French; without a KG label '<id> (label not loaded)' (never a bare id)"
+    )
+    label_fr: str | None = Field(description="French label; '<id> (libellé non chargé)' when the KG has no label")
+    label_loaded: bool = Field(True, description="False: the KG has no en/fr label for this item yet")
     kind: str | None
 
 
@@ -77,6 +80,12 @@ class CausalSource(s.ApiModel):
     codebook: dict[str, Any] | None
     verification: Literal["community_edited_not_verified", "source_reported_not_verified", "derived"]
     retrieved_at: datetime
+    rights: dict[str, Any] | None = Field(
+        None,
+        description="Licence of the asserting source as the source registry (/v1/sources) records it, normalised "
+        "like atlas cells (licence, licence_url, commercial_use, non_commercial, share_alike, no_derivatives, "
+        "open_licence, restricted, basis); null when no terms are recorded (never assumed open)",
+    )
 
 
 class CausalGrade(s.ApiModel):
@@ -117,7 +126,13 @@ class CausalClaim(s.ApiModel):
     attribution: dict[str, Any] | None = Field(
         None,
         description="Who Wikidata records as making the claim (P3680 statement supported by), the nature qualifier"
-        " (P5102) and the source's doubtful certainty codes; the wording names them (grading.yaml v2)",
+        " (P5102), the sourcing circumstances (P1480: presumably, possibly ...), the scope qualifiers (P518, P1001, "
+        "P1011, P1012, P1013) and the source's doubtful certainty codes; the wording names them (grading.yaml v3)",
+    )
+    generic: dict[str, Any] | None = Field(
+        None,
+        description="Set in /why when the cause or effect is a class (KG P279 / P31-only target): a generic "
+        "statement about a kind of event, filed in the 'generic' lane, not a cause of the event",
     )
     grade: CausalGrade | None = Field(description="Null until the grader has run on this claim row")
     review_status: str = Field(description="unreviewed until a maintainer review (agents cannot record reviews)")
@@ -181,7 +196,7 @@ class Mechanism(s.ApiModel):
 class WhyLane(s.ApiModel):
     lane: str = Field(
         description="immediate / underlying / contributing / general / coded (triggers) / reaction / prevention / "
-        "outcome (coded outcomes: not causes)"
+        "generic (class-level statements: not causes of the event) / outcome (coded outcomes: not causes)"
     )
     label: dict[str, str]
     claims: list[CausalClaim]
@@ -194,7 +209,10 @@ class CausalWhy(s.ApiModel):
     mechanisms: list[Mechanism]
     dissent: list[CausalClaim]
     truncated: bool
-    causal_claims: int = Field(0, description="Claims in the causal lanes (every lane but 'outcome')")
+    causal_claims: int = Field(0, description="Claims in the causal lanes (every lane but 'generic' and 'outcome')")
+    generic_claims: int = Field(
+        0, description="Claims in the 'generic' lane: the cause or effect is a class (a kind of event), not an event"
+    )
     outcome_claims: int = Field(
         0, description="Claims in the 'outcome' lane: this record is how an event ended (coded outcome), not a cause"
     )
@@ -252,6 +270,10 @@ class ChainSearch(s.ApiModel):
     )
     class_nodes_skipped: int = Field(0, description="Class items (KG P279 / P31-only targets) not traversed")
     class_nodes_sample: list[str] = Field(default_factory=list, max_length=20)
+    unloaded_nodes_skipped: int = Field(
+        0, description="Entities with no KG entity row (no label, kind or dates) not traversed as intermediate nodes"
+    )
+    unloaded_nodes_sample: list[str] = Field(default_factory=list, max_length=20)
     node_rule: str = ""
     identity: dict[str, Any] = Field(default_factory=dict, description="same_as links loaded for identity hops")
     duplicate_paths_merged: int = Field(
@@ -385,12 +407,14 @@ def _env(
 ) -> dict[str, Any]:
     origin = origin_of(c["origin"] for c in claims)
     community = any(c["source"].get("verification") == "community_edited_not_verified" for c in claims)
+    lic = cg.licence_warning(claims)
     return {
         "context_mode": "evidence",
         "origin": origin,
         "modality": "reported_observation",
         "warnings": [CLAIMS_WARNING, *(extra or [])]
         + ([COMMUNITY_WARNING] if community else [])
+        + ([s.ApiWarning(**lic)] if lic else [])
         + origin_warnings(origin),
         "cost": t.cost(len(claims), **detail),
     }

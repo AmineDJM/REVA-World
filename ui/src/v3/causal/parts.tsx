@@ -129,7 +129,8 @@ function Focal({ label }: { label: string }) {
 /** Licence of the claim's source, when the registry marks it restrictive (non-commercial, not open…). */
 function ClaimLicence({ c }: { c: Pick<CausalClaim, 'source'> }) {
   const rights = useContext(RightsContext);
-  const r = rights?.get(c.source.key);
+  // the causal API carries the source's licence (audit2 N9); the registry map is the fallback for older servers
+  const r = c.source.rights ?? rights?.get(c.source.key);
   return r ? <LicenceBadge rights={r} /> : null;
 }
 
@@ -147,6 +148,16 @@ function AttributionBadges({ c }: { c: CausalClaim }) {
       {a.nature.length > 0 && (
         <span className="v3-attrib" data-testid="claim-nature">
           nature qualifiée par la source : {partiesFr(a.nature)}
+        </span>
+      )}
+      {a.hedges.length > 0 && (
+        <span className="v3-attrib" data-testid="claim-hedged">
+          Wikidata qualifie : {partiesFr(a.hedges)} (circonstances de la source)
+        </span>
+      )}
+      {a.scope.length > 0 && (
+        <span className="v3-attrib" data-testid="claim-scope">
+          portée restreinte par la source : {partiesFr(a.scope)}
         </span>
       )}
       {a.doubtful.length > 0 && (
@@ -206,7 +217,7 @@ export function ClaimDetail({ c, all, onOpen, onClose }: { c: CausalClaim; all: 
   const outcome = isOutcomeClaim(c);
   const attributed = attributedTo(c);
   const rights = useContext(RightsContext);
-  const licence = rights?.get(c.source.key) ?? null;
+  const licence = c.source.rights ?? rights?.get(c.source.key) ?? null;
   return (
     <article className="v3-claim-detail" data-testid="claim-detail" aria-label={`Affirmation ${c.cause.label} → ${c.effect.label}`}>
       <header>
@@ -265,7 +276,7 @@ export function ClaimDetail({ c, all, onOpen, onClose }: { c: CausalClaim; all: 
               <LicenceBadge rights={licence} />
             </>
           ) : (
-            <span className="muted">{rights ? 'non indiquée dans le registre des sources' : 'registre des sources non consulté'}</span>
+            <span className="muted">{rights ? 'non indiquée dans le registre des sources' : 'non indiquée par le service causal'}</span>
           )}
         </dd>
         <dt>Déclaration / ligne</dt>
@@ -563,6 +574,7 @@ export function WhyPanel({ groups, derived, onOpen }: { groups: Record<WhyGroup,
   const order: WhyGroup[] = ['immediate', 'underlying', 'contributing', 'coded', 'general', 'reaction', 'prevention'];
   const total = order.reduce((n, g) => n + groups[g].length, 0);
   const outcomes = groups.outcome ?? [];
+  const generic = groups.generic ?? [];
   return (
     <section className="v3-why" aria-labelledby="why-title" data-testid="why-panel">
       <h2 id="why-title">Pourquoi ?</h2>
@@ -592,6 +604,21 @@ export function WhyPanel({ groups, derived, onOpen }: { groups: Record<WhyGroup,
               </ul>
             </div>
           ))
+      )}
+      {generic.length > 0 && (
+        <div className="v3-why-lane v3-why-generic" data-testid="why-generic">
+          <h3>
+            {WHY_FR.generic} <span className="muted">({generic.length})</span>
+          </h3>
+          <p className="field-hint">La cause ou l’effet de ces affirmations est une classe d’après le graphe de connaissances (sous-classe de, ou seulement « nature de » d’autres éléments) : elles parlent d’un type d’événement en général. Elles ne sont pas comptées parmi les causes de cet événement.</p>
+          <ul className="v3-plain">
+            {generic.map((c) => (
+              <li key={c.id}>
+                <ClaimLine c={c} show="cause" onOpen={onOpen} />
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
       {outcomes.length > 0 && (
         <div className="v3-why-lane v3-why-outcome" data-testid="why-outcome">

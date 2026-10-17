@@ -269,11 +269,15 @@ class Evidence:
                 "attribution": {
                     "supported_by": [dict(x) for x in c.supported_by_refs],
                     "nature_of_statement": [dict(x) for x in c.nature_of_statement],
+                    "sourcing_circumstances": [dict(x) for x in c.sourcing_circumstances],
+                    "scope_qualifiers": [dict(x) for x in c.scope_qualifiers],
                     "note": dict(c.attribution_note),
                     "source_asserts_it_itself": not c.supported_by,
                 }
-                if (c.supported_by or c.nature_of_statement or c.attribution_note)
+                if (c.supported_by or c.nature_of_statement or c.attribution_note or c.sourcing_circumstances)
                 else None,
+                # a class endpoint: a generic statement about a kind of event, not a cause of this one (M1)
+                "generic": {"class_endpoints": list(c.generic_ends)} if c.generic_ends else None,
                 "citation": {
                     "source": c.source_key,
                     "tier": c.tier,
@@ -288,6 +292,8 @@ class Evidence:
                     "references": [dict(r) for r in c.references][:10],
                     "origin": c.origin,
                     "status": "community_edited" if wd else "source_reported",
+                    # licence of the asserting source (audit2 N9): restricted terms are named in the answer
+                    "rights": dict(c.rights) if c.rights else None,
                 },
             },
         )

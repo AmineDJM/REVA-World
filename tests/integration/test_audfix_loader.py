@@ -159,7 +159,8 @@ def test_dataset_delivery_minus_one_row_retracts_it(az) -> None:  # type: ignore
         az.worker, az.store, retrieved_at=t0 + timedelta(minutes=1), claims=[claim(0), claim(2)], **kw
     )
     assert (r.retracted, r.unchanged, r.inserted) == (1, 2, 0)
-    assert _retractions(az, f"ds:{src}:") == [(f"ds:{src}:cases:1", "removed_at_source")]
+    # same raw bytes in both deliveries: the source still has row 1, REVA dropped it (FIXA, audit2 N1)
+    assert _retractions(az, f"ds:{src}:") == [(f"ds:{src}:cases:1", "reclassified_by_reva")]
     assert _current_keys(az, f"ds:{src}:") == [f"ds:{src}:cases:0", f"ds:{src}:cases:2"]
     with az.api.connect() as conn:  # the retracted row is still stored (nothing is deleted)
         assert (

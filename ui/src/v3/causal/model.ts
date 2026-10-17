@@ -156,7 +156,8 @@ export function selon(c: Pick<CausalClaim, 'source' | 'tier'>): string {
 
 /** "Q7747 et Q1140115" — the parties a source records as making the claim (labels when the KG has them). */
 export function partiesFr(refs: { id: string; label: string }[]): string {
-  const names = refs.map((r) => (r.label && r.label !== r.id ? `${r.label} (${r.id})` : r.id));
+  // a label the KG has not loaded comes as "Q7747 (libellé non chargé)" from the server: shown as is, never re-wrapped
+  const names = refs.map((r) => (r.label && r.label !== r.id && !r.label.startsWith(`${r.id} (`) ? `${r.label} (${r.id})` : r.label || r.id));
   return names.length <= 1 ? (names[0] ?? '') : `${names.slice(0, -1).join(', ')} et ${names[names.length - 1]}`;
 }
 
@@ -211,6 +212,7 @@ export const WHY_FR: Record<WhyGroup, string> = {
   general: 'Autres causes affirmées',
   reaction: 'Réaction à (selon la source)',
   prevention: 'Ce qui l’a empêché ou retardé (selon la source)',
+  generic: 'Énoncés génériques (classe) — la cause ou l’effet est un type d’événement : pas des causes de cet événement',
   outcome: 'Issue codée de… (comment un événement s’est terminé selon un jeu de données — pas une cause)',
 };
 
@@ -229,7 +231,7 @@ const RELATION_LANE: Record<string, WhyGroup> = {
 /** Group causes by why-lane (the server's `lane`, else the relation) — used when /why is not deployed.
  *  A source *denying* a link is not a cause: it goes to the dissent panel, never into a lane. */
 export function groupWhy(claims: CausalClaim[]): Record<WhyGroup, CausalClaim[]> {
-  const out: Record<WhyGroup, CausalClaim[]> = { immediate: [], underlying: [], contributing: [], coded: [], general: [], reaction: [], prevention: [], outcome: [] };
+  const out: Record<WhyGroup, CausalClaim[]> = { immediate: [], underlying: [], contributing: [], coded: [], general: [], reaction: [], prevention: [], generic: [], outcome: [] };
   for (const c of claims) {
     if (c.stance === 'denies') continue;
     // a coded outcome is never a cause, whatever lane the server filed it in
