@@ -1,0 +1,51 @@
+schema: reva-beat-nowcast-hypotheses/1
+written_at: '2026-10-17T23:08:14.820911+00:00'
+statement: Written by the development stage from protocol.yaml's selection rule; committed
+  before the holdout is opened. Only these hypotheses can be confirmed (one Holm over
+  all of them).
+protocol_sha256: f396477b827bac662568a4cb88b212473340b1df6e61d906438540b9fbd57c6b
+development_json_sha256: a291ff9ba79e47aa9f708b045f1d96432d40da8b15fa2edbfa513cf03f77408e
+code_sha256: 11ad0b60acd40b41f79e8537183ba34d8fe578ae69286a5c3b98280a69536896
+model_version: 1.0.0
+family_size: 5
+hypotheses:
+- cell: cpi_clev
+  loss: ae
+  candidate: forecast.nc_biascorr
+  benchmark: benchmark.clev_nowcast
+  uses_official_forecast: true
+  dev_relative: 0.999787
+  dev_p_better: 0.439467
+  dev_n_targets: 95
+- cell: gdp_gdpnow
+  loss: ae
+  candidate: forecast.nc_stack_reva
+  benchmark: benchmark.atl_gdpnow
+  uses_official_forecast: true
+  dev_relative: 0.815906
+  dev_p_better: 0.025953
+  dev_n_targets: 30
+- cell: gdp_gdpnow
+  loss: crps
+  candidate: forecast.nc_stack_all
+  benchmark: benchmark.atl_gdpnow_errfan
+  uses_official_forecast: true
+  dev_relative: 0.898112
+  dev_p_better: 0.144222
+  dev_n_targets: 30
+- cell: gdp_nyfed
+  loss: ae
+  candidate: forecast.nc_stack_all
+  benchmark: benchmark.nyfed_nowcast
+  uses_official_forecast: true
+  dev_relative: 0.881383
+  dev_p_better: 0.000521
+  dev_n_targets: 17
+- cell: gdp_nyfed
+  loss: crps
+  candidate: forecast.nc_stack_all
+  benchmark: benchmark.nyfed_nowcast_errfan
+  uses_official_forecast: true
+  dev_relative: 0.846244
+  dev_p_better: 0.108231
+  dev_n_targets: 13
