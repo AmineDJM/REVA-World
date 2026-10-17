@@ -87,13 +87,18 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   oecd.sdmx 82 -> 92, eurostat.dissemination 100 -> 116, worldbank.atlas 40 -> 42); same caps.
 # * budgets.yaml -> budgets-1.3.18 (2026-10-17, V4INDUSTRY): merge of v4industry.yaml (new gleif.api 3000/day;
 #   oecd.sdmx +15) and of the V4 requests filed since 1.3.17 (chebi.release, ...); same caps.
+# * budgets.yaml -> budgets-1.3.21 (2026-10-17, re-pinned by V4INDUSTRY): the file committed by a WIP snapshot (merges
+#   of later V4 requests, e.g. V4ECO fao.fishstat) had not been re-pinned; content unchanged by budget_merge.
 # * budgets.yaml -> budgets-1.3.19 (2026-10-17, V4CLIMATE): merge of v4climate.yaml (new climate.global_indices 80/day,
 #   noaa.ghcnm 10/day, carbonbrief.attribution 6/day, naturalearth.admin1_10m 2/day; worldbank.cckp 6 -> 80).
 # * budgets.yaml -> budgets-1.3.20 (2026-10-17, V4ECO): merge of v4eco.yaml (new gbif.occurrence 600/day,
 #   globi.interactions 200/day, resolve.ecoregions2017 6/day, fao.fishstat 4/day); same caps.
+# * budgets.yaml -> budgets-1.3.21 (2026-10-17, PRED-VINTAGE): merge of pred_vintage.yaml (new dbnomics.api 80/day,
+#   philfed.data 20/day, ecb.data_api 6/day; oecd.sdmx 92 -> 120) and of pred_effect.yaml filed since 1.3.20
+#   (effects.literature 40/day); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "42cb2a8e90a02c51967d4c3008365c553123ce6acee95689d8f1243dd1c0b5f6",
+    "budgets.yaml": "7a71abd9fedf05f8b144269546ff070c4bc22f57cc6a4a18412278dbe56e0926",
 }
 
 
