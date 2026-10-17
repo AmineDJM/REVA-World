@@ -73,9 +73,68 @@ CAVEATS_FR = [
 
 
 class VintageAccessor(Protocol):
-    """Interface reserved for PRED-VINTAGE: the outcome panel as it was published at ``as_of``."""
+    """The outcome panel as it was published at ``as_of`` (implemented over PRED-VINTAGE by
+    :class:`PredVintagePanels`)."""
 
     def panel(self, outcome: str, as_of: date, frequency: str) -> PanelData: ...
+
+
+class PredVintagePanels:
+    """Outcome panels from PRED-VINTAGE's accessor (``reva.evaluation.vintages.VintageAccessor``, e.g.
+    ``CutoffRepository(conn, cutoff=..., mode="available_then").vintages(store)``): outcome refs are
+    ``vintage:<family>.<variable>`` (``registry`` of families/variables in
+    ``reva.adapters.connectors.vintage_common``); for every (country, period) the value of the latest vintage
+    admissible at the accessor's cutoff; projections are never used as observations."""
+
+    def __init__(self, accessor: Any, snapshot_sha256: str = "vintage"):
+        self.accessor = accessor
+        self.snapshot_sha256 = snapshot_sha256
+
+    def panel(self, outcome: str, as_of: date, frequency: str) -> PanelData:
+        kind, _, ident = outcome.partition(":")
+        if kind != "vintage" or "." not in ident:
+            raise ValidationProblem("vintage outcomes are 'vintage:<family>.<variable>'", outcome=outcome)
+        cut = self.accessor.cutoff.date()
+        if cut > as_of:
+            raise ValidationProblem("the vintage accessor's cutoff is after the run's as_of", cutoff=str(cut))
+        family, variable = ident.split(".", 1)
+        scope = self.accessor.latest(family=family, variable=variable)
+        values: dict[tuple[str, int], float] = {}
+        rows = []
+        for r in scope.as_records():
+            iso3, ps, pe, v = r.get("iso3"), r["period_start"], r["period_end"], r.get("value")
+            if iso3 is None or v is None:
+                continue
+            days = (pe - ps).days
+            if frequency == "annual" and ps.month == 1 and ps.day == 1 and 365 <= days <= 366:
+                key = (str(iso3), ps.year)
+            elif frequency == "quarter" and ps.day == 1 and ps.month in (1, 4, 7, 10) and 89 <= days <= 92:
+                key = (str(iso3), 4 * ps.year + (ps.month - 1) // 3)
+            else:
+                continue
+            try:
+                values[key] = float(v)
+            except ValueError:
+                continue
+            rows.append([key[0], key[1], v, r.get("vintage"), r.get("raw_sha256")])
+        return PanelData(
+            ref=outcome,
+            snapshot_sha256=self.snapshot_sha256,
+            values=values,
+            unit=None,
+            series=[
+                {
+                    "series": outcome,
+                    "cells": len(values),
+                    "vintage_mode": scope.mode,
+                    "cutoff": scope.cutoff.isoformat(),
+                    "exclusions": scope.exclusion_report(),
+                }
+            ],
+            dropped={},
+            digest=canonical_sha256(sorted(rows)),
+            label=variable,
+        )
 
 
 @dataclass(frozen=True)

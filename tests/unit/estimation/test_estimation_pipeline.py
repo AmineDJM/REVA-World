@@ -184,3 +184,48 @@ def test_gate_refuses_without_three_passes() -> None:
     with pytest.raises(ValidationProblem):
         rp.gate({"gate_open": False, "passed": ["a"]})
     rp.gate({"gate_open": True, "passed": ["a", "b", "c"]})
+
+
+def test_pred_vintage_adapter() -> None:
+    from datetime import UTC, datetime
+
+    from reva.estimation.run import PredVintagePanels
+
+    class Scope:
+        mode = "available_then"
+        cutoff = datetime(2010, 12, 31, tzinfo=UTC)
+
+        def as_records(self) -> list[dict[str, object]]:
+            return [
+                {
+                    "iso3": "FRA",
+                    "period_start": date(2008, 1, 1),
+                    "period_end": date(2009, 1, 1),
+                    "value": "0.2",
+                    "vintage": "2010-10",
+                    "raw_sha256": "a" * 64,
+                },
+                {
+                    "iso3": "FRA",
+                    "period_start": date(2009, 4, 1),
+                    "period_end": date(2009, 7, 1),
+                    "value": "1",
+                    "vintage": "2010-10",
+                    "raw_sha256": "a" * 64,
+                },
+            ]
+
+        def exclusion_report(self) -> list[dict[str, object]]:
+            return []
+
+    class Acc:
+        cutoff = datetime(2010, 12, 31, tzinfo=UTC)
+
+        def latest(self, **kw: object) -> Scope:
+            assert kw == {"family": "imf_weo", "variable": "real_gdp_growth"}
+            return Scope()
+
+    p = PredVintagePanels(Acc()).panel("vintage:imf_weo.real_gdp_growth", date(2011, 1, 1), "annual")
+    assert p.values == {("FRA", 2008): 0.2}
+    with pytest.raises(ValidationProblem):
+        PredVintagePanels(Acc()).panel("vintage:imf_weo.real_gdp_growth", date(2009, 1, 1), "annual")

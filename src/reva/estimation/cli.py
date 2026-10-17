@@ -146,6 +146,9 @@ def event_study_cmd(
     origin: str = typer.Option("live", help="snapshot and KG origin"),
     out: Path | None = typer.Option(None, help="write the run document (JSON) to this file"),
     archive: bool = typer.Option(False, "--archive", help="store the run document as an artifact (worker)"),
+    vintage_mode: str = typer.Option(
+        "available_then", help="outcome vintage:<family>.<variable>: PRED-VINTAGE mode available_then | as_known"
+    ),
     write_effects: bool = typer.Option(
         False, "--write-effects", help="also write the REVA-run effect estimate (PRED-EFFECT loader; implies --archive)"
     ),
@@ -180,8 +183,29 @@ def event_study_cmd(
             rep = run_replications(panels)
             gate(rep)
             with eng.connect() as conn:
+                vintage = None
+                if outcome.startswith("vintage:"):
+                    if req.as_of is None:
+                        typer.echo("a vintage outcome needs --as-of", err=True)
+                        raise typer.Exit(2)
+                    from datetime import UTC, datetime, time
+
+                    from reva.adapters.objects.factory import get_store
+                    from reva.estimation.run import PredVintagePanels
+                    from reva.evaluation.cutoff import CutoffRepository
+
+                    cutoff = datetime.combine(req.as_of, time.max, tzinfo=UTC)
+                    acc = CutoffRepository(conn, cutoff=cutoff, mode=vintage_mode, origins=(origin,)).vintages(
+                        get_store()
+                    )
+                    vintage = PredVintagePanels(acc, snapshot_sha256=sha)
                 doc = run_event_study(
-                    req, panels, conn=conn, replication_report=rep, progress=lambda m: typer.echo(m, err=True)
+                    req,
+                    panels,
+                    conn=conn,
+                    vintage=vintage,
+                    replication_report=rep,
+                    progress=lambda m: typer.echo(m, err=True),
                 )
     finally:
         eng.dispose()
