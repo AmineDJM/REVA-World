@@ -124,9 +124,11 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   usda.psd 6/day, usda.wasde 100/day, fao.faostat_tm 4/day, ifpri.export_restrictions 6/day); same caps.
 # * budgets.yaml -> budgets-1.3.36 (2026-10-17, merge run and pinned by V6DIGITAL): 1.3.35 plus v6digital.yaml (new
 #   accessnow.stop 8/day, cfr.cyber_operations 6/day); same caps.
+# * budgets.yaml -> budgets-1.3.38 (2026-10-17, merge run and pinned by V6TRADEHF; 1.3.37 was an intermediate
+#   write of the same merge): 1.3.36 plus v6tradehf.yaml (new eurostat.comext 300/day; imf.sdmx 80 -> 98); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "548ca3920d19a7990c58d877729d662f84d33f1ff0d8a126ef743491edc0f03f",
+    "budgets.yaml": "fc8aa2ac75c6b152c932a9099a79f271e1339ac3773c0da5d7c409c3ec49269e",
 }
 
 
