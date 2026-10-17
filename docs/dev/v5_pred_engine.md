@@ -336,3 +336,25 @@ uv run python -m reva.predict.run --reference all --draws 2000 --seed 0 --out /t
 # after PRED-EFFECT / PRED-EVENTSTUDY loads, or once a release pins FIGARO + the retirement datasets: rerun the line
 # above and replace §7. API: POST /v1/predict/decision {"reference_id": "opec_plus_cut_2mbd_2027q1"}; UI: /v3/decision
 ```
+
+## 7b. Re-run after the effect layer landed (lead, 2026-10-17)
+
+`uv run python -m reva.predict.run --reference all --draws 2000 --seed 0` with 77 current effect estimates
+(72 published, 5 REVA event-study runs). Raw output kept in the lead's scratchpad (`ops/predict_run.json`).
+Every result: « scénario non validé — pas une probabilité ».
+
+* **ECB +50 bp (2027Q1), euro-area countries (DEU, FRA, ITA, ESP, NLD):** peak effects, date not published
+  (undated), scaled linearly from the ECB Occasional Paper 377 meta-analysis (+25 bp → ×2, the engine's own
+  scaling): CPI inflation −0.1 pp, real GDP level −0.5 %, consumer price level −0.36 %. Degenerate (no
+  published uncertainty used) → flagged incomplete. Propagation stops after one hop (no estimate starts from
+  inflation or GDP).
+* **EU ban on Russian oil (2027Q1), RUS:** two estimates of the same edge (sanction episode → GDP per capita)
+  are shown side by side, never averaged: REVA's event-study run `run:es-1b3eff04653ec3971c9c:h5` (TIES
+  sanctions → GDP per capita growth, median +0.18 %, 5–95 % −0.38…+0.77, i.e. no significant effect, estimated
+  on data to 2025) and Gutmann–Neuenkirch–Neumeier (2022) year-1 response −1.32 pp (no published uncertainty,
+  scope "158 countries", RUS membership not machine-checked; lags 0–3 quarters not published → missing).
+  8 Wikidata causal claims listed as liens non chiffrés.
+* **OPEC+ −2 mb/d:** stops — no estimate has crude production as cause (Baumeister–Hamilton gives supply/demand
+  elasticities, not a price response; deriving one would be REVA's own calculation).
+* **India rice export ban:** stops — no estimate for `trade.export_restriction` (CEPR source refused, 403).
+* **France 65 in 2027:** stops — the retirement model's Eurostat inputs are not pinned in the release.
