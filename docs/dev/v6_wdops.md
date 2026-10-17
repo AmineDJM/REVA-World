@@ -23,7 +23,9 @@ queued work, in priority order: (1) causal harvester queue → `reva kg import-h
 |---|---|
 | `src/reva/kg/harvest.py` | `run --ledger-db <db>` / `budgeted_client(ledger_db=…)`: reserve, meter and settle in a shared ledger DB while loading into another throwaway DB |
 | `src/reva/causal_harvest/{live,__main__}.py` | `run --share F`: explicit share of today's *global* remaining wbapi budget (replaces the per-day 30 % CAUSWD fairness share, designed for parallel agents); `run --min-free-mb N` (default 5 GiB, unchanged) |
-| `tests/unit/test_wdops.py` | ledger routing (shared vs. load DB), share arithmetic |
+| `src/reva/adapters/connectors/atlas_wdops_qlever.py` + `registry/kg/qlever_packs_wdops.yaml` (new) | `atlas.wdops_qlever`: the V4 *statements* specs (ecology, chemistry, health) read as statement packs from QLever (see below) |
+| `src/reva/adapters/connectors/atlas_bio_taxonomy.py` (V4BIO, 1.0.2 → 1.0.3) | new source `atlas.bio_qlever`: V4BIO's identifier bridges / common names read from QLever (POST, 3,000 VALUES per query instead of 350, rank filtered in Python, QLever's lower-case statement IRIs normalised) |
+| `tests/unit/test_wdops.py` | ledger routing (shared vs. load DB), share arithmetic, pack parsing (dedupe, deprecated, non-item objects, snapshot precedence), bio QLever query/parse |
 
 ## Property requests (priority 2)
 
@@ -37,6 +39,20 @@ queued work, in priority order: (1) causal harvester queue → `reva kg import-h
   (not edited: connector code digest).
 * P642 (qualifier "of", A-LAW) rejected again: deleted on Wikidata.
 * Every other request (13 files) was already merged.
+
+## Paths
+
+| Path | Used for | Cost |
+|---|---|---|
+| `python -m reva.causal_harvest run --share F` (EntityData / wbgetentities) | causal queue (priority 1) | ~1 wbapi request per entity (wbgetentities batches of 10 when the API answers) |
+| `python -m reva.kg.harvest run … --db reva_kg_wdops --ledger-db reva_kg_wdharvest` | *seed* specs (entities with all allow-listed claims, revisions, references) | 1 wbapi request per entity + WDQS listing (≈ 1 answer per 13–17 min ban window) |
+| `reva atlas ingest atlas.wdops_qlever --option packs=…` | *statements* specs (one query per pack) | 2 `qlever.wikidata` requests per run (60/day shared with V4LINK/V4BIO) |
+| `reva atlas ingest atlas.v4link_qlever --option packs=…` | V4LINK identifier bridges | 43 requests reserved per run (settled on use) |
+
+A QLever row is a Wikidata statement (same statement id) **without** entity revision, qualifiers or references:
+recorded as `qlever@<time>`, `_revision.wikidata_revision = unknown`, references "unknown (not read)". A statement
+the KG already holds from a Wikidata snapshot is not loaded twice (snapshot wins; the QLever copy is retracted on the
+next run).
 
 ## Results per spec
 
