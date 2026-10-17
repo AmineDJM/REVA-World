@@ -1,4 +1,4 @@
-policy_version: "budgets-1.3.34"
+policy_version: "budgets-1.3.35"
 daily:
   http_requests_total: 20000
   http_bytes_total: 3221225472
@@ -93,6 +93,8 @@ per_source_daily_requests:
   factbook.json: 900
   # fao.faostat: requested by A-FAO (a_fao.yaml)
   fao.faostat: 45
+  # fao.faostat_tm: requested by V6AGRI (v6agri.yaml)
+  fao.faostat_tm: 4
   # fao.ffpi: requested by V4ECON (v4econ.yaml)
   fao.ffpi: 4
   # fao.fishstat: requested by V4ECO (v4eco.yaml)
@@ -147,6 +149,8 @@ per_source_daily_requests:
   icow.paulhensel: 8
   # idmc.gidd: requested by CAUSMORE (causmore.yaml), FIXB (fixb.yaml)
   idmc.gidd: 12
+  # ifpri.export_restrictions: requested by V6AGRI (v6agri.yaml)
+  ifpri.export_restrictions: 6
   # ilostat.rplumber: requested by A-ILO (a_ilo.yaml), SIMWORLD (simworld.yaml), V4MIND (v4mind.yaml)
   ilostat.rplumber: 75
   # imf.portwatch: requested by V6INFRA (v6infra.yaml)
@@ -293,6 +297,10 @@ per_source_daily_requests:
   unsd.syb: 5
   # untc.mtdsg: requested by A-TREATIES (a_treaties.yaml)
   untc.mtdsg: 120
+  # usda.psd: requested by V6AGRI (v6agri.yaml)
+  usda.psd: 6
+  # usda.wasde: requested by V6AGRI (v6agri.yaml)
+  usda.wasde: 100
   # usgs.sciencebase: requested by A-RESOURCES (a_resources.yaml)
   usgs.sciencebase: 20
   # ustreasury.rates: requested by PRED-HF (pred_hf.yaml)

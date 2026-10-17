@@ -1,0 +1,30 @@
+# Budget request from agent V6AGRI (V6, 2026-10-17). Merged by `uv run python -m reva.atlas.budget_merge --write`.
+agent: V6AGRI
+requests:
+  - source_key: usda.psd
+    # atlas.usda_psd: psd_grains_pulses_csv.zip (2.9 MB) + psd_oilseeds_csv.zip (3.8 MB) per run.
+    daily_requests: 6
+    expected_bytes_per_day: 20000000
+    reason: "2 requests (~7 MB) per run, one retry"
+  - source_key: usda.wasde
+    # atlas.usda_wasde: one ~1 MB CSV per monthly report 2021-01..now (~70 files) + a '-V2' try (404, ~0.14 MB)
+    # for the months whose plain name is missing (2 known) and months without a report (2025-10).
+    daily_requests: 100
+    expected_bytes_per_day: 100000000
+    reason: "~75 requests (~72 MB) per full run of the WASDE vintages; monthly refresh = 1-2 files"
+  - source_key: fao.faostat_tm
+    # atlas.fao_tm: archive tail (64 KiB) + wide member byte range (57.8 MB) of the TM Asia regional zip.
+    daily_requests: 4
+    expected_bytes_per_day: 130000000
+    reason: "2 byte-range requests (~58 MB) per run, one retry"
+  - source_key: ifpri.export_restrictions
+    # atlas.ifpri_er: tool page (~90 kB) + two workbooks (24 kB + 32 kB).
+    daily_requests: 6
+    expected_bytes_per_day: 1000000
+    reason: "3 requests per run, one retry"
+daily_totals_increase:
+  http_requests_total: "+120"
+  http_bytes_total: "+250_000_000"
+notes: >-
+  Raw archive of one full run: ~137 MB fetched; on disk after DISKZ zstd ~70 MB (the TM member is already deflated;
+  the WASDE CSVs compress ~25x).

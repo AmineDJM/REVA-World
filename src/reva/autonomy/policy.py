@@ -120,9 +120,11 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   unhcr.asylum 10/day, iom.missing_migrants 8/day); same caps.
 # * budgets.yaml -> budgets-1.3.34 (2026-10-17, merge run and pinned by V6POLITICS): 1.3.33 plus v6politics.yaml (new
 #   nelda.dataverse 10/day, oxcgrt.github 8/day, whogov.dataverseno 12/day; parlgov.dataverse 6 -> 10); same caps.
+# * budgets.yaml -> budgets-1.3.35 (2026-10-17, merge run and pinned by V6AGRI): 1.3.34 plus v6agri.yaml (new
+#   usda.psd 6/day, usda.wasde 100/day, fao.faostat_tm 4/day, ifpri.export_restrictions 6/day); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "49d05ce102b4bf650c03fa135aef4a51920793eeea49ca5f59f00ce337a9499e",
+    "budgets.yaml": "200140ee77f8c6f2b7be6ef691d520c6e8221f5df09a8b5afe7c0d491443c6c4",
 }
 
 
