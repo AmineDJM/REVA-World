@@ -136,7 +136,7 @@ describe('Palette', () => {
   });
 
   it('a failing provider does not hide the others; empty result says so', async () => {
-    const ok: PaletteProvider = async () => [hit('Brésil', 'Pays & régions')];
+    const ok: PaletteProvider = async (q) => (q.startsWith('br') ? [hit('Brésil', 'Pays & régions')] : []);
     const ko: PaletteProvider = async () => {
       throw new Error('500');
     };
@@ -147,8 +147,6 @@ describe('Palette', () => {
     });
     expect(screen.getByRole('option', { name: /Brésil/ })).toBeInTheDocument();
     fireEvent.change(input, { target: { value: 'zzzzqq' } });
-    const none: PaletteProvider = async () => [];
-    void none;
     await act(async () => {
       vi.advanceTimersByTime(130);
     });

@@ -43,9 +43,8 @@ describe('V8App shell', () => {
   it('lists discovered features in the nav (order) and routes to them', async () => {
     renderAt('/v8/monde');
     const nav = screen.getByRole('navigation', { name: 'Sections' });
-    const links = Array.from(nav.querySelectorAll('a')).map((a) => a.textContent);
-    expect(links[0]).toMatch(/Fiche/);
-    expect(links.slice(1).map((l) => l?.replace(/g.$/, ''))).toEqual(['Monde', 'Scores', 'Boom']);
+    const links = Array.from(nav.querySelectorAll('.v8-nav-text')).map((a) => a.textContent);
+    expect(links).toEqual(['Fiche', 'Monde', 'Scores', 'Boom']);
     expect(screen.getByRole('heading', { name: 'Page Monde' })).toBeInTheDocument();
     expect(document.documentElement.classList.contains('v8-active')).toBe(true);
   });

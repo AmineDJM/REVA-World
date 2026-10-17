@@ -39,6 +39,7 @@ export function useTitleLabel(): string | null {
   const [t, setT] = useState(() => (typeof document !== 'undefined' ? document.title : ''));
   useEffect(() => {
     const el = document.querySelector('title');
+    setT(document.title);
     if (!el || typeof MutationObserver === 'undefined') return;
     const mo = new MutationObserver(() => setT(document.title));
     mo.observe(el, { childList: true, characterData: true, subtree: true });
