@@ -85,11 +85,13 @@ from reva.adapters.connectors.atlas_geopol_common import (
 )
 from reva.kernel.errors import SourceResponseError
 
-CONNECTOR_VERSION = "1.1.0"
+CONNECTOR_VERSION = "1.1.1"
 # 1.1.0 (AUDFIX, docs/dev/v3_audfix.md): codebooks fetched + archived + sha256-checked, quotes located in the archived
 # bytes (M4); state repression events coded without a date of their own get a typed-missing date, never the
 # campaign's (M3); no coded_outcome claim for campaigns the source codes as ongoing (L2); NAVCO 2.1 outcomes with
-# success = 0 cite the progress definition (L1)
+# success = 0 cite the progress definition (L1). 1.1.1: the KG source revision names the REVA representation
+# (KG_REVISION_SUFFIX): a statement REVA now writes differently from the same provider file (typed-missing dates) is a
+# new revision, not a "conflicting" one
 PARSER_VERSION = "atlas-contention-navco-1"
 HOSTS = ("dataverse.harvard.edu", "dvn-cloud-iqss.s3.amazonaws.com")
 VERSION_URL = "https://dataverse.harvard.edu/api/datasets/:persistentId/versions/{version}?persistentId={doi}"
@@ -98,6 +100,8 @@ TAB_MEDIA = ("text/tab-separated-values", "text/plain", "application/octet-strea
 LICENCE = "CC0 1.0"
 LICENCE_URL = "http://creativecommons.org/publicdomain/zero/1.0"
 CLAIM_TIER = "T1"
+#: appended to the KG source revision: the provider file AND the REVA representation of it (connector version)
+KG_REVISION_SUFFIX = f"+reva-{CONNECTOR_VERSION}"
 
 
 class ContentionParseError(SourceResponseError):
@@ -2668,7 +2672,14 @@ async def _ingest_navco(run: Any) -> dict[str, Any]:
     if run.wants("n30_cy"):
         res["atlas"]["n30_cy"], res["stats"]["n30"] = await _ingest_n30(run, strict=strict)
     files = {ds: parsed[CLAIM_DATASETS[ds]] for ds in out["claims"]}
-    return finish(run, res, out, files=files, source_key=SOURCE_KEY_NAVCO, revision="navco-1.2v2.0-1.3v1.0-2.1v2.1")
+    return finish(
+        run,
+        res,
+        out,
+        files=files,
+        source_key=SOURCE_KEY_NAVCO,
+        revision="navco-1.2v2.0-1.3v1.0-2.1v2.1" + KG_REVISION_SUFFIX,
+    )
 
 
 async def _ingest_n30(run: Any, *, strict: bool) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -2716,7 +2727,7 @@ async def _ingest_mec(run: Any) -> dict[str, Any]:
         res["atlas"]["episodes_cy"] = {
             k: r[k] for k in ("dataset_key", "row_count", "created", "unmapped_provider_geo")
         }
-    return finish(run, res, out, files={"mec": p}, source_key=SOURCE_KEY_MEC, revision="mec-v3.0")
+    return finish(run, res, out, files={"mec": p}, source_key=SOURCE_KEY_MEC, revision="mec-v3.0" + KG_REVISION_SUFFIX)
 
 
 def finish(

@@ -255,7 +255,8 @@ def _read_strls(body: bytes, off: int, release: int, e: str) -> dict[tuple[int, 
 # ============================================================================= Archigos 4.1
 ARCHIGOS_SOURCE_KEY = "archigos.leaders"
 ARCHIGOS_NAME = "atlas.archigos"
-ARCHIGOS_VERSION_CONNECTOR = "1.1.0"  # 1.1.0 (AUDFIX M3/M4/M5): no coup -> removal claim; codebook archived
+ARCHIGOS_VERSION_CONNECTOR = "1.1.1"  # 1.1.0 (AUDFIX M3/M4/M5): no coup -> removal claim; codebook archived;
+# 1.1.1: the KG source revision names the REVA representation (changed qualifiers are new revisions, not conflicts)
 ARCHIGOS_PARSER = "atlas-archigos-1"
 ARCHIGOS_RELEASE = "4.1"
 ARCHIGOS_HOST = "www.rochester.edu"
@@ -1713,7 +1714,7 @@ async def _ingest_archigos(run: Any) -> dict[str, Any]:
             out["statements"],
             properties=leader_kg_properties() + _correspondence_property(),
             source_key=ARCHIGOS_SOURCE_KEY,
-            source_revision=f"archigos-{ARCHIGOS_RELEASE}",
+            source_revision=f"archigos-{ARCHIGOS_RELEASE}+reva-{ARCHIGOS_VERSION_CONNECTOR}",
             raw_sha256s=raws,
             retrieved_at=dta.retrieved_at,
             origin=run.origin,

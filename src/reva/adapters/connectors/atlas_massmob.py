@@ -71,7 +71,7 @@ from reva.adapters.connectors.atlas_navco import (
 
 SOURCE_KEY = "harvard.dataverse.massmob"
 CONNECTOR_NAME = "atlas.massmob"
-CONNECTOR_VERSION = "1.1.0"
+CONNECTOR_VERSION = "1.1.1"  # 1.1.1: KG source revision names the representation
 # 1.1.0 (AUDFIX, docs/dev/v3_audfix.md): users manual fetched + archived + sha256-checked, quotes located (M4); the
 # state response has no date of its own in MMP -> typed-missing date, never the protest's (M3); the coded response
 # list is kept verbatim in the claim selector, "ignore" included and marked as inaction (L3)
@@ -572,7 +572,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             out["entities"],
             out["statements"],
             source_key=SOURCE_KEY,
-            source_revision="mmp-v5.1",
+            source_revision=f"mmp-v5.1+reva-{CONNECTOR_VERSION}",
             raw_sha256s=[p.sha],
             retrieved_at=p.data_raw.retrieved_at,
             origin=run.origin,

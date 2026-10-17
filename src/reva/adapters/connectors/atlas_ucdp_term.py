@@ -49,7 +49,8 @@ from reva.ports.connectors import RawAcquisition
 
 SOURCE_KEY = "ucdp.downloads"
 CONNECTOR_NAME = "atlas.ucdp_term"
-CONNECTOR_VERSION = "1.1.0"  # 1.1.0 (AUDFIX M6): peace agreements are context, not reaction_to claims
+CONNECTOR_VERSION = "1.1.1"  # 1.1.0 (AUDFIX M6): peace agreements are context, not reaction_to claims
+# 1.1.1: ucdppa:conflict statements keep their 1.0.0 content (the context reading lives in the relation registry)
 PARSER_VERSION = "atlas-ucdp-term-parse-1"
 ATLAS_SOURCE = "ucdp"
 HOST = "ucdp.uu.se"
@@ -324,11 +325,7 @@ def kg_and_claims(
                     subject=pid,
                     property="ucdppa:conflict",
                     object_qid=f"ucdp:conflict:{cid}",
-                    qualifiers={
-                        "variable": "conflict_id",
-                        "relation": "context: the codebook's 'conflicts related to the dyads signing the peace "
-                        "agreement' (not a reaction or a cause)",
-                    },
+                    qualifiers={"variable": "conflict_id"},
                     raw_sha256=sp,
                     selector={**sel, "column": "conflict_id"},
                 )
