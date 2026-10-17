@@ -136,4 +136,7 @@ flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.eurostat_asylum   # 2.
 Fixture-mode runs (no network): `--fixture --option unhcr_origin=SYR` (UNHCR), `--fixture --option
 eurostat_key=M.PER.SY+UA.T.TOTAL+FRST.TOTAL.DE+FR+EU27_2020` (Eurostat), `--fixture` (MMP, IDMC).
 
-Outcome of the queued run: see below.
+Outcome of the queued run (21:18 UTC): `reva seed` exit 0 — connector versions `atlas.{unhcr_asylum,
+eurostat_asylum,iom_mmp,idmc_national}@1.0.1` are registered in the dev DB; all four ingests **skipped: free disk 4,323
+MB < 5 GB**. Nothing live was archived or registered by V6MIGR (0 bytes of raw archive used). Run the four
+`reva atlas ingest` commands above once ≥ 5 GB are free; no other step is needed before the lead's snapshot.
