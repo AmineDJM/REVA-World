@@ -24,12 +24,15 @@ pytestmark = pytest.mark.db
 @pytest.fixture(scope="module")
 def registered(db):  # type: ignore[no-untyped-def]
     for m in (cs, ci, gm, at):
-        register_connector(db.owner, db.store, m.atlas_source())
+        specs = m.atlas_source()
+        for spec in specs if isinstance(specs, list) else [specs]:
+            register_connector(db.owner, db.store, spec)
     return db
 
 
 def _run(db: Any, mod: Any, **options: Any) -> Any:
-    run = make_run(mod.atlas_source(), db.worker, db.store, FixtureHttp(mod.NAME))
+    specs = mod.atlas_source()
+    run = make_run(specs[0] if isinstance(specs, list) else specs, db.worker, db.store, FixtureHttp(mod.NAME))
     run.options = dict(options)
     return run
 
@@ -76,6 +79,14 @@ async def test_ghcnm_stations_adm1_and_series(registered) -> None:  # type: igno
     )
     assert n > 0
     assert _count(db, "SELECT count(*) FROM kg.entity WHERE kind = 'region_adm1'") == out["kg"]["adm1_entities"]
+    # AUDIT3 L2: the Natural Earth zip is archived with Natural Earth's terms, not NOAA's
+    with db.worker.connect() as c:
+        ne_sha = c.execute(
+            text("SELECT DISTINCT raw_sha256 FROM kg.statement WHERE source_key = :s"), {"s": gm.NE_SOURCE_KEY}
+        ).scalar_one()
+        rights = c.execute(text("SELECT rights FROM meta.artifact WHERE sha256 = :h"), {"h": ne_sha}).scalar_one()
+    assert rights["source_key"] == gm.NE_SOURCE_KEY and "Natural Earth" in rights["licence"], rights
+    assert "NOAA" not in str(rights)
 
 
 async def test_attribution_kg_and_t2_claims(registered) -> None:  # type: ignore[no-untyped-def]

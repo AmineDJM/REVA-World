@@ -184,7 +184,7 @@ def ne_spec() -> AtlasSourceSpec:
         provider="Natural Earth 1:10m Admin-1 states/provinces (naturalearthdata.com, via naciscdn.org)",
         licence=f"{NE_RIGHTS['licence']}; attribution: {NE_RIGHTS['attribution']}",
         allowed_hosts=(NE_HOST,),
-        datasets=(),
+        datasets=("adm1",),  # KG only (no atlas table)
         dataset_ids=(URLS["ne_admin1"],),
         cadence_seconds=180 * ic.DAY,
         planned_requests=1,
