@@ -56,4 +56,7 @@ async def test_daily_sources_end_to_end(db: Any) -> None:
     s = await _run(db, "atlas.bis_daily")
     cb = read_atlas_table(db.store, next(t for t in s["tables"] if t["table"] == "bis.cbpol_d")["artifact_sha256"])
     assert set(cb.filter(pl.col("provider_geo") == "US")["iso3"].unique().to_list()) == {"USA"}
-    assert cb.filter(pl.col("provider_geo") == "XM")["iso3"].null_count() == cb.filter(pl.col("provider_geo") == "XM").height
+    assert (
+        cb.filter(pl.col("provider_geo") == "XM")["iso3"].null_count()
+        == cb.filter(pl.col("provider_geo") == "XM").height
+    )
