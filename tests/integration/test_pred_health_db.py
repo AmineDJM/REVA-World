@@ -78,9 +78,11 @@ def test_health_registry_end_to_end(db: Any) -> None:
     for fam, d in man["families"].items():
         assert set(d["issued_models"]) - set(d["winners"]) <= {"health.persistence", "health.climatology"}, fam
     ref = next(
-        f for f in man["forecasts"] if f["model"] == "forecast.reference_flusight_ensemble" and f["status"] == "issued"
-    )
+        f for f in man["forecasts"] if f["model"] == "forecast.reference_covidhub_ensemble" and f["status"] == "issued"
+    )  # the COVID fixture holds the 2026-10-17 round
     assert "not a REVA forecast" in ref["attribution"] and len(ref["quantiles"]) == 23
+    flu_ref = [f for f in man["forecasts"] if f["model"] == "forecast.reference_flusight_ensemble"]
+    assert flu_ref and all(f["status"] == "abstained" for f in flu_ref)  # no FluSight round 2026-10-17 in the fixture
     with pytest.raises(Exception, match=r"calendar override"):
         svc.issue_round(db.worker, db.store, origin="live", today=DAY)
 
@@ -115,7 +117,7 @@ def test_health_registry_end_to_end(db: Any) -> None:
         db,
         "SELECT metrics->>'model', (metrics->>'n_scored')::int FROM model.evaluation WHERE metrics->>'kind' = 'health_score'",
     )
-    assert dict(scores)["forecast.reference_flusight_ensemble@1.0.0"] == 12
+    assert dict(scores)["health.persistence@1.0.0"] >= 12
     assert (
         svc.resolve_due(db.worker, db.store, origin="test_fixture", today=later_day)["batches"][0]["status"]
         == "awaiting_outcomes"

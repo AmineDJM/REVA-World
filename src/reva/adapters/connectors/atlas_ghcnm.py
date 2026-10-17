@@ -63,7 +63,11 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.ghcnm"
-VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB from an in-flight snapshot (different code)
+# 1.0.1: 1.0.0 was registered in the dev DB from an in-flight snapshot (different code).
+# 1.0.2 (FIX4C, AUDIT3 L2): the Natural Earth zip is archived by its own connector spec (atlas.naturalearth_admin1,
+#        source key naturalearth.admin1_10m) so its artifact records Natural Earth's public-domain terms, not NOAA's.
+VERSION = "1.0.2"
+NE_NAME = "atlas.naturalearth_admin1"
 SOURCE_KEY = "noaa.ghcnm"
 NE_SOURCE_KEY = "naturalearth.admin1_10m"
 ATLAS_SOURCE = "ghcnm"
@@ -166,7 +170,34 @@ def code_digest() -> str:
     return ic.code_digest(sys.modules[__name__], cc)
 
 
-def atlas_source() -> AtlasSourceSpec:
+def atlas_source() -> list[AtlasSourceSpec]:
+    return [ghcnm_spec(), ne_spec()]
+
+
+def ne_spec() -> AtlasSourceSpec:
+    """Natural Earth admin-1 (KG only): archives the zip under ``naturalearth.admin1_10m`` (public domain)."""
+    return AtlasSourceSpec(
+        name=NE_NAME,
+        version=VERSION,
+        source_key=NE_SOURCE_KEY,
+        atlas_source=ATLAS_SOURCE,
+        provider="Natural Earth 1:10m Admin-1 states/provinces (naturalearthdata.com, via naciscdn.org)",
+        licence=f"{NE_RIGHTS['licence']}; attribution: {NE_RIGHTS['attribution']}",
+        allowed_hosts=(NE_HOST,),
+        datasets=(),
+        dataset_ids=(URLS["ne_admin1"],),
+        cadence_seconds=180 * ic.DAY,
+        planned_requests=1,
+        max_response_bytes=MAX_BYTES,
+        min_interval_seconds=2.0,
+        parser_version=PARSER_VERSION,
+        code_digest=code_digest(),
+        notes="KG only: ADM1 entities iso3166_2:<code> (region_adm1); also archived by the atlas.ghcnm run, which "
+        "places GHCN stations in these polygons",
+    )
+
+
+def ghcnm_spec() -> AtlasSourceSpec:
     return AtlasSourceSpec(
         name=NAME,
         version=VERSION,
@@ -515,6 +546,17 @@ def kg_items(
         if sid in selected:
             st(sid, "ghcnm:tavg_series", value={"type": "string", "value": f"{ATLAS_SOURCE}.{DATASET}.TAVG @ provider_geo={sid}"},
                quals={"selection": list(selected[sid])})  # fmt: skip
+    a_ents, a_sts = adm1_items(recs, ne, country_qids)
+    report = {**dict(rep), "adm1_country_mismatch_sample": mismatch[:20], "adm1_entities": len(a_ents)}
+    return (ents, sts), (a_ents, a_sts), report
+
+
+def adm1_items(recs: Sequence[Adm1], ne: Fetched, country_qids: Mapping[str, str]) -> tuple[list[Any], list[Any]]:
+    """KG ``region_adm1`` entities and statements of the usable Natural Earth admin-1 codes (source key
+    ``naturalearth.admin1_10m``; every reference states Natural Earth's public-domain terms)."""
+    from reva.atlas.tables import country_iso3
+    from reva.kg.model import KgEntity, KgStatement
+
     # ADM1 entities (Natural Earth), only usable codes
     ok = usable_codes(recs)
     a_ents: list[Any] = []
@@ -552,18 +594,51 @@ def kg_items(
             ast("naturalearth:type_en", value={"type": "string", "value": a.type_en})
         if re.match(r"^Q[1-9][0-9]*$", a.wikidataid):
             ast("naturalearth:wikidataid", value={"type": "external_id", "value": a.wikidataid})
-    report = {**dict(rep), "adm1_country_mismatch_sample": mismatch[:20], "adm1_entities": len(a_ents)}
-    return (ents, sts), (a_ents, a_sts), report
+    return a_ents, a_sts
 
 
 # --------------------------------------------------------------------------- ingest
+async def _fetch_ne(run: Any) -> Fetched:
+    """GET the Natural Earth zip through the run's client; archive it under the Natural Earth connector spec so the
+    artifact's rights are Natural Earth's (AUDIT3 L2), whichever run fetched it."""
+    import dataclasses
+
+    url = URLS["ne_admin1"]
+    raw = await run.get(url, key="ne_admin1", media_types=("application/zip", "application/octet-stream"),
+                        max_bytes=MAX_BYTES)  # fmt: skip
+    archiver = run if run.spec.name == NE_NAME else dataclasses.replace(run, spec=ne_spec())
+    sha = archiver.archive(raw)
+    return Fetched("ne_admin1", raw.body, sha, url, raw.retrieved_at)
+
+
+async def ingest_ne_only(run: Any) -> dict[str, Any]:
+    from reva.adapters.connectors.atlas_geo_common import load_country_qids
+
+    ne = await _fetch_ne(run)
+    recs, _geoms, ne_report = read_ne_admin1(ne.body, origin=run.origin)
+    kg: dict[str, Any] = {"loaded": False}
+    if run.engine is not None:
+        a_ents, a_sts = adm1_items(recs, ne, load_country_qids())
+        cc.register_props(run.engine, NE_PREDICATES, WIKIDATA_PIDS)
+        kg = {"loaded": True, "adm1_entities": len(a_ents), "adm1_statements": len(a_sts),
+              "load_adm1": cc.load_kg(run.engine, run.store, entities=a_ents, statements=a_sts,
+                                      source_key=NE_SOURCE_KEY, raw_sha256s=[ne.sha], retrieved_at=ne.retrieved_at,
+                                      origin=run.origin, parameters={"connector": NE_NAME, "parser": PARSER_VERSION})}  # fmt: skip
+    return {"ok": True, "raw_sha256": ne.sha, "natural_earth": ne_report, "kg": kg}
+
+
 async def atlas_ingest(run: Any) -> dict[str, Any]:
     from reva.adapters.connectors.atlas_geo_common import load_country_qids
 
+    if run.spec.name == NE_NAME:
+        return await ingest_ne_only(run)
     files: dict[str, Fetched] = {}
     for key, url in URLS.items():
+        if key == "ne_admin1":
+            files[key] = await _fetch_ne(run)
+            continue
         media = ("application/gzip", "application/x-gzip", "application/octet-stream") if key == "tavg_qcf" else (
-            ("application/zip", "application/octet-stream") if key == "ne_admin1" else ("text/plain",))  # fmt: skip
+            "text/plain",)  # fmt: skip
         got = await ic.fetch_archived(run, url, name=key, key=key, media_types=media, max_bytes=MAX_BYTES)
         files[key] = Fetched(key, got.body, got.sha256, url, got.retrieved_at)
     quotes = check_readme(files["readme"].body)

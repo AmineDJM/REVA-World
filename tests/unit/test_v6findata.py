@@ -120,7 +120,7 @@ def test_boe_tables() -> None:
 
 
 def test_ff_factors_restricted() -> None:
-    frames, rep = _rows(ff.build, _files("atlas.ff_factors", ff.FILES), ff.DATASETS)
+    frames, _rep = _rows(ff.build, _files("atlas.ff_factors", ff.FILES), ff.DATASETS)
     for ds, fr in frames.items():
         assert fr.height, ds
         assert all(f["licence_restriction"] == "no_licence_granted" for f in _flags(fr))

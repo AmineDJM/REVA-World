@@ -81,3 +81,51 @@ def test_causal_share_override_uses_global_remaining() -> None:
     cap2, _ = live.wbapi_cap({"wikidata.wbapi": 1600}, {"entitydata": 1300}, share=0.6)
     assert cap2 == 1440
     assert live.wbapi_cap({"wikidata.wbapi": 4000}, {}, share=1.0)[0] == 0
+
+
+# ----------------------------------------------------------------------------- QLever statement packs (synthetic rows)
+def _b(item: str, pid: str, guid: str, v: str, rank: str = "Normal", **labels: str) -> dict[str, Any]:
+    e = "http://www.wikidata.org/entity/"
+    row: dict[str, Any] = {
+        "item": {"value": e + item},
+        "prop": {"value": pid},
+        "st": {"value": f"http://www.wikidata.org/entity/statement/{item.lower()}-{guid}"},
+        "v": {"value": v if v.startswith(("http", "_:")) else e + v},
+        "rank": {"value": f"http://wikiba.se/ontology#{rank}Rank"},
+    }
+    row.update({k: {"value": x} for k, x in labels.items()})
+    return row
+
+
+def test_qlever_pack_rows_are_parsed_deduplicated_and_never_doubled() -> None:
+    from datetime import UTC, datetime
+
+    from reva.adapters.connectors import atlas_wdops_qlever as wq
+
+    packs = wq.load_packs()
+    assert {"eco_food", "chem_petroleum", "health_treat"} <= set(packs)
+    pack = packs["eco_food"]
+    q = wq.pack_query(pack)
+    assert "FILTER(?rank" not in q and q.rstrip().endswith(f"LIMIT {pack.max_rows + 1}")
+    bindings = [
+        _b("Q1", "P1034", "a", "Q10", en="lion", ven="zebra"),
+        _b("Q1", "P1034", "a", "Q10", en="lion", fr="lion"),  # label OPTIONALs repeat the statement
+        _b("Q2", "P1034", "b", "Q11", rank="Deprecated"),
+        _b("Q3", "P1034", "c", "http://www.wikidata.org/.well-known/genid/x"),  # some value
+        _b("Q4", "P1034", "d", "Q10", rank="Preferred"),
+    ]
+    rows, labels, skipped = wq.parse_rows(bindings, pack)
+    assert [(r.item, r.statement_id, r.rank) for r in rows] == [("Q1", "Q1$a", "normal"), ("Q4", "Q4$d", "preferred")]
+    assert skipped == {"deprecated": 1, "object_not_item": 1}
+    assert labels["Q1"] == {"en": "lion", "fr": "lion"} and labels["Q10"] == {"en": "zebra"}
+    t = datetime(2026, 10, 17, tzinfo=UTC)
+    ents, sts, rep = wq.build(
+        rows, labels, pack, raw_sha256="r" * 64, query_sha256="q" * 64, retrieved_at=t,
+        qlever_index="idx", held_by_snapshot={"Q4$d"}, known_entities={"Q10"},
+    )  # fmt: skip
+    assert [s.statement_id for s in sts] == ["wdops:eco_food:Q1$a"] and rep["held_by_snapshot"] == 1
+    st = sts[0]
+    assert st.property_pid == "P1034" and st.object_qid == "Q10" and st.source_revision == "qlever@2026-10-17T00:00:00Z"
+    assert st.qualifiers["_revision"]["wikidata_revision"] == "unknown"
+    assert st.references[0]["wikidata_references"] == "unknown (not read)"
+    assert [e.qid for e in ents] == ["Q1"]  # Q10 already known, Q4 not loaded (snapshot holds its statement)

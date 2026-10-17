@@ -30,7 +30,8 @@ async def _run(db: Any, name: str) -> dict[str, Any]:
     ensure_registered(db.owner, db.store, get_source(name).spec)
     out = await run_atlas_ingest(db.settings, db.worker, db.store, name, mode="fixture")
     assert out["status"] == "completed", out
-    return out["summary"]
+    summary: dict[str, Any] = out["summary"]
+    return summary
 
 
 async def test_findata_sources_end_to_end(db: Any) -> None:
