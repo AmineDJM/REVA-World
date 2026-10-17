@@ -269,9 +269,7 @@ def parse(fl: ImfFlow, f: hc.Fetched, rows: fd.PeriodRows) -> dict[str, Any]:
     return {"flow": msg.flow_ref, "update_date": upd, "geos": len(geos), **fd.counter_report(rep)}
 
 
-def build(
-    files: Mapping[str, hc.Fetched], wanted: tuple[str, ...]
-) -> tuple[dict[str, hc.TableBuild], dict[str, Any]]:
+def build(files: Mapping[str, hc.Fetched], wanted: tuple[str, ...]) -> tuple[dict[str, hc.TableBuild], dict[str, Any]]:
     out: dict[str, hc.TableBuild] = {}
     report: dict[str, Any] = {}
     for ds in wanted:

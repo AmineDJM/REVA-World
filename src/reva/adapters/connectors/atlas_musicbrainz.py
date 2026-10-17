@@ -62,7 +62,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.musicbrainz_stats"
-VERSION = "1.0.0"
+VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB from an in-progress copy of this module
 SOURCE_KEY = "musicbrainz.stats"
 HOST = "musicbrainz.org"
 ATLAS_SOURCE = "musicbrainz"

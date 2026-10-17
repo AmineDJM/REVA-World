@@ -136,7 +136,7 @@ def _period(token: str) -> tuple[str, date, date]:
 
 
 def parse(ds: str, f: hc.Fetched, rows: fd.PeriodRows) -> dict[str, Any]:
-    zname, member = FILES_BY_DS[ds]
+    _zname, member = FILES_BY_DS[ds]
     z = fd.zip_member(f, member, max_bytes=50_000_000)
     text = io.TextIOWrapper(z.open(member), encoding="utf-8-sig", errors="strict").read()
     lines = text.splitlines()
@@ -193,9 +193,7 @@ def parse(ds: str, f: hc.Fetched, rows: fd.PeriodRows) -> dict[str, Any]:
     return {"crsp_vintage": m.group(1), **fd.counter_report(rep)}
 
 
-def build(
-    files: Mapping[str, hc.Fetched], wanted: tuple[str, ...]
-) -> tuple[dict[str, hc.TableBuild], dict[str, Any]]:
+def build(files: Mapping[str, hc.Fetched], wanted: tuple[str, ...]) -> tuple[dict[str, hc.TableBuild], dict[str, Any]]:
     out: dict[str, hc.TableBuild] = {}
     report: dict[str, Any] = {}
     for ds in wanted:

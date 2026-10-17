@@ -184,24 +184,41 @@ def make_design(xs: Sequence[dict[str, float | None]], feats: Sequence[str]) -> 
     return Design(names, mean, sd, impute, tuple(miss))
 
 
-def fit_logit(x: np.ndarray, y: np.ndarray, lam: float = RIDGE, iters: int = 60) -> np.ndarray:
-    """Ridge logistic regression by Newton-Raphson (intercept unpenalised). Returns [b0, b...]."""
+def fit_logit(x: np.ndarray, y: np.ndarray, lam: float = RIDGE, iters: int = 100) -> np.ndarray:
+    """Ridge logistic regression by damped Newton-Raphson (step halving on the penalised log-likelihood; the
+    intercept carries a negligible 1e-6 penalty so separable or constant columns cannot make it diverge).
+    Returns [b0, b...]."""
     n, k = x.shape
     xa = np.column_stack([np.ones(n), x])
     pen = np.eye(k + 1) * lam
-    pen[0, 0] = 0.0
+    pen[0, 0] = 1e-6
+
+    def objective(bb: np.ndarray) -> float:
+        eta = xa @ bb
+        return float(np.sum(y * eta - np.logaddexp(0.0, eta)) - 0.5 * bb @ pen @ bb)
+
     b = np.zeros(k + 1)
-    m = min(max(y.mean(), 1e-4), 1 - 1e-4)
+    m = min(max(float(y.mean()), 1e-4), 1 - 1e-4)
     b[0] = math.log(m / (1 - m))
+    cur = objective(b)
     for _ in range(iters):
-        eta = np.clip(xa @ b, -35, 35)
-        mu = 1.0 / (1.0 + np.exp(-eta))
+        mu = 1.0 / (1.0 + np.exp(-np.clip(xa @ b, -500, 500)))
         w = mu * (1 - mu)
         grad = xa.T @ (y - mu) - pen @ b
-        hess = (xa * w[:, None]).T @ xa + pen + 1e-9 * np.eye(k + 1)
+        hess = (xa * w[:, None]).T @ xa + pen
         step = np.linalg.solve(hess, grad)
-        b = b + step
-        if np.max(np.abs(step)) < 1e-8:
+        t = 1.0
+        while t > 1e-6:
+            nb = b + t * step
+            new = objective(nb)
+            if new >= cur - 1e-12:
+                break
+            t /= 2.0
+        else:
+            break
+        b, done = nb, abs(new - cur) < 1e-10 and float(np.max(np.abs(t * step))) < 1e-7
+        cur = new
+        if done:
             break
     return b
 

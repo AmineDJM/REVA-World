@@ -112,8 +112,15 @@ LABELS: dict[str, dict[str, str]] = {
     "VALUATION": {"M": "Market value", "N": "Nominal value", "F": "Face value"},
     "UNIT_MEASURE": {"USD": "US dollar"},
     "UNIT_MULT": {"6": "Millions", "9": "Billions", "0": "Units"},
-    "COLLECTION": {"A": "Average of observations through period", "B": "Beginning of period", "E": "End of period",
-                   "H": "Highest in period", "M": "Middle of period", "S": "Summed through period", "U": "Unknown"},
+    "COLLECTION": {
+        "A": "Average of observations through period",
+        "B": "Beginning of period",
+        "E": "End of period",
+        "H": "Highest in period",
+        "M": "Middle of period",
+        "S": "Summed through period",
+        "U": "Unknown",
+    },
 }
 OBS_STATUS = {
     "A": "Normal value", "B": "Break", "D": "Definition differs", "E": "Estimated value", "F": "Forecast value",
@@ -341,14 +348,22 @@ def parse_bulk(fl: BisFlow, f: hc.Fetched, rows: fd.PeriodRows) -> dict[str, Any
     rep: Counter[str] = Counter()
     series: set[str] = set()
     for line, d, labels, attrs, obs in fd.stream_bis_flat(f, fl.member, fl.dims):
-        _row(fl, rows, f, line, dict(zip(fl.dims, d, strict=True)), attrs, obs, rep, series,
-             dict(zip(fl.dims, labels, strict=True)))
+        _row(
+            fl,
+            rows,
+            f,
+            line,
+            dict(zip(fl.dims, d, strict=True)),
+            attrs,
+            obs,
+            rep,
+            series,
+            dict(zip(fl.dims, labels, strict=True)),
+        )
     return {"series": len(series), **fd.counter_report(rep)}
 
 
-def build(
-    files: Mapping[str, hc.Fetched], wanted: tuple[str, ...]
-) -> tuple[dict[str, hc.TableBuild], dict[str, Any]]:
+def build(files: Mapping[str, hc.Fetched], wanted: tuple[str, ...]) -> tuple[dict[str, hc.TableBuild], dict[str, Any]]:
     out: dict[str, hc.TableBuild] = {}
     report: dict[str, Any] = {}
     for ds in wanted:
@@ -387,6 +402,8 @@ NOTES = {
 
 
 async def atlas_ingest(run: Any) -> dict[str, Any]:
+    files: tuple[hc.FileSpec, ...]
+    datasets: tuple[str, ...]
     if run.spec.name == BULK_NAME:
         files, datasets, key = BULK_FILES, BULK_DATASETS, "bis.bulk"
     else:

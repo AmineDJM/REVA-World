@@ -435,7 +435,7 @@ _EVENT_SAMPLING = (
 )
 
 
-def add_slot_rows(rows: hc.DailyRows, agg: SlotAgg, day: date, f: hc.Fetched, slot: str, *, reused: bool) -> None:
+def add_slot_rows(rows: hc.DailyRows, agg: SlotAgg, day: date, f: hc.Fetched, slot: str) -> None:
     rights = RIGHTS[DS_EVENTS]
     common = {
         "signal_kind": SIGNAL_KIND,
@@ -443,7 +443,6 @@ def add_slot_rows(rows: hc.DailyRows, agg: SlotAgg, day: date, f: hc.Fetched, sl
         "sampling": _EVENT_SAMPLING,
         "slot_utc": slot,
         "day_basis": "DATEADDED (update day), not the event date",
-        "reused_archive": True if reused else None,
     }
     sel = {"file": f.key, "member": f"{agg.stamp}.export.CSV"}
 
@@ -665,7 +664,7 @@ async def ingest_events(run: Any) -> dict[str, Any]:
             continue
         rep["reused" if reused else "fetched"] += 1
         agg = parse_export(f.body, stamp)
-        add_slot_rows(rows, agg, day, f, slot, reused=reused)
+        add_slot_rows(rows, agg, day, f, slot)  # a reused file yields the same rows (same bytes, as_of)
         for k in ("records", "malformed", "dateadded_mismatch", "unknown_quad", "unknown_root"):
             rep[k] += getattr(agg, k)
         rep["no_actiongeo"] += agg.no_geo

@@ -207,9 +207,7 @@ async def ingest_files(
     wanted = tuple(d for d in datasets if run.wants(d))
     fetched = await hc.fetch_all(run, files, wanted)
     builds, report = build(fetched, wanted)
-    tables = hc.register_tables(
-        run, builds, rights=rights, notes=notes, source_key=source_key, geo_scheme=geo_scheme
-    )
+    tables = hc.register_tables(run, builds, rights=rights, notes=notes, source_key=source_key, geo_scheme=geo_scheme)
     return {"ok": True, "tables": tables, "report": report}
 
 

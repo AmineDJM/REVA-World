@@ -63,7 +63,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.openlibrary_subjects"
-VERSION = "1.0.0"
+VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB from an in-progress copy of this module
 SOURCE_KEY = "openlibrary.api"
 HOST = "openlibrary.org"
 ATLAS_SOURCE = "openlibrary"

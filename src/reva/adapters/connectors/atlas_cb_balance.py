@@ -416,8 +416,12 @@ def parse_boe(ds: str, f: hc.Fetched, rows: fd.PeriodRows, codes: tuple[str, ...
             if v is None:
                 rep["empty_cell"] += 1
                 continue
-            extra: dict[str, Any] = {"series_title": desc[c][:500], "frequency": freq, "precision": "day",
-                                     "position_date_rule": "Wednesday close" if freq == "W" else "quarter-end date"}
+            extra: dict[str, Any] = {
+                "series_title": desc[c][:500],
+                "frequency": freq,
+                "precision": "day",
+                "position_date_rule": "Wednesday close" if freq == "W" else "quarter-end date",
+            }
             if normalised:
                 extra["value_normalised"] = True
             rows.add_period(indicator=c, provider_geo="GB", start=d, end=d + timedelta(days=1), value=v,
@@ -428,9 +432,7 @@ def parse_boe(ds: str, f: hc.Fetched, rows: fd.PeriodRows, codes: tuple[str, ...
 
 
 # --------------------------------------------------------------------------- build / ingest
-def build(
-    files: Mapping[str, hc.Fetched], wanted: tuple[str, ...]
-) -> tuple[dict[str, hc.TableBuild], dict[str, Any]]:
+def build(files: Mapping[str, hc.Fetched], wanted: tuple[str, ...]) -> tuple[dict[str, hc.TableBuild], dict[str, Any]]:
     out: dict[str, hc.TableBuild] = {}
     report: dict[str, Any] = {}
     for ds in wanted:
@@ -488,6 +490,8 @@ NOTES = {
 
 async def atlas_ingest(run: Any) -> dict[str, Any]:
     name = run.spec.name
+    files: tuple[hc.FileSpec, ...]
+    datasets: tuple[str, ...]
     if name == ECB_NAME:
         files, datasets, key = ECB_FILES, ECB_DATASETS, "ecb.stats"
     elif name == FRB_NAME:

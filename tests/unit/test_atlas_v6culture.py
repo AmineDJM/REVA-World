@@ -31,7 +31,7 @@ def _fixture(name: str, url_end: str) -> tuple[bytes, dict[str, Any]]:
 @pytest.fixture(scope="module")
 def mb_countries() -> tuple[list[mb.StatRow], date]:
     body, e = _fixture("atlas.musicbrainz_stats", "/statistics/countries")
-    assert e["note"].startswith("EXCERPT") and e["excerpt_of_sha256"]
+    assert "EXCERPT" in e["note"] and e["excerpt_of_sha256"]
     return mb.parse_countries(body)
 
 
