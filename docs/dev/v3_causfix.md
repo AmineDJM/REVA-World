@@ -147,9 +147,12 @@ QID). The audit's chain `Q110999040 → Q454` is no longer composed on the dev D
 ## Follow-ups
 
 * Throwaway DBs with the stale first `0015_causal` CHECK (`reva_kg_causwd`, `reva_kg_wdharvest_drift1016`,
-  `reva_causcand`): the loader now rejects their T2 statement rows per statement; recreate them from the current
-  migrations if T2 rows matter there. `0015_causal` must never be edited in place again (a schema change is a new
-  migration).
+  `reva_causcand`): the loader now rejects their T2 statement rows per statement. **Done:** migration
+  `0019_causal_claim_checks` (`reva db bootstrap` / `alembic upgrade head`) replaces the table CHECKs of
+  `kg.causal_claim` with the current `0015_causal` set under the same names (no-op when they already match; no row
+  changed), then `reva.causal.refresh` stores the DOI-referenced statements as T2
+  (`tests/integration/test_causfix_store.py::test_migration_0019_repairs_the_stale_check_of_the_first_0015`).
+  `0015_causal` must never be edited in place again (a schema change is a new migration).
 * P5102 values are shown verbatim and uniformly capped at D; a registry of natures (often / rarely vs alleged /
   hypothetical) could refine that.
 * Reports and UI totals should count `coded_outcome` apart from causal claims (audit L6, display side).

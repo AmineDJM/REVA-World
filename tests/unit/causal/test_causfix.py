@@ -6,7 +6,10 @@ Dates and ids mirror the Wikidata findings of docs/dev/v3_causwd.md; nothing her
 
 from __future__ import annotations
 
+import importlib.util
+import re
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -17,6 +20,7 @@ from reva.causal.model import Deferred, claim_from_statement
 from reva.causal.temporal import DateValue, claim_time_window, event_dates, temporal_detail, window_of_time
 
 RULES = gr.load_rules()
+ROOT = Path(__file__).resolve().parents[3]
 
 
 # ---------------------------------------------------------------------------------------------- tier (H1)
@@ -74,6 +78,30 @@ def test_wdqs_rows_are_references_unknown_not_unreferenced() -> None:
     row = claim_from_statement(_st("wikidata.wbapi", [{"P143": ["Q58251"]}]))
     assert row["source_tier"] == "T4" and row["citation"] is None
     assert row["upstream_keys"] == ["community:wikidata"]  # a pointer is not an independent upstream (H2)
+
+
+def test_doi_referenced_statement_is_a_t2_claim_on_its_statement_row() -> None:
+    """The reva_kg_causwd statement Q84263196$2c6ebb7d... (P1542, a DOI reference): T2 with its citation, and it
+    keeps its statement row (the CHECKs of 0015_causal / 0019_causal_claim_checks allow T2 statement rows)."""
+    refs = [{"P356": ["10.1016/S0140-6736(20)31129-6"], "P1476": ["..."]}]
+    row = claim_from_statement(_st("wikidata.wbapi", refs))
+    assert row["source_tier"] == "T2" and row["citation"] == {"doi": ["10.1016/S0140-6736(20)31129-6"]}
+    assert row["statement_row_id"] is not None and row["claim_key"].startswith("kg:")
+
+
+def test_migration_0019_restates_the_table_checks_of_0015() -> None:
+    p = ROOT / "migrations" / "versions" / "0019_causal_claim_checks.py"
+    spec = importlib.util.spec_from_file_location("m0019", p)
+    assert spec and spec.loader
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    assert (m.revision, m.down_revision) == ("0019_causal_claim_checks", "0018_retraction_reasons")
+    sql = (ROOT / "migrations" / "versions" / "0015_causal.py").read_text(encoding="utf-8")
+    table = sql[sql.index("CREATE TABLE kg.causal_claim (") :]
+    table = table[: table.index("\n);")]
+    checks = tuple(re.findall(r"^  CHECK \((.*)\),$", table, re.M))
+    assert checks == m.TABLE_CHECKS
+    assert m.NAMES[:2] == ("causal_claim_check", "causal_claim_check1") and len(m.NAMES) == len(checks)
 
 
 # ---------------------------------------------------------------------------------------------- corroboration (H2)

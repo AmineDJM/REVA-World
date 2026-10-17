@@ -164,11 +164,15 @@ or agent can change it. Candidates never appear in claim answers.
 
 * `load_kg_claims(engine, *, origin=None, source_keys=None) -> ClaimLoadReport` — reads the causal
   properties of `kg.statement_current` (community-edited `wikidata*` sources), normalises direction, keeps
-  statement key/id/row id, revision, raw sha256 and references verbatim; T3 with references, T4 without
-  (T2 if a reference carries a DOI/ISBN). Idempotent; a statement that left the KG current view retracts its
+  statement key/id/row id, revision, raw sha256 and references verbatim; T3 with references, T4 without or with
+  only non-source pointers (P143 / P4656 Wikimedia import, P3452, P887), T2 if a reference carries a DOI/ISBN (a
+  T2 claim keeps its statement row id, like T3/T4); WDQS rows (references never read) are deferred
+  (`deferred_counts["references_unknown"]`), not tiered. Idempotent; a statement that left the KG current view retracts its
   claim (`source_statement_retracted`). The qualifier P1310 (*statement disputed by*) marks the claim as
   contested by a source. A row the database refuses is rejected per statement (`rejected_counts`
-  `db_refused:<constraint>`), never aborting the load (CAUSFIX, `docs/dev/v3_causfix.md`).
+  `db_refused:<constraint>`), never aborting the load (CAUSFIX, `docs/dev/v3_causfix.md`). A database migrated
+  with the first `0015_causal` refused T2 statement rows (`db_refused:causal_claim_check`); migration
+  `0019_causal_claim_checks` brings its CHECKs to the current set (a no-op on a fresh bootstrap).
 * `grade_claims(engine, *, origin=None) -> GradeReport` — applies `registry/causal/grading.yaml`.
 * `refresh(engine, store=None, *, origin=None)` — `load_kg_claims` then `grade_claims`.
 

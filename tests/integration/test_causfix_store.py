@@ -9,8 +9,10 @@ session database. Nothing here is a real-world fact.
 
 from __future__ import annotations
 
+import importlib.util
 import uuid
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -21,6 +23,7 @@ from reva.causal import graph as cg
 from reva.kg.model import KgProperty, KgStatement, load_batch, register_properties
 
 pytestmark = pytest.mark.db
+ROOT = Path(__file__).resolve().parents[2]
 
 PROPS = [
     KgProperty("P828", "item", "has_cause", "has cause"),
@@ -113,6 +116,73 @@ def test_a_refused_row_is_rejected_and_never_aborts_the_load(cf) -> None:  # typ
     r3 = load_kg_claims(cf.worker, origin="test_fixture", source_keys=[src])
     assert (r3.inserted, r3.rejected_total) == (1, 0)
     assert _current(cf, f"kg:{src}:")["BAD"]["source_tier"] == "T2"
+
+
+def _m0019():  # type: ignore[no-untyped-def]
+    spec = importlib.util.spec_from_file_location(
+        "m0019", ROOT / "migrations" / "versions" / "0019_causal_claim_checks.py"
+    )
+    assert spec and spec.loader
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+
+def _table_checks(db) -> dict[str, tuple[str, bool]]:  # type: ignore[no-untyped-def]
+    with db.owner.connect() as c:
+        return _m0019()._checks(c, "kg.causal_claim")
+
+
+def test_migration_0019_repairs_the_stale_check_of_the_first_0015(cf) -> None:  # type: ignore[no-untyped-def]
+    """A database migrated with the first 0015_causal (reva_kg_causwd) refuses the T2 claim of a DOI-referenced
+    statement; 0019_causal_claim_checks brings its CHECKs to the current 0015 set and the claim is stored."""
+    m = _m0019()
+    fresh = _table_checks(cf)
+    with cf.owner.begin() as conn:
+        assert m.repair(conn) is False  # a database bootstrapped from the current 0015: nothing to do
+    assert _table_checks(cf) == fresh and set(fresh) == set(m.NAMES)
+    ns = _ns()
+    src = f"wikidata.{ns}"
+    a, b, c = f"{ns}:a", f"{ns}:b", f"{ns}:c"
+    doi = [{"P356": ["10.1016/S0140-6736(20)31129-6"], "P1476": ["causfix title"]}]
+    _kg(
+        cf,
+        src,
+        [
+            KgStatement(a, "P1542", b, statement_id="DOI", references=doi),
+            KgStatement(b, "P1542", c, statement_id="REF", references=[{"P854": ["https://example.org/y"]}]),
+        ],
+    )
+    try:
+        with cf.owner.begin() as conn:  # the first 0015_causal: one CHECK instead of the first two, the rest renamed
+            conn.execute(
+                text(
+                    "ALTER TABLE kg.causal_claim DROP CONSTRAINT causal_claim_check, "
+                    "DROP CONSTRAINT causal_claim_check1"
+                )
+            )
+            for i in range(2, len(m.NAMES)):
+                conn.execute(text(f"ALTER TABLE kg.causal_claim RENAME CONSTRAINT {m.NAMES[i]} TO {m.NAMES[i - 1]}"))
+            conn.execute(
+                text(
+                    "ALTER TABLE kg.causal_claim ADD CONSTRAINT causal_claim_check "
+                    "CHECK ((source_tier IN ('T3','T4')) = (statement_row_id IS NOT NULL)) NOT VALID"
+                )
+            )
+        r = load_kg_claims(cf.worker, origin="test_fixture", source_keys=[src])
+        assert (r.inserted, r.rejected_counts) == (1, {"db_refused:causal_claim_check": 1})
+        assert r.rejected_sample[0]["key"] == f"kg:{src}:DOI"
+        with cf.owner.begin() as conn:
+            assert m.repair(conn) is True
+    finally:
+        with cf.owner.begin() as conn:  # never leave the shared session database in the stale shape
+            m.repair(conn)
+    assert _table_checks(cf) == fresh
+    r = load_kg_claims(cf.worker, origin="test_fixture", source_keys=[src])
+    assert (r.inserted, r.rejected_total) == (1, 0)
+    row = _current(cf, f"kg:{src}:")["DOI"]
+    assert row["source_tier"] == "T2" and row["statement_row_id"] is not None
+    assert row["citation"] == {"doi": ["10.1016/S0140-6736(20)31129-6"]}
 
 
 def test_wdqs_rows_are_deferred_and_pointer_references_give_t4(cf) -> None:  # type: ignore[no-untyped-def]
