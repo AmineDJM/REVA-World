@@ -156,7 +156,9 @@ def extract_series(frame: pl.DataFrame, family: Family) -> tuple[dict[str, Serie
     if dropped:
         notes.append({"family": family.key, "reason": "cells at another frequency / non-calendar window", "n": dropped})
     if fiscal:
-        notes.append({"family": family.key, "reason": "fiscal-year cells (never a calendar-year question)", "n": fiscal})
+        notes.append(
+            {"family": family.key, "reason": "fiscal-year cells (never a calendar-year question)", "n": fiscal}
+        )
     out: dict[str, Series] = {}
     for geo, by_idx in sorted(cells.items()):
         ambiguous = [k for k, v in by_idx.items() if len({c["indicator"] for c in v}) > 1 or len(v) > 1]

@@ -582,9 +582,7 @@ def _record_resolution(
     }
     qids = sorted(o["question_id"] for o in res["outcomes"])
     with engine.begin() as conn:
-        sha = repo.store_json_artifact(
-            conn, store, doc, "evaluation", schema_version="forecast-registry-resolution/1"
-        )
+        sha = repo.store_json_artifact(conn, store, doc, "evaluation", schema_version="forecast-registry-resolution/1")
         act = repo.simple_activity(
             "evaluation.forecast_registry_resolve",
             "evaluation",
@@ -646,7 +644,6 @@ def resolve_due(
     engine: Engine, store: Any, *, origin: str = "live", actor: str = "worker:forecast_registry"
 ) -> dict[str, Any]:
     """Resolve and score every sealed batch's due questions (only those not handled before)."""
-    from reva.adapters.postgres import repositories as repo
 
     _check_origin(origin)
     cache = FrameCache(store, size=4)
