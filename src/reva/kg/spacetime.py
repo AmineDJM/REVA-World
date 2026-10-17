@@ -446,7 +446,9 @@ def place_chain(
     """Climb from ``start`` to the top through evidenced located_in edges.
 
     ``edges``: statement dicts with ``subject_qid``, ``property_pid``, ``object_qid``, ``statement_key`` (the
-    caller reads them from ``kg.statement_current``). At each level the parent is chosen by property preference
+    caller reads them from ``kg.statement_current``; optional ``ended``: the statement has an end date, so a
+    current containment is preferred over a past one). At each level the parent is chosen by currency, then by
+    property preference
     (:data:`ADMIN_ORDER`, then the other located_in pids sorted) and then by statement key, deterministically;
     a cycle stops the climb. When the chain stops at an ISO 3166-2 node without a stated parent and
     ``country_by_iso2`` maps its prefix, the country is appended with basis ``iso3166_2_code_prefix``.
@@ -463,7 +465,12 @@ def place_chain(
     for _ in range(max_depth):
         cands = sorted(
             up.get(cur, []),
-            key=lambda e: (order.get(str(e["property_pid"]), 99), str(e["property_pid"]), str(e.get("statement_key"))),
+            key=lambda e: (
+                bool(e.get("ended")),
+                order.get(str(e["property_pid"]), 99),
+                str(e["property_pid"]),
+                str(e.get("statement_key")),
+            ),
         )
         nxt = next((e for e in cands if str(e["object_qid"]) not in seen), None)
         if nxt is None:

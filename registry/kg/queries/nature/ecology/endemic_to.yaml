@@ -1,0 +1,20 @@
+id: geography.ecology.endemic_to
+domain: geography
+owner: V4ECO
+description: >-
+  Taxa endemic to a place, as Wikidata states it: endemic to (P183), e.g. a lemur species -> Madagascar. Bounded
+  to subjects with at least 5 sitelinks (28,367 statements at 2026-10-17; 45,458 without the bound). Family
+  located_in (subtype endemic_to, V4CORE mapping). Statement nodes bound (references re-read from wbgetentities);
+  objects expanded so the places get labels.
+purpose: statements
+entity_kind: other
+sparql: |
+  SELECT ?item ?statement ?object ?rank WHERE {
+    ?item p:P183 ?statement ; wikibase:sitelinks ?links .
+    FILTER(?links >= 5)
+    ?statement ps:P183 ?object ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+  }
+columns: {subject: item, property: P183, object: object, statement: statement, rank: rank}
+max_rows: 35000
+expand_hops: 1

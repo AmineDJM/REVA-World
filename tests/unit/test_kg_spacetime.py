@@ -134,3 +134,11 @@ def test_place_chain() -> None:
     ch2 = st.place_chain("iso3166_2:SA-04", [], country_by_iso2={"SA": "Q851"})
     assert [(s.qid, s.basis) for s in ch2] == [("iso3166_2:SA-04", "start"), ("Q851", "iso3166_2_code_prefix")]
     assert st.place_chain("Q90", edges) == [st.PlaceStep("Q90", None, None, None, "start")]
+
+
+def test_place_chain_prefers_current_containment() -> None:
+    edges = [
+        {"subject_qid": "Q1", "property_pid": "P131", "object_qid": "Q_old", "statement_key": "a", "ended": True},
+        {"subject_qid": "Q1", "property_pid": "P17", "object_qid": "Q_now", "statement_key": "b", "ended": False},
+    ]
+    assert [s.qid for s in st.place_chain("Q1", edges)] == ["Q1", "Q_now"]

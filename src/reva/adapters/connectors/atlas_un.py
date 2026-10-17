@@ -75,7 +75,7 @@ import polars as pl
 from reva.kernel.errors import SourceResponseError
 from reva.ports.connectors import FetchItem, RawAcquisition
 
-CONNECTOR_VERSION = "1.1.0"
+CONNECTOR_VERSION = "1.1.1"  # V4ECO 1.1.1: SDG 15.5.1 Red List Index (ER_RSK_LST) added
 PARSER_VERSION = "atlas-un-2"  # 2: compact WPP flags (revision/label/sex/age moved to manifest, catalog, indicator)
 GEO_SCHEME = "un_m49x"  # registry/atlas/geo_aliases/a_un.yaml: crosswalk M49 + evidence-backed aliases
 STRICT_DECIMAL = re.compile(r"^-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][-+]?[0-9]{1,3})?$")
@@ -1164,6 +1164,7 @@ SDG_SERIES: tuple[SdgSeries, ...] = (
     SdgSeries("EN_LND_SLUM", "un.sdg.urban_slum_population"),
     SdgSeries("AG_LND_FRST", "un.sdg.forest_area_share"),
     SdgSeries("ER_MRN_MPA", "un.sdg.marine_kba_protected"),
+    SdgSeries("ER_RSK_LST", "ecology.red_list_index"),  # V4ECO: SDG 15.5.1 (custodians IUCN, BirdLife)
     SdgSeries("VC_IHR_PSRC", "un.sdg.homicide_rate"),
     SdgSeries("VC_DTH_TOTR", "un.sdg.conflict_deaths_rate"),
     SdgSeries("SG_REG_BRTH", "un.sdg.birth_registration"),

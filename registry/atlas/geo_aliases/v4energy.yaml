@@ -2,6 +2,9 @@
 #
 # gppd: WRI Global Power Plant Database v1.3.0 column `country` = ISO 3166-1 alpha-3 except KOS for Kosovo
 #   (column country_long = "Kosovo" on both KOS rows; ISO has no code for Kosovo, the crosswalk entity is XKX).
+# usgs_name (scheme of A-RESOURCES, registry/atlas/geo_aliases/a_resources.yaml): four country names that occur only in
+#   the USGS Minerals Yearbook 2024 facilities table (2024MYBv3_Facilities_table.csv, column 'Country (Short Form) or
+#   Locality'), each the exact ISO 3166-1 English short name of the crosswalk entity.
 schemes:
   gppd:
     base: iso3
@@ -13,3 +16,9 @@ schemes:
       kind: provider_data
       url: "https://raw.githubusercontent.com/wri/global-power-plant-database/master/output_database/global_power_plant_database.csv"
       retrieved_at: "2026-10-17"
+  usgs_name:
+    aliases:
+      - {code: "Barbados", iso3: BRB, source: "MYB2024 facilities name = ISO 3166-1 short name 'Barbados'"}
+      - {code: "Cabo Verde", iso3: CPV, source: "MYB2024 facilities name = ISO 3166-1 short name 'Cabo Verde'"}
+      - {code: "Haiti", iso3: HTI, source: "MYB2024 facilities name = ISO 3166-1 short name 'Haiti'"}
+      - {code: "Somalia", iso3: SOM, source: "MYB2024 facilities name = ISO 3166-1 short name 'Somalia'"}

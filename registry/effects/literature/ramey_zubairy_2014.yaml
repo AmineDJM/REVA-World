@@ -1,0 +1,90 @@
+# U.S. government spending multipliers (agent PRED-EFFECT), NBER working-paper version.
+schema: reva-effects-literature/1
+id: ramey_zubairy_2014
+source_key: effects.literature
+citation:
+  text: "Valerie A. Ramey and Sarah Zubairy. Government Spending Multipliers in Good Times and in Bad: Evidence from U.S. Historical Data. NBER Working Paper No. 20719, November 2014. JEL No. E52,E62,N12."
+  text_basis: assembled from the title and abstract pages of the version read (NBER working paper)
+  short: "Ramey & Zubairy (2014), NBER WP 20719"
+  authors: [Valerie A. Ramey, Sarah Zubairy]
+  title: "Government Spending Multipliers in Good Times and in Bad: Evidence from U.S. Historical Data"
+  year: 2014
+  series: NBER Working Paper No. 20719
+  doi: null
+  url: http://www.nber.org/papers/w20719
+document:
+  url: https://www.nber.org/system/files/working_papers/w20719/w20719.pdf
+  media_type: application/pdf
+  sha256: d66b65ac2f28e96ebc92fe72c15c1310d8299b8e8e261071421ccbc307e8687a
+  bytes: 269086
+  version_read: NBER Working Paper 20719, November 2014 (not peer reviewed per the NBER notice; the journal version may report different numbers)
+as_of: "2014-11-30"
+rights:
+  licence: "© 2014 by Valerie A. Ramey and Sarah Zubairy. All rights reserved. Short sections of text, not to exceed two paragraphs, may be quoted without explicit permission provided that full credit, including © notice, is given to the source."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent PRED-EFFECT
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  cause: {kind: variable, id: fiscal.government_purchases, transform: level_change,
+          definition: "government spending (real government purchases), cumulative change after a military news shock"}
+  effect: {kind: variable, id: output.real_gdp_level, transform: level_change,
+           definition: "real GDP, cumulative change over the same horizon (multiplier = ratio of cumulative GDP change to cumulative government spending change)"}
+  measure: multiplier
+  unit: currency_per_currency
+  sign: positive
+  point_kind: point
+  method: local_projection
+  identification: "Jordà local projections on U.S. quarterly data 1889-2013; government spending shocks identified by Ramey's (2011) military news variable; multiplier = cumulative output response / cumulative government spending response ('integral' multiplier); Newey-West standard errors"
+  pdf_page: 40
+  scope: {countries: [USA], period: {from: "1889", to: "2013"}, frequency: quarterly}
+  applicability: "REVA note: U.S. federal (largely military) purchases, 1889-2013 including both world wars; the paper discusses that multipliers may differ for other spending types, financing, monetary regimes or countries."
+estimates:
+  - id: linear_2y
+    point: 0.76
+    as_printed: "0.76"
+    uncertainty: {se: 0.102, se_as_printed: "0.102", status: reported}
+    horizon: {kind: cumulative, value: 2, unit: year}
+    locator: "Table 1 'Estimated Multipliers Across States of Slack', U.S., row '2 year integral', column 'Linear Model' (printed p.39)"
+    quote: "2 year integral 0.76 0.69 0.78 (0.102) (0.094) (0.187) 0.631"
+  - id: linear_4y
+    point: 0.84
+    as_printed: "0.84"
+    uncertainty: {se: 0.092, se_as_printed: "0.092", status: reported}
+    horizon: {kind: cumulative, value: 4, unit: year}
+    locator: "Table 1 'Estimated Multipliers Across States of Slack', U.S., row '4 year integral', column 'Linear Model' (printed p.39)"
+    quote: "4 year integral 0.84 0.76 0.96 (0.092) (0.060) (0.218) 0.331"
+  - id: high_unemployment_2y
+    point: 0.69
+    as_printed: "0.69"
+    uncertainty: {se: 0.094, se_as_printed: "0.094", status: reported}
+    horizon: {kind: cumulative, value: 2, unit: year}
+    scope: {sample_note: "State-dependent model, high unemployment state (unemployment rate above the 6.5 percent threshold)"}
+    locator: "Table 1, U.S., row '2 year integral', column 'High Unemployment' (printed p.39)"
+    quote: "2 year integral 0.76 0.69 0.78 (0.102) (0.094) (0.187) 0.631"
+  - id: high_unemployment_4y
+    point: 0.76
+    as_printed: "0.76"
+    uncertainty: {se: 0.060, se_as_printed: "0.060", status: reported}
+    horizon: {kind: cumulative, value: 4, unit: year}
+    scope: {sample_note: "State-dependent model, high unemployment state (unemployment rate above the 6.5 percent threshold)"}
+    locator: "Table 1, U.S., row '4 year integral', column 'High Unemployment' (printed p.39)"
+    quote: "4 year integral 0.84 0.76 0.96 (0.092) (0.060) (0.218) 0.331"
+  - id: low_unemployment_2y
+    point: 0.78
+    as_printed: "0.78"
+    uncertainty: {se: 0.187, se_as_printed: "0.187", status: reported}
+    horizon: {kind: cumulative, value: 2, unit: year}
+    scope: {sample_note: "State-dependent model, low unemployment state (unemployment rate at or below the 6.5 percent threshold)"}
+    locator: "Table 1, U.S., row '2 year integral', column 'Low Unemployment' (printed p.39)"
+    quote: "2 year integral 0.76 0.69 0.78 (0.102) (0.094) (0.187) 0.631"
+  - id: low_unemployment_4y
+    point: 0.96
+    as_printed: "0.96"
+    uncertainty: {se: 0.218, se_as_printed: "0.218", status: reported}
+    horizon: {kind: cumulative, value: 4, unit: year}
+    scope: {sample_note: "State-dependent model, low unemployment state (unemployment rate at or below the 6.5 percent threshold)"}
+    locator: "Table 1, U.S., row '4 year integral', column 'Low Unemployment' (printed p.39)"
+    quote: "4 year integral 0.84 0.76 0.96 (0.092) (0.060) (0.218) 0.331"

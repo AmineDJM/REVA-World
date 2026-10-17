@@ -1,0 +1,252 @@
+# Okun's law coefficients (agent PRED-EFFECT). Every number is transcribed from the archived NBER PDF with its
+# table/page and a verbatim quote; the loader re-finds each quote in the archived bytes (pdftotext) before loading.
+schema: reva-effects-literature/1
+id: ball_leigh_loungani_2013
+source_key: effects.literature
+citation:
+  text: "Laurence M. Ball, Daniel Leigh, and Prakash Loungani. Okun's Law: Fit at Fifty? NBER Working Paper No. 18668, January 2013. JEL No. E24,E32."
+  text_basis: assembled from the title and abstract pages of the version read (NBER working paper)
+  short: "Ball, Leigh & Loungani (2013), NBER WP 18668"
+  authors: [Laurence M. Ball, Daniel Leigh, Prakash Loungani]
+  title: "Okun's Law: Fit at Fifty?"
+  year: 2013
+  series: NBER Working Paper No. 18668
+  doi: null
+  url: http://www.nber.org/papers/w18668
+document:
+  url: https://www.nber.org/system/files/working_papers/w18668/w18668.pdf
+  media_type: application/pdf
+  sha256: 71391e9bee460a488a66eb43d9c583a85d6567a13e1a80279505a1e8655a60bd
+  bytes: 690678
+  version_read: NBER Working Paper 18668, January 2013 (not peer reviewed per the NBER notice; a later journal version may differ)
+as_of: "2013-01-31"
+rights:
+  licence: "© 2013 by Laurence M. Ball, Daniel Leigh, and Prakash Loungani. All rights reserved. Short sections of text, not to exceed two paragraphs, may be quoted without explicit permission provided that full credit, including © notice, is given to the source."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent PRED-EFFECT
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  cause: {kind: variable, id: output.gap, transform: gap,
+          definition: "Yt – Yt*: log real output minus its long-run level (Hodrick-Prescott trend with the smoothing parameter stated)"}
+  effect: {kind: variable, id: labour.unemployment_gap, transform: gap,
+           definition: "Ut – Ut*: unemployment rate minus its long-run level (Hodrick-Prescott trend with the smoothing parameter stated)"}
+  measure: slope
+  unit: pp_per_percent
+  sign: negative
+  point_kind: point
+  horizon: {kind: impact}
+  method: time_series_regression
+  pdf_page: 29
+  identification: "OLS of the unemployment gap on the output gap (Okun's Law in levels, Ut – Ut* = β (Yt – Yt *) + εt); a statistical relationship, the paper does not claim a causal identification of output shocks"
+  applicability: "REVA note: Okun coefficients summarise the co-movement of unemployment and output over the cycle in the sample country and period; they are not the effect of a policy that changes output by other means, and the paper finds cross-country variation and some instability over time (Table 6)."
+estimates:
+  - id: us_annual_levels_hp100
+    pdf_page: 25
+    point: -0.411
+    as_printed: "-0.411"
+    uncertainty: {se: 0.024, se_as_printed: "0.024", status: reported}
+    scope: {countries: [USA], period: {from: "1948", to: "2011"}, frequency: annual, n_obs: 64}
+    locator: "Table 1 'United States: Estimates of Okun's Law (Annual data, 1948-2011)', equation in levels, Hodrick-Prescott filter λ = 100 (printed p.24)"
+    quote: "Hodrick-Prescott filter λ = 100 β -0.411*** (0.024) Obs 64"
+    meta: {adjusted_r2: 0.817, rmse: 0.426, hp_lambda: 100}
+  - id: us_annual_levels_hp1000
+    pdf_page: 25
+    point: -0.383
+    as_printed: "-0.383"
+    uncertainty: {se: 0.023, se_as_printed: "0.023", status: reported}
+    scope: {countries: [USA], period: {from: "1948", to: "2011"}, frequency: annual, n_obs: 64}
+    locator: "Table 1 'United States: Estimates of Okun's Law (Annual data, 1948-2011)', equation in levels, Hodrick-Prescott filter λ = 1,000 (printed p.24)"
+    quote: "Hodrick-Prescott filter λ = 1,000 β -0.383*** (0.023) Obs 64"
+    meta: {adjusted_r2: 0.813, rmse: 0.524, hp_lambda: 1000}
+  - id: us_annual_changes
+    pdf_page: 25
+    cause: {kind: atlas_concept, id: imf.gdp_real_growth, transform: growth_rate,
+            definition: "ΔYt: annual change in log real output (output growth), in percent"}
+    effect: {kind: atlas_concept, id: imf.unemployment_rate, transform: pp_change,
+             definition: "ΔUt: annual change in the unemployment rate, in percentage points"}
+    point: -0.405
+    as_printed: "-0.405"
+    uncertainty: {se: 0.029, se_as_printed: "0.029", status: reported}
+    scope: {countries: [USA], period: {from: "1948", to: "2011"}, frequency: annual, n_obs: 63}
+    identification: "OLS of the change in unemployment on output growth (Okun's Law in first differences, ΔUt = α + β ΔYt + εt)"
+    locator: "Table 1 'United States: Estimates of Okun's Law (Annual data, 1948-2011)', equation in first differences (printed p.24)"
+    quote: "Equation in first differences β -0.405*** (0.029) α 1.349*** (0.116) Obs 63"
+    meta: {adjusted_r2: 0.752, rmse: 0.556, constant: 1.349}
+  - id: us_quarterly_levels_hp1600_two_lags
+    pdf_page: 26
+    point: -0.494
+    as_printed: "-0.494"
+    uncertainty: {se: 0.0126, se_as_printed: "0.0126", status: reported}
+    horizon: {kind: cumulative, value: 2, unit: quarter}
+    irf:
+      - {h: 0, unit: quarter, point: -0.245, se: 0.0230, as_printed: "-0.245"}
+      - {h: 1, unit: quarter, point: -0.133, se: 0.0345, as_printed: "-0.133"}
+      - {h: 2, unit: quarter, point: -0.116, se: 0.0230, as_printed: "-0.116"}
+    scope: {countries: [USA], period: {from: "1948Q2", to: "2011Q4"}, frequency: quarterly, n_obs: 256}
+    identification: "OLS of the unemployment gap on the current and two lagged output gaps (Ut – Ut* = β(L) (Yt – Yt *) + εt, HP λ = 1,600); the irf lists the coefficients on the current and lagged gaps, the point is their sum"
+    locator: "Table 2 'United States: Estimates of Okun's Law (Quarterly data, 1948Q2-2011Q4)', equation in levels, λ = 1,600 with two lags, rows β0, β1, β2 and β0 + β1 + β2 (printed p.25)"
+    quote: "β0 + β 1 + β 2 -0.494*** -0.445*** -0.432*** (0.0126) (0.0119) (0.0200)"
+    meta: {adjusted_r2: 0.865, rmse: 0.302, hp_lambda: 1600, lag_coefficients_quote: "β0 -0.428*** -0.245*** -0.411*** -0.213*** -0.286*** -0.218***"}
+  - id: country_aus_levels_hp100
+    point: -0.536
+    as_printed: "-0.536"
+    uncertainty: {se: 0.0476, se_as_printed: "0.0476", status: reported}
+    scope: {countries: [AUS], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: Australia"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'Australia', column beta (printed p.28)"
+    quote: "Australia -0.536*** (0.0476) 32 0.797 0.439"
+    meta: {adjusted_r2: 0.797, rmse: 0.439}
+  - id: country_aut_levels_hp100
+    point: -0.136
+    as_printed: "-0.136"
+    uncertainty: {se: 0.0438, se_as_printed: "0.0438", status: reported}
+    scope: {countries: [AUT], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: Austria"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'Austria', column beta (printed p.28)"
+    quote: "Austria -0.136*** (0.0438) 32 0.213 0.375"
+    meta: {adjusted_r2: 0.213, rmse: 0.375}
+  - id: country_bel_levels_hp100
+    point: -0.511
+    as_printed: "-0.511"
+    uncertainty: {se: 0.0817, se_as_printed: "0.0817", status: reported}
+    scope: {countries: [BEL], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: Belgium"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'Belgium', column beta (printed p.28)"
+    quote: "Belgium -0.511*** (0.0817) 32 0.543 0.708"
+    meta: {adjusted_r2: 0.543, rmse: 0.708}
+  - id: country_can_levels_hp100
+    point: -0.432
+    as_printed: "-0.432"
+    uncertainty: {se: 0.0374, se_as_printed: "0.0374", status: reported}
+    scope: {countries: [CAN], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: Canada"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'Canada', column beta (printed p.28)"
+    quote: "Canada -0.432*** (0.0374) 32 0.805 0.495"
+    meta: {adjusted_r2: 0.805, rmse: 0.495}
+  - id: country_dnk_levels_hp100
+    point: -0.434
+    as_printed: "-0.434"
+    uncertainty: {se: 0.0471, se_as_printed: "0.0471", status: reported}
+    scope: {countries: [DNK], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: Denmark"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'Denmark', column beta (printed p.28)"
+    quote: "Denmark -0.434*** (0.0471) 32 0.724 0.570"
+    meta: {adjusted_r2: 0.724, rmse: 0.570}
+  - id: country_fin_levels_hp100
+    point: -0.504
+    as_printed: "-0.504"
+    uncertainty: {se: 0.0485, se_as_printed: "0.0485", status: reported}
+    scope: {countries: [FIN], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: Finland"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'Finland', column beta (printed p.28)"
+    quote: "Finland -0.504*** (0.0485) 32 0.770 1.025"
+    meta: {adjusted_r2: 0.770, rmse: 1.025}
+  - id: country_fra_levels_hp100
+    point: -0.367
+    as_printed: "-0.367"
+    uncertainty: {se: 0.0441, se_as_printed: "0.0441", status: reported}
+    scope: {countries: [FRA], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: France"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'France', column beta (printed p.28)"
+    quote: "France -0.367*** (0.0441) 32 0.681 0.394"
+    meta: {adjusted_r2: 0.681, rmse: 0.394}
+  - id: country_deu_levels_hp100
+    point: -0.367
+    as_printed: "-0.367"
+    uncertainty: {se: 0.0629, se_as_printed: "0.0629", status: reported}
+    scope: {countries: [DEU], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: Germany"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'Germany', column beta (printed p.28)"
+    quote: "Germany -0.367*** (0.0629) 32 0.508 0.689"
+    meta: {adjusted_r2: 0.508, rmse: 0.689}
+  - id: country_irl_levels_hp100
+    point: -0.406
+    as_printed: "-0.406"
+    uncertainty: {se: 0.0395, se_as_printed: "0.0395", status: reported}
+    scope: {countries: [IRL], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: Ireland"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'Ireland', column beta (printed p.28)"
+    quote: "Ireland -0.406*** (0.0395) 32 0.766 0.835"
+    meta: {adjusted_r2: 0.766, rmse: 0.835}
+  - id: country_ita_levels_hp100
+    point: -0.254
+    as_printed: "-0.254"
+    uncertainty: {se: 0.0672, se_as_printed: "0.0672", status: reported}
+    scope: {countries: [ITA], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: Italy"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'Italy', column beta (printed p.28)"
+    quote: "Italy -0.254*** (0.0672) 32 0.292 0.654"
+    meta: {adjusted_r2: 0.292, rmse: 0.654}
+  - id: country_jpn_levels_hp100
+    point: -0.152
+    as_printed: "-0.152"
+    uncertainty: {se: 0.0194, se_as_printed: "0.0194", status: reported}
+    scope: {countries: [JPN], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: Japan"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'Japan', column beta (printed p.28)"
+    quote: "Japan -0.152*** (0.0194) 32 0.654 0.229"
+    meta: {adjusted_r2: 0.654, rmse: 0.229}
+  - id: country_nld_levels_hp100
+    point: -0.511
+    as_printed: "-0.511"
+    uncertainty: {se: 0.0705, se_as_printed: "0.0705", status: reported}
+    scope: {countries: [NLD], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: Netherlands"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'Netherlands', column beta (printed p.28)"
+    quote: "Netherlands -0.511*** (0.0705) 32 0.617 0.722"
+    meta: {adjusted_r2: 0.617, rmse: 0.722}
+  - id: country_nzl_levels_hp100
+    point: -0.341
+    as_printed: "-0.341"
+    uncertainty: {se: 0.0493, se_as_printed: "0.0493", status: reported}
+    scope: {countries: [NZL], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: New Zealand"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'New Zealand', column beta (printed p.28)"
+    quote: "New Zealand -0.341*** (0.0493) 32 0.594 0.705"
+    meta: {adjusted_r2: 0.594, rmse: 0.705}
+  - id: country_nor_levels_hp100
+    point: -0.294
+    as_printed: "-0.294"
+    uncertainty: {se: 0.0406, se_as_printed: "0.0406", status: reported}
+    scope: {countries: [NOR], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: Norway"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'Norway', column beta (printed p.28)"
+    quote: "Norway -0.294*** (0.0406) 32 0.617 0.449"
+    meta: {adjusted_r2: 0.617, rmse: 0.449}
+  - id: country_prt_levels_hp100
+    point: -0.268
+    as_printed: "-0.268"
+    uncertainty: {se: 0.0371, se_as_printed: "0.0371", status: reported}
+    scope: {countries: [PRT], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: Portugal"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'Portugal', column beta (printed p.28)"
+    quote: "Portugal -0.268*** (0.0371) 32 0.615 0.629"
+    meta: {adjusted_r2: 0.615, rmse: 0.629}
+  - id: country_esp_levels_hp100
+    point: -0.852
+    as_printed: "-0.852"
+    uncertainty: {se: 0.0503, se_as_printed: "0.0503", status: reported}
+    scope: {countries: [ESP], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: Spain"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'Spain', column beta (printed p.28)"
+    quote: "Spain -0.852*** (0.0503) 32 0.899 0.757"
+    meta: {adjusted_r2: 0.899, rmse: 0.757}
+  - id: country_swe_levels_hp100
+    point: -0.524
+    as_printed: "-0.524"
+    uncertainty: {se: 0.0719, se_as_printed: "0.0719", status: reported}
+    scope: {countries: [SWE], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: Sweden"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'Sweden', column beta (printed p.28)"
+    quote: "Sweden -0.524*** (0.0719) 32 0.619 1.002"
+    meta: {adjusted_r2: 0.619, rmse: 1.002}
+  - id: country_che_levels_hp100
+    point: -0.234
+    as_printed: "-0.234"
+    uncertainty: {se: 0.0458, se_as_printed: "0.0458", status: reported}
+    scope: {countries: [CHE], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: Switzerland"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'Switzerland', column beta (printed p.28)"
+    quote: "Switzerland -0.234*** (0.0458) 32 0.439 0.434"
+    meta: {adjusted_r2: 0.439, rmse: 0.434}
+  - id: country_gbr_levels_hp100
+    point: -0.343
+    as_printed: "-0.343"
+    uncertainty: {se: 0.0495, se_as_printed: "0.0495", status: reported}
+    scope: {countries: [GBR], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: United Kingdom"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'United Kingdom', column beta (printed p.28)"
+    quote: "United Kingdom -0.343*** (0.0495) 32 0.595 0.699"
+    meta: {adjusted_r2: 0.595, rmse: 0.699}
+  - id: country_usa_levels_hp100
+    point: -0.454
+    as_printed: "-0.454"
+    uncertainty: {se: 0.0373, se_as_printed: "0.0373", status: reported}
+    scope: {countries: [USA], period: {from: "1980", to: "2011"}, frequency: annual, n_obs: 32, sample_note: "Country as printed: United States"}
+    locator: "Table 5 '20 Advanced Economies: Estimates of Okun's Law (Annual data, 1980-2011)', row 'United States', column beta (printed p.28)"
+    quote: "United States -0.454*** (0.0373) 32 0.821 0.418"
+    meta: {adjusted_r2: 0.821, rmse: 0.418}

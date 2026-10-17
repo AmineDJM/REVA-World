@@ -16,7 +16,7 @@ MOI, SOP, CLASSIFICATION, ONLINE REPORT, CLASSIFICATION DATE, GCEP``, a separato
 KG (source key ``clingen.gene_validity``)
 -----------------------------------------
 One statement per curation: ``hgnc:<id> --clingen:gene_disease_validity--> mondo:<id>``, statement id = the
-curation's assertion id (``CGGV:assertion_...`` from the online report URL; a re-curation is a new assertion, the
+curation's assertion id (``CGGV:assertion_...`` / legacy ``CGGCIEX:assertion_<n>``, from the online report URL; a re-curation is a new assertion, the
 old one is retracted by the next run), qualifiers = classification (Definitive / Strong / Moderate / Limited /
 Disputed / Refuted / No Known Disease Relationship ...), mode of inheritance, SOP version, classification date,
 expert panel (GCEP), report URL, gene symbol and disease label as written. Family ``associated_with``: a ClinGen
@@ -38,7 +38,7 @@ from reva.adapters.connectors.health_obo_common import digest, drift, kg_availab
 from reva.atlas.sources import AtlasSourceSpec
 
 NAME = "atlas.clingen"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 PARSER_VERSION = "atlas_clingen/1"
 SOURCE_KEY = "clingen.gene_validity"
 HOST = "search.clinicalgenome.org"
@@ -68,7 +68,8 @@ RIGHTS = {
 }
 HGNC_RE = re.compile(r"^HGNC:([0-9]+)$")
 MONDO_RE = re.compile(r"^MONDO:([0-9]{7})$")
-ASSERTION_RE = re.compile(r"/gene-validity/(CGGV:assertion_[A-Za-z0-9_.:-]+)$")
+#: ClinGen curation ids: ``CGGV:assertion_<uuid>-<date>`` (GCI) and ``CGGCIEX:assertion_<n>`` (GCI Express, legacy)
+ASSERTION_RE = re.compile(r"/gene-validity/(CGG[A-Z]{1,8}:assertion_[A-Za-z0-9_.:-]+)$")
 
 
 def parse(body: bytes) -> tuple[str, list[dict[str, Any]]]:

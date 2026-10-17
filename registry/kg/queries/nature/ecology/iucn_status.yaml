@@ -1,0 +1,21 @@
+id: geography.ecology.iucn_status
+domain: geography
+owner: V4ECO
+description: >-
+  IUCN conservation status of taxa as Wikidata states it (P141, e.g. Vulnerable Q278113), with the IUCN taxon id
+  (P627) and the GBIF taxon id (P846) of the subject kept by the subject snapshot when allow-listed. Bounded to taxa
+  with at least 20 sitelinks (16,420 statements at 2026-10-17). Requested properties
+  (registry/kg/property_requests/v4eco.yaml). Wikidata copies of IUCN assessments are community-edited; the
+  authoritative category per GBIF species comes from atlas.gbif_occ (gbif:iucn_red_list_category).
+purpose: statements
+entity_kind: other
+sparql: |
+  SELECT ?item ?statement ?object ?rank WHERE {
+    ?item p:P141 ?statement ; wikibase:sitelinks ?links .
+    FILTER(?links >= 20)
+    ?statement ps:P141 ?object ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+  }
+columns: {subject: item, property: P141, object: object, statement: statement, rank: rank}
+max_rows: 20000
+expand_hops: 1

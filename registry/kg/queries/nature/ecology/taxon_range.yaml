@@ -1,0 +1,19 @@
+id: geography.ecology.taxon_range
+domain: geography
+owner: V4ECO
+description: >-
+  Geographic range of taxa, as Wikidata states it: taxon range (P9714), taxon -> country / region / continent where
+  it occurs. Bounded to well-documented taxa (at least 20 sitelinks: 23,357 statements at 2026-10-17; 341,009
+  without the bound). Family located_in (subtype taxon_range, V4CORE mapping).
+purpose: statements
+entity_kind: other
+sparql: |
+  SELECT ?item ?statement ?object ?rank WHERE {
+    ?item p:P9714 ?statement ; wikibase:sitelinks ?links .
+    FILTER(?links >= 20)
+    ?statement ps:P9714 ?object ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+  }
+columns: {subject: item, property: P9714, object: object, statement: statement, rank: rank}
+max_rows: 30000
+expand_hops: 1

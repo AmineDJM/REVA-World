@@ -1,0 +1,41 @@
+# V4ECO mappings of the ecology predicates (registry/kg/predicates_eco.yaml) to the universal relation families.
+version: 1
+agent: V4ECO
+note: >-
+  GloBI interactions are recorded biotic interactions (taxon-level aggregates of published records), never causal
+  claims; gbif_occ:recorded_in is presence in GBIF occurrence records (>= 10 records), not a native range;
+  resolve:* are attributes of the RESOLVE Ecoregions 2017 release. Wikidata P183 / P9714 / P1034 are mapped by
+  V4CORE (relations_v4.yaml). Ecoregion <-> country is not mapped: the release has no such table and a polygon
+  overlay would be a derived overlap, not a located_in statement.
+mappings:
+  - {property: "gbif_occ:recorded_in", family: located_in, subtype: gbif_occurrence_records_in, source: gbif,
+     subject_kinds: [taxon], object_kinds: [country],
+     note: "taxon has >= 10 GBIF occurrence records (PRESENT, no fossil/living specimens) in the country; presence records, not native range"}
+  - {property: "gbif_occ:measured_by", family: measured_by, subtype: gbif_occurrence_facets, source: gbif,
+     subject_kinds: [taxon], object_kinds: [atlas_dataset]}
+  - {property: "globi:eats", family: eats, subtype: eats, source: globi, subject_kinds: [taxon], object_kinds: [taxon]}
+  - {property: "globi:preys_on", family: eats, subtype: preys_on, source: globi, subject_kinds: [taxon], object_kinds: [taxon]}
+  - {property: "globi:parasite_of", family: interacts_with, subtype: parasite_of, source: globi,
+     subject_kinds: [taxon], object_kinds: [taxon]}
+  - {property: "globi:pathogen_of", family: interacts_with, subtype: pathogen_of, source: globi,
+     subject_kinds: [taxon], object_kinds: [taxon],
+     note: "a recorded host-pathogen interaction, not a claim that the pathogen causes a given outcome"}
+  - {property: "globi:pollinates", family: interacts_with, subtype: pollinates, source: globi,
+     subject_kinds: [taxon], object_kinds: [taxon]}
+  - {property: "globi:visits_flowers_of", family: interacts_with, subtype: visits_flowers_of, source: globi,
+     subject_kinds: [taxon], object_kinds: [taxon], note: "a flower visit is not proof of pollination"}
+  - {property: "globi:vector_of", family: interacts_with, subtype: vector_of, source: globi,
+     subject_kinds: [taxon], object_kinds: [taxon]}
+  - {property: "globi:has_host", family: interacts_with, subtype: has_host, source: globi,
+     subject_kinds: [taxon], object_kinds: [taxon]}
+  - {property: "globi:resolved_within", family: is_a, subtype: globi_taxon_resolution, source: globi,
+     subject_kinds: [taxon], object_kinds: [taxon],
+     note: "GloBI returns records indexed under this id for the queried GBIF taxon (the taxon itself or a descendant): taxonomic subsumption per GloBI's taxon graph"}
+  - {property: "resolve:in_biome", family: part_of, subtype: ecoregion_in_biome, source: resolve,
+     subject_kinds: [ecoregion], object_kinds: [biome]}
+  - {property: "resolve:in_realm", family: part_of, subtype: ecoregion_in_realm, source: resolve,
+     subject_kinds: [ecoregion], object_kinds: [biogeographic_realm]}
+  # Wikidata properties requested by V4ECO (registry/kg/property_requests/v4eco.yaml)
+  - {property: P2975, family: interacts_with, subtype: host, source: wikidata, subject_kinds: [taxon], object_kinds: [taxon]}
+  - {property: P141, family: context, subtype: iucn_conservation_status, source: wikidata,
+     note: "Wikidata's copy of an IUCN Red List assessment (community-edited); an expert assessment, not a population count"}

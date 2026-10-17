@@ -1,0 +1,17 @@
+id: geography.ecology.main_food_source
+domain: geography
+owner: V4ECO
+description: >-
+  Main food source of taxa, as Wikidata states it: main food source (P1034), e.g. koala -> Eucalyptus, giant
+  panda -> bamboo. All statements (2,330 at 2026-10-17). Family eats (subtype main_food_source, V4CORE mapping).
+purpose: statements
+entity_kind: other
+sparql: |
+  SELECT ?item ?statement ?object ?rank WHERE {
+    ?item p:P1034 ?statement .
+    ?statement ps:P1034 ?object ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+  }
+columns: {subject: item, property: P1034, object: object, statement: statement, rank: rank}
+max_rows: 4000
+expand_hops: 1

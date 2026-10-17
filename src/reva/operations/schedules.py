@@ -52,6 +52,7 @@ SCHEDULE_JOB_TYPES = frozenset(
         "atlas_snapshot",  # ATLASOPS (V3): daily atlas snapshot (reused when no table changed)
         "links_materialise",  # LINKWIRE (V3): daily link store after the snapshot (reused when inputs unchanged)
         "causal_refresh",  # CAUSOPS (V3): daily causal claims + grades after the link store (no-op when unchanged)
+        "forecast_registry",  # PRED-REGISTRY (V5): weekly issue (once per quarterly cycle), daily resolution
     }
 )
 SCHEDULE_PRIORITY = -5

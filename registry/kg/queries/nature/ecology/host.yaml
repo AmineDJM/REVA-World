@@ -1,0 +1,20 @@
+id: geography.ecology.host
+domain: geography
+owner: V4ECO
+description: >-
+  Host of parasites, pathogens and symbionts, as Wikidata states it: host (P2975), e.g. a virus or parasite ->
+  its host species. Bounded to subjects with at least 20 sitelinks (4,678 statements at 2026-10-17; 70,787
+  without the bound). Requested property (registry/kg/property_requests/v4eco.yaml); family interacts_with
+  (subtype host). A recorded host relation is not a causal claim.
+purpose: statements
+entity_kind: other
+sparql: |
+  SELECT ?item ?statement ?object ?rank WHERE {
+    ?item p:P2975 ?statement ; wikibase:sitelinks ?links .
+    FILTER(?links >= 20)
+    ?statement ps:P2975 ?object ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+  }
+columns: {subject: item, property: P2975, object: object, statement: statement, rank: rank}
+max_rows: 6000
+expand_hops: 1

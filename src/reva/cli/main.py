@@ -30,6 +30,8 @@ kg_app = typer.Typer(no_args_is_help=True, help="V3 knowledge graph: governed im
 app.add_typer(kg_app, name="kg")
 events_app = typer.Typer(no_args_is_help=True, help="V3 events: evidence-based same_as identity links")
 app.add_typer(events_app, name="events")
+forecasts_app = typer.Typer(no_args_is_help=True, help="V5 prospective forecast registry (PRED-REGISTRY)")
+app.add_typer(forecasts_app, name="forecasts")
 
 
 def _out(obj: Any) -> None:
@@ -707,6 +709,75 @@ def events_same_as_cmd(
             engine, get_store(), report, origin=origin, rules_sha256=sa.rules_sha256()
         ).as_dict()
     _out({"status": "dry_run" if dry_run else "completed", **out})
+
+
+# --------------------------------------------------------------------------- forecasts (V5, PRED-REGISTRY)
+def _forecast_job(payload: dict[str, Any]) -> dict[str, Any]:
+    from types import SimpleNamespace
+
+    from reva.adapters.objects.factory import get_store
+    from reva.adapters.postgres.engine import make_engine
+    from reva.evaluation.registry.service import handle_forecast_registry
+    from reva.settings import get_settings
+
+    ctx = SimpleNamespace(worker_engine=make_engine("worker", get_settings()), store=get_store())
+    return handle_forecast_registry(payload, ctx)
+
+
+@forecasts_app.command("issue")
+def forecasts_issue_cmd(
+    origin: str = typer.Option("live", help="live or test_fixture"),
+    family: list[str] = typer.Option([], "--family", help="limit to these question families (repeatable)"),
+) -> None:
+    """Generate this quarterly cycle's questions not issued yet, forecast them with the baselines and SEAL the batch
+    (worker credentials; same code path as the scheduled `forecast_registry` issue job)."""
+    payload: dict[str, Any] = {"action": "issue", "origin": origin}
+    if family:
+        payload["families"] = list(family)
+    _out(_forecast_job(payload))
+
+
+@forecasts_app.command("resolve")
+def forecasts_resolve_cmd(origin: str = typer.Option("live", help="live or test_fixture")) -> None:
+    """Resolve due questions from table versions registered after each seal and score the frozen forecasts."""
+    _out(_forecast_job({"action": "resolve", "origin": origin}))
+
+
+@forecasts_app.command("backtest")
+def forecasts_backtest_cmd(
+    origin: str = typer.Option("live", help="live or test_fixture"),
+    years: int = typer.Option(8, help="years of rolling origins"),
+    family: list[str] = typer.Option([], "--family", help="limit to these question families (repeatable)"),
+) -> None:
+    """Final-vintage pseudo-real-time back-test of the baselines (labelled; never real-time skill)."""
+    payload: dict[str, Any] = {"action": "backtest", "origin": origin, "years": years}
+    if family:
+        payload["families"] = list(family)
+    _out(_forecast_job(payload))
+
+
+@forecasts_app.command("status")
+def forecasts_status_cmd(origin: str = typer.Option("live", help="live, test_fixture or any")) -> None:
+    """Sealed batches, question counts by status and the leaderboard (read-only)."""
+    from reva.adapters.objects.factory import get_store
+    from reva.adapters.postgres.engine import make_engine
+    from reva.evaluation.registry import read as R
+    from reva.settings import get_settings
+
+    o = None if origin == "any" else origin
+    eng = make_engine("api", get_settings())
+    with eng.connect() as conn:
+        bs = R.batches(conn, o)
+        lb = R.leaderboard(conn, get_store(), o)
+        fams = R.families(conn, o)
+    _out(
+        {
+            "batches": [{k: str(v) if k == "recorded_at" else v for k, v in b.items()} for b in bs],
+            "questions": lb["questions"],
+            "leaderboard": [{k: r[k] for k in ("model", "n_issued", "n_scored", "mae", "crps", "brier")} for r in lb["models"]],
+            "families": {f["key"]: f["status"] for f in fams},
+        }
+    )
 
 
 def main() -> None:  # pragma: no cover

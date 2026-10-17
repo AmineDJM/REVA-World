@@ -1,0 +1,148 @@
+# Published results the event-study engine must reproduce BEFORE it produces any new estimate
+# (docs/roadmap/v5_prediction_engine.md, PRED-EVENTSTUDY). Agent PRED-EVENTSTUDY, 2026-10-17.
+#
+# Each target: the publication (citation verbatim, URL, sha256 of the file read, retrieval date), the published
+# numbers as printed with a verbatim (whitespace-normalised) quote of the row they appear in, the exact
+# specification REVA runs, the data REVA uses (atlas snapshot series), the documented differences with the
+# original, and a tolerance DECLARED HERE BEFORE THE FIRST RUN (changing a tolerance after seeing a result is
+# not allowed: bump the target id instead and keep the old outcome in the report).
+#
+# Publication files are archived by `reva estimate replicate --archive-papers <dir>` into the artifact store
+# (namespace raw, rights: copyright of the authors/publisher, not redistributed); they are not in the repository.
+schema: reva-estimation-replications/1
+targets:
+  - id: jst2013_table4
+    citation: >-
+      Jordà, Ò., Schularick, M. and Taylor, A. M. (2011, revised), 'When Credit Bites Back: Leverage, Business
+      Cycles, and Crises', NBER Working Paper 17621 (published 2013 in the Journal of Money, Credit and Banking
+      45(s2), 3-28).
+    url: https://www.nber.org/system/files/working_papers/w17621/w17621.pdf
+    file_sha256: ea3021153056f7709c6421d9ad1c2b664b5dfd4a6f09eb93dc6350345a528ed4
+    retrieved_at: "2026-10-17"
+    locator: "Table 4: Unconditional Recession Paths, Normal v. Financial Bins (pdf p. 16); peaks: Table 1 (p. 8)"
+    design: event_sample_bins
+    published:
+      unit: "Log real GDP per capita (relative to Year 0, x100)"
+      horizons: [1, 2, 3, 4, 5]
+      quotes:
+        N: "Normal recession (N) -2.0∗ -0.0 2.0∗ 3.3∗ 4.5∗ (0.2) (0.3) (0.4) (0.6) (0.7)"
+        F: "Financial recession (F) -2.7∗ -3.1∗ -2.5∗ -0.9 1.0 (0.3) (0.6) (0.8) (1.1) (1.2)"
+        n: "Observations, Normal 173 173 173 173 173 Observations, Financial 50 50 50 50 50"
+      coefficients:
+        N: {point: [-2.0, -0.0, 2.0, 3.3, 4.5], se: [0.2, 0.3, 0.4, 0.6, 0.7], n: 173}
+        F: {point: [-2.7, -3.1, -2.5, -0.9, 1.0], se: [0.3, 0.6, 0.8, 1.1, 1.2], n: 50}
+    specification: >-
+      For every business-cycle peak of Table 1 (14 countries, 298 peaks, classified N/F by the authors), the
+      dependent variable is 100 x (ln y[peak+h] - ln y[peak]), h = 1..5, y = real GDP per capita. OLS on the two
+      mutually exclusive bin dummies without constant (= bin means), classical OLS standard errors. Exclusions
+      quoted from the paper: "the war windows 1914–18 and 1939–45 are excluded, as are data corresponding to peaks
+      which are within 5 years of the wars looking forwards, or 2 years looking backwards" and "excluding the
+      recessions starting in 2007–08 for which the windows do not yet have complete data" (implemented as: drop a
+      peak p when [p-2, p+5] meets 1914-1918 or 1939-1945, or p+5 > 2008; this reproduces the paper's counts
+      173 N + 50 F = 223 exactly).
+    data:
+      outcome: series:jst.macrohistory.rgdpbarro
+      outcome_label: "JST R6 rgdpbarro: real GDP per capita (index, 2005=100), Barro-Ursúa based"
+    differences: >-
+      The paper uses the Barro-Ursúa (2008) per-capita GDP data of 2011; REVA uses the JST Macrohistory Database
+      R6 (2021) series rgdpbarro, which extends and revises it. The peak dates are the paper's (Table 1), not
+      re-dated by REVA. Standard errors: the paper does not state the estimator; REVA uses classical OLS.
+    tolerance:
+      rule: >-
+        PASS when every one of the 10 published coefficients is reproduced within 2 published standard errors
+        (|REVA - published| <= 2 x SE_published) and the bin counts equal 173 and 50.
+      max_se_multiple: 2.0
+    peaks:
+      AUS: {N: [1875, 1878, 1881, 1883, 1885, 1887, 1889, 1896, 1898, 1900, 1904, 1910, 1913, 1926, 1938, 1943, 1951, 1956, 1961, 1973, 1976, 1981], F: [1891, 1894, 1989]}
+      CAN: {N: [1871, 1877, 1882, 1884, 1888, 1891, 1894, 1903, 1913, 1917, 1928, 1944, 1947, 1953, 1956, 1981, 1989, 2007], F: [1874, 1907]}
+      CHE: {N: [1875, 1880, 1886, 1890, 1893, 1899, 1902, 1906, 1912, 1916, 1920, 1933, 1939, 1947, 1951, 1957, 1974, 1981, 1990, 1994, 2001], F: [1871, 1929, 2008]}
+      DEU: {N: [1879, 1898, 1905, 1913, 1922, 1943, 1966, 1974, 1980, 1992, 2001], F: [1875, 1890, 1908, 1928, 2008]}
+      DNK: {N: [1870, 1880, 1887, 1911, 1914, 1916, 1923, 1939, 1944, 1950, 1962, 1973, 1979, 1987, 1992], F: [1872, 1876, 1883, 1920, 1931, 2007]}
+      ESP: {N: [1873, 1877, 1892, 1894, 1901, 1909, 1911, 1916, 1927, 1932, 1935, 1940, 1944, 1947, 1952, 1958, 1974, 1980, 1992], F: [1883, 1889, 1913, 1925, 1929, 1978, 2007]}
+      FRA: {N: [1872, 1874, 1892, 1894, 1896, 1900, 1905, 1909, 1912, 1916, 1920, 1926, 1933, 1937, 1939, 1942, 1974, 1992], F: [1882, 1907, 1929, 2007]}
+      GBR: {N: [1871, 1875, 1877, 1883, 1896, 1899, 1902, 1907, 1918, 1925, 1929, 1938, 1943, 1951, 1957, 1979], F: [1873, 1889, 1973, 1990, 2007]}
+      ITA: {N: [1870, 1883, 1897, 1918, 1923, 1925, 1932, 1939, 1974, 1992, 2002, 2004], F: [1874, 1887, 1891, 1929, 2007]}
+      JPN: {N: [1875, 1877, 1880, 1887, 1890, 1892, 1895, 1898, 1903, 1919, 1921, 1929, 1933, 1940, 1973, 2001, 2007], F: [1882, 1901, 1907, 1913, 1925, 1997]}
+      NLD: {N: [1870, 1873, 1877, 1889, 1894, 1899, 1902, 1913, 1929, 1957, 1974, 1980, 2001], F: [1892, 1906, 1937, 1939, 2008]}
+      NOR: {N: [1876, 1881, 1885, 1893, 1902, 1916, 1923, 1939, 1941, 1957, 1981, 2008], F: [1897, 1920, 1930, 1987]}
+      SWE: {N: [1873, 1876, 1881, 1883, 1885, 1888, 1890, 1899, 1901, 1904, 1913, 1916, 1924, 1939, 1976, 1980], F: [1879, 1907, 1920, 1930, 1990, 2007]}
+      USA: {N: [1875, 1887, 1889, 1895, 1901, 1909, 1913, 1916, 1918, 1926, 1937, 1944, 1948, 1953, 1957, 1969, 1973, 1979, 1981, 1990, 2000], F: [1873, 1882, 1892, 1906, 1929, 2007]}
+
+  - id: lv2020_output_loss
+    citation: >-
+      Laeven, L. and Valencia, F. (2020), 'Systemic Banking Crises Database II', IMF Economic Review 68, 307-361,
+      doi:10.1057/s41308-020-00107-3 (data file: electronic supplementary material 1). (c) IMF.
+    url: https://static-content.springer.com/esm/art%3A10.1057%2Fs41308-020-00107-3/MediaObjects/41308_2020_107_MOESM1_ESM.xlsx
+    file_sha256: "from the atlas cells (raw_sha256 of atlas.laeven_valencia.sbcd output_loss cells)"
+    locator: "data file, sheet of crisis episodes, column 'Output loss 1/' and footnote 1/"
+    design: per_crisis_computation
+    published:
+      series: series:laeven_valencia.sbcd.output_loss
+      definition_quote: >-
+        In percent of GDP. Output losses are computed as the cumulative sum of the differences between actual and
+        trend real GDP over the period [T, T+3], expressed in percent of trend real GDP, with T denoting the
+        starting year of the crisis. The trend is computed by applying an HP filter (λ=100) to the GDP series over
+        [T-20, T-1].  No output losses are reported for crises in transition economies that took place during the
+        period of transition to market economies.
+    specification: >-
+      PRIMARY (declared before the first run): for each crisis with a published output loss, log real GDP over
+      [T-20, T-1] (the contiguous available span ending at T-1, at least 4 years), HP trend (lambda = 100);
+      trend extrapolated to T..T+3 at the HP trend's growth rate of year T-1 (tau[T-1] - tau[T-2]); loss =
+      sum over k = 0..3 of 100 x (trend[T+k] - actual[T+k]) / trend[T+k]; negative totals truncated at 0 (the
+      published file reports 0 for such crises). Real GDP: IMF WEO real GDP growth (NGDP_RPCH, chained into an
+      index; LV name the WEO as their source) when it covers [T-4, T+3]; else WDI GDP constant 2015 US$
+      (NY.GDP.MKTP.KD). SENSITIVITY (reported, not used for the verdict): WDI only; trend extrapolated at the
+      mean trend growth over the window.
+    data:
+      primary: series:imf.weo.NGDP_RPCH
+      fallback: series:wb.wdi_econ.NY.GDP.MKTP.KD
+    differences: >-
+      The extrapolation rule is not stated in the footnote (REVA's reading, declared above). LV computed with the
+      WEO vintage of 2017-2018 (and WDI where WEO was missing); REVA uses the WEO and WDI vintages of the pinned
+      atlas snapshot (later revisions, different base years). Transition-economy crises have no published loss
+      and are not compared.
+    tolerance:
+      rule: >-
+        PASS when, over crises with both a published and a REVA value (at least 80), the Spearman rank
+        correlation is >= 0.75 and the median absolute difference is <= 10 percentage points of trend GDP.
+      min_n: 80
+      min_spearman: 0.75
+      max_median_abs_diff: 10.0
+
+  - id: cs2007_table2_all
+    citation: >-
+      Cerra, V. and Saxena, S. C. (2007), 'Growth dynamics: the myth of economic recovery', BIS Working Papers
+      No 226 (March 2007); published as Cerra and Saxena (2008), American Economic Review 98(1), 439-457.
+    url: https://www.bis.org/publications/working-paper-226-growth-dynamics-myth-economic-recovery.pdf
+    file_sha256: 80c2b0841bcb14e2b4e3c121630b82925fab15846898bb47fcd6f3605138bb00
+    retrieved_at: "2026-10-17"
+    locator: "Table 2: Characteristics of recessions, row 'All country episodes', World Bank columns (pdf p. 18)"
+    design: recession_episodes
+    published:
+      quote: "All country episodes –7.5 1.62 637 –7.5 1.78 928"
+      definition_quote: >-
+        For the sample of World Bank and Penn World Tables growth rates, we calculated the average cumulative loss
+        and average length of recessions (defined as years of negative growth).
+      sample_quote: >-
+        unbalanced panels of annual observations spanning 192 countries from 1960 to 2001 for the World Bank
+        dataset
+      mean_cumulative_loss: -7.5
+      mean_duration_years: 1.62
+      n_episodes: 637
+    specification: >-
+      Annual real GDP growth (WDI NY.GDP.MKTP.KD.ZG, annual %), every crosswalk country, years 1960-2001. A
+      recession is a maximal run of consecutive years with negative growth; its cumulative loss is the sum of the
+      growth rates over the run (percent of GDP), its duration the run length. Means over all episodes.
+    data:
+      outcome: series:wb.wdi_econ.NY.GDP.MKTP.KD.ZG
+    differences: >-
+      The paper used the WDI vintage of about 2005 (192 countries); REVA uses the WDI release of the pinned
+      snapshot (revised national accounts, new base year 2015, more back-filled country-years). Whether a run cut
+      by the sample edges counts is not stated; REVA counts it.
+    tolerance:
+      rule: >-
+        PASS when the mean cumulative loss is within 1.5 percentage points of -7.5, the mean duration within 0.25
+        years of 1.62, and the number of episodes within 20 % of 637.
+      loss_abs: 1.5
+      duration_abs: 0.25
+      n_rel: 0.20

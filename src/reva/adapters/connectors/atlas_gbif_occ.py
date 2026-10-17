@@ -302,6 +302,7 @@ class Taxon:
     rank: str | None
     status: str | None
     kingdom: str | None
+    vernacular_name: str | None = None
 
 
 def parse_species(body: bytes, key: int) -> Taxon:
@@ -318,6 +319,7 @@ def parse_species(body: bytes, key: int) -> Taxon:
         rank=d.get("rank"),
         status=d.get("taxonomicStatus"),
         kingdom=d.get("kingdom"),
+        vernacular_name=d.get("vernacularName") if isinstance(d.get("vernacularName"), str) else None,
     )
 
 
@@ -480,6 +482,7 @@ def taxon_entity(t: Taxon) -> Any:
         qid=f"gbif:{t.key}",
         kind="taxon",
         labels={"en": label},
+        aliases={"en": [t.vernacular_name]} if t.vernacular_name else {},
         descriptions={
             "en": f"{rank} in the GBIF Backbone Taxonomy: {t.scientific_name}",
             "fr": f"{rank} dans la taxonomie de référence GBIF : {t.scientific_name}",

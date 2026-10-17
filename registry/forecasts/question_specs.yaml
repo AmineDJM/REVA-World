@@ -1,0 +1,412 @@
+# Prospective forecast registry: question families (V5, agent PRED-REGISTRY).
+#
+# Each family turns one atlas series into dated questions for the next 1-12 months / 1-8 quarters / current and
+# next calendar year, one question per (family, country, reference period, type, quarterly cycle). The generator
+# (reva.evaluation.registry.questions) only creates a question when the declared atlas table is registered, the
+# country's series is fresh enough and the reference period is after the last observed period; everything else is
+# listed in the generation report with its reason (never filled in).
+#
+# Resolution: the value of the declared cell in the FIRST version of the declared atlas table registered AFTER the
+# forecasts were sealed in which the cell is published as an observation (never a projection), checked from the end
+# of the reference period; a question with no such value by `void_after_days` after the period end is void (typed,
+# never scored). A value already present as an observation in the table version pinned at issue makes the question
+# "not prospective" (never scored).
+#
+# Families whose table has not landed yet (`dataset_key` of a connector not ingested, or `awaiting` for a source
+# with no connector) are kept here: the scheduled regeneration (`forecast_registry:issue`, weekly) picks them up
+# as soon as their table is registered.
+
+schema: reva-forecast-question-specs/1
+version: "1.0.0"
+interval_level: 0.8
+
+panels:
+  # G20 member economies (EU excluded: not a country) + the two most populous African economies not in the G20.
+  g20_plus: [ARG, AUS, BRA, CAN, CHN, DEU, FRA, GBR, IDN, IND, ITA, JPN, KOR, MEX, RUS, SAU, TUR, USA, ZAF, NGA, EGY]
+  eu_big: [DEU, FRA, ITA, ESP, NLD, POL, BEL, SWE, AUT, IRL]
+
+families:
+  # ------------------------------------------------------------------ available now (live atlas tables)
+  - key: weo.cpi_inflation
+    concept_id: imf.inflation_cpi_avg
+    labels: {fr: "Inflation (IPC, moyenne annuelle)", en: "Inflation (CPI, annual average)"}
+    definition: "Annual percent change of the period-average consumer price index (IMF WEO PCPIPCH)."
+    definition_source: registry/atlas/catalog/imf.yaml (imf.inflation_cpi_avg)
+    dataset_key: atlas.imf.weo
+    indicator: PCPIPCH
+    frequency: A
+    value_rule: cell
+    unit: "% change (CPI, period average)"
+    panel: g20_plus
+    questions:
+      - {type: quantity, horizons: [0, 1]}
+    reference_forecasters: [forecast.reference_imf_weo]
+    publication_lag_days: 120
+    void_after_days: 760
+    backtest_lag_periods: 1
+    resolution_note: >-
+      Resolved by the first IMF World Economic Outlook vintage (atlas.imf.weo) in which the year is an actual
+      (after the WEO's LATEST_ACTUAL_ANNUAL_DATA boundary), normally the April WEO of the following year.
+
+  - key: weo.gdp_growth
+    concept_id: imf.gdp_real_growth
+    labels: {fr: "Croissance du PIB réel", en: "Real GDP growth"}
+    definition: "Annual percent change of GDP at constant prices (IMF WEO NGDP_RPCH)."
+    definition_source: registry/atlas/catalog/imf.yaml (imf.gdp_real_growth)
+    dataset_key: atlas.imf.weo
+    indicator: NGDP_RPCH
+    frequency: A
+    value_rule: cell
+    unit: "% change (constant prices)"
+    panel: g20_plus
+    questions:
+      - {type: quantity, horizons: [0, 1]}
+    reference_forecasters: [forecast.reference_imf_weo]
+    publication_lag_days: 120
+    void_after_days: 760
+    backtest_lag_periods: 1
+    resolution_note: First WEO vintage in which the year is an actual (see weo.cpi_inflation).
+
+  - key: weo.unemployment
+    concept_id: imf.unemployment_rate
+    labels: {fr: "Taux de chômage", en: "Unemployment rate"}
+    definition: "Unemployed persons as a percent of the labour force, national definitions as compiled by the IMF WEO (LUR)."
+    definition_source: registry/atlas/catalog/imf.yaml (imf.unemployment_rate)
+    dataset_key: atlas.imf.weo
+    indicator: LUR
+    frequency: A
+    value_rule: cell
+    unit: "% of labour force"
+    panel: g20_plus
+    questions:
+      - {type: quantity, horizons: [0, 1]}
+    reference_forecasters: [forecast.reference_imf_weo]
+    publication_lag_days: 120
+    void_after_days: 760
+    backtest_lag_periods: 1
+    resolution_note: First WEO vintage in which the year is an actual (see weo.cpi_inflation).
+
+  - key: fao.cpi_inflation_yoy
+    concept_id: null
+    labels: {fr: "Inflation des prix à la consommation (IPC général, glissement annuel)", en: "Consumer price inflation (general CPI, year on year)"}
+    definition: >-
+      Derived by REVA: 100 x (I_t / I_(t-12) - 1) where I is FAOSTAT item 23012 "Consumer Prices, General Indices
+      (2015 = 100)" (element 6125 "Value"), both months read from the same table version.
+    definition_source: FAOSTAT CP raw file ConsumerPriceIndices_E_All_Data_(Normalized).csv (item label verbatim)
+    dataset_key: atlas.fao.cp
+    indicator: "23012|6125"
+    frequency: M
+    value_rule: yoy_pct_from_index
+    unit: "% (year on year)"
+    panel: g20_plus
+    questions:
+      - {type: quantity, horizons: [1, 3, 6, 12]}
+    publication_lag_days: 240
+    void_after_days: 540
+    backtest_lag_periods: 7
+    resolution_note: >-
+      First FAOSTAT CP release (atlas.fao.cp) registered after sealing that publishes both the month and the same
+      month one year earlier; FAOSTAT flags (E estimated, I imputed) are kept with the outcome.
+
+  - key: fao.food_inflation
+    concept_id: null
+    labels: {fr: "Inflation des prix alimentaires (glissement annuel)", en: "Food price inflation (year on year)"}
+    definition: 'FAOSTAT item 23014 "Food price inflation", element 6121 "Value", unit "%".'
+    definition_source: FAOSTAT CP raw file ConsumerPriceIndices_E_All_Data_(Normalized).csv (labels verbatim)
+    dataset_key: atlas.fao.cp
+    indicator: "23014|6121"
+    frequency: M
+    value_rule: cell
+    unit: "%"
+    panel: g20_plus
+    questions:
+      - {type: interval, horizons: [1, 3, 6, 12]}
+      - {type: binary, horizons: [3, 12], threshold_rule: above_last_observed}
+    publication_lag_days: 240
+    void_after_days: 540
+    backtest_lag_periods: 7
+    resolution_note: First FAOSTAT CP release (atlas.fao.cp) registered after sealing that publishes the month.
+
+  - key: bis.property_prices_real_yoy
+    concept_id: finance.property_prices_real_yoy
+    labels: {fr: "Prix réels de l'immobilier résidentiel (variation sur un an)", en: "Real residential property prices (year-on-year change)"}
+    definition: "BIS selected residential property price series: real residential property prices (year-on-year change), quarterly."
+    definition_source: registry/atlas/catalog/finance.yaml (finance.property_prices_real_yoy)
+    dataset_key: atlas.bis.spp
+    indicator: "SPP|value=R|unit_measure=771"
+    frequency: Q
+    value_rule: cell
+    unit: "% year-on-year"
+    panel: g20_plus
+    questions:
+      - {type: interval, horizons: [1, 2, 4, 8]}
+    publication_lag_days: 150
+    void_after_days: 450
+    backtest_lag_periods: 3
+    resolution_note: First BIS SPP release (atlas.bis.spp) registered after sealing that publishes the quarter.
+
+  - key: imf.fx_usd_annual_avg
+    concept_id: imf.exchange_rate_lcu_per_usd_avg
+    labels: {fr: "Taux de change (monnaie nationale par dollar US, moyenne annuelle)", en: "Exchange rate (national currency per US dollar, annual average)"}
+    definition: "Domestic currency per US dollar, period average (IMF ER XDC_USD, PA_RT; ex-IFS)."
+    definition_source: registry/atlas/catalog/imf.yaml (imf.exchange_rate_lcu_per_usd_avg)
+    dataset_key: atlas.imf.er
+    indicator: "XDC_USD|PA_RT"
+    frequency: A
+    value_rule: cell
+    unit: "national currency per US dollar"
+    panel: g20_plus
+    questions:
+      - {type: interval, horizons: [1]}
+    publication_lag_days: 200
+    void_after_days: 760
+    backtest_lag_periods: 1
+    resolution_note: First IMF ER release (atlas.imf.er) registered after sealing that publishes the year.
+
+  - key: imf.policy_rate_annual
+    concept_id: imf.policy_rate
+    labels: {fr: "Taux directeur (moyenne annuelle)", en: "Monetary policy-related interest rate (annual)"}
+    definition: "Monetary policy-related interest rate, percent per annum, annual (IMF MFS_IR MFS166; ex-IFS 'central bank policy rate')."
+    definition_source: registry/atlas/catalog/imf.yaml (MFS166 concept)
+    dataset_key: atlas.imf.mfs_ir
+    indicator: MFS166_RT_PT_A_PT
+    frequency: A
+    value_rule: cell
+    unit: "% per annum"
+    panel: g20_plus
+    questions:
+      - {type: binary, horizons: [1], threshold_rule: above_last_observed}
+      - {type: quantity, horizons: [1]}
+    publication_lag_days: 200
+    void_after_days: 760
+    backtest_lag_periods: 1
+    resolution_note: First IMF MFS_IR release (atlas.imf.mfs_ir) registered after sealing that publishes the year.
+
+  # ------------------------------------------------------------------ connectors written, tables not ingested yet
+  - key: imf.cpi_inflation_monthly
+    concept_id: null
+    labels: {fr: "Inflation IPC (glissement annuel, mensuel)", en: "CPI inflation (year over year, monthly)"}
+    definition: "IMF CPI, All Items (COICOP 1999 _T): Period average, Year-over-year (YOY) percent change, monthly."
+    definition_source: src/reva/adapters/connectors/atlas_imf_hf.py (IMF codelist labels quoted there)
+    dataset_key: atlas.imf.cpi_m
+    indicator_parts: [CPI, coicop_1999=_T, type_of_transformation=YOY_PCH_PA_PT]
+    owner_agent: V4ECON
+    frequency: M
+    value_rule: cell
+    unit: "%"
+    panel: g20_plus
+    questions:
+      - {type: quantity, horizons: [1, 3, 6, 12]}
+      - {type: binary, horizons: [6], threshold_rule: above_last_observed}
+    publication_lag_days: 75
+    void_after_days: 400
+    backtest_lag_periods: 2
+    resolution_note: First IMF CPI release (atlas.imf.cpi_m) registered after sealing that publishes the month.
+
+  - key: imf.unemployment_monthly
+    concept_id: null
+    labels: {fr: "Taux de chômage (mensuel)", en: "Unemployment rate (monthly)"}
+    definition: "IMF Labor Statistics: Unemployment rate, Percent, monthly (no seasonal-adjustment dimension stated)."
+    definition_source: src/reva/adapters/connectors/atlas_imf_hf.py
+    dataset_key: atlas.imf.ls_mq
+    indicator_parts: [U, type_of_transformation=PT]
+    owner_agent: V4ECON
+    frequency: M
+    value_rule: cell
+    unit: "%"
+    panel: g20_plus
+    questions:
+      - {type: interval, horizons: [1, 3, 6, 12]}
+    publication_lag_days: 90
+    void_after_days: 400
+    backtest_lag_periods: 2
+    resolution_note: First IMF LS release (atlas.imf.ls_mq) registered after sealing that publishes the month.
+
+  - key: imf.gdp_growth_quarterly
+    concept_id: null
+    labels: {fr: "Croissance du PIB réel (glissement annuel, trimestriel)", en: "Real GDP growth (year over year, quarterly)"}
+    definition: "IMF QNEA: Gross domestic product (GDP), Constant prices, Not seasonally adjusted (NSA), Year-over-year (YOY) percent change, quarterly."
+    definition_source: src/reva/adapters/connectors/atlas_imf_hf.py
+    dataset_key: atlas.imf.qnea_q
+    indicator_parts: [B1GQ, price_type=Q, s_adjustment=NSA, type_of_transformation=YOY_PCH_PT]
+    owner_agent: V4ECON
+    frequency: Q
+    value_rule: cell
+    unit: "%"
+    panel: g20_plus
+    questions:
+      - {type: quantity, horizons: [1, 2, 4, 8]}
+      - {type: binary, horizons: [2], threshold_rule: above_last_observed}
+    publication_lag_days: 120
+    void_after_days: 450
+    backtest_lag_periods: 2
+    resolution_note: First IMF QNEA release (atlas.imf.qnea_q) registered after sealing that publishes the quarter.
+
+  - key: imf.policy_rate_monthly
+    concept_id: null
+    labels: {fr: "Taux directeur (mensuel)", en: "Monetary policy-related rate (monthly)"}
+    definition: "IMF MFS_IR: Monetary policy-related, Rate, Percent per annum, monthly."
+    definition_source: src/reva/adapters/connectors/atlas_imf_hf.py
+    dataset_key: atlas.imf.mfs_ir_m
+    indicator_parts: [MFS166_RT_PT_A_PT]
+    owner_agent: V4ECON
+    frequency: M
+    value_rule: cell
+    unit: "% per annum"
+    panel: g20_plus
+    questions:
+      - {type: binary, horizons: [3, 6, 12], threshold_rule: above_last_observed}
+      - {type: quantity, horizons: [6]}
+    publication_lag_days: 90
+    void_after_days: 400
+    backtest_lag_periods: 2
+    resolution_note: First IMF MFS_IR monthly release registered after sealing that publishes the month.
+
+  - key: imf.fx_usd_monthly_avg
+    concept_id: null
+    labels: {fr: "Taux de change (monnaie nationale par dollar US, moyenne mensuelle)", en: "Exchange rate (national currency per US dollar, monthly average)"}
+    definition: "IMF ER: Domestic currency per US Dollar, Period average, monthly."
+    definition_source: src/reva/adapters/connectors/atlas_imf_hf.py
+    dataset_key: atlas.imf.er_m
+    indicator_parts: [XDC_USD, type_of_transformation=PA_RT]
+    owner_agent: V4ECON
+    frequency: M
+    value_rule: cell
+    unit: "national currency per US dollar"
+    panel: g20_plus
+    questions:
+      - {type: interval, horizons: [1, 3, 6, 12]}
+    publication_lag_days: 75
+    void_after_days: 400
+    backtest_lag_periods: 2
+    resolution_note: First IMF ER monthly release registered after sealing that publishes the month.
+
+  - key: eurostat.hicp_inflation
+    concept_id: null
+    labels: {fr: "Inflation IPCH (taux annuel)", en: "HICP inflation (annual rate of change)"}
+    definition: "Eurostat prc_hicp_minr, ECOICOP ver. 2 TOTAL, annual rate of change (RCH_A), monthly."
+    definition_source: src/reva/adapters/connectors/atlas_eurostat_macro.py
+    dataset_key: atlas.eurostat.hicp_m
+    indicator_parts: [prc_hicp_minr, unit=RCH_A]
+    owner_agent: V4ECON
+    frequency: M
+    value_rule: cell
+    unit: "%"
+    panel: eu_big
+    questions:
+      - {type: quantity, horizons: [1, 3, 6, 12]}
+      - {type: binary, horizons: [6], threshold_rule: above_last_observed}
+    publication_lag_days: 45
+    void_after_days: 365
+    backtest_lag_periods: 1
+    resolution_note: First Eurostat release (atlas.eurostat.hicp_m) registered after sealing that publishes the month.
+
+  - key: eurostat.unemployment
+    concept_id: null
+    labels: {fr: "Taux de chômage (Eurostat, CVS)", en: "Unemployment rate (Eurostat, seasonally adjusted)"}
+    definition: "Eurostat une_rt_m, total, % of the labour force (PC_ACT), seasonally adjusted (SA), monthly."
+    definition_source: src/reva/adapters/connectors/atlas_eurostat_macro.py
+    dataset_key: atlas.eurostat.une_m
+    indicator_parts: [une_rt_m, s_adj=SA]
+    owner_agent: V4ECON
+    frequency: M
+    value_rule: cell
+    unit: "%"
+    panel: eu_big
+    questions:
+      - {type: interval, horizons: [1, 3, 6, 12]}
+    publication_lag_days: 60
+    void_after_days: 365
+    backtest_lag_periods: 2
+    resolution_note: First Eurostat release (atlas.eurostat.une_m) registered after sealing that publishes the month.
+
+  - key: eurostat.gdp_growth_yoy
+    concept_id: null
+    labels: {fr: "Croissance du PIB en volume (même trimestre de l'année précédente)", en: "GDP volume growth (same quarter previous year)"}
+    definition: "Eurostat namq_10_gdp, B1GQ, chain-linked volumes, % change compared with same period in previous year (CLV_PCH_SM), seasonally and calendar adjusted (SCA)."
+    definition_source: src/reva/adapters/connectors/atlas_eurostat_macro.py
+    dataset_key: atlas.eurostat.gdp_q
+    indicator_parts: [namq_10_gdp, unit=CLV_PCH_SM, s_adj=SCA]
+    owner_agent: V4ECON
+    frequency: Q
+    value_rule: cell
+    unit: "%"
+    panel: eu_big
+    questions:
+      - {type: quantity, horizons: [1, 2, 4, 8]}
+    publication_lag_days: 75
+    void_after_days: 400
+    backtest_lag_periods: 1
+    resolution_note: First Eurostat release (atlas.eurostat.gdp_q) registered after sealing that publishes the quarter.
+
+  - key: eia.brent_monthly
+    concept_id: null
+    labels: {fr: "Prix du Brent (moyenne mensuelle, $/baril)", en: "Brent crude oil spot price (monthly average, $/barrel)"}
+    definition: "EIA Short-Term Energy Outlook series BREPUUS (Brent crude oil spot price), monthly, historical periods only (steo_observed)."
+    definition_source: src/reva/adapters/connectors/atlas_eia_steo.py
+    dataset_key: atlas.eia_steo.steo_observed
+    indicator: STEO.BREPUUS.M
+    owner_agent: V4ENERGY
+    geos: [{provider_geo: not_stated, key: WORLD, label_fr: "Monde (référence Brent)", label_en: "World (Brent benchmark)"}]
+    frequency: M
+    value_rule: cell
+    unit: "dollars per barrel"
+    questions:
+      - {type: quantity, horizons: [1, 3, 6, 12]}
+      - {type: interval, horizons: [1, 3, 6, 12]}
+      - {type: binary, horizons: [3, 6, 12], threshold_rule: above_last_observed}
+    publication_lag_days: 45
+    void_after_days: 365
+    backtest_lag_periods: 1
+    resolution_note: >-
+      First EIA STEO release (atlas.eia_steo steo_observed) registered after sealing in which the month is a
+      historical period (STEO lastHistoricalPeriod); STEO forecast cells are never an outcome.
+
+  # ------------------------------------------------------------------ no table / connector yet
+  - key: fao.food_price_index
+    concept_id: null
+    labels: {fr: "Indice FAO des prix des produits alimentaires", en: "FAO Food Price Index"}
+    definition: null
+    definition_source: null
+    dataset_key: null
+    awaiting: "no connector yet: FAO Food Price Index (fao.org/worldfoodsituation/foodpricesindex, monthly CSV) — V4ECON or PRED-HF"
+    frequency: M
+    value_rule: cell
+    unit: "index (2014-2016 = 100)"
+    questions:
+      - {type: quantity, horizons: [1, 3, 6, 12]}
+    publication_lag_days: 10
+    void_after_days: 365
+    backtest_lag_periods: 1
+
+  - key: ecb.fx_eur_monthly_mean
+    concept_id: null
+    labels: {fr: "Taux de référence BCE (moyenne mensuelle des cours quotidiens)", en: "ECB reference rate (monthly mean of daily rates)"}
+    definition: null
+    definition_source: null
+    dataset_key: null
+    awaiting: "PRED-HF: ECB euro foreign exchange reference rates (daily); value_rule monthly_mean_of_daily once the table lands"
+    frequency: M
+    value_rule: monthly_mean_of_daily
+    unit: "currency per euro"
+    questions:
+      - {type: interval, horizons: [1, 3, 6, 12]}
+    publication_lag_days: 5
+    void_after_days: 120
+    backtest_lag_periods: 1
+
+  - key: bis.policy_rate_daily
+    concept_id: null
+    labels: {fr: "Taux directeur (BIS, moyenne mensuelle des taux quotidiens)", en: "Central bank policy rate (BIS, monthly mean of daily rates)"}
+    definition: null
+    definition_source: null
+    dataset_key: null
+    awaiting: "PRED-HF: BIS central bank policy rates (daily); value_rule monthly_mean_of_daily once the table lands"
+    frequency: M
+    value_rule: monthly_mean_of_daily
+    unit: "% per annum"
+    questions:
+      - {type: binary, horizons: [3, 6, 12], threshold_rule: above_last_observed}
+    publication_lag_days: 5
+    void_after_days: 120
+    backtest_lag_periods: 1

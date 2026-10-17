@@ -77,7 +77,11 @@ async def test_owid_and_wid_ingest(db: Any) -> None:
         "atlas.owid.co2",
         "atlas.owid.g_ghg_by_sector",
         "atlas.owid.g_temperature_anomaly",
+        "atlas.owid.g_living_planet_index",  # V4ECO: WWF/ZSL Living Planet Index (published trends)
     }
+    lpi = read_atlas_table(db.store, keys["atlas.owid.g_living_planet_index"]["artifact_sha256"])
+    w1970 = lpi.filter((pl.col("provider_geo") == "OWID_WRL") & (pl.col("period_start").dt.year() == 1970))
+    assert sorted(w1970["indicator"].to_list()) == ["ci_high", "ci_low", "lpi_final"] and set(w1970["value"]) == {"1"}
     co2 = read_atlas_table(db.store, keys["atlas.owid.co2"]["artifact_sha256"])
     assert co2.filter(pl.col("provider_geo") == "Kosovo")["iso3"].unique().to_list() == ["XKX"]
     assert all("original_source" in json.loads(f) for f in co2["flags"].unique().to_list())

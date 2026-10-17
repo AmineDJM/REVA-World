@@ -62,7 +62,7 @@ from reva.kernel.errors import SourceResponseError
 from reva.ports.connectors import FetchItem, RawAcquisition
 
 CONNECTOR_NAME = "atlas.owid"
-CONNECTOR_VERSION = "1.1.0"  # 1.1.0: atlas source platform (metered run.get), same parser
+CONNECTOR_VERSION = "1.1.1"  # 1.1.0: atlas source platform (metered run.get), same parser; 1.1.1: V4ECO LPI chart
 PARSER_VERSION = "atlas_owid/1"
 SOURCE_KEY = "owid.compilations"
 SOURCE = "owid"
@@ -99,6 +99,10 @@ GITHUB_DATASETS: tuple[GithubDataset, ...] = (
 GRAPHER_CHARTS: dict[str, tuple[str, str]] = {
     "ghg-emissions-by-sector": ("g_ghg_by_sector", "Climate Watch sectoral GHG emissions (CC BY 4.0)"),
     "annual-temperature-anomalies": ("g_temperature_anomaly", "ERA5 annual temperature anomalies (Copernicus)"),
+    # V4ECO: published Living Planet Index trends (WWF/ZSL; OWID origin licence CC BY 4.0, ZSL data-use policy:
+    # "reproduction of the published LPI trends ... is permitted under creative commons CC BY-SA 4.0"). The
+    # population-level Living Planet Database itself is behind a data-use agreement form and is not used.
+    "global-living-planet-index": ("g_living_planet_index", "WWF/ZSL Living Planet Index + CI (CC BY-SA 4.0)"),
 }
 GRAPHER_QS = "v=1&csvType=full&useColumnShortNames=true"
 ID_COLUMNS_GH = ("country", "year", "iso_code")  # file order
@@ -261,7 +265,11 @@ def parse_grapher(
             continue
         keep.append(c)
         units[c] = (m.get("unit") or m.get("shortUnit") or "as defined by OWID (no unit)")[:100]
+        factor = m.get("conversionFactor")
+        if factor not in (None, 1):  # V4ECO: the CSV holds values multiplied by the chart's conversion factor
+            units[c] = f"{units[c]} x {factor} (OWID conversionFactor)"[:100]
         flags[c] = canon(
+            {"owid_conversion_factor": factor} if factor not in (None, 1) else None,
             original_source=(m.get("citationShort") or "")[:2000],
             original_producers=sorted({o["producer"] for o in origins if o.get("producer")}),
             owid_processing=fm.get("processingLevel"),

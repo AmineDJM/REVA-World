@@ -1,0 +1,26 @@
+# V4 (agent V4ECO): Global Biotic Interactions (GloBI) web API, bounded to selected seed taxa (GBIF keys).
+# Connector src/reva/adapters/connectors/atlas_globi.py -> KG statements globi:eats / globi:preys_on /
+# globi:parasite_of / globi:pathogen_of / globi:pollinates / globi:visits_flowers_of / globi:vector_of /
+# globi:has_host (no atlas table).
+source_key: globi.interactions
+title: Global Biotic Interactions (GloBI) — who eats, preys on, parasitises, pollinates whom (selected taxa)
+provider_url: https://www.globalbioticinteractions.org
+lineage_family: globi
+rights:
+  licence: "varies per contributing dataset (GloBI aggregator); not stated in the API response — licence_unclear"
+  licence_url: https://www.globalbioticinteractions.org/about
+  attribution: >-
+    Poelen, J.H., Simons, J.D. and Mungall, C.J. (2014). Global Biotic Interactions: An open infrastructure to
+    share and analyze species-interaction datasets. Ecological Informatics 24: 148-159; plus the citation of each
+    contributing dataset.
+  licence_status: >-
+    GloBI indexes datasets published under their own terms (many CC0 / CC BY, some CC BY-NC or unstated). The
+    /interaction API returns taxon-level aggregates without the contributing datasets' licences, so every
+    statement is flagged licence_unclear; a per-dataset licence review is an owner decision.
+metadata:
+  allowed_hosts: [api.globalbioticinteractions.org]
+  authentication: none
+  method: >-
+    GET /interaction?sourceTaxon=GBIF:<key> (and targetTaxon=GBIF:<key>) &interactionType=<types>&fields=...
+    &limit=<cap>; GloBI resolves the GBIF id through its own taxon graph (taxon or descendants).
+  cadence: monthly

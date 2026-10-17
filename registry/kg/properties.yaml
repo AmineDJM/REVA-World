@@ -1980,6 +1980,304 @@ properties:
     wikidata_datatype: wikibase-item
     requested_by: V4CORE
     why: "regulates (molecular biology) (gene product -> biological process)."
+# merged property requests (wbgetentities labels|datatype 2026-10-17T13:57:43.671579+00:00 raw d12f6e93c6cd,00535b7272c1,c945be84cd0d,5390578811e8,db5339198780,a21bfeb9885b,29558b0fd783,09e46c3cbf5c,e475605e8b0a,da8ae3e2195c,53ad538c425f,a206af10709a,a9ec4db73daf,9b0e85e14c1a,62e09566205e,7d89740fbd90,89abbec2565e,f52bde2b1bc6,0b7238fd8c19,c6651d994392,8c772c4d4802,ded051b4e41a,19cdbb265341,8591b4c7dba4,08e027fd3564,40b07cd766c5,53bae0745984,f83570ec5391)
+  - property: P1086
+    reva_predicate: atomic_number
+    inverse: null
+    kind: quantity
+    group: science
+    expected_en: "atomic number"
+    label_en: "atomic number"
+    label_fr: "numéro atomique"
+    wikidata_datatype: quantity
+    requested_by: V4CHEM
+    why: "atomic number (element -> Z); the identifier that links Wikidata element items to REVA element:<Z> nodes."
+  - property: P246
+    reva_predicate: element_symbol
+    inverse: null
+    kind: string
+    group: science
+    expected_en: "element symbol"
+    label_en: "element symbol"
+    label_fr: "symbole chimique"
+    wikidata_datatype: string
+    requested_by: V4CHEM
+    why: "element symbol (element -> \"Fe\"); a second identifier check of the element <-> element:<Z> link."
+  - property: P189
+    reva_predicate: location_of_discovery
+    inverse: "discovery_location_of"
+    kind: entity
+    group: science
+    expected_en: "location of discovery"
+    label_en: "location of discovery"
+    label_fr: "lieu de découverte"
+    wikidata_datatype: wikibase-item
+    requested_by: V4CHEM
+    why: "location of discovery (element/compound/mineral -> place), for \"who discovered it, when, where\"."
+  - property: P274
+    reva_predicate: chemical_formula
+    inverse: null
+    kind: string
+    group: science
+    expected_en: "chemical formula"
+    label_en: "chemical formula"
+    label_fr: "formule chimique"
+    wikidata_datatype: string
+    requested_by: V4CHEM
+    why: "chemical formula (compound/mineral -> formula string); minerals have no PubChem CID, Wikidata gives the formula."
+  - property: P2067
+    reva_predicate: mass
+    inverse: null
+    kind: quantity
+    group: science
+    expected_en: "mass"
+    label_en: "mass"
+    label_fr: "masse"
+    wikidata_datatype: quantity
+    requested_by: V4CHEM
+    why: "mass (compound/element -> molar mass with unit), compared with PubChem/ChEBI masses (never merged)."
+  - property: P2114
+    reva_predicate: half_life
+    inverse: null
+    kind: quantity
+    group: science
+    expected_en: "half-life"
+    label_en: "half-life"
+    label_fr: "demi-vie"
+    wikidata_datatype: quantity
+    requested_by: V4CHEM
+    why: "half-life (isotope -> duration with unit)."
+  - property: P817
+    reva_predicate: decay_mode
+    inverse: "decay_mode_of"
+    kind: entity
+    group: science
+    expected_en: "decay mode"
+    label_en: "decay mode"
+    label_fr: "mode de rayonnement radioactif"
+    wikidata_datatype: wikibase-item
+    requested_by: V4CHEM
+    why: "decay mode (isotope -> decay mode item, with proportion qualifier)."
+  - property: P2374
+    reva_predicate: natural_abundance
+    inverse: null
+    kind: quantity
+    group: science
+    expected_en: "natural abundance"
+    label_en: "natural abundance"
+    label_fr: "abondance naturelle"
+    wikidata_datatype: quantity
+    requested_by: V4CHEM
+    why: "natural abundance (isotope -> fraction)."
+  - property: P1148
+    reva_predicate: neutron_number
+    inverse: null
+    kind: quantity
+    group: science
+    expected_en: "neutron number"
+    label_en: "neutron number"
+    label_fr: "nombre de neutrons"
+    wikidata_datatype: quantity
+    requested_by: V4CHEM
+    why: "neutron number (isotope -> N)."
+  - property: P683
+    reva_predicate: chebi_id
+    inverse: null
+    kind: external_id
+    group: science
+    expected_en: "ChEBI ID"
+    label_en: "ChEBI ID"
+    label_fr: "identifiant ChEBI"
+    wikidata_datatype: external-id
+    requested_by: V4CHEM
+    why: "ChEBI ID (Wikidata item -> ChEBI accession); the identifier bridge chebi:<n> <-> Wikidata QID."
+  - property: P662
+    reva_predicate: pubchem_cid
+    inverse: null
+    kind: external_id
+    group: science
+    expected_en: "PubChem CID"
+    label_en: "PubChem CID"
+    label_fr: "identifiant PubChem (CID)"
+    wikidata_datatype: external-id
+    requested_by: V4CHEM
+    why: "PubChem CID (Wikidata item -> CID); the identifier bridge pubchem:cid:<n> <-> Wikidata QID."
+  - property: P231
+    reva_predicate: cas_registry_number
+    inverse: null
+    kind: external_id
+    group: science
+    expected_en: "CAS Registry Number"
+    label_en: "CAS Registry Number"
+    label_fr: "numéro CAS"
+    wikidata_datatype: external-id
+    requested_by: V4CHEM
+    why: "CAS Registry Number (compound -> CAS RN), an identifier shared by trade/regulatory datasets."
+  - property: P579
+    reva_predicate: ima_status
+    inverse: null
+    kind: entity
+    group: science
+    expected_en: "IMA status and/or rank"
+    label_en: "IMA status and/or rank"
+    label_fr: "statut IMA"
+    wikidata_datatype: wikibase-item
+    requested_by: V4CHEM
+    why: "IMA status and/or rank (mineral species -> IMA status item), to select approved mineral species."
+  - property: P141
+    reva_predicate: iucn_conservation_status
+    inverse: "iucn_conservation_status_of"
+    kind: entity
+    group: nature
+    expected_en: "IUCN conservation status"
+    label_en: "IUCN conservation status"
+    label_fr: "statut de conservation UICN"
+    wikidata_datatype: wikibase-item
+    requested_by: V4ECO
+    why: "IUCN conservation status (taxon -> status item, e.g. Panthera leo -> Vulnerable Q278113), as Wikidata copies it; spec registry/kg/queries/nature/ecology/iucn_status.yaml. Family context (V4ECO drop-in)."
+  - property: P627
+    reva_predicate: iucn_taxon_id
+    inverse: null
+    kind: external_id
+    group: nature
+    expected_en: "IUCN taxon ID"
+    label_en: "IUCN taxon ID"
+    label_fr: "identifiant Union internationale pour la conservation de la nature"
+    wikidata_datatype: external-id
+    requested_by: V4ECO
+    why: "IUCN taxon ID (external id) so Wikidata taxa can be tied to IUCN assessments by identifier, never by name."
+  - property: P846
+    reva_predicate: gbif_taxon_id
+    inverse: null
+    kind: external_id
+    group: nature
+    expected_en: "GBIF taxon ID"
+    label_en: "GBIF-species-ID (before 2026 update)"
+    label_fr: "identifiant Global Biodiversity Information Facility (avant la mise à jour de 2026)"
+    wikidata_datatype: external-id
+    requested_by: V4ECO
+    why: "GBIF taxon ID (external id): ties Wikidata taxa to the GBIF backbone keys used as KG nodes gbif:<key> by V4ECO (atlas.gbif_occ, atlas.globi) and V4BIO, by identifier only."
+  - property: P2975
+    reva_predicate: host_taxon
+    inverse: "host_of_taxon"
+    kind: entity
+    group: nature
+    expected_en: "host"
+    label_en: "has host"
+    label_fr: "hôte"
+    wikidata_datatype: wikibase-item
+    requested_by: V4ECO
+    why: "host (parasite / pathogen / symbiont taxon -> host taxon); spec nature/ecology/host.yaml. Family interacts_with."
+  - property: P1278
+    reva_predicate: legal_entity_identifier
+    inverse: null
+    kind: external_id
+    group: economy
+    expected_en: "Legal Entity Identifier"
+    label_en: "Legal Entity Identifier"
+    label_fr: "LEI"
+    wikidata_datatype: external-id
+    requested_by: V4INDUSTRY
+    why: "Legal Entity Identifier (ISO 17442) of a company or other legal entity, e.g. Toyota -> 5493006W3QUS5LMH6R84. The only key joining Wikidata companies to GLEIF records (atlas.gleif_wikidata, registry/kg/predicates_industry.yaml)."
+  - property: P5531
+    reva_predicate: sec_central_index_key
+    inverse: null
+    kind: external_id
+    group: economy
+    expected_en: "Central Index Key"
+    label_en: "Central Index Key"
+    label_fr: "Central Index Key"
+    wikidata_datatype: external-id
+    requested_by: V4INDUSTRY
+    why: "Central Index Key (SEC EDGAR filer id), e.g. Apple -> 0000320193; joins Wikidata companies to SEC company facts once SEC access is configured (owner decision, docs/dev/v4_v4industry.md)."
+  - property: P2139
+    reva_predicate: total_revenue
+    inverse: null
+    kind: quantity
+    group: economy
+    expected_en: "total revenue"
+    label_en: "total revenue"
+    label_fr: "chiffre d'affaires"
+    wikidata_datatype: quantity
+    requested_by: V4INDUSTRY
+    why: "total revenue of a company (quantity with point in time and currency unit), e.g. Toyota FY revenue."
+  - property: P2403
+    reva_predicate: total_assets
+    inverse: null
+    kind: quantity
+    group: economy
+    expected_en: "total assets"
+    label_en: "total assets"
+    label_fr: "totalité des actifs"
+    wikidata_datatype: quantity
+    requested_by: V4INDUSTRY
+    why: "total assets of a company (quantity with point in time and currency unit)."
+  - property: P2295
+    reva_predicate: net_profit
+    inverse: null
+    kind: quantity
+    group: economy
+    expected_en: "net profit"
+    label_en: "net profit"
+    label_fr: "résultat net"
+    wikidata_datatype: quantity
+    requested_by: V4INDUSTRY
+    why: "net profit of a company (quantity with point in time and currency unit)."
+  - property: P2226
+    reva_predicate: market_capitalization
+    inverse: null
+    kind: quantity
+    group: economy
+    expected_en: "market capitalization"
+    label_en: "market capitalization"
+    label_fr: "capitalisation boursière"
+    wikidata_datatype: quantity
+    requested_by: V4INDUSTRY
+    why: "market capitalization of a listed company (quantity with point in time and currency unit)."
+  - property: P672
+    reva_predicate: mesh_tree_code
+    inverse: null
+    kind: external_id
+    group: health
+    expected_en: "MeSH tree code"
+    label_en: "MeSH tree code"
+    label_fr: "arborescence MeSH"
+    wikidata_datatype: external-id
+    requested_by: V4MIND
+    why: "MeSH tree code (selects psychological constructs F01/F02 and mental disorders F03 by identifier)."
+  - property: P486
+    reva_predicate: mesh_descriptor_id
+    inverse: null
+    kind: external_id
+    group: health
+    expected_en: "MeSH descriptor ID"
+    label_en: "MeSH descriptor ID"
+    label_fr: "identifiant Medical Subject Headings"
+    wikidata_datatype: external-id
+    requested_by: V4MIND
+    why: "MeSH descriptor ID (psychological constructs, mental disorders); identifier for cross-source links."
+  - property: P1930
+    reva_predicate: dsm5_code
+    inverse: null
+    kind: external_id
+    group: health
+    expected_en: "DSM-5 classification code"
+    label_en: "DSM-5 code"
+    label_fr: "DSM-5 (identifiant)"
+    wikidata_datatype: external-id
+    requested_by: V4MIND
+    why: "DSM-5 classification code (mental disorders); only the code Wikidata holds, the DSM text is proprietary."
+  - property: P425
+    reva_predicate: field_of_occupation
+    inverse: "occupation_in_field"
+    kind: entity
+    group: economy
+    expected_en: "field of this occupation"
+    label_en: "field of this occupation"
+    label_fr: "domaine correspondant à l'occupation"
+    wikidata_datatype: wikibase-item
+    requested_by: V4MIND
+    why: "field of this occupation (occupation -> field), read as the context family."
 # Qualifiers kept on statements (others are dropped). P580/P582/P585 become the statement's
 # temporal fields (with precision); the rest go to the qualifiers jsonb.
 qualifiers:

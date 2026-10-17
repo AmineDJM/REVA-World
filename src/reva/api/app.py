@@ -234,6 +234,7 @@ def create_app(
     app.include_router(__import__("reva.api.routes.links", fromlist=["router"]).router)  # V3 links (LINKS)
     app.include_router(__import__("reva.api.routes.events", fromlist=["router"]).router)  # V3 event view (EVENTS)
     app.include_router(__import__("reva.api.routes.causal", fromlist=["router"]).router)  # V3 causality (CAUSCORE)
+    app.include_router(__import__("reva.api.routes.forecasts", fromlist=["router"]).router)  # V5 registry (PRED-REGISTRY)
 
     # Added before the header middleware so that it runs inside it: its 413 responses get headers/metrics.
     app.add_middleware(BodySizeLimit, max_bytes=max_body_bytes)

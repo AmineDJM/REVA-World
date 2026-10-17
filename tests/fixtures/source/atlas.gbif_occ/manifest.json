@@ -1,0 +1,140 @@
+[
+  {
+    "request_fingerprint": "7e60860426e77f0939f38d459aef0fe355aaada8c6281fb8637bd423986c4723",
+    "url": "https://graphql.gbif.org/graphql",
+    "file": "7e60860426e77f09.json",
+    "sha256": "786b297db3397c50f4167b98a9b1984e7693c96202280a8f730a540dededa8df",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8",
+      "etag": "W/\"4e4f-du7rbN0INdAWmIx21bj1l45P/U0\""
+    },
+    "retrieved_at": "2026-10-17T13:41:09.730127+00:00",
+    "licence": "GBIF data user agreement (aggregate counts; records CC0/CC BY/CC BY-NC); species metadata CC BY 4.0; IUCN category CC BY 4.0 per GBIF dataset 19491596"
+  },
+  {
+    "request_fingerprint": "fb8dc37796b12255bbde97a77f7207b13ac5027c160edd181b8b017085c900ff",
+    "url": "https://graphql.gbif.org/graphql",
+    "file": "fb8dc37796b12255.json",
+    "sha256": "a161067d55b7add449408e5d7790fed633beae60d6934e042b4dcfb631cd4b01",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8",
+      "etag": "W/\"49f8-LpKNvi0QYCVoN5WQRTvHn4sq0EQ\""
+    },
+    "retrieved_at": "2026-10-17T13:41:25.252549+00:00",
+    "licence": "GBIF data user agreement (aggregate counts; records CC0/CC BY/CC BY-NC); species metadata CC BY 4.0; IUCN category CC BY 4.0 per GBIF dataset 19491596"
+  },
+  {
+    "request_fingerprint": "24d5f689e1aca472fdf5cde7dc8849953572187d97c5eaa01666e452e715fe45",
+    "url": "https://api.gbif.org/v1/species/359",
+    "file": "24d5f689e1aca472.json",
+    "sha256": "8cd94b5a5677cc9b69647923f1cf0745459028dc516430ed5ff70313b28b3445",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:41:28.106218+00:00",
+    "licence": "GBIF data user agreement (aggregate counts; records CC0/CC BY/CC BY-NC); species metadata CC BY 4.0; IUCN category CC BY 4.0 per GBIF dataset 19491596"
+  },
+  {
+    "request_fingerprint": "3f05cff350c4b5c599c1a362e0e3429e23f23c413b37548e9dc6fd86bd8eee8a",
+    "url": "https://graphql.gbif.org/graphql",
+    "file": "3f05cff350c4b5c5.json",
+    "sha256": "e1933798ae8a63a68e6e7df7aca0ffbb594a65dd1a3a22b301b89ac6e889d34f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8",
+      "etag": "W/\"4a65-e7j1RKYyoaWjykQp6qM0VlVpjKA\""
+    },
+    "retrieved_at": "2026-10-17T13:41:43.358370+00:00",
+    "licence": "GBIF data user agreement (aggregate counts; records CC0/CC BY/CC BY-NC); species metadata CC BY 4.0; IUCN category CC BY 4.0 per GBIF dataset 19491596"
+  },
+  {
+    "request_fingerprint": "2bdd4e4b308462100f636db3e6ed197890ca424f724d2c88aa9133505e59b182",
+    "url": "https://graphql.gbif.org/graphql",
+    "file": "2bdd4e4b30846210.json",
+    "sha256": "9f4e8a82bce7ce3debf615fb55c640f58796d5eb3597f33b426f5b283df330dd",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8",
+      "etag": "W/\"477a-7T1LVhrlf/yOjXbrPoGRFR05fRA\""
+    },
+    "retrieved_at": "2026-10-17T13:41:44.711247+00:00",
+    "licence": "GBIF data user agreement (aggregate counts; records CC0/CC BY/CC BY-NC); species metadata CC BY 4.0; IUCN category CC BY 4.0 per GBIF dataset 19491596"
+  },
+  {
+    "request_fingerprint": "45e7760e7ce109de91825e792907f0122990339038c8e3b70e0d0e68132aa038",
+    "url": "https://api.gbif.org/v1/species/5219404",
+    "file": "45e7760e7ce109de.json",
+    "sha256": "6f10a921632d3c32ba6c0f16219e120c144c885fa67a205eea34f49fc315acd8",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:41:46.547477+00:00",
+    "licence": "GBIF data user agreement (aggregate counts; records CC0/CC BY/CC BY-NC); species metadata CC BY 4.0; IUCN category CC BY 4.0 per GBIF dataset 19491596"
+  },
+  {
+    "request_fingerprint": "8338ceb0d1e3be4b77cdca978bb05420304547364641f9ec2c5fda93d5158592",
+    "url": "https://api.gbif.org/v1/species/5219404/iucnRedListCategory",
+    "file": "8338ceb0d1e3be4b.json",
+    "sha256": "ca5003eb8ec90f126d85e168f7685b7573245bd4ca6a212792fca1ad117f4c7f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:41:47.680513+00:00",
+    "licence": "GBIF data user agreement (aggregate counts; records CC0/CC BY/CC BY-NC); species metadata CC BY 4.0; IUCN category CC BY 4.0 per GBIF dataset 19491596"
+  },
+  {
+    "request_fingerprint": "c7dfeee89947c657b2bed713a880118fc64a55440da6bd3ee7d993335b853a01",
+    "url": "https://graphql.gbif.org/graphql",
+    "file": "c7dfeee89947c657.json",
+    "sha256": "011804fd5ef6609bca41bb85764c7b5b60021f754fe09efa84f500a03ddb16c6",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8",
+      "etag": "W/\"678-SAPSNXYcBlYpwofGLseFtwJU4Cc\""
+    },
+    "retrieved_at": "2026-10-17T13:41:49.856801+00:00",
+    "licence": "GBIF data user agreement (aggregate counts; records CC0/CC BY/CC BY-NC); species metadata CC BY 4.0; IUCN category CC BY 4.0 per GBIF dataset 19491596"
+  },
+  {
+    "request_fingerprint": "f1e1a922234dca92f92aad1225f24a769369ea914b29356018bc401c41aa1076",
+    "url": "https://api.gbif.org/v1/species/1341976",
+    "file": "f1e1a922234dca92.json",
+    "sha256": "f709387853693f310750d85183349cc1cda2dd24206ae7e56b53a2edb370de0a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:41:51.071198+00:00",
+    "licence": "GBIF data user agreement (aggregate counts; records CC0/CC BY/CC BY-NC); species metadata CC BY 4.0; IUCN category CC BY 4.0 per GBIF dataset 19491596"
+  },
+  {
+    "request_fingerprint": "8ed3f50879a75d9503d8bebe9ef99d758cb17a4473720f4f60631a3aea9da491",
+    "url": "https://api.gbif.org/v1/species/1341976/iucnRedListCategory",
+    "file": "8ed3f50879a75d95.json",
+    "sha256": "319fee2082906a51bb2fbda2fab1b65c0dc224221b365fa6b45ffc971cd1940b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:41:52.331558+00:00",
+    "licence": "GBIF data user agreement (aggregate counts; records CC0/CC BY/CC BY-NC); species metadata CC BY 4.0; IUCN category CC BY 4.0 per GBIF dataset 19491596"
+  },
+  {
+    "request_fingerprint": "9717d015017ebdbe89d2c32790400d244e9fb83f9c89c881b042bb6356b8dcc2",
+    "url": "https://graphql.gbif.org/graphql",
+    "file": "9717d015017ebdbe.json",
+    "sha256": "1d20760608d684ada5a951fa98323cf707f9dea3846c97018ec4da3c02fc2475",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8",
+      "etag": "W/\"163b-gmg6hjYweZFAnH7euVyph9eU37Q\""
+    },
+    "retrieved_at": "2026-10-17T13:41:54.142725+00:00",
+    "licence": "GBIF data user agreement (aggregate counts; records CC0/CC BY/CC BY-NC); species metadata CC BY 4.0; IUCN category CC BY 4.0 per GBIF dataset 19491596"
+  }
+]

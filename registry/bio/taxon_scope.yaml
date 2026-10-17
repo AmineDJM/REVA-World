@@ -1,0 +1,219 @@
+# V4BIO taxon scope (owner: V4BIO). Which parts of the GBIF Backbone Taxonomy get full species lists in the KG.
+# This is REVA's SELECTION of what to load, not a source fact: the KG statements about each taxon are GBIF's.
+#
+# species_groups: every accepted species-rank usage classified under these backbone keys is listed through
+#   ChecklistBank dataset 53147 (= GBIF backbone with its keys) and loaded with its genus. `load: false` groups are
+#   declared but not loaded by default (raw-archive bound <= 150 MB on this machine): run them on a bigger machine with
+#   `uv run reva atlas ingest atlas.gbif_backbone --option groups=<key>,<key>` (see docs/dev/v4_v4bio.md). The
+#   backbone includes fossil species (e.g. Mammalia: 21,100 accepted species of which GBIF flags 6,323 extant).
+# species: curated keys (crops, livestock, pathogens, model organisms, iconic / threatened species), each read
+#   from GBIF /species/{key}; loaded ONLY if GBIF's canonicalName, rank (SPECIES) and status (ACCEPTED) equal the
+#   entry (else refused and reported). Keys were looked up once (2026-10-17) with GBIF's species/match (strict,
+#   EXACT + ACCEPTED only); names GBIF treats as synonyms or does not know are listed under `not_loaded` with GBIF's
+#   own answer (no guessing, no accepted-name substitution).
+version: "2026-10-17"
+species_groups:
+  - {gbif_key: 359, name: Mammalia, load: true}
+  - {gbif_key: 212, name: Aves, load: true}
+  - {gbif_key: 131, name: Amphibia, load: false}
+  - {gbif_key: 11592253, name: Squamata, load: false}
+  - {gbif_key: 11418114, name: Testudines, load: false}
+  - {gbif_key: 11493978, name: Crocodylia, load: false}
+  - {gbif_key: 11569602, name: Sphenodontia, load: false}
+  - {gbif_key: 121, name: Elasmobranchii, load: false}
+  - {gbif_key: 204, name: Actinopterygii, load: false}
+species:
+  crops:
+    - {gbif_key: 7795888, name: "Triticum aestivum"}
+    - {gbif_key: 2703459, name: "Oryza sativa"}
+    - {gbif_key: 5290052, name: "Zea mays"}
+    - {gbif_key: 5359660, name: "Glycine max"}
+    - {gbif_key: 2930262, name: "Solanum tuberosum"}
+    - {gbif_key: 3060998, name: "Manihot esculenta"}
+    - {gbif_key: 2703912, name: "Saccharum officinarum"}
+    - {gbif_key: 2706056, name: "Hordeum vulgare"}
+    - {gbif_key: 2705181, name: "Sorghum bicolor"}
+    - {gbif_key: 2731882, name: "Elaeis guineensis"}
+    - {gbif_key: 2895345, name: "Coffea arabica"}
+    - {gbif_key: 2895528, name: "Coffea canephora"}
+    - {gbif_key: 3152205, name: "Theobroma cacao"}
+    - {gbif_key: 3152661, name: "Gossypium hirsutum"}
+    - {gbif_key: 5372392, name: "Vitis vinifera"}
+    - {gbif_key: 2762680, name: "Musa acuminata"}
+    - {gbif_key: 2928551, name: "Ipomoea batatas"}
+    - {gbif_key: 5353770, name: "Arachis hypogaea"}
+    - {gbif_key: 3042636, name: "Brassica napus"}
+    - {gbif_key: 9206251, name: "Helianthus annuus"}
+    - {gbif_key: 2930137, name: "Solanum lycopersicum"}
+    - {gbif_key: 5350452, name: "Phaseolus vulgaris"}
+    - {gbif_key: 3189635, name: "Camellia sinensis"}
+    - {gbif_key: 3071171, name: "Hevea brasiliensis"}
+    - {gbif_key: 5415040, name: "Olea europaea"}
+    - {gbif_key: 3001244, name: "Malus domestica"}
+    - {gbif_key: 2705290, name: "Avena sativa"}
+    - {gbif_key: 2705966, name: "Secale cereale"}
+    - {gbif_key: 2735117, name: "Cocos nucifera"}
+    - {gbif_key: 8971274, name: "Beta vulgaris"}
+    - {gbif_key: 2857697, name: "Allium cepa"}
+    - {gbif_key: 2947311, name: "Cicer arietinum"}
+    - {gbif_key: 2932944, name: "Capsicum annuum"}
+    - {gbif_key: 2754476, name: "Dioscorea alata"}
+    - {gbif_key: 5330776, name: "Colocasia esculenta"}
+    - {gbif_key: 3190638, name: "Mangifera indica"}
+    - {gbif_key: 5288819, name: "Ananas comosus"}
+    - {gbif_key: 2928774, name: "Nicotiana tabacum"}
+    - {gbif_key: 2873861, name: "Linum usitatissimum"}
+    - {gbif_key: 3172622, name: "Sesamum indicum"}
+    - {gbif_key: 2982583, name: "Vigna unguiculata"}
+    - {gbif_key: 9151957, name: "Medicago sativa"}
+  livestock:
+    - {gbif_key: 2441022, name: "Bos taurus"}
+    - {gbif_key: 7422937, name: "Bubalus bubalis"}
+    - {gbif_key: 2441110, name: "Ovis aries"}
+    - {gbif_key: 2441056, name: "Capra hircus"}
+    - {gbif_key: 7705930, name: "Sus scrofa"}
+    - {gbif_key: 9326020, name: "Gallus gallus"}
+    - {gbif_key: 2440886, name: "Equus caballus"}
+    - {gbif_key: 2440891, name: "Equus asinus"}
+    - {gbif_key: 9055455, name: "Camelus dromedarius"}
+    - {gbif_key: 2441238, name: "Camelus bactrianus"}
+    - {gbif_key: 9761484, name: "Anas platyrhynchos"}
+    - {gbif_key: 2498036, name: "Anser anser"}
+    - {gbif_key: 9606290, name: "Meleagris gallopavo"}
+    - {gbif_key: 1341976, name: "Apis mellifera"}
+    - {gbif_key: 2436940, name: "Oryctolagus cuniculus"}
+    - {gbif_key: 5204019, name: "Oncorhynchus mykiss"}
+    - {gbif_key: 7595433, name: "Salmo salar"}
+    - {gbif_key: 4286975, name: "Cyprinus carpio"}
+    - {gbif_key: 4285694, name: "Oreochromis niloticus"}
+    - {gbif_key: 1868664, name: "Bombyx mori"}
+    - {gbif_key: 5220190, name: "Lama glama"}
+    - {gbif_key: 7515593, name: "Vicugna pacos"}
+    - {gbif_key: 5220114, name: "Rangifer tarandus"}
+    - {gbif_key: 2474162, name: "Coturnix japonica"}
+    - {gbif_key: 2362030, name: "Ctenopharyngodon idella"}
+    - {gbif_key: 2362473, name: "Hypophthalmichthys molitrix"}
+    - {gbif_key: 2223872, name: "Penaeus vannamei"}
+  pathogens:
+    - {gbif_key: 3225140, name: "Mycobacterium tuberculosis"}
+    - {gbif_key: 10540993, name: "Plasmodium falciparum"}
+    - {gbif_key: 3222442, name: "Vibrio cholerae"}
+    - {gbif_key: 9701185, name: "Salmonella enterica"}
+    - {gbif_key: 11286021, name: "Escherichia coli"}
+    - {gbif_key: 3227657, name: "Staphylococcus aureus"}
+    - {gbif_key: 10967718, name: "Streptococcus pneumoniae"}
+    - {gbif_key: 3221874, name: "Klebsiella pneumoniae"}
+    - {gbif_key: 3223274, name: "Acinetobacter baumannii"}
+    - {gbif_key: 10894522, name: "Pseudomonas aeruginosa"}
+    - {gbif_key: 3220217, name: "Neisseria gonorrhoeae"}
+    - {gbif_key: 3220226, name: "Neisseria meningitidis"}
+    - {gbif_key: 11245832, name: "Haemophilus influenzae"}
+    - {gbif_key: 3221854, name: "Shigella flexneri"}
+    - {gbif_key: 11637103, name: "Helicobacter pylori"}
+    - {gbif_key: 3223337, name: "Campylobacter jejuni"}
+    - {gbif_key: 3227413, name: "Enterococcus faecium"}
+    - {gbif_key: 10971266, name: "Clostridioides difficile"}
+    - {gbif_key: 3228214, name: "Treponema pallidum"}
+    - {gbif_key: 5427631, name: "Yersinia pestis"}
+    - {gbif_key: 5428037, name: "Bacillus anthracis"}
+    - {gbif_key: 3479791, name: "Candida auris"}
+    - {gbif_key: 2599597, name: "Candida albicans"}
+    - {gbif_key: 5260010, name: "Aspergillus fumigatus"}
+    - {gbif_key: 5237368, name: "Cryptococcus neoformans"}
+    - {gbif_key: 8205154, name: "Trypanosoma cruzi"}
+    - {gbif_key: 7822322, name: "Trypanosoma brucei"}
+    - {gbif_key: 5967489, name: "Schistosoma mansoni"}
+    - {gbif_key: 8014281, name: "Toxoplasma gondii"}
+    - {gbif_key: 3225137, name: "Mycobacterium leprae"}
+    - {gbif_key: 3219833, name: "Bordetella pertussis"}
+    - {gbif_key: 3225001, name: "Corynebacterium diphtheriae"}
+    - {gbif_key: 3226668, name: "Clostridium tetani"}
+    - {gbif_key: 3223087, name: "Legionella pneumophila"}
+    - {gbif_key: 10979426, name: "Listeria monocytogenes"}
+    - {gbif_key: 9098612, name: "Chlamydia trachomatis"}
+    - {gbif_key: 2284455, name: "Wuchereria bancrofti"}
+    - {gbif_key: 7031770, name: "Onchocerca volvulus"}
+    - {gbif_key: 4558786, name: "Ascaris lumbricoides"}
+    - {gbif_key: 3210505, name: "Entamoeba histolytica"}
+    - {gbif_key: 3203716, name: "Phytophthora infestans"}
+    - {gbif_key: 2514501, name: "Puccinia graminis"}
+    - {gbif_key: 5251961, name: "Fusarium oxysporum"}
+    - {gbif_key: 2627503, name: "Batrachochytrium dendrobatidis"}
+    - {gbif_key: 1650518, name: "Anopheles gambiae"}
+    - {gbif_key: 1651891, name: "Aedes aegypti"}
+  model_organisms:
+    - {gbif_key: 2436436, name: "Homo sapiens"}
+    - {gbif_key: 7429082, name: "Mus musculus"}
+    - {gbif_key: 2439261, name: "Rattus norvegicus"}
+    - {gbif_key: 9797255, name: "Danio rerio"}
+    - {gbif_key: 5073713, name: "Drosophila melanogaster"}
+    - {gbif_key: 2283683, name: "Caenorhabditis elegans"}
+    - {gbif_key: 7440012, name: "Saccharomyces cerevisiae"}
+    - {gbif_key: 3052436, name: "Arabidopsis thaliana"}
+    - {gbif_key: 5217334, name: "Xenopus laevis"}
+    - {gbif_key: 3212434, name: "Dictyostelium discoideum"}
+    - {gbif_key: 2586935, name: "Schizosaccharomyces pombe"}
+    - {gbif_key: 10826006, name: "Bacillus subtilis"}
+    - {gbif_key: 5253986, name: "Neurospora crassa"}
+    - {gbif_key: 5271221, name: "Chlamydomonas reinhardtii"}
+  iconic_threatened:
+    - {gbif_key: 5219416, name: "Panthera tigris"}
+    - {gbif_key: 5219404, name: "Panthera leo"}
+    - {gbif_key: 5219426, name: "Panthera onca"}
+    - {gbif_key: 5219436, name: "Panthera pardus"}
+    - {gbif_key: 2433399, name: "Ailuropoda melanoleuca"}
+    - {gbif_key: 2435350, name: "Loxodonta africana"}
+    - {gbif_key: 5219461, name: "Elephas maximus"}
+    - {gbif_key: 2436441, name: "Gorilla gorilla"}
+    - {gbif_key: 5219534, name: "Pan troglodytes"}
+    - {gbif_key: 5219533, name: "Pan paniscus"}
+    - {gbif_key: 5707420, name: "Pongo abelii"}
+    - {gbif_key: 5219532, name: "Pongo pygmaeus"}
+    - {gbif_key: 2440735, name: "Balaenoptera musculus"}
+    - {gbif_key: 5220086, name: "Megaptera novaeangliae"}
+    - {gbif_key: 8123917, name: "Physeter macrocephalus"}
+    - {gbif_key: 5220113, name: "Rhinoceros unicornis"}
+    - {gbif_key: 5220111, name: "Diceros bicornis"}
+    - {gbif_key: 2440880, name: "Ceratotherium simum"}
+    - {gbif_key: 2433451, name: "Ursus maritimus"}
+    - {gbif_key: 2433433, name: "Ursus arctos"}
+    - {gbif_key: 2441205, name: "Giraffa camelopardalis"}
+    - {gbif_key: 2435270, name: "Acinonyx jubatus"}
+    - {gbif_key: 5219173, name: "Canis lupus"}
+    - {gbif_key: 2480506, name: "Aquila chrysaetos"}
+    - {gbif_key: 2480446, name: "Haliaeetus leucocephalus"}
+    - {gbif_key: 2442225, name: "Chelonia mydas"}
+    - {gbif_key: 9789983, name: "Dermochelys coriacea"}
+    - {gbif_key: 2420694, name: "Carcharodon carcharias"}
+    - {gbif_key: 2417522, name: "Rhincodon typus"}
+    - {gbif_key: 2440012, name: "Phascolarctos cinereus"}
+    - {gbif_key: 2481920, name: "Gymnogyps californianus"}
+    - {gbif_key: 5229384, name: "Spheniscus demersus"}
+    - {gbif_key: 2481661, name: "Aptenodytes forsteri"}
+    - {gbif_key: 2441247, name: "Hippopotamus amphibius"}
+    - {gbif_key: 2435296, name: "Trichechus manatus"}
+    - {gbif_key: 2684120, name: "Sequoiadendron giganteum"}
+    - {gbif_key: 2683909, name: "Sequoia sempervirens"}
+    - {gbif_key: 5275521, name: "Welwitschia mirabilis"}
+    - {gbif_key: 5184681, name: "Acropora cervicornis"}
+    - {gbif_key: 2441273, name: "Latimeria chalumnae"}
+    - {gbif_key: 2431950, name: "Ambystoma mexicanum"}
+    - {gbif_key: 9724339, name: "Dendrobates tinctorius"}
+    - {gbif_key: 2470854, name: "Varanus komodoensis"}
+    - {gbif_key: 2495150, name: "Struthio camelus"}
+    - {gbif_key: 9451184, name: "Pavo cristatus"}
+    - {gbif_key: 4352332, name: "Phoenicopterus roseus"}
+    - {gbif_key: 2433376, name: "Ornithorhynchus anatinus"}
+    - {gbif_key: 2440301, name: "Vombatus ursinus"}
+    - {gbif_key: 2435261, name: "Lynx pardinus"}
+not_loaded:
+  - {group: crops, name: "Citrus sinensis", gbif_match: EXACT, gbif_status: SYNONYM, usage_key: 3190158, accepted_usage_key: 8077391, gbif_canonical: "Citrus sinensis"}
+  - {group: crops, name: "Pisum sativum", gbif_match: EXACT, gbif_status: SYNONYM, usage_key: 5347845, accepted_usage_key: 5347846, gbif_canonical: "Pisum sativum"}
+  - {group: crops, name: "Lens culinaris", gbif_match: EXACT, gbif_status: SYNONYM, usage_key: 5350010, accepted_usage_key: 3973001, gbif_canonical: "Lens culinaris"}
+  - {group: crops, name: "Pennisetum glaucum", gbif_match: EXACT, gbif_status: SYNONYM, usage_key: 2706141, accepted_usage_key: 5828197, gbif_canonical: "Pennisetum glaucum"}
+  - {group: livestock, name: "Bos indicus", gbif_match: EXACT, gbif_status: SYNONYM, usage_key: 2441023, accepted_usage_key: 4262587, gbif_canonical: "Bos indicus"}
+  - {group: pathogens, name: "Plasmodium vivax", gbif_match: NONE, gbif_status: None, usage_key: None, accepted_usage_key: None, gbif_canonical: "None"}
+  - {group: pathogens, name: "Leishmania donovani", gbif_match: NONE, gbif_status: None, usage_key: None, accepted_usage_key: None, gbif_canonical: "None"}
+  - {group: pathogens, name: "Giardia intestinalis", gbif_match: EXACT, gbif_status: SYNONYM, usage_key: 8635830, accepted_usage_key: 8562913, gbif_canonical: "Giardia intestinalis"}
+  - {group: pathogens, name: "Magnaporthe oryzae", gbif_match: EXACT, gbif_status: SYNONYM, usage_key: 2569259, accepted_usage_key: 2569273, gbif_canonical: "Magnaporthe oryzae"}
+  - {group: iconic_threatened, name: "Rafflesia arnoldii", gbif_match: FUZZY, gbif_status: ACCEPTED, usage_key: 7279683, accepted_usage_key: None, gbif_canonical: "Rafflesia arnoldi"}

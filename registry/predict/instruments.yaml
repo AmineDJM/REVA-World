@@ -1,0 +1,114 @@
+# Decision instruments of the V5 decision engine (agent PRED-ENGINE, src/reva/predict/).
+#
+# An instrument turns a decision's magnitude into the *direct changes* the engine propagates. A direct change is
+# a change of one variable (an atlas concept, an effect variable of registry/effects/variables.yaml, or an event
+# type of registry/events/taxonomy.yaml) at one geography, in the unit in which effect estimates state their
+# cause. The translation decision -> direct change is a *stated scenario assumption* (its `basis` is shown on
+# every result); it is never an effect estimate and never carries a number that the decision does not state.
+#
+# magnitude_units: the units a user may state the magnitude in, with the EXACT definitional factor to the
+# direct change unit (1 mb/d = 1000 thousand barrels per day; 1 bp = 0.01 percentage point; 1 year = 12 months).
+# No other conversion is ever applied.
+#
+# geo: an ISO 3166-1 alpha-3 code, "WLD" (world level), "ACTOR" (the decision's actor geography) or
+# "EACH" (every country of interest of the decision).
+schema_version: "1.0.0"
+instruments:
+  - id: oil_production_quota_change
+    label_fr: "Variation d'un quota de production de pétrole brut"
+    label_en: "Change of a crude-oil production quota"
+    magnitude_units:
+      "mb/d": "1000"
+      "million barrels per day": "1000"
+      "kb/d": "1"
+      "thousand barrels per day": "1"
+    direct_changes:
+      - variable: {kind: atlas_concept, id: resources.energy.eia.crude_oil_production}
+        geo: WLD
+        transform: level_change
+        unit: "thousand barrels per day"
+        sign: 1
+        timing: step
+        basis_fr: >-
+          Hypothèse de scénario : la variation de quota décidée s'applique entièrement à la production mondiale de
+          brut (respect total du quota, aucune compensation par d'autres producteurs, aucun déstockage).
+        basis_en: >-
+          Scenario assumption: the decided quota change applies in full to world crude production (full
+          compliance, no offsetting supply from other producers, no stock draw).
+  - id: export_ban
+    label_fr: "Interdiction d'exporter un produit"
+    label_en: "Export ban on a product"
+    magnitude_units:
+      "share_of_exports_banned": "1"
+    direct_changes:
+      - variable: {kind: variable, id: trade.export_restriction}
+        geo: ACTOR
+        transform: occurrence
+        unit: occurrence
+        sign: 1
+        timing: occurrence
+        basis_fr: >-
+          Hypothèse de scénario : l'interdiction est traitée comme la survenue d'une restriction d'exportation par
+          le pays acteur au début de la décision (le produit visé est indiqué dans la cible de la décision).
+        basis_en: >-
+          Scenario assumption: the ban is treated as the occurrence of an export restriction by the actor country
+          at the start of the decision (the product is named in the decision's target).
+  - id: policy_rate_change
+    label_fr: "Variation du taux directeur"
+    label_en: "Policy-rate change"
+    magnitude_units:
+      "bp": "0.01"
+      "basis points": "0.01"
+      "percentage_points": "1"
+      "pp": "1"
+    direct_changes:
+      - variable: {kind: atlas_concept, id: imf.policy_rate}
+        geo: EACH
+        transform: pp_change
+        unit: percentage_points
+        sign: 1
+        timing: step
+        basis_fr: >-
+          Hypothèse de scénario : le taux directeur de chaque pays d'intérêt (membres de l'union monétaire de
+          l'acteur) varie de la grandeur décidée, maintenue pendant la durée de la décision.
+        basis_en: >-
+          Scenario assumption: the policy rate of every country of interest (members of the actor's monetary
+          union) changes by the decided amount, held for the decision's duration.
+  - id: import_ban
+    label_fr: "Interdiction d'importer (embargo, sanctions)"
+    label_en: "Import ban (embargo, sanctions)"
+    magnitude_units:
+      "share_of_imports_banned": "1"
+    direct_changes:
+      - variable: {kind: event_type, id: sanction_episode}
+        geo: TARGET
+        transform: occurrence
+        unit: occurrence
+        sign: 1
+        timing: occurrence
+        basis_fr: >-
+          Hypothèse de scénario : l'interdiction est traitée comme la survenue d'un épisode de sanctions (type
+          d'événement « sanction_episode » de la taxonomie REVA) visant le pays cible, au début de la décision.
+        basis_en: >-
+          Scenario assumption: the ban is treated as the occurrence of a sanction episode (REVA event type
+          "sanction_episode") against the target country, at the start of the decision.
+  - id: statutory_retirement_age
+    label_fr: "Âge légal minimal de départ à la retraite"
+    label_en: "Statutory minimum pension age"
+    magnitude_units:
+      "years": "12"
+      "months": "1"
+    direct_changes:
+      - variable: {kind: variable, id: pension.minimum_pension_age}
+        geo: ACTOR
+        transform: level
+        unit: months
+        sign: 1
+        timing: step
+        basis_fr: >-
+          Hypothèse de scénario : l'âge minimal légal (levier « minimum_pension_age » de la table de règles du pays)
+          est porté au niveau décidé pour les générations qui atteignent cet âge à partir de l'année de début.
+        basis_en: >-
+          Scenario assumption: the statutory minimum pension age (lever "minimum_pension_age" of the country's
+          rule table) is set to the decided level for the cohorts reaching that age from the start year on.
+    plugins: [social.retirement_age]

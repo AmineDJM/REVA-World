@@ -349,7 +349,7 @@ def entity_places(
             dict(r)
             for r in conn.execute(
                 text(f"""SELECT s.subject_qid, s.property_pid, s.object_qid, s.statement_key, s.source_key,
-                                s.origin FROM kg.statement_current s
+                                s.origin, (s.end_time IS NOT NULL) AS ended FROM kg.statement_current s
                           WHERE s.subject_qid = ANY(:f) AND s.property_pid = ANY(:p) AND s.object_qid IS NOT NULL
                             {kq._origin_sql(origin)}
                           ORDER BY s.id LIMIT 500"""),

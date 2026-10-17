@@ -1,0 +1,233 @@
+# Weather and climate (agent V4CLIMATE). Provider-declared concepts, not human-reviewed. Observed series (CRU, ERA5)
+# and CMIP6 projections are separate concepts, never mixed; sources and caveats: docs/dev/v4_v4climate.md.
+domain: climate
+labels:
+  en: Weather and climate
+  fr: Météo et climat
+maintainer: V4CLIMATE
+concepts:
+- id: climate.temperature.mean_annual
+  labels:
+    en: Mean annual near-surface air temperature
+    fr: Température moyenne annuelle de l'air en surface
+  definition: Annual mean of near-surface air temperature, national aggregate of a gridded product as published by the World
+    Bank Climate Change Knowledge Portal (CCKP).
+  unit: °C
+  domain: climate
+  subdomain: observed
+  theme: climate
+  value_kind: numeric
+  source_order:
+  - cckp_ts.cru_annual.tas
+  - cckp_ts.era5_annual.tas
+  provider_declared: true
+  notes: 'CRU TS 4.09 (station-based gridded observations, 1901-2024) first, ERA5 reanalysis (1950-2024) second; kept per
+    source, never blended. Monthly values: cckp_ts.cru_monthly / cckp_ts.era5_monthly (indicator tas).'
+  tags:
+  - cckp
+  - cru
+  - era5
+- id: climate.precipitation.annual_total
+  labels:
+    en: Annual precipitation
+    fr: Précipitations annuelles
+  definition: Annual precipitation total, national aggregate of a gridded product as published by the World Bank CCKP.
+  unit: mm/year
+  domain: climate
+  subdomain: observed
+  theme: climate
+  value_kind: numeric
+  source_order:
+  - cckp_ts.cru_annual.pr
+  - cckp_ts.era5_annual.pr
+  provider_declared: true
+  notes: CRU and ERA5 precipitation can differ markedly; the best-available view names its source. Monthly values in the *_monthly
+    tables (mm/month).
+  tags:
+  - cckp
+  - cru
+  - era5
+- id: climate.projection.tas_ssp126_median
+  labels:
+    en: Projected mean annual temperature, SSP1-2.6 (CMIP6 ensemble median)
+    fr: Température moyenne annuelle projetée, SSP1-2.6 (médiane de l'ensemble CMIP6)
+  definition: PROJECTION. Annual mean near-surface air temperature under scenario SSP1-2.6, median of the CMIP6 multi-model
+    ensemble (CCKP ensemble_all, 0.25° downscaled and bias-corrected), national aggregate, 2015-2100.
+  unit: °C
+  domain: climate
+  subdomain: projections
+  theme: climate
+  value_kind: numeric
+  source_order:
+  - cckp_ts.cmip6_annual.tas|scenario=ssp126|stat=median
+  provider_declared: true
+  notes: 'Projection (flags.estimate_kind = projection): never an observation; p10/p90 in the same table (stat=p10|p90); model
+    history 1950-2014 under scenario=historical (model simulation).'
+  tags:
+  - cckp
+  - cmip6
+  - projection
+  - ssp126
+- id: climate.projection.pr_ssp126_median
+  labels:
+    en: Projected annual precipitation, SSP1-2.6 (CMIP6 ensemble median)
+    fr: Précipitations annuelles projetées, SSP1-2.6 (médiane de l'ensemble CMIP6)
+  definition: PROJECTION. Annual precipitation total under scenario SSP1-2.6, median of the CMIP6 multi-model ensemble (CCKP
+    ensemble_all), national aggregate, 2015-2100.
+  unit: mm/year
+  domain: climate
+  subdomain: projections
+  theme: climate
+  value_kind: numeric
+  source_order:
+  - cckp_ts.cmip6_annual.pr|scenario=ssp126|stat=median
+  provider_declared: true
+  notes: 'Projection (flags.estimate_kind = projection): never an observation.'
+  tags:
+  - cckp
+  - cmip6
+  - projection
+  - ssp126
+- id: climate.projection.tas_ssp245_median
+  labels:
+    en: Projected mean annual temperature, SSP2-4.5 (CMIP6 ensemble median)
+    fr: Température moyenne annuelle projetée, SSP2-4.5 (médiane de l'ensemble CMIP6)
+  definition: PROJECTION. Annual mean near-surface air temperature under scenario SSP2-4.5, median of the CMIP6 multi-model
+    ensemble (CCKP ensemble_all, 0.25° downscaled and bias-corrected), national aggregate, 2015-2100.
+  unit: °C
+  domain: climate
+  subdomain: projections
+  theme: climate
+  value_kind: numeric
+  source_order:
+  - cckp_ts.cmip6_annual.tas|scenario=ssp245|stat=median
+  provider_declared: true
+  notes: 'Projection (flags.estimate_kind = projection): never an observation; p10/p90 in the same table (stat=p10|p90); model
+    history 1950-2014 under scenario=historical (model simulation).'
+  tags:
+  - cckp
+  - cmip6
+  - projection
+  - ssp245
+- id: climate.projection.pr_ssp245_median
+  labels:
+    en: Projected annual precipitation, SSP2-4.5 (CMIP6 ensemble median)
+    fr: Précipitations annuelles projetées, SSP2-4.5 (médiane de l'ensemble CMIP6)
+  definition: PROJECTION. Annual precipitation total under scenario SSP2-4.5, median of the CMIP6 multi-model ensemble (CCKP
+    ensemble_all), national aggregate, 2015-2100.
+  unit: mm/year
+  domain: climate
+  subdomain: projections
+  theme: climate
+  value_kind: numeric
+  source_order:
+  - cckp_ts.cmip6_annual.pr|scenario=ssp245|stat=median
+  provider_declared: true
+  notes: 'Projection (flags.estimate_kind = projection): never an observation.'
+  tags:
+  - cckp
+  - cmip6
+  - projection
+  - ssp245
+- id: climate.projection.tas_ssp370_median
+  labels:
+    en: Projected mean annual temperature, SSP3-7.0 (CMIP6 ensemble median)
+    fr: Température moyenne annuelle projetée, SSP3-7.0 (médiane de l'ensemble CMIP6)
+  definition: PROJECTION. Annual mean near-surface air temperature under scenario SSP3-7.0, median of the CMIP6 multi-model
+    ensemble (CCKP ensemble_all, 0.25° downscaled and bias-corrected), national aggregate, 2015-2100.
+  unit: °C
+  domain: climate
+  subdomain: projections
+  theme: climate
+  value_kind: numeric
+  source_order:
+  - cckp_ts.cmip6_annual.tas|scenario=ssp370|stat=median
+  provider_declared: true
+  notes: 'Projection (flags.estimate_kind = projection): never an observation; p10/p90 in the same table (stat=p10|p90); model
+    history 1950-2014 under scenario=historical (model simulation).'
+  tags:
+  - cckp
+  - cmip6
+  - projection
+  - ssp370
+- id: climate.projection.pr_ssp370_median
+  labels:
+    en: Projected annual precipitation, SSP3-7.0 (CMIP6 ensemble median)
+    fr: Précipitations annuelles projetées, SSP3-7.0 (médiane de l'ensemble CMIP6)
+  definition: PROJECTION. Annual precipitation total under scenario SSP3-7.0, median of the CMIP6 multi-model ensemble (CCKP
+    ensemble_all), national aggregate, 2015-2100.
+  unit: mm/year
+  domain: climate
+  subdomain: projections
+  theme: climate
+  value_kind: numeric
+  source_order:
+  - cckp_ts.cmip6_annual.pr|scenario=ssp370|stat=median
+  provider_declared: true
+  notes: 'Projection (flags.estimate_kind = projection): never an observation.'
+  tags:
+  - cckp
+  - cmip6
+  - projection
+  - ssp370
+- id: climate.projection.tas_ssp585_median
+  labels:
+    en: Projected mean annual temperature, SSP5-8.5 (CMIP6 ensemble median)
+    fr: Température moyenne annuelle projetée, SSP5-8.5 (médiane de l'ensemble CMIP6)
+  definition: PROJECTION. Annual mean near-surface air temperature under scenario SSP5-8.5, median of the CMIP6 multi-model
+    ensemble (CCKP ensemble_all, 0.25° downscaled and bias-corrected), national aggregate, 2015-2100.
+  unit: °C
+  domain: climate
+  subdomain: projections
+  theme: climate
+  value_kind: numeric
+  source_order:
+  - cckp_ts.cmip6_annual.tas|scenario=ssp585|stat=median
+  provider_declared: true
+  notes: 'Projection (flags.estimate_kind = projection): never an observation; p10/p90 in the same table (stat=p10|p90); model
+    history 1950-2014 under scenario=historical (model simulation).'
+  tags:
+  - cckp
+  - cmip6
+  - projection
+  - ssp585
+- id: climate.projection.pr_ssp585_median
+  labels:
+    en: Projected annual precipitation, SSP5-8.5 (CMIP6 ensemble median)
+    fr: Précipitations annuelles projetées, SSP5-8.5 (médiane de l'ensemble CMIP6)
+  definition: PROJECTION. Annual precipitation total under scenario SSP5-8.5, median of the CMIP6 multi-model ensemble (CCKP
+    ensemble_all), national aggregate, 2015-2100.
+  unit: mm/year
+  domain: climate
+  subdomain: projections
+  theme: climate
+  value_kind: numeric
+  source_order:
+  - cckp_ts.cmip6_annual.pr|scenario=ssp585|stat=median
+  provider_declared: true
+  notes: 'Projection (flags.estimate_kind = projection): never an observation.'
+  tags:
+  - cckp
+  - cmip6
+  - projection
+  - ssp585
+- id: climate.attribution.findings_more_likely
+  labels:
+    en: 'Attribution study findings: extreme made more severe or likely by climate change'
+    fr: 'Conclusions d''études d''attribution : extrême rendu plus intense ou probable par le changement climatique'
+  definition: Number of study findings in Carbon Brief's attribution map, for extremes of a single year in the country, classified
+    'More severe or more likely to occur' (derived count).
+  unit: study findings
+  domain: climate
+  subdomain: attribution
+  theme: climate
+  value_kind: numeric
+  source_order:
+  - attribution_cb.findings.FINDINGS|class=more_severe_or_likely
+  provider_declared: true
+  notes: Carbon Brief, CC BY-NC-ND 4.0 (non-commercial, no derivatives). A count of studies, not of events; reflects research
+    effort.
+  tags:
+  - carbonbrief
+  - attribution
+  - non_commercial

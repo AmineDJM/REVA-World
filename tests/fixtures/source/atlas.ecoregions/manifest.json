@@ -1,0 +1,10 @@
+{
+ "kind": "byte_range_archive",
+ "url": "https://storage.googleapis.com/teow2016/Ecoregions2017.zip",
+ "file": "Ecoregions2017_dbf_only.zip",
+ "sha256": "8ed4992e28ee0a8f055e50b8d9b9c3791826fa635c5bcc966e07b7ea334057cc",
+ "etag": "\"5d568e0d7b25602a12bba18baf0b03ba\"",
+ "retrieved_at": "2026-10-17T13:30:00+00:00",
+ "licence": "CC BY 4.0 (LICENSE attribute of every record; Dinerstein et al. 2017, (c) Resolve)",
+ "excerpt": "A small zip REBUILT for tests holding only the real Ecoregions2017.dbf member (1,027,078 bytes, CRC-checked against the release's central directory) retrieved 2026-10-17 by two byte ranges of the 149,248,653-byte release archive (ETag 5d568e0d7b25602a12bba18baf0b03ba); the .shp/.shx/.prj members are not included. Served by byte range (reva.atlas.ingest.ArchiveRangeFixtureHttp)."
+}

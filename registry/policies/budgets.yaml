@@ -1,6 +1,6 @@
-policy_version: "budgets-1.3.19"
+policy_version: "budgets-1.3.20"
 daily:
-  http_requests_total: 17578
+  http_requests_total: 18388
   http_bytes_total: 3221225472
 per_source_daily_requests:
   worldbank.wdi: 200
@@ -65,8 +65,12 @@ per_source_daily_requests:
   fao.faostat: 45
   # fao.ffpi: requested by V4ECON (v4econ.yaml)
   fao.ffpi: 4
+  # fao.fishstat: requested by V4ECO (v4eco.yaml)
+  fao.fishstat: 4
   # gapminder.fasttrack: requested by A-HISTECON (a_histecon.yaml)
   gapminder.fasttrack: 20
+  # gbif.occurrence: requested by V4ECO (v4eco.yaml)
+  gbif.occurrence: 600
   # gcat.planet4589: requested by A-INFRA (a_infra.yaml)
   gcat.planet4589: 10
   # geonames.cities: requested by A-CITIES (a_cities.yaml)
@@ -75,6 +79,8 @@ per_source_daily_requests:
   geonames.countryinfo: 2
   # gleif.api: requested by V4INDUSTRY (v4industry.yaml)
   gleif.api: 3000
+  # globi.interactions: requested by V4ECO (v4eco.yaml)
+  globi.interactions: 200
   # glottolog.cldf: requested by KGLANG (kglang.yaml)
   glottolog.cldf: 8
   # grambank.cldf: requested by KGLANG (kglang.yaml)
@@ -165,6 +171,8 @@ per_source_daily_requests:
   reign.leaderlist: 6
   # reinhart_rogoff.bffs: requested by A-ECRISES (a_ecrises.yaml)
   reinhart_rogoff.bffs: 3
+  # resolve.ecoregions2017: requested by V4ECO (v4eco.yaml)
+  resolve.ecoregions2017: 6
   # spc.pdh_stat: requested by GAPHUNT (gaphunt.yaml)
   spc.pdh_stat: 12
   # ssa.ssptw: requested by A-LAW (a_law.yaml)

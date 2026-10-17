@@ -215,6 +215,11 @@ def test_clingen_associations_by_identifier_only() -> None:
     assert s.statement_id.startswith("CGGV:assertion_") and s.qualifiers["classification"]
     assert s.qualifiers["gene_symbol_as_written"] == "HTT" and s.property_pid == cg.PID
     assert rep["statements"] == len(sts) == len(rows)
+    legacy = dict(
+        rows[0], **{"ONLINE REPORT": "https://search.clinicalgenome.org/kb/gene-validity/CGGCIEX:assertion_6238"}
+    )
+    (st,), _ = cg.build([legacy], raw_sha256="e" * 64, revision="r")
+    assert st.statement_id == "CGGCIEX:assertion_6238"
     bad = _fx("atlas.clingen", "gene_validity.csv").replace(b'"MOI"', b'"MODE"')
     with pytest.raises(HealthSourceError):
         cg.parse(bad)

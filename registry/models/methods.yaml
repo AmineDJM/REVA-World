@@ -343,3 +343,61 @@ models:
       - employment response share from the literature registry (stated assumption with citation; L2 grid)
       - exceptions to the general eligibility age (long careers, disability, hardship) not represented
       - average pension constant in nominal euro of its year; pension recipients level scales with the 65+ population
+  # --- PRED-REGISTRY (V5): baselines of the prospective forecast registry (reva.models.forecasting.registry_baselines)
+  # and the attributed IMF WEO reference forecast. Candidates: they are what the registry judges, not judged models.
+  - model_key: forecast.registry_persistence
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Random walk / persistence: point = last observed value; Gaussian predictive with sigma = root mean square of the
+      historical h-step changes of the final consecutive run (zero-mean random-walk errors). Registry baseline.
+    input_ports: [{name: series, kind: regular_frequency_any_sign}]
+    output_ports: [{name: point_forecast}, {name: predictive_normal}]
+    applicability: {min_h_step_changes: 8, frequencies: [M, Q, A]}
+    assumptions: [random-walk point; zero-mean h-step errors; history = final consecutive run only]
+  - model_key: forecast.registry_seasonal_naive
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Seasonal naive: value of the same season in the most recent observed year; Gaussian predictive from the root
+      mean square of the historical seasonal-naive errors at the same lag. Monthly and quarterly series only.
+    input_ports: [{name: series, kind: regular_frequency_any_sign}]
+    output_ports: [{name: point_forecast}, {name: predictive_normal}]
+    applicability: {min_errors: 8, frequencies: [M, Q]}
+    assumptions: [same-season persistence; zero-mean errors]
+  - model_key: forecast.registry_ar
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      AR(p) with intercept on levels, OLS on the last window (120 months / 80 quarters / 40 years) fitted as of the
+      issue time, p <= 6/4/2 by AIC on a common sample; iterated forecast; Gaussian h-step variance from the psi
+      weights. A non-stationary fit abstains.
+    input_ports: [{name: series, kind: regular_frequency_any_sign}]
+    output_ports: [{name: point_forecast}, {name: predictive_normal}]
+    applicability: {min_points: {M: 36, Q: 24, A: 15}, frequencies: [M, Q, A], requires_stationary_fit: true}
+    assumptions: [linear Gaussian AR on levels; parameters estimated within the window only]
+  - model_key: forecast.registry_hist_quantile
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Historical-quantile baseline: predictive = last value + the empirical distribution of the historical h-step
+      changes of the final consecutive run; point = median; binary probabilities by the rule of succession.
+    input_ports: [{name: series, kind: regular_frequency_any_sign}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}]
+    applicability: {min_h_step_changes: 10, frequencies: [M, Q, A]}
+    assumptions: [past h-step changes are exchangeable with the next one]
+  - model_key: forecast.reference_imf_weo
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      External reference, attributed to the IMF: the World Economic Outlook projection cell of the WEO vintage pinned
+      at issue (atlas.imf.weo). Point only; REVA does not produce it.
+    input_ports: [{name: weo_projection_cell, kind: atlas_cell}]
+    output_ports: [{name: point_forecast}]
+    applicability: {families: [weo.cpi_inflation, weo.gdp_growth, weo.unemployment], question_types: [quantity]}
+    assumptions: [IMF staff projection as published; no distribution]

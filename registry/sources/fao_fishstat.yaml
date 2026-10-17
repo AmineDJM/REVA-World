@@ -1,0 +1,19 @@
+# V4 (agent V4ECO): FAO FishStat Global Production (capture + aquaculture), release zip with code lists.
+# Connector src/reva/adapters/connectors/atlas_fishstat.py -> atlas table fishstat.production.
+source_key: fao.fishstat
+title: FAO FishStat — global fisheries and aquaculture production by country, production source and species group
+provider_url: https://www.fao.org/fishery/en/collection/global_production
+lineage_family: fao_fishstat
+rights:
+  licence: "CC BY 4.0 (FAO Statistical Database terms of use, quoted in the release ReadMe.txt)"
+  licence_url: https://www.fao.org/contact-us/terms/db-terms-of-use/en
+  attribution: "FAO. <year>. FishStat Data. Global production by production source 1950-<year>. Licence: CC-BY-4.0."
+  terms_quote: >-
+    Unless specified otherwise in their metadata or webpage, all datasets disseminated through FAO corporate
+    statistical databases (see examples in Annex 1) are licensed under the Creative Commons Attribution-4.0
+    International licence (CC BY 4.0)
+metadata:
+  allowed_hosts: [www.fao.org]
+  archive_pattern: https://www.fao.org/fishery/static/Data/GlobalProduction_<release>.zip
+  authentication: none
+  cadence: yearly release (March)

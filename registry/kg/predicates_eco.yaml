@@ -143,6 +143,19 @@ predicates:
     inverse_label_fr: "est l'hôte de (GloBI)"
     derived: false
     description: GloBI interaction type `hasHost` (symbiont -> host).
+  - pid: "globi:resolved_within"
+    value_kind: item
+    reva_predicate: globi_resolved_within
+    label_en: "is returned by GloBI for the taxon (taxon resolution)"
+    label_fr: "est renvoyé par GloBI pour le taxon (résolution taxonomique)"
+    inverse_name: globi_resolves_to
+    inverse_label_en: "GloBI returns records indexed under"
+    inverse_label_fr: "GloBI renvoie des enregistrements indexés sous"
+    derived: false
+    description: >-
+      Taxon id returned by GloBI -> the GBIF backbone taxon that was queried (sourceTaxon / targetTaxon = GBIF:<key>):
+      GloBI's own taxon graph places the returned id at or below the queried taxon. An identifier resolution made by
+      GloBI, read as taxonomic subsumption; REVA never matches the two by name.
   - pid: "resolve:in_biome"
     value_kind: item
     reva_predicate: resolve_in_biome

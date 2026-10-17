@@ -1,0 +1,86 @@
+# The five reference decisions of the V5 decision engine (roadmap docs/roadmap/v5_prediction_engine.md).
+# They are test cases for the engine, not policy recommendations and not forecasts of what will be decided.
+#
+# anchors: KG entity ids (Wikidata QIDs or provider keys) of *analogue episodes* chosen by REVA's curator
+# (agent PRED-ENGINE, 2026-10-17) and verified by identifier against the dev knowledge graph (label shown in
+# `anchor_labels`, as loaded). Sourced causal claims touching them are listed as "liens non chiffrés"; the
+# choice of analogue is REVA's curation, not a causal identification, and never yields a number.
+schema_version: "1.0.0"
+decisions:
+  - id: opec_plus_cut_2mbd_2027q1
+    label_fr: "OPEP+ réduit sa production de 2 mb/j à partir du 1er trimestre 2027"
+    label_en: "OPEC+ cuts production by 2 mb/d from 2027Q1"
+    actor: {label_fr: "OPEP+", label_en: "OPEC+", kg_id: null, geo: null}
+    instrument: oil_production_quota_change
+    target: {label_fr: "Production mondiale de pétrole brut", label_en: "World crude oil production", kg_id: null, geo: WLD}
+    magnitude: {value: "-2", unit: "mb/d"}
+    start: "2027Q1"
+    duration_quarters: null
+    horizon_quarters: 8
+    countries: [FRA, DEU, USA, IND, CHN, JPN]
+    anchors: [Q4574284, Q1925730]
+    anchor_labels: {Q4574284: "1970s energy crisis", Q1925730: "1979 energy crisis"}
+  - id: india_rice_export_ban_2027q1
+    label_fr: "L'Inde interdit les exportations de riz pendant un an à partir du 1er trimestre 2027"
+    label_en: "India bans rice exports for one year from 2027Q1"
+    actor: {label_fr: "Inde", label_en: "India", kg_id: Q668, geo: IND}
+    instrument: export_ban
+    target: {label_fr: "Exportations de riz", label_en: "Rice exports", kg_id: null, geo: null}
+    magnitude: {value: "1", unit: "share_of_exports_banned"}
+    start: "2027Q1"
+    duration_quarters: 4
+    horizon_quarters: 8
+    countries: [IND, BGD, PHL, SEN, NGA]
+    anchors: []
+    anchor_labels: {}
+  - id: ecb_plus_50bp_2027q1
+    label_fr: "La BCE relève ses taux directeurs de 50 points de base au 1er trimestre 2027"
+    label_en: "The ECB raises its policy rates by 50 bp in 2027Q1"
+    actor: {label_fr: "Banque centrale européenne", label_en: "European Central Bank", kg_id: null, geo: null}
+    instrument: policy_rate_change
+    target: {label_fr: "Taux directeur de la zone euro", label_en: "Euro-area policy rate", kg_id: null, geo: null}
+    magnitude: {value: "50", unit: "bp"}
+    start: "2027Q1"
+    duration_quarters: null
+    horizon_quarters: 8
+    countries: [DEU, FRA, ITA, ESP, NLD]
+    countries_note_fr: "Sélection de membres de la zone euro (pas toute la zone)."
+    anchors: []
+    anchor_labels: {}
+  - id: eu_ban_russian_oil_2027q1
+    label_fr: "L'UE interdit toute importation de pétrole russe à partir du 1er trimestre 2027"
+    label_en: "The EU bans all imports of Russian oil from 2027Q1"
+    actor: {label_fr: "Union européenne", label_en: "European Union", kg_id: Q458, geo: null}
+    instrument: import_ban
+    target: {label_fr: "Pétrole de Russie", label_en: "Oil from Russia", kg_id: Q159, geo: RUS}
+    magnitude: {value: "1", unit: "share_of_imports_banned"}
+    start: "2027Q1"
+    duration_quarters: null
+    horizon_quarters: 8
+    countries: [RUS, DEU, FRA, ITA, POL]
+    anchors: [Q111022187, Q111034374, eusanct:case:2014022701]
+    anchor_labels:
+      Q111022187: "international sanctions during the Russian invasion of Ukraine"
+      Q111034374: "economic impact of the Russian invasion of Ukraine"
+      "eusanct:case:2014022701": "Sanctions case 2014022701 (EUSANCT): target Russia (COW 365), from 2014"
+  - id: france_retirement_65_2027
+    label_fr: "La France porte l'âge légal de départ à la retraite à 65 ans en 2027"
+    label_en: "France sets the statutory retirement age to 65 in 2027"
+    actor: {label_fr: "France", label_en: "France", kg_id: Q142, geo: FRA}
+    instrument: statutory_retirement_age
+    target: {label_fr: "Âge minimal légal de la pension de vieillesse", label_en: "Minimum statutory pension age", kg_id: null, geo: FRA}
+    magnitude: {value: "65", unit: "years"}
+    start: "2027Q1"
+    duration_quarters: null
+    horizon_quarters: 8
+    countries: [FRA]
+    plugin_options:
+      social.retirement_age:
+        reference_path: law_in_force_2026
+        reference_year: 2024
+        periods: 8
+        # Derived, not stated by the decision: the cohort reaching 65 in the start year (2027 - 65 = 1962) is the
+        # first one the target level applies to.
+        first_birth_year: 1962
+    anchors: []
+    anchor_labels: {}

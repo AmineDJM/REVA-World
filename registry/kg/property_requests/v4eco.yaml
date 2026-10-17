@@ -1,0 +1,37 @@
+# Property requests from V4ECO (ecology & animals). Merged by WDHARVEST's
+# `python -m reva.kg.harvest merge-property-requests` (checks id, datatype and takes the property's own labels).
+# P183 endemic to, P9714 taxon range and P1034 main food source are requested by V4CORE (not repeated here).
+- property: P141
+  why: >-
+    IUCN conservation status (taxon -> status item, e.g. Panthera leo -> Vulnerable Q278113), as Wikidata copies
+    it; spec registry/kg/queries/nature/ecology/iucn_status.yaml. Family context (V4ECO drop-in).
+  reva_predicate: iucn_conservation_status
+  inverse: iucn_conservation_status_of
+  kind: entity
+  group: nature
+  label_en: IUCN conservation status
+  label_fr: statut de conservation UICN
+- property: P627
+  why: IUCN taxon ID (external id) so Wikidata taxa can be tied to IUCN assessments by identifier, never by name.
+  reva_predicate: iucn_taxon_id
+  kind: external_id
+  group: nature
+  label_en: IUCN taxon ID
+  label_fr: identifiant UICN d'un taxon
+- property: P846
+  why: >-
+    GBIF taxon ID (external id): ties Wikidata taxa to the GBIF backbone keys used as KG nodes gbif:<key> by
+    V4ECO (atlas.gbif_occ, atlas.globi) and V4BIO, by identifier only.
+  reva_predicate: gbif_taxon_id
+  kind: external_id
+  group: nature
+  label_en: GBIF taxon ID
+  label_fr: identifiant Global Biodiversity Information Facility
+- property: P2975
+  why: host (parasite / pathogen / symbiont taxon -> host taxon); spec nature/ecology/host.yaml. Family interacts_with.
+  reva_predicate: host_taxon
+  inverse: host_of_taxon
+  kind: entity
+  group: nature
+  label_en: host
+  label_fr: hôte

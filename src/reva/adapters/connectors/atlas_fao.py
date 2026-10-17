@@ -73,7 +73,9 @@ from reva.kernel.errors import SourceResponseError
 CONNECTOR_NAME = "atlas.fao"
 # ATLASOPS: 1.0.1, code changed after 1.0.0 was registered in the dev DB (TWNMAP/agent edits).
 # SWEEP2: 1.0.2, `ruff format` changed the module source and so the code digest.
-CONNECTOR_VERSION = "1.0.2"
+# V4ECO: 1.0.3, QCL live-animal stocks extended (ducks, geese, turkeys, other birds, mules, rabbits, other rodents,
+# other camelids, bees: items 1068, 1072, 1079, 1083, 1110, 1140, 1150, 1157, 1181).
+CONNECTOR_VERSION = "1.0.3"
 PARSER_VERSION = "atlas_fao/1"
 SOURCE_KEY = "fao.faostat"
 SOURCE = "fao"
@@ -122,6 +124,7 @@ QCL_ITEMS = _codes(
     656, 661, 667, 486, 489, 515, 490, 560, 388, 403, 260, 176, 187, 191, 826, 836, 577, 571, 1182,
     867, 1035, 1058, 977, 1017, 882, 1062, 987, 951, 1020,  # meat, milk, eggs, wool
     866, 946, 976, 1016, 1034, 1057, 1126, 1096, 1107,  # live animals (stocks)
+    1068, 1072, 1079, 1083, 1110, 1140, 1150, 1157, 1181,  # V4ECO: more live animals (stocks; 1181 = beehives)
     1717, 1720, 1723, 1726, 1729, 1730, 1732, 1735, 1738, 1753, 1765, 1780, 1783, 1806, 1807, 1808,
     1746, 1749, 2029, 1714, 1804,  # FAO aggregates: cereals, roots, pulses, meat total, milk total...
 )  # fmt: skip

@@ -1,0 +1,109 @@
+# Slope of the regional Phillips curve, U.S. states (agent PRED-EFFECT), NBER working paper revised May 2021.
+# The source writes the curve as π = … − κ Σ β^j u (eq. 17) and π = … − ψ u_{t-4} (eq. 19): the printed κ and ψ are
+# positive; REVA stores the response of inflation to +1 pp unemployment, i.e. −κ / −ψ (printed_transform: negated).
+schema: reva-effects-literature/1
+id: hazell_herreno_nakamura_steinsson_2021
+source_key: effects.literature
+citation:
+  text: "Jonathon Hazell, Juan Herreño, Emi Nakamura, and Jón Steinsson. The Slope of the Phillips Curve: Evidence from U.S. States. NBER Working Paper No. 28005, October 2020, Revised May 2021."
+  text_basis: assembled from the title page of the version read (NBER working paper)
+  short: "Hazell, Herreño, Nakamura & Steinsson (2021), NBER WP 28005"
+  authors: [Jonathon Hazell, Juan Herreño, Emi Nakamura, Jón Steinsson]
+  title: "The Slope of the Phillips Curve: Evidence from U.S. States"
+  year: 2021
+  series: NBER Working Paper No. 28005
+  doi: null
+  url: http://www.nber.org/papers/w28005
+document:
+  url: https://www.nber.org/system/files/working_papers/w28005/w28005.pdf
+  media_type: application/pdf
+  sha256: 5f4d7ad41b2517f91a6a80671e4413c331e1c6414c21fe421a384337cc1641d3
+  bytes: 546497
+  version_read: NBER Working Paper 28005, October 2020, revised May 2021
+as_of: "2021-05-31"
+rights:
+  licence: "© 2020 by Jonathon Hazell, Juan Herreño, Emi Nakamura, and Jón Steinsson. All rights reserved. Short sections of text, not to exceed two paragraphs, may be quoted without explicit permission provided that full credit, including © notice, is given to the source."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent PRED-EFFECT
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  effect: {kind: variable, id: prices.nontradeable_inflation_regional, transform: pp_change,
+           definition: "cumulative non-tradeable inflation over four quarters, measured in percentage points (state-level price indexes for non-tradeable goods)"}
+  measure: slope
+  unit: pp_per_pp
+  sign: negative
+  point_kind: point
+  printed_transform: negated
+  method: iv
+  pdf_page: 30
+  scope: {countries: [USA], period: {from: "1978", to: "2018"}, frequency: quarterly, sample_note: "Panel of U.S. states"}
+  applicability: "REVA note: regional (state) slope for non-tradeables with time fixed effects absorbing national long-run expectations; the paper maps it to an aggregate slope with a multi-region model. Not a national CPI response."
+estimates:
+  - id: kappa_lagged_unemployment_iv
+    cause: {kind: variable, id: labour.unemployment_rate_discounted_sum, transform: pp_change,
+            definition: "the discounted future sum of quarterly state unemployment, in percentage points (truncated at 20 quarters)"}
+    point: -0.0062
+    as_printed: "0.0062"
+    uncertainty: {se: 0.0028, se_as_printed: "0.0028", status: reported}
+    horizon: {kind: unspecified}
+    identification: "Two-sample two-stage least squares of equation (17) with state and time fixed effects, instrumenting with the fourth lags of state unemployment and of the relative price of non-tradeables; standard errors clustered by state with the Chodorow-Reich and Wieland (2019) correction"
+    locator: "Table 1 'Slope of the Regional Phillips Curve', Panel A (κ from equation (17)), column (3) 'Lagged Unempl.' (printed p.28)"
+    quote: "κ -0.0037 0.0003 0.0062 0.0062 (0.0013) (0.0019) (0.0028) (0.0025)"
+  - id: kappa_tradeable_demand_iv
+    cause: {kind: variable, id: labour.unemployment_rate_discounted_sum, transform: pp_change,
+            definition: "the discounted future sum of quarterly state unemployment, in percentage points (truncated at 20 quarters)"}
+    point: -0.0062
+    as_printed: "0.0062"
+    uncertainty: {se: 0.0025, se_as_printed: "0.0025", status: reported}
+    horizon: {kind: unspecified}
+    identification: "Two-sample two-stage least squares of equation (17) with state and time fixed effects, the tradeable-demand instrument replacing lagged unemployment among the instruments; clustered, corrected standard errors"
+    locator: "Table 1, Panel A, column (4) 'Tradeable Demand IV' (printed p.28)"
+    quote: "κ -0.0037 0.0003 0.0062 0.0062 (0.0013) (0.0019) (0.0028) (0.0025)"
+  - id: psi_lagged_unemployment
+    cause: {kind: variable, id: labour.unemployment_rate_regional, transform: pp_change,
+            definition: "the fourth lag of quarterly state unemployment, measured in percentage points"}
+    point: -0.112
+    as_printed: "0.112"
+    uncertainty: {se: 0.057, se_as_printed: "0.057", status: reported}
+    horizon: {kind: at_horizon, value: 4, unit: quarter}
+    method: panel_regression
+    identification: "Reduced-form regression (19) with state and time fixed effects, OLS (fourth lags as regressors); a reduced-form slope the authors call hard to interpret because it depends on the persistence of the identifying variation"
+    locator: "Table 1, Panel B (ψ from equation (19)), column (3) 'Lagged Unempl.' (printed p.28)"
+    quote: "ψ -0.103 0.017 0.112 0.339 (0.036) (0.027) (0.057) (0.126)"
+  - id: psi_tradeable_demand_iv
+    cause: {kind: variable, id: labour.unemployment_rate_regional, transform: pp_change,
+            definition: "the fourth lag of quarterly state unemployment, measured in percentage points"}
+    point: -0.339
+    as_printed: "0.339"
+    uncertainty: {se: 0.126, se_as_printed: "0.126", status: reported}
+    horizon: {kind: at_horizon, value: 4, unit: quarter}
+    identification: "Regression (19) with state and time fixed effects, tradeable-demand instrument; reduced-form slope sensitive to the persistence of the identifying variation (per the authors)"
+    locator: "Table 1, Panel B (ψ from equation (19)), column (4) 'Tradeable Demand IV' (printed p.28)"
+    quote: "ψ -0.103 0.017 0.112 0.339 (0.036) (0.027) (0.057) (0.126)"
+  - id: kappa_pre1990_tradeable_demand_iv
+    pdf_page: 32
+    cause: {kind: variable, id: labour.unemployment_rate_discounted_sum, transform: pp_change,
+            definition: "the discounted future sum of quarterly state unemployment, in percentage points (truncated at 20 quarters)"}
+    point: -0.0109
+    as_printed: "0.0109"
+    uncertainty: {se: 0.0062, se_as_printed: "0.0062", status: reported}
+    horizon: {kind: unspecified}
+    scope: {period: {from: "1978", to: "1990"}}
+    identification: "Equation (17) with state and time fixed effects, tradeable-demand instrument, sample 1978-1990"
+    locator: "Table 2 'Has the Phillips Curve Flattened?', Panel A, column (5) 'Tradeable Demand IV With Time Fixed Effect, Pre-1990' (printed p.30)"
+    quote: "κ 0.0278 0.0002 0.0107 0.0050 0.0109 0.0055 (0.0025) (0.0017) (0.0080) (0.0040) (0.0062) (0.0028)"
+  - id: kappa_post1990_tradeable_demand_iv
+    pdf_page: 32
+    cause: {kind: variable, id: labour.unemployment_rate_discounted_sum, transform: pp_change,
+            definition: "the discounted future sum of quarterly state unemployment, in percentage points (truncated at 20 quarters)"}
+    point: -0.0055
+    as_printed: "0.0055"
+    uncertainty: {se: 0.0028, se_as_printed: "0.0028", status: reported}
+    horizon: {kind: unspecified}
+    scope: {period: {from: "1991", to: "2018"}}
+    identification: "Equation (17) with state and time fixed effects, tradeable-demand instrument, sample 1991-2018"
+    locator: "Table 2 'Has the Phillips Curve Flattened?', Panel A, column (6) 'Tradeable Demand IV With Time Fixed Effect, Post-1990' (printed p.30)"
+    quote: "κ 0.0278 0.0002 0.0107 0.0050 0.0109 0.0055 (0.0025) (0.0017) (0.0080) (0.0040) (0.0062) (0.0028)"

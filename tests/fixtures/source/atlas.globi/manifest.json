@@ -1,0 +1,50 @@
+[
+  {
+    "request_fingerprint": "a09d6b3e11293a32d28a5f7318b12f8051602f7410c4aee5ffbe6603299de080",
+    "url": "https://api.globalbioticinteractions.org/interaction?sourceTaxon=GBIF%3A5219404&interactionType=eats&interactionType=preysOn&interactionType=parasiteOf&interactionType=pathogenOf&interactionType=pollinates&interactionType=visitsFlowersOf&interactionType=vectorOf&interactionType=hasHost&fields=source_taxon_external_id%2Csource_taxon_name%2Cinteraction_type%2Ctarget_taxon_external_id%2Ctarget_taxon_name%2Cnumber_of_interactions%2Cnumber_of_studies%2Cnumber_of_sources&limit=2000",
+    "file": "a09d6b3e11293a32.json",
+    "sha256": "c5edaccbeb8a0ca9ad1c5adf5673a7639cffe2d9899ffd43d0ff0b980348756e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:44:28.897893+00:00",
+    "licence": "unclear: GloBI aggregates datasets under their own licences (not stated in the API response)"
+  },
+  {
+    "request_fingerprint": "d6865e012ae7c625e439d93798ddb560994cb9388e25891d7f5993b9d0bc853f",
+    "url": "https://api.globalbioticinteractions.org/interaction?targetTaxon=GBIF%3A5219404&interactionType=eats&interactionType=preysOn&interactionType=parasiteOf&interactionType=pathogenOf&interactionType=pollinates&interactionType=visitsFlowersOf&interactionType=vectorOf&interactionType=hasHost&fields=source_taxon_external_id%2Csource_taxon_name%2Cinteraction_type%2Ctarget_taxon_external_id%2Ctarget_taxon_name%2Cnumber_of_interactions%2Cnumber_of_studies%2Cnumber_of_sources&limit=2000",
+    "file": "d6865e012ae7c625.json",
+    "sha256": "96636c935de452c7d3f60239e65c394bb86000ed1d98ca8566e1a731e7a4acaa",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:44:30.273000+00:00",
+    "licence": "unclear: GloBI aggregates datasets under their own licences (not stated in the API response)"
+  },
+  {
+    "request_fingerprint": "9aa73a4b4a66b9e6e69c172167caae12588415c489d84b9b2893b3cbe3b1862c",
+    "url": "https://api.globalbioticinteractions.org/interaction?sourceTaxon=GBIF%3A1341976&interactionType=eats&interactionType=preysOn&interactionType=parasiteOf&interactionType=pathogenOf&interactionType=pollinates&interactionType=visitsFlowersOf&interactionType=vectorOf&interactionType=hasHost&fields=source_taxon_external_id%2Csource_taxon_name%2Cinteraction_type%2Ctarget_taxon_external_id%2Ctarget_taxon_name%2Cnumber_of_interactions%2Cnumber_of_studies%2Cnumber_of_sources&limit=2000",
+    "file": "9aa73a4b4a66b9e6.json",
+    "sha256": "9f304ae56ec95c664abd97d4cba2e20ad17cb5f6600d0ad6ecee253f9d4d37ef",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:44:35.421435+00:00",
+    "licence": "unclear: GloBI aggregates datasets under their own licences (not stated in the API response)"
+  },
+  {
+    "request_fingerprint": "2fd797b3093f6b4aa5f2768eaee1e2cdd9cd3353f870c0acddd1d6850190c8d6",
+    "url": "https://api.globalbioticinteractions.org/interaction?targetTaxon=GBIF%3A1341976&interactionType=eats&interactionType=preysOn&interactionType=parasiteOf&interactionType=pathogenOf&interactionType=pollinates&interactionType=visitsFlowersOf&interactionType=vectorOf&interactionType=hasHost&fields=source_taxon_external_id%2Csource_taxon_name%2Cinteraction_type%2Ctarget_taxon_external_id%2Ctarget_taxon_name%2Cnumber_of_interactions%2Cnumber_of_studies%2Cnumber_of_sources&limit=2000",
+    "file": "2fd797b3093f6b4a.json",
+    "sha256": "d8eb46fab9aa36d197de9724704d8fb328430dc77afa25be9c0f95572eac7d1a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:44:38.466156+00:00",
+    "licence": "unclear: GloBI aggregates datasets under their own licences (not stated in the API response)"
+  }
+]

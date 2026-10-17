@@ -1,0 +1,33 @@
+# Budget request from agent V4ECO (V4: ecology & animals). Merged into registry/policies/budgets.yaml by
+# python -m reva.atlas.budget_merge --write. All sources are read through provider aggregations (no bulk dumps).
+agent: V4ECO
+requests:
+  - source_key: gbif.occurrence
+    # graphql.gbif.org countryCode facets (34 taxon groups, 56 years, 9 IUCN categories, 45 seed taxa; ~20 kB each)
+    # + api.gbif.org species / iucnRedListCategory records (78 small JSON). GBIF data user agreement.
+    daily_requests: 600
+    expected_bytes_per_day: 15000000
+    reason: "one full run = 34 + 33 + 56 + 9 + 3 x 45 = 267 requests (~5 MB); 600/day allows one retried run"
+  - source_key: globi.interactions
+    # api.globalbioticinteractions.org/interaction, 45 seed taxa x 2 directions, limit 2000 rows (<= 0.5 MB each).
+    daily_requests: 200
+    expected_bytes_per_day: 60000000
+    reason: "one full run = 90 requests (up to ~25 MB); 200/day allows one retried run"
+  - source_key: resolve.ecoregions2017
+    # storage.googleapis.com/teow2016/Ecoregions2017.zip: two byte ranges (64 kB tail + 57 kB dbf member). CC BY 4.0.
+    daily_requests: 6
+    expected_bytes_per_day: 1000000
+    reason: "one run = 2 range requests (~0.12 MB)"
+  - source_key: fao.fishstat
+    # www.fao.org/fishery/static/Data/GlobalProduction_2026.1.0.zip (6.4 MB). CC BY 4.0.
+    daily_requests: 4
+    expected_bytes_per_day: 30000000
+    reason: "one run = 1 request (6.4 MB); allow retries"
+daily_totals_increase:
+  http_requests_total: "+810"
+  http_bytes_total: "+106_000_000"
+notes: >-
+  V4ECO also adds 5 OWID grapher requests (Living Planet Index chart, csv + chart metadata + 3 indicator metadata)
+  to owid.compilations (limit 50, one run uses ~20) and 1-2 UN SDG pages (ER_RSK_LST) to un.sdg (limit 400): both
+  fit the existing limits. Wikidata specs (registry/kg/queries/nature/ecology) run under WDHARVEST's wikidata.wdqs /
+  wikidata.wbapi keys. Disk: raw archive ~35 MB per full refresh of all four sources.

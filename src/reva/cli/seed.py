@@ -525,6 +525,12 @@ DEFAULT_SCHEDULES: tuple[tuple[str, str, dict[str, Any], int], ...] = (
     # link store slot, live origin only (production serves live claims); writes nothing when unchanged.
     ("causal_refresh:live", "causal_refresh", {"origin": "live"}, 86400),
     # --- end CAUSOPS
+    # --- PRED-REGISTRY (V5): forecast registry. `issue` weekly: questions are issued once per quarterly cycle, so a
+    # run within a cycle only adds families whose atlas table landed since (V4ECON / PRED-HF series); `resolve` daily
+    # after the atlas ingests: scores questions whose value appeared in a table version registered after the seal.
+    ("forecast_registry:issue:live", "forecast_registry", {"action": "issue", "origin": "live"}, 7 * 86400),
+    ("forecast_registry:resolve:live", "forecast_registry", {"action": "resolve", "origin": "live"}, 86400),
+    # --- end PRED-REGISTRY
 )
 
 #: ATLASOPS: hours from seeding to a schedule's first slot (default 1 h). Heavy downloads get a day of
@@ -534,6 +540,8 @@ ATLAS_FIRST_SLOT_HOURS: dict[str, int] = {
     "atlas_snapshot:live": 8,
     "links_materialise:live": 10,  # LINKWIRE: after the daily atlas snapshot slot
     "causal_refresh:live": 12,  # CAUSOPS: after the daily link store slot
+    "forecast_registry:issue:live": 14,  # PRED-REGISTRY: after the daily atlas snapshot / causal slots
+    "forecast_registry:resolve:live": 15,
 }
 
 

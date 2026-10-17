@@ -1,0 +1,106 @@
+# REVA effect variables (agent PRED-EFFECT; contract docs/dev/v5_effect_interface.md).
+#
+# Variables that published effect estimates talk about but that the atlas catalog (registry/atlas/catalog/**)
+# does not carry as such. Definitions are REVA's (labelled `definition_by: reva`), written from the sources'
+# own variable definitions; each estimate also keeps the source's definition verbatim.
+# `atlas_concepts`: a CURATED link to atlas concepts that measure the same quantity (declared by a curator
+# with a note; never inferred from names). An empty list means: no atlas concept measures it yet.
+schema: reva-effect-variables/1
+version: 1
+variables:
+  - id: output.gap
+    labels: {en: Output gap, fr: Écart de production}
+    definition: Log real output minus its long-run (trend or potential) level, in percent.
+    unit: percent of trend output
+    atlas_concepts: []
+  - id: output.real_gdp_level
+    labels: {en: Real GDP (level), fr: PIB réel (niveau)}
+    definition: Real gross domestic product, level (a multiplier relates its change, in currency, to the change of the cause in the same currency).
+    unit: constant-price currency
+    atlas_concepts: []
+  - id: labour.unemployment_gap
+    labels: {en: Unemployment gap, fr: Écart de chômage}
+    definition: Unemployment rate minus its long-run (trend or natural) level, in percentage points.
+    unit: percentage points
+    atlas_concepts: []
+  - id: labour.unemployment_rate_discounted_sum
+    labels: {en: Discounted future sum of the unemployment rate, fr: Somme actualisée future du taux de chômage}
+    definition: Discounted sum of current and expected future quarterly unemployment rates (the forcing term of a forward-looking Phillips curve).
+    unit: percentage points (discounted sum)
+    atlas_concepts: []
+  - id: prices.nontradeable_inflation_regional
+    labels: {en: Regional non-tradeable inflation, fr: Inflation régionale des biens non échangeables}
+    definition: Cumulative four-quarter inflation of a region's (U.S. state's) price index for non-tradeable goods and services.
+    unit: percentage points
+    atlas_concepts: []
+  - id: labour.unemployment_rate_regional
+    labels: {en: Regional unemployment rate, fr: Taux de chômage régional}
+    definition: Unemployment rate of a sub-national region (U.S. state).
+    unit: percent of labour force
+    atlas_concepts: []
+  - id: oil_price.global
+    labels: {en: Global crude oil price, fr: Prix mondial du pétrole brut}
+    definition: World crude oil price in U.S. dollars (its percent change is "global oil price inflation").
+    unit: USD per barrel
+    atlas_concepts: []
+  - id: energy_price.all_products
+    labels: {en: Energy prices (all energy products), fr: Prix de l'énergie (tous produits énergétiques)}
+    definition: Prices of all energy products (coal, crude oil and gas, refined products, electricity, gas and steam supply) as inputs and consumption goods.
+    unit: index
+    atlas_concepts: []
+  - id: prices.consumer_level
+    labels: {en: Consumer price level, fr: Niveau des prix à la consommation}
+    definition: Level of a consumer price index (CPI / HICP); its percent change over a period is consumer price inflation over that period.
+    unit: index
+    atlas_concepts: [imf.cpi_index]
+    atlas_note: imf.cpi_index is the IMF WEO consumer price index (period average); a source's HICP or CPI-before-taxes differs in coverage.
+  - id: prices.producer_level
+    labels: {en: Producer price level, fr: Niveau des prix à la production}
+    definition: Level of producer (output) prices across branches.
+    unit: index
+    atlas_concepts: []
+  - id: prices.import_level
+    labels: {en: Import price level, fr: Niveau des prix à l'importation}
+    definition: Level of import prices or the import deflator (total imports unless an estimate says otherwise).
+    unit: index
+    atlas_concepts: []
+  - id: exchange_rate.neer_depreciation
+    labels: {en: Nominal effective depreciation of the domestic currency, fr: Dépréciation effective nominale de la monnaie nationale}
+    definition: Percent depreciation of the domestic currency's nominal effective exchange rate (a positive value is a depreciation).
+    unit: percent
+    atlas_concepts: []
+  - id: fiscal.government_purchases
+    labels: {en: Government purchases, fr: Achats de l'État}
+    definition: Real government purchases of goods and services (consumption and investment), level.
+    unit: constant-price currency
+    atlas_concepts: []
+  - id: trade.bilateral_trade_flow
+    labels: {en: Bilateral trade flow, fr: Flux commercial bilatéral}
+    definition: Value of exports from an origin country to a destination country (the dependent variable of a gravity equation).
+    unit: currency
+    atlas_concepts: []
+  - id: trade.bilateral_trade_cost
+    labels: {en: Bilateral trade cost factor, fr: Facteur de coût commercial bilatéral}
+    definition: Ad valorem bilateral trade cost factor (one plus the tariff or freight rate); its elasticity is the trade elasticity.
+    unit: factor (1 + rate)
+    atlas_concepts: []
+  - id: trade.bilateral_distance
+    labels: {en: Bilateral distance, fr: Distance bilatérale}
+    definition: Geographic distance between the origin and destination countries.
+    unit: km
+    atlas_concepts: []
+  - id: trade.rta_membership
+    labels: {en: Regional trade agreement in force, fr: Accord commercial régional en vigueur}
+    definition: Indicator that the two countries are parties to a common regional or free trade agreement.
+    unit: indicator (0/1)
+    atlas_concepts: []
+  - id: trade.eu_membership
+    labels: {en: Both countries in the European Union, fr: Deux pays membres de l'Union européenne}
+    definition: Indicator that both countries are EU members.
+    unit: indicator (0/1)
+    atlas_concepts: []
+  - id: trade.common_currency
+    labels: {en: Common currency, fr: Monnaie commune}
+    definition: Indicator that the two countries share a currency (currency union).
+    unit: indicator (0/1)
+    atlas_concepts: []

@@ -12,7 +12,10 @@
 #                           Wave and Tidal, Other); code = the category lower-cased, spaces -> "_". The category
 #                           is GPPD's own, not mapped to any Wikidata item (no identifier is published).
 #                                                                                                  kind energy_source
-#   usgs_myb:facility:<n>   a facility row of the USGS Minerals Yearbook vol. III facilities table (when loaded).
+#   usgs_myb:<facility id>  a mine / plant of the USGS Minerals Yearbook 2024 vol. III facilities table (USGS Facility ID,
+#                           e.g. CHL0012).                                                         kind facility
+#   usgs_myb:commodity:<c>  a USGS "Level 2 (Commodity)" value (code = lower-cased, non-alphanumerics -> "_").
+#                                                                                                  kind commodity
 #
 # Honesty:
 # * Every statement is what GPPD v1.3.0 states (CC BY 4.0, WRI); the per-plant upstream source (EIA, Wiki-Solar,
@@ -36,3 +39,13 @@ predicates:
   - {pid: "gppd:generation_gwh", value_kind: quantity, reva_predicate: gppd_generation_gwh, label_en: "reported annual electricity generation, GWh (GPPD)", label_fr: "production annuelle d'électricité déclarée, GWh (GPPD)"}
   - {pid: "gppd:wepp_id", value_kind: external_id, reva_predicate: gppd_wepp_id, label_en: "Platts WEPP id cited by GPPD", label_fr: "identifiant Platts WEPP cité par GPPD"}
   - {pid: "gppd:data_source", value_kind: string, reva_predicate: gppd_data_source, label_en: "upstream data source of the plant record (GPPD)", label_fr: "source amont de la fiche (GPPD)"}
+  # ------------------------------------------------------------------ USGS Minerals Yearbook 2024 vol. III facilities
+  - {pid: "usgs_myb:country", value_kind: item, reva_predicate: usgs_myb_country, label_en: "country (USGS Minerals Yearbook facilities)", label_fr: "pays (installations du Minerals Yearbook de l'USGS)", inverse_name: usgs_myb_has_facility, inverse_label_en: "has mineral facility (USGS MYB)", inverse_label_fr: "a pour installation minière (USGS MYB)"}
+  - {pid: "usgs_myb:produces", value_kind: item, reva_predicate: usgs_myb_produces, label_en: "produces mineral commodity (USGS MYB facilities)", label_fr: "produit le produit minéral (installations USGS MYB)", inverse_name: usgs_myb_produced_at, inverse_label_en: "produced at (USGS MYB)", inverse_label_fr: "produit à (USGS MYB)"}
+  - {pid: "usgs_myb:annual_capacity", value_kind: quantity, reva_predicate: usgs_myb_annual_capacity, label_en: "annual production capacity (USGS MYB facilities)", label_fr: "capacité annuelle de production (installations USGS MYB)"}
+  - {pid: "usgs_myb:feature_type", value_kind: string, reva_predicate: usgs_myb_feature_type, label_en: "feature type (USGS MYB facilities)", label_fr: "type d'installation (USGS MYB)"}
+  - {pid: "usgs_myb:adm1_name", value_kind: string, reva_predicate: usgs_myb_adm1_name, label_en: "first-level administrative division name, as listed in the NGA GNS (USGS MYB)", label_fr: "nom de la division administrative de premier niveau, selon le GNS de la NGA (USGS MYB)"}
+  - {pid: "usgs_myb:location", value_kind: string, reva_predicate: usgs_myb_location, label_en: "location description (USGS MYB facilities)", label_fr: "description de l'emplacement (USGS MYB)"}
+  - {pid: "usgs_myb:operator_name", value_kind: string, reva_predicate: usgs_myb_operator_name, label_en: "major operating company, as named by USGS (free text)", label_fr: "principal exploitant, tel que nommé par l'USGS (texte libre)"}
+  - {pid: "usgs_myb:equity_owner_name", value_kind: string, reva_predicate: usgs_myb_equity_owner_name, label_en: "equity owner, as named by USGS (free text; share_percent qualifier when given)", label_fr: "actionnaire, tel que nommé par l'USGS (texte libre ; part en % quand elle est donnée)"}
+  - {pid: "usgs_myb:data_source", value_kind: string, reva_predicate: usgs_myb_data_source, label_en: "data source of the facility entry (USGS MYB)", label_fr: "source de l'entrée (USGS MYB)"}

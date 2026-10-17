@@ -1,0 +1,9 @@
+# Model chains of the decision engine that passed the judge (agent PRED-ENGINE; judge = PRED-REGISTRY's
+# prospective registry and src/reva/evaluation/**). A chain is identified by its signature: the sha256 of the
+# sorted list of hop identifiers it uses (effect estimate keys and plugin model ids with versions).
+#
+# Until an entry with BOTH a back-test record (as-of replay on vintage data, never final-vintage
+# pseudo-real-time reported as real-time skill) AND a calibration record exists for a chain, every output of
+# that chain is labelled "scénario non validé — pas une probabilité". Entries are appended by the judge only.
+schema_version: "1.0.0"
+chains: []

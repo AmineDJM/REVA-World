@@ -1,0 +1,3716 @@
+# Ecology and wildlife (agent V4ECO). Provider-declared concepts, not human-reviewed. Generated from the
+# connectors' declared indicators (atlas_gbif_occ, atlas_fishstat) plus the V4ECO additions to atlas.un_sdg
+# (Red List Index), atlas.owid (Living Planet Index) and atlas.fao (live-animal stocks). Sources and caveats:
+# docs/dev/v4_v4eco.md. GBIF counts reflect sampling effort, never abundance.
+domain: ecology
+labels:
+  fr: Écologie et faune
+  en: Ecology and wildlife
+maintainer: V4ECO
+concepts:
+- id: ecology.gbif.country_group.occurrences.all
+  labels:
+    en: 'GBIF occurrence records: all'
+    fr: 'Observations enregistrées dans GBIF : tous les taxons'
+  definition: Number of occurrence records in the GBIF index (all records) whose GBIF-interpreted countryCode is the country,
+    at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.all
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.all
+  labels:
+    en: 'Species with GBIF records: all'
+    fr: 'Espèces avec observations GBIF : tous les taxons'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (all records) whose
+    countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation. Not a species
+    checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.all
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.animalia
+  labels:
+    en: 'GBIF occurrence records: animalia'
+    fr: 'Observations enregistrées dans GBIF : animaux (Animalia)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone kingdom key 1) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.animalia
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.animalia
+  labels:
+    en: 'Species with GBIF records: animalia'
+    fr: 'Espèces avec observations GBIF : animaux (Animalia)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone kingdom
+    key 1) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.animalia
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.archaea
+  labels:
+    en: 'GBIF occurrence records: archaea'
+    fr: 'Observations enregistrées dans GBIF : archées (Archaea)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone kingdom key 2) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.archaea
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.archaea
+  labels:
+    en: 'Species with GBIF records: archaea'
+    fr: 'Espèces avec observations GBIF : archées (Archaea)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone kingdom
+    key 2) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.archaea
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.bacteria
+  labels:
+    en: 'GBIF occurrence records: bacteria'
+    fr: 'Observations enregistrées dans GBIF : bactéries (Bacteria)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone kingdom key 3) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.bacteria
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.bacteria
+  labels:
+    en: 'Species with GBIF records: bacteria'
+    fr: 'Espèces avec observations GBIF : bactéries (Bacteria)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone kingdom
+    key 3) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.bacteria
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.chromista
+  labels:
+    en: 'GBIF occurrence records: chromista'
+    fr: 'Observations enregistrées dans GBIF : Chromista'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone kingdom key 4) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.chromista
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.chromista
+  labels:
+    en: 'Species with GBIF records: chromista'
+    fr: 'Espèces avec observations GBIF : Chromista'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone kingdom
+    key 4) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.chromista
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.fungi
+  labels:
+    en: 'GBIF occurrence records: fungi'
+    fr: 'Observations enregistrées dans GBIF : champignons (Fungi)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone kingdom key 5) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.fungi
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.fungi
+  labels:
+    en: 'Species with GBIF records: fungi'
+    fr: 'Espèces avec observations GBIF : champignons (Fungi)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone kingdom
+    key 5) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.fungi
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.plantae
+  labels:
+    en: 'GBIF occurrence records: plantae'
+    fr: 'Observations enregistrées dans GBIF : plantes (Plantae)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone kingdom key 6) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.plantae
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.plantae
+  labels:
+    en: 'Species with GBIF records: plantae'
+    fr: 'Espèces avec observations GBIF : plantes (Plantae)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone kingdom
+    key 6) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.plantae
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.protozoa
+  labels:
+    en: 'GBIF occurrence records: protozoa'
+    fr: 'Observations enregistrées dans GBIF : protozoaires (Protozoa)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone kingdom key 7) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.protozoa
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.protozoa
+  labels:
+    en: 'Species with GBIF records: protozoa'
+    fr: 'Espèces avec observations GBIF : protozoaires (Protozoa)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone kingdom
+    key 7) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.protozoa
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.viruses
+  labels:
+    en: 'GBIF occurrence records: viruses'
+    fr: 'Observations enregistrées dans GBIF : virus (Viruses)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone kingdom key 8) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.viruses
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.viruses
+  labels:
+    en: 'Species with GBIF records: viruses'
+    fr: 'Espèces avec observations GBIF : virus (Viruses)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone kingdom
+    key 8) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.viruses
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.incertae_sedis
+  labels:
+    en: 'GBIF occurrence records: incertae sedis'
+    fr: 'Observations enregistrées dans GBIF : règne incertae sedis'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone kingdom key 0) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.incertae_sedis
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.incertae_sedis
+  labels:
+    en: 'Species with GBIF records: incertae sedis'
+    fr: 'Espèces avec observations GBIF : règne incertae sedis'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone kingdom
+    key 0) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.incertae_sedis
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.chordata
+  labels:
+    en: 'GBIF occurrence records: chordata'
+    fr: 'Observations enregistrées dans GBIF : cordés (Chordata)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone phylum key 44) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.chordata
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.chordata
+  labels:
+    en: 'Species with GBIF records: chordata'
+    fr: 'Espèces avec observations GBIF : cordés (Chordata)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone phylum
+    key 44) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.chordata
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.arthropoda
+  labels:
+    en: 'GBIF occurrence records: arthropoda'
+    fr: 'Observations enregistrées dans GBIF : arthropodes (Arthropoda)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone phylum key 54) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.arthropoda
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.arthropoda
+  labels:
+    en: 'Species with GBIF records: arthropoda'
+    fr: 'Espèces avec observations GBIF : arthropodes (Arthropoda)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone phylum
+    key 54) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.arthropoda
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.mollusca
+  labels:
+    en: 'GBIF occurrence records: mollusca'
+    fr: 'Observations enregistrées dans GBIF : mollusques (Mollusca)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone phylum key 52) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.mollusca
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.mollusca
+  labels:
+    en: 'Species with GBIF records: mollusca'
+    fr: 'Espèces avec observations GBIF : mollusques (Mollusca)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone phylum
+    key 52) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.mollusca
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.tracheophyta
+  labels:
+    en: 'GBIF occurrence records: tracheophyta'
+    fr: 'Observations enregistrées dans GBIF : plantes vasculaires (Tracheophyta)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone phylum key 7707728) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.tracheophyta
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.tracheophyta
+  labels:
+    en: 'Species with GBIF records: tracheophyta'
+    fr: 'Espèces avec observations GBIF : plantes vasculaires (Tracheophyta)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone phylum
+    key 7707728) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.tracheophyta
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.mammalia
+  labels:
+    en: 'GBIF occurrence records: mammalia'
+    fr: 'Observations enregistrées dans GBIF : mammifères (Mammalia)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 359) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.mammalia
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.mammalia
+  labels:
+    en: 'Species with GBIF records: mammalia'
+    fr: 'Espèces avec observations GBIF : mammifères (Mammalia)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 359) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.mammalia
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.aves
+  labels:
+    en: 'GBIF occurrence records: aves'
+    fr: 'Observations enregistrées dans GBIF : oiseaux (Aves)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 212) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.aves
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.aves
+  labels:
+    en: 'Species with GBIF records: aves'
+    fr: 'Espèces avec observations GBIF : oiseaux (Aves)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 212) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.aves
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.amphibia
+  labels:
+    en: 'GBIF occurrence records: amphibia'
+    fr: 'Observations enregistrées dans GBIF : amphibiens (Amphibia)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 131) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.amphibia
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.amphibia
+  labels:
+    en: 'Species with GBIF records: amphibia'
+    fr: 'Espèces avec observations GBIF : amphibiens (Amphibia)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 131) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.amphibia
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.squamata
+  labels:
+    en: 'GBIF occurrence records: squamata'
+    fr: 'Observations enregistrées dans GBIF : squamates (Squamata)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 11592253) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.squamata
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.squamata
+  labels:
+    en: 'Species with GBIF records: squamata'
+    fr: 'Espèces avec observations GBIF : squamates (Squamata)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 11592253) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.squamata
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.testudines
+  labels:
+    en: 'GBIF occurrence records: testudines'
+    fr: 'Observations enregistrées dans GBIF : tortues (Testudines)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 11418114) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.testudines
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.testudines
+  labels:
+    en: 'Species with GBIF records: testudines'
+    fr: 'Espèces avec observations GBIF : tortues (Testudines)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 11418114) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.testudines
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.crocodylia
+  labels:
+    en: 'GBIF occurrence records: crocodylia'
+    fr: 'Observations enregistrées dans GBIF : crocodiliens (Crocodylia)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 11493978) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.crocodylia
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.crocodylia
+  labels:
+    en: 'Species with GBIF records: crocodylia'
+    fr: 'Espèces avec observations GBIF : crocodiliens (Crocodylia)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 11493978) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.crocodylia
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.elasmobranchii
+  labels:
+    en: 'GBIF occurrence records: elasmobranchii'
+    fr: 'Observations enregistrées dans GBIF : requins et raies (Elasmobranchii)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 121) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.elasmobranchii
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.elasmobranchii
+  labels:
+    en: 'Species with GBIF records: elasmobranchii'
+    fr: 'Espèces avec observations GBIF : requins et raies (Elasmobranchii)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 121) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.elasmobranchii
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.insecta
+  labels:
+    en: 'GBIF occurrence records: insecta'
+    fr: 'Observations enregistrées dans GBIF : insectes (Insecta)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 216) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.insecta
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.insecta
+  labels:
+    en: 'Species with GBIF records: insecta'
+    fr: 'Espèces avec observations GBIF : insectes (Insecta)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 216) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.insecta
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.arachnida
+  labels:
+    en: 'GBIF occurrence records: arachnida'
+    fr: 'Observations enregistrées dans GBIF : arachnides (Arachnida)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 367) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.arachnida
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.arachnida
+  labels:
+    en: 'Species with GBIF records: arachnida'
+    fr: 'Espèces avec observations GBIF : arachnides (Arachnida)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 367) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.arachnida
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.malacostraca
+  labels:
+    en: 'GBIF occurrence records: malacostraca'
+    fr: 'Observations enregistrées dans GBIF : malacostracés (Malacostraca)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 229) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.malacostraca
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.malacostraca
+  labels:
+    en: 'Species with GBIF records: malacostraca'
+    fr: 'Espèces avec observations GBIF : malacostracés (Malacostraca)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 229) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.malacostraca
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.gastropoda
+  labels:
+    en: 'GBIF occurrence records: gastropoda'
+    fr: 'Observations enregistrées dans GBIF : gastéropodes (Gastropoda)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 225) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.gastropoda
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.gastropoda
+  labels:
+    en: 'Species with GBIF records: gastropoda'
+    fr: 'Espèces avec observations GBIF : gastéropodes (Gastropoda)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 225) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.gastropoda
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.bivalvia
+  labels:
+    en: 'GBIF occurrence records: bivalvia'
+    fr: 'Observations enregistrées dans GBIF : bivalves (Bivalvia)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 137) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.bivalvia
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.bivalvia
+  labels:
+    en: 'Species with GBIF records: bivalvia'
+    fr: 'Espèces avec observations GBIF : bivalves (Bivalvia)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 137) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.bivalvia
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.anthozoa
+  labels:
+    en: 'GBIF occurrence records: anthozoa'
+    fr: 'Observations enregistrées dans GBIF : anthozoaires (Anthozoa)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 206) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.anthozoa
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.anthozoa
+  labels:
+    en: 'Species with GBIF records: anthozoa'
+    fr: 'Espèces avec observations GBIF : anthozoaires (Anthozoa)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 206) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.anthozoa
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.magnoliopsida
+  labels:
+    en: 'GBIF occurrence records: magnoliopsida'
+    fr: 'Observations enregistrées dans GBIF : dicotylédones (Magnoliopsida)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 220) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.magnoliopsida
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.magnoliopsida
+  labels:
+    en: 'Species with GBIF records: magnoliopsida'
+    fr: 'Espèces avec observations GBIF : dicotylédones (Magnoliopsida)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 220) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.magnoliopsida
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.liliopsida
+  labels:
+    en: 'GBIF occurrence records: liliopsida'
+    fr: 'Observations enregistrées dans GBIF : monocotylédones (Liliopsida)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 196) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.liliopsida
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.liliopsida
+  labels:
+    en: 'Species with GBIF records: liliopsida'
+    fr: 'Espèces avec observations GBIF : monocotylédones (Liliopsida)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 196) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.liliopsida
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.pinopsida
+  labels:
+    en: 'GBIF occurrence records: pinopsida'
+    fr: 'Observations enregistrées dans GBIF : conifères (Pinopsida)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 194) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.pinopsida
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.pinopsida
+  labels:
+    en: 'Species with GBIF records: pinopsida'
+    fr: 'Espèces avec observations GBIF : conifères (Pinopsida)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 194) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.pinopsida
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.polypodiopsida
+  labels:
+    en: 'GBIF occurrence records: polypodiopsida'
+    fr: 'Observations enregistrées dans GBIF : fougères (Polypodiopsida)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 7228684) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.polypodiopsida
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.polypodiopsida
+  labels:
+    en: 'Species with GBIF records: polypodiopsida'
+    fr: 'Espèces avec observations GBIF : fougères (Polypodiopsida)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 7228684) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.polypodiopsida
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.bryopsida
+  labels:
+    en: 'GBIF occurrence records: bryopsida'
+    fr: 'Observations enregistrées dans GBIF : mousses (Bryopsida)'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 327) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.bryopsida
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.bryopsida
+  labels:
+    en: 'Species with GBIF records: bryopsida'
+    fr: 'Espèces avec observations GBIF : mousses (Bryopsida)'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 327) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.bryopsida
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.agaricomycetes
+  labels:
+    en: 'GBIF occurrence records: agaricomycetes'
+    fr: 'Observations enregistrées dans GBIF : Agaricomycetes'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 186) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.agaricomycetes
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.agaricomycetes
+  labels:
+    en: 'Species with GBIF records: agaricomycetes'
+    fr: 'Espèces avec observations GBIF : Agaricomycetes'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 186) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.agaricomycetes
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_group.occurrences.lecanoromycetes
+  labels:
+    en: 'GBIF occurrence records: lecanoromycetes'
+    fr: 'Observations enregistrées dans GBIF : lichens Lecanoromycetes'
+  definition: Number of occurrence records in the GBIF index (GBIF backbone class key 180) whose GBIF-interpreted countryCode
+    is the country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.occurrences.lecanoromycetes
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+  - snapshot
+- id: ecology.gbif.country_group.distinct_species.lecanoromycetes
+  labels:
+    en: 'Species with GBIF records: lecanoromycetes'
+    fr: 'Espèces avec observations GBIF : lichens Lecanoromycetes'
+  definition: Number of distinct GBIF backbone species keys (speciesKey) among the occurrence records (GBIF backbone class
+    key 180) whose countryCode is the country; computed by GBIF's search engine with an approximate cardinality aggregation.
+    Not a species checklist of the country.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_group.distinct_species.lecanoromycetes
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+  - snapshot
+- id: ecology.gbif.country_year.occurrences.all
+  labels:
+    en: GBIF occurrence records by event year
+    fr: Observations GBIF par année d'observation
+  definition: Number of occurrence records in the GBIF index whose event year is the period and whose countryCode is the country
+    (values as of the snapshot date).
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_occurrences
+  theme: ecology
+  source_order:
+  - gbif_occ.country_year.occurrences.all
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - biodiversity
+- id: ecology.gbif.country_year.distinct_species.all
+  labels:
+    en: Species with GBIF records by event year
+    fr: Espèces observées dans GBIF par année
+  definition: Number of distinct GBIF speciesKey values among the occurrence records of the event year in the country (approximate
+    cardinality computed by GBIF).
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_species
+  theme: ecology
+  source_order:
+  - gbif_occ.country_year.distinct_species.all
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Approximate (Elasticsearch HyperLogLog++).'
+  tags:
+  - gbif
+  - biodiversity
+  - approximate
+- id: ecology.gbif.country_iucn.distinct_species.ex
+  labels:
+    en: Species with GBIF records, IUCN Extinct (EX)
+    fr: Espèces observées (GBIF) classées éteintes par l'UICN (EX)
+  definition: Number of distinct GBIF speciesKey values among occurrence records in the country whose species has the global
+    IUCN Red List category EX (Extinct) as indexed by GBIF from the checklist 'The IUCN Red List of Threatened Species' (19491596-35ae-4a91-9a98-85cf505f1bd3).
+    Global category, not a national red list; includes vagrant and introduced organisms.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_iucn
+  theme: ecology
+  source_order:
+  - gbif_occ.country_iucn.distinct_species.ex
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. IUCN categories: CC BY 4.0 per the GBIF dataset
+    record.'
+  tags:
+  - gbif
+  - iucn
+  - threatened_species
+  - approximate
+- id: ecology.gbif.country_iucn.occurrences.ex
+  labels:
+    en: GBIF records of IUCN Extinct (EX) species
+    fr: Observations GBIF d'espèces éteintes (UICN EX)
+  definition: Number of occurrence records in the country of species whose global IUCN Red List category is EX (Extinct) as
+    indexed by GBIF.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_iucn
+  theme: ecology
+  source_order:
+  - gbif_occ.country_iucn.occurrences.ex
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - iucn
+- id: ecology.gbif.country_iucn.distinct_species.ew
+  labels:
+    en: Species with GBIF records, IUCN Extinct in the Wild (EW)
+    fr: Espèces observées (GBIF) classées éteintes à l'état sauvage par l'UICN (EW)
+  definition: Number of distinct GBIF speciesKey values among occurrence records in the country whose species has the global
+    IUCN Red List category EW (Extinct in the Wild) as indexed by GBIF from the checklist 'The IUCN Red List of Threatened
+    Species' (19491596-35ae-4a91-9a98-85cf505f1bd3). Global category, not a national red list; includes vagrant and introduced
+    organisms.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_iucn
+  theme: ecology
+  source_order:
+  - gbif_occ.country_iucn.distinct_species.ew
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. IUCN categories: CC BY 4.0 per the GBIF dataset
+    record.'
+  tags:
+  - gbif
+  - iucn
+  - threatened_species
+  - approximate
+- id: ecology.gbif.country_iucn.occurrences.ew
+  labels:
+    en: GBIF records of IUCN Extinct in the Wild (EW) species
+    fr: Observations GBIF d'espèces éteintes à l'état sauvage (UICN EW)
+  definition: Number of occurrence records in the country of species whose global IUCN Red List category is EW (Extinct in
+    the Wild) as indexed by GBIF.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_iucn
+  theme: ecology
+  source_order:
+  - gbif_occ.country_iucn.occurrences.ew
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - iucn
+- id: ecology.gbif.country_iucn.distinct_species.cr
+  labels:
+    en: Species with GBIF records, IUCN Critically Endangered (CR)
+    fr: Espèces observées (GBIF) classées en danger critique par l'UICN (CR)
+  definition: Number of distinct GBIF speciesKey values among occurrence records in the country whose species has the global
+    IUCN Red List category CR (Critically Endangered) as indexed by GBIF from the checklist 'The IUCN Red List of Threatened
+    Species' (19491596-35ae-4a91-9a98-85cf505f1bd3). Global category, not a national red list; includes vagrant and introduced
+    organisms.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_iucn
+  theme: ecology
+  source_order:
+  - gbif_occ.country_iucn.distinct_species.cr
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. IUCN categories: CC BY 4.0 per the GBIF dataset
+    record.'
+  tags:
+  - gbif
+  - iucn
+  - threatened_species
+  - approximate
+- id: ecology.gbif.country_iucn.occurrences.cr
+  labels:
+    en: GBIF records of IUCN Critically Endangered (CR) species
+    fr: Observations GBIF d'espèces en danger critique (UICN CR)
+  definition: Number of occurrence records in the country of species whose global IUCN Red List category is CR (Critically
+    Endangered) as indexed by GBIF.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_iucn
+  theme: ecology
+  source_order:
+  - gbif_occ.country_iucn.occurrences.cr
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - iucn
+- id: ecology.gbif.country_iucn.distinct_species.en
+  labels:
+    en: Species with GBIF records, IUCN Endangered (EN)
+    fr: Espèces observées (GBIF) classées en danger par l'UICN (EN)
+  definition: Number of distinct GBIF speciesKey values among occurrence records in the country whose species has the global
+    IUCN Red List category EN (Endangered) as indexed by GBIF from the checklist 'The IUCN Red List of Threatened Species'
+    (19491596-35ae-4a91-9a98-85cf505f1bd3). Global category, not a national red list; includes vagrant and introduced organisms.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_iucn
+  theme: ecology
+  source_order:
+  - gbif_occ.country_iucn.distinct_species.en
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. IUCN categories: CC BY 4.0 per the GBIF dataset
+    record.'
+  tags:
+  - gbif
+  - iucn
+  - threatened_species
+  - approximate
+- id: ecology.gbif.country_iucn.occurrences.en
+  labels:
+    en: GBIF records of IUCN Endangered (EN) species
+    fr: Observations GBIF d'espèces en danger (UICN EN)
+  definition: Number of occurrence records in the country of species whose global IUCN Red List category is EN (Endangered)
+    as indexed by GBIF.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_iucn
+  theme: ecology
+  source_order:
+  - gbif_occ.country_iucn.occurrences.en
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - iucn
+- id: ecology.gbif.country_iucn.distinct_species.vu
+  labels:
+    en: Species with GBIF records, IUCN Vulnerable (VU)
+    fr: Espèces observées (GBIF) classées vulnérables par l'UICN (VU)
+  definition: Number of distinct GBIF speciesKey values among occurrence records in the country whose species has the global
+    IUCN Red List category VU (Vulnerable) as indexed by GBIF from the checklist 'The IUCN Red List of Threatened Species'
+    (19491596-35ae-4a91-9a98-85cf505f1bd3). Global category, not a national red list; includes vagrant and introduced organisms.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_iucn
+  theme: ecology
+  source_order:
+  - gbif_occ.country_iucn.distinct_species.vu
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. IUCN categories: CC BY 4.0 per the GBIF dataset
+    record.'
+  tags:
+  - gbif
+  - iucn
+  - threatened_species
+  - approximate
+- id: ecology.gbif.country_iucn.occurrences.vu
+  labels:
+    en: GBIF records of IUCN Vulnerable (VU) species
+    fr: Observations GBIF d'espèces vulnérables (UICN VU)
+  definition: Number of occurrence records in the country of species whose global IUCN Red List category is VU (Vulnerable)
+    as indexed by GBIF.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_iucn
+  theme: ecology
+  source_order:
+  - gbif_occ.country_iucn.occurrences.vu
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - iucn
+- id: ecology.gbif.country_iucn.distinct_species.nt
+  labels:
+    en: Species with GBIF records, IUCN Near Threatened (NT)
+    fr: Espèces observées (GBIF) classées quasi menacées par l'UICN (NT)
+  definition: Number of distinct GBIF speciesKey values among occurrence records in the country whose species has the global
+    IUCN Red List category NT (Near Threatened) as indexed by GBIF from the checklist 'The IUCN Red List of Threatened Species'
+    (19491596-35ae-4a91-9a98-85cf505f1bd3). Global category, not a national red list; includes vagrant and introduced organisms.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_iucn
+  theme: ecology
+  source_order:
+  - gbif_occ.country_iucn.distinct_species.nt
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. IUCN categories: CC BY 4.0 per the GBIF dataset
+    record.'
+  tags:
+  - gbif
+  - iucn
+  - threatened_species
+  - approximate
+- id: ecology.gbif.country_iucn.occurrences.nt
+  labels:
+    en: GBIF records of IUCN Near Threatened (NT) species
+    fr: Observations GBIF d'espèces quasi menacées (UICN NT)
+  definition: Number of occurrence records in the country of species whose global IUCN Red List category is NT (Near Threatened)
+    as indexed by GBIF.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_iucn
+  theme: ecology
+  source_order:
+  - gbif_occ.country_iucn.occurrences.nt
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - iucn
+- id: ecology.gbif.country_iucn.distinct_species.lc
+  labels:
+    en: Species with GBIF records, IUCN Least Concern (LC)
+    fr: Espèces observées (GBIF) classées préoccupation mineure par l'UICN (LC)
+  definition: Number of distinct GBIF speciesKey values among occurrence records in the country whose species has the global
+    IUCN Red List category LC (Least Concern) as indexed by GBIF from the checklist 'The IUCN Red List of Threatened Species'
+    (19491596-35ae-4a91-9a98-85cf505f1bd3). Global category, not a national red list; includes vagrant and introduced organisms.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_iucn
+  theme: ecology
+  source_order:
+  - gbif_occ.country_iucn.distinct_species.lc
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. IUCN categories: CC BY 4.0 per the GBIF dataset
+    record.'
+  tags:
+  - gbif
+  - iucn
+  - threatened_species
+  - approximate
+- id: ecology.gbif.country_iucn.occurrences.lc
+  labels:
+    en: GBIF records of IUCN Least Concern (LC) species
+    fr: Observations GBIF d'espèces préoccupation mineure (UICN LC)
+  definition: Number of occurrence records in the country of species whose global IUCN Red List category is LC (Least Concern)
+    as indexed by GBIF.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_iucn
+  theme: ecology
+  source_order:
+  - gbif_occ.country_iucn.occurrences.lc
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - iucn
+- id: ecology.gbif.country_iucn.distinct_species.dd
+  labels:
+    en: Species with GBIF records, IUCN Data Deficient (DD)
+    fr: Espèces observées (GBIF) classées données insuffisantes par l'UICN (DD)
+  definition: Number of distinct GBIF speciesKey values among occurrence records in the country whose species has the global
+    IUCN Red List category DD (Data Deficient) as indexed by GBIF from the checklist 'The IUCN Red List of Threatened Species'
+    (19491596-35ae-4a91-9a98-85cf505f1bd3). Global category, not a national red list; includes vagrant and introduced organisms.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_iucn
+  theme: ecology
+  source_order:
+  - gbif_occ.country_iucn.distinct_species.dd
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. IUCN categories: CC BY 4.0 per the GBIF dataset
+    record.'
+  tags:
+  - gbif
+  - iucn
+  - threatened_species
+  - approximate
+- id: ecology.gbif.country_iucn.occurrences.dd
+  labels:
+    en: GBIF records of IUCN Data Deficient (DD) species
+    fr: Observations GBIF d'espèces données insuffisantes (UICN DD)
+  definition: Number of occurrence records in the country of species whose global IUCN Red List category is DD (Data Deficient)
+    as indexed by GBIF.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_iucn
+  theme: ecology
+  source_order:
+  - gbif_occ.country_iucn.occurrences.dd
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - iucn
+- id: ecology.gbif.country_iucn.distinct_species.cd
+  labels:
+    en: Species with GBIF records, IUCN Conservation Dependent (pre-2001 category) (CD)
+    fr: Espèces observées (GBIF) classées dépendant de mesures de conservation (catégorie antérieure à 2001) par l'UICN (CD)
+  definition: Number of distinct GBIF speciesKey values among occurrence records in the country whose species has the global
+    IUCN Red List category CD (Conservation Dependent (pre-2001 category)) as indexed by GBIF from the checklist 'The IUCN
+    Red List of Threatened Species' (19491596-35ae-4a91-9a98-85cf505f1bd3). Global category, not a national red list; includes
+    vagrant and introduced organisms.
+  unit: species (distinct GBIF speciesKey)
+  domain: ecology
+  subdomain: gbif_iucn
+  theme: ecology
+  source_order:
+  - gbif_occ.country_iucn.distinct_species.cd
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. IUCN categories: CC BY 4.0 per the GBIF dataset
+    record.'
+  tags:
+  - gbif
+  - iucn
+  - threatened_species
+  - approximate
+- id: ecology.gbif.country_iucn.occurrences.cd
+  labels:
+    en: GBIF records of IUCN Conservation Dependent (pre-2001 category) (CD) species
+    fr: Observations GBIF d'espèces dépendant de mesures de conservation (catégorie antérieure à 2001) (UICN CD)
+  definition: Number of occurrence records in the country of species whose global IUCN Red List category is CD (Conservation
+    Dependent (pre-2001 category)) as indexed by GBIF.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_iucn
+  theme: ecology
+  source_order:
+  - gbif_occ.country_iucn.occurrences.cd
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size.'
+  tags:
+  - gbif
+  - iucn
+- id: ecology.gbif.taxon_country.occurrences.gbif_5219404
+  labels:
+    en: GBIF occurrence records of Panthera leo
+    fr: Observations GBIF de Panthera leo
+  definition: Number of occurrence records of GBIF backbone taxon 5219404 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_5219404
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_5219416
+  labels:
+    en: GBIF occurrence records of Panthera tigris
+    fr: Observations GBIF de Panthera tigris
+  definition: Number of occurrence records of GBIF backbone taxon 5219416 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_5219416
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_5219436
+  labels:
+    en: GBIF occurrence records of Panthera pardus
+    fr: Observations GBIF de Panthera pardus
+  definition: Number of occurrence records of GBIF backbone taxon 5219436 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_5219436
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_5219173
+  labels:
+    en: GBIF occurrence records of Canis lupus
+    fr: Observations GBIF de Canis lupus
+  definition: Number of occurrence records of GBIF backbone taxon 5219173 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_5219173
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2433433
+  labels:
+    en: GBIF occurrence records of Ursus arctos
+    fr: Observations GBIF de Ursus arctos
+  definition: Number of occurrence records of GBIF backbone taxon 2433433 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2433433
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2433451
+  labels:
+    en: GBIF occurrence records of Ursus maritimus
+    fr: Observations GBIF de Ursus maritimus
+  definition: Number of occurrence records of GBIF backbone taxon 2433451 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2433451
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_5219243
+  labels:
+    en: GBIF occurrence records of Vulpes vulpes
+    fr: Observations GBIF de Vulpes vulpes
+  definition: Number of occurrence records of GBIF backbone taxon 5219243 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_5219243
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2435350
+  labels:
+    en: GBIF occurrence records of Loxodonta africana
+    fr: Observations GBIF de Loxodonta africana
+  definition: Number of occurrence records of GBIF backbone taxon 2435350 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2435350
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2440483
+  labels:
+    en: GBIF occurrence records of Orcinus orca
+    fr: Observations GBIF de Orcinus orca
+  definition: Number of occurrence records of GBIF backbone taxon 2440483 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2440483
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2440735
+  labels:
+    en: GBIF occurrence records of Balaenoptera musculus
+    fr: Observations GBIF de Balaenoptera musculus
+  definition: Number of occurrence records of GBIF backbone taxon 2440735 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2440735
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2439261
+  labels:
+    en: GBIF occurrence records of Rattus norvegicus
+    fr: Observations GBIF de Rattus norvegicus
+  definition: Number of occurrence records of GBIF backbone taxon 2439261 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2439261
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_7705930
+  labels:
+    en: GBIF occurrence records of Sus scrofa
+    fr: Observations GBIF de Sus scrofa
+  definition: Number of occurrence records of GBIF backbone taxon 7705930 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_7705930
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2440958
+  labels:
+    en: GBIF occurrence records of Cervus elaphus
+    fr: Observations GBIF de Cervus elaphus
+  definition: Number of occurrence records of GBIF backbone taxon 2440958 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2440958
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2440012
+  labels:
+    en: GBIF occurrence records of Phascolarctos cinereus
+    fr: Observations GBIF de Phascolarctos cinereus
+  definition: Number of occurrence records of GBIF backbone taxon 2440012 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2440012
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2433399
+  labels:
+    en: GBIF occurrence records of Ailuropoda melanoleuca
+    fr: Observations GBIF de Ailuropoda melanoleuca
+  definition: Number of occurrence records of GBIF backbone taxon 2433399 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2433399
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2441022
+  labels:
+    en: GBIF occurrence records of Bos taurus
+    fr: Observations GBIF de Bos taurus
+  definition: Number of occurrence records of GBIF backbone taxon 2441022 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2441022
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2441110
+  labels:
+    en: GBIF occurrence records of Ovis aries
+    fr: Observations GBIF de Ovis aries
+  definition: Number of occurrence records of GBIF backbone taxon 2441110 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2441110
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2480446
+  labels:
+    en: GBIF occurrence records of Haliaeetus leucocephalus
+    fr: Observations GBIF de Haliaeetus leucocephalus
+  definition: Number of occurrence records of GBIF backbone taxon 2480446 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2480446
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2481047
+  labels:
+    en: GBIF occurrence records of Falco peregrinus
+    fr: Observations GBIF de Falco peregrinus
+  definition: Number of occurrence records of GBIF backbone taxon 2481047 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2481047
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2497921
+  labels:
+    en: GBIF occurrence records of Tyto alba
+    fr: Observations GBIF de Tyto alba
+  definition: Number of occurrence records of GBIF backbone taxon 2497921 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2497921
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2481912
+  labels:
+    en: GBIF occurrence records of Ciconia ciconia
+    fr: Observations GBIF de Ciconia ciconia
+  definition: Number of occurrence records of GBIF backbone taxon 2481912 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2481912
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_5231190
+  labels:
+    en: GBIF occurrence records of Passer domesticus
+    fr: Observations GBIF de Passer domesticus
+  definition: Number of occurrence records of GBIF backbone taxon 5231190 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_5231190
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_9326020
+  labels:
+    en: GBIF occurrence records of Gallus gallus
+    fr: Observations GBIF de Gallus gallus
+  definition: Number of occurrence records of GBIF backbone taxon 9326020 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_9326020
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_8084280
+  labels:
+    en: GBIF occurrence records of Gadus morhua
+    fr: Observations GBIF de Gadus morhua
+  definition: Number of occurrence records of GBIF backbone taxon 8084280 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_8084280
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_8351946
+  labels:
+    en: GBIF occurrence records of Clupea harengus
+    fr: Observations GBIF de Clupea harengus
+  definition: Number of occurrence records of GBIF backbone taxon 8351946 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_8351946
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_7595433
+  labels:
+    en: GBIF occurrence records of Salmo salar
+    fr: Observations GBIF de Salmo salar
+  definition: Number of occurrence records of GBIF backbone taxon 7595433 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_7595433
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2373980
+  labels:
+    en: GBIF occurrence records of Thunnus thynnus
+    fr: Observations GBIF de Thunnus thynnus
+  definition: Number of occurrence records of GBIF backbone taxon 2373980 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2373980
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2420694
+  labels:
+    en: GBIF occurrence records of Carcharodon carcharias
+    fr: Observations GBIF de Carcharodon carcharias
+  definition: Number of occurrence records of GBIF backbone taxon 2420694 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2420694
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2427091
+  labels:
+    en: GBIF occurrence records of Lithobates catesbeianus
+    fr: Observations GBIF de Lithobates catesbeianus
+  definition: Number of occurrence records of GBIF backbone taxon 2427091 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2427091
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2441341
+  labels:
+    en: GBIF occurrence records of Crocodylus niloticus
+    fr: Observations GBIF de Crocodylus niloticus
+  definition: Number of occurrence records of GBIF backbone taxon 2441341 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2441341
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_1341976
+  labels:
+    en: GBIF occurrence records of Apis mellifera
+    fr: Observations GBIF de Apis mellifera
+  definition: Number of occurrence records of GBIF backbone taxon 1341976 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_1341976
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_1340503
+  labels:
+    en: GBIF occurrence records of Bombus terrestris
+    fr: Observations GBIF de Bombus terrestris
+  definition: Number of occurrence records of GBIF backbone taxon 1340503 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_1340503
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_5133088
+  labels:
+    en: GBIF occurrence records of Danaus plexippus
+    fr: Observations GBIF de Danaus plexippus
+  definition: Number of occurrence records of GBIF backbone taxon 5133088 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_5133088
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_1650518
+  labels:
+    en: GBIF occurrence records of Anopheles gambiae
+    fr: Observations GBIF de Anopheles gambiae
+  definition: Number of occurrence records of GBIF backbone taxon 1650518 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_1650518
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_1651891
+  labels:
+    en: GBIF occurrence records of Aedes aegypti
+    fr: Observations GBIF de Aedes aegypti
+  definition: Number of occurrence records of GBIF backbone taxon 1651891 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_1651891
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_1311477
+  labels:
+    en: GBIF occurrence records of Vespa velutina
+    fr: Observations GBIF de Vespa velutina
+  definition: Number of occurrence records of GBIF backbone taxon 1311477 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_1311477
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_5290052
+  labels:
+    en: GBIF occurrence records of Zea mays
+    fr: Observations GBIF de Zea mays
+  definition: Number of occurrence records of GBIF backbone taxon 5290052 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_5290052
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2930262
+  labels:
+    en: GBIF occurrence records of Solanum tuberosum
+    fr: Observations GBIF de Solanum tuberosum
+  definition: Number of occurrence records of GBIF backbone taxon 2930262 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2930262
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2895345
+  labels:
+    en: GBIF occurrence records of Coffea arabica
+    fr: Observations GBIF de Coffea arabica
+  definition: Number of occurrence records of GBIF backbone taxon 2895345 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2895345
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_3152205
+  labels:
+    en: GBIF occurrence records of Theobroma cacao
+    fr: Observations GBIF de Theobroma cacao
+  definition: Number of occurrence records of GBIF backbone taxon 3152205 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_3152205
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_3001244
+  labels:
+    en: GBIF occurrence records of Malus domestica
+    fr: Observations GBIF de Malus domestica
+  definition: Number of occurrence records of GBIF backbone taxon 3001244 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_3001244
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_10540993
+  labels:
+    en: GBIF occurrence records of Plasmodium falciparum
+    fr: Observations GBIF de Plasmodium falciparum
+  definition: Number of occurrence records of GBIF backbone taxon 10540993 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_10540993
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_2627503
+  labels:
+    en: GBIF occurrence records of Batrachochytrium dendrobatidis
+    fr: Observations GBIF de Batrachochytrium dendrobatidis
+  definition: Number of occurrence records of GBIF backbone taxon 2627503 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_2627503
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_3203716
+  labels:
+    en: GBIF occurrence records of Phytophthora infestans
+    fr: Observations GBIF de Phytophthora infestans
+  definition: Number of occurrence records of GBIF backbone taxon 3203716 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_3203716
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.gbif.taxon_country.occurrences.gbif_8295448
+  labels:
+    en: GBIF occurrence records of Pseudogymnoascus destructans
+    fr: Observations GBIF de Pseudogymnoascus destructans
+  definition: Number of occurrence records of GBIF backbone taxon 8295448 (descendants included) whose countryCode is the
+    country, at the snapshot date.
+  unit: occurrence records
+  domain: ecology
+  subdomain: gbif_taxa
+  theme: ecology
+  source_order:
+  - gbif_occ.taxon_country.occurrences.gbif_8295448
+  provider_declared: true
+  notes: 'GBIF occurrence index, GraphQL countryCode facet (agent V4ECO, src/reva/adapters/connectors/atlas_gbif_occ.py).
+    Filter: occurrenceStatus=PRESENT; basisOfRecord not in (FOSSIL_SPECIMEN, LIVING_SPECIMEN). occurrence records reflect
+    sampling effort and data mobilisation, not abundance or population size. Presence records, not native range.'
+  tags:
+  - gbif
+  - species_distribution
+- id: ecology.fishstat.aquaculture_brackishwater.mg_amphibia_reptilia.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture brackishwater, AMPHIBIA, REPTILIA (tonnes)'
+    fr: 'Production halieutique : aquaculture en eau saumâtre, AMPHIBIA, REPTILIA (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_brackishwater (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'AMPHIBIA, REPTILIA';
+    measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_brackishwater.mg_amphibia_reptilia.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_brackishwater.mg_crustacea.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture brackishwater, CRUSTACEA (tonnes)'
+    fr: 'Production halieutique : aquaculture en eau saumâtre, CRUSTACEA (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_brackishwater (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'CRUSTACEA'; measure
+    Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_brackishwater.mg_crustacea.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_brackishwater.mg_invertebrata_aquatica.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture brackishwater, INVERTEBRATA AQUATICA (tonnes)'
+    fr: 'Production halieutique : aquaculture en eau saumâtre, INVERTEBRATA AQUATICA (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_brackishwater (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'INVERTEBRATA AQUATICA';
+    measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_brackishwater.mg_invertebrata_aquatica.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_brackishwater.mg_mollusca.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture brackishwater, MOLLUSCA (tonnes)'
+    fr: 'Production halieutique : aquaculture en eau saumâtre, MOLLUSCA (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_brackishwater (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'MOLLUSCA'; measure
+    Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_brackishwater.mg_mollusca.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_brackishwater.mg_pisces.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture brackishwater, PISCES (tonnes)'
+    fr: 'Production halieutique : aquaculture en eau saumâtre, PISCES (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_brackishwater (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'PISCES'; measure
+    Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_brackishwater.mg_pisces.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_brackishwater.mg_plantae_aquaticae.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture brackishwater, PLANTAE AQUATICAE (tonnes)'
+    fr: 'Production halieutique : aquaculture en eau saumâtre, PLANTAE AQUATICAE (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_brackishwater (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'PLANTAE AQUATICAE';
+    measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_brackishwater.mg_plantae_aquaticae.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_brackishwater.yb_algae_aquatic_plants.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture brackishwater, Algae (Aquatic plants) (tonnes)'
+    fr: 'Production halieutique : aquaculture en eau saumâtre, Algae (Aquatic plants) (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_brackishwater (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Yearbook group (CL_FI_SPECIES_GROUPS) is 'Algae (Aquatic
+    plants)'; measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_brackishwater.yb_algae_aquatic_plants.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_brackishwater.yb_aquatic_animals_fish_crustaceans_and_molluscs_etc.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture brackishwater, Aquatic animals (Fish, crustaceans and molluscs, etc.)
+      (tonnes)'
+    fr: 'Production halieutique : aquaculture en eau saumâtre, Aquatic animals (Fish, crustaceans and molluscs, etc.) (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_brackishwater (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Yearbook group (CL_FI_SPECIES_GROUPS) is 'Aquatic animals
+    (Fish, crustaceans and molluscs, etc.)'; measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_brackishwater.yb_aquatic_animals_fish_crustaceans_and_molluscs_etc.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_freshwater.mg_amphibia_reptilia.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture freshwater, AMPHIBIA, REPTILIA (tonnes)'
+    fr: 'Production halieutique : aquaculture en eau douce, AMPHIBIA, REPTILIA (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_freshwater (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'AMPHIBIA, REPTILIA';
+    measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_freshwater.mg_amphibia_reptilia.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_freshwater.mg_crustacea.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture freshwater, CRUSTACEA (tonnes)'
+    fr: 'Production halieutique : aquaculture en eau douce, CRUSTACEA (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_freshwater (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'CRUSTACEA'; measure
+    Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_freshwater.mg_crustacea.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_freshwater.mg_invertebrata_aquatica.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture freshwater, INVERTEBRATA AQUATICA (tonnes)'
+    fr: 'Production halieutique : aquaculture en eau douce, INVERTEBRATA AQUATICA (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_freshwater (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'INVERTEBRATA AQUATICA';
+    measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_freshwater.mg_invertebrata_aquatica.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_freshwater.mg_mollusca.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture freshwater, MOLLUSCA (tonnes)'
+    fr: 'Production halieutique : aquaculture en eau douce, MOLLUSCA (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_freshwater (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'MOLLUSCA'; measure
+    Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_freshwater.mg_mollusca.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_freshwater.mg_pisces.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture freshwater, PISCES (tonnes)'
+    fr: 'Production halieutique : aquaculture en eau douce, PISCES (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_freshwater (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'PISCES'; measure
+    Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_freshwater.mg_pisces.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_freshwater.mg_plantae_aquaticae.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture freshwater, PLANTAE AQUATICAE (tonnes)'
+    fr: 'Production halieutique : aquaculture en eau douce, PLANTAE AQUATICAE (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_freshwater (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'PLANTAE AQUATICAE';
+    measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_freshwater.mg_plantae_aquaticae.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_freshwater.yb_algae_aquatic_plants.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture freshwater, Algae (Aquatic plants) (tonnes)'
+    fr: 'Production halieutique : aquaculture en eau douce, Algae (Aquatic plants) (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_freshwater (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Yearbook group (CL_FI_SPECIES_GROUPS) is 'Algae (Aquatic
+    plants)'; measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_freshwater.yb_algae_aquatic_plants.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_freshwater.yb_aquatic_animals_fish_crustaceans_and_molluscs_etc.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture freshwater, Aquatic animals (Fish, crustaceans and molluscs, etc.)
+      (tonnes)'
+    fr: 'Production halieutique : aquaculture en eau douce, Aquatic animals (Fish, crustaceans and molluscs, etc.) (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_freshwater (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Yearbook group (CL_FI_SPECIES_GROUPS) is 'Aquatic animals
+    (Fish, crustaceans and molluscs, etc.)'; measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_freshwater.yb_aquatic_animals_fish_crustaceans_and_molluscs_etc.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_freshwater.yb_other_aquatic_animals_products.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture freshwater, Other aquatic animals & products (tonnes)'
+    fr: 'Production halieutique : aquaculture en eau douce, Other aquatic animals & products (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_freshwater (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Yearbook group (CL_FI_SPECIES_GROUPS) is 'Other aquatic
+    animals & products'; measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_freshwater.yb_other_aquatic_animals_products.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_marine.mg_crustacea.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture marine, CRUSTACEA (tonnes)'
+    fr: 'Production halieutique : aquaculture marine, CRUSTACEA (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_marine (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'CRUSTACEA'; measure
+    Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_marine.mg_crustacea.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_marine.mg_invertebrata_aquatica.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture marine, INVERTEBRATA AQUATICA (tonnes)'
+    fr: 'Production halieutique : aquaculture marine, INVERTEBRATA AQUATICA (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_marine (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'INVERTEBRATA AQUATICA';
+    measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_marine.mg_invertebrata_aquatica.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_marine.mg_mollusca.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture marine, MOLLUSCA (tonnes)'
+    fr: 'Production halieutique : aquaculture marine, MOLLUSCA (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_marine (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'MOLLUSCA'; measure
+    Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_marine.mg_mollusca.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_marine.mg_pisces.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture marine, PISCES (tonnes)'
+    fr: 'Production halieutique : aquaculture marine, PISCES (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_marine (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'PISCES'; measure
+    Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_marine.mg_pisces.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_marine.mg_plantae_aquaticae.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture marine, PLANTAE AQUATICAE (tonnes)'
+    fr: 'Production halieutique : aquaculture marine, PLANTAE AQUATICAE (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_marine (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'PLANTAE AQUATICAE';
+    measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_marine.mg_plantae_aquaticae.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_marine.yb_algae_aquatic_plants.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture marine, Algae (Aquatic plants) (tonnes)'
+    fr: 'Production halieutique : aquaculture marine, Algae (Aquatic plants) (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_marine (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Yearbook group (CL_FI_SPECIES_GROUPS) is 'Algae (Aquatic
+    plants)'; measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_marine.yb_algae_aquatic_plants.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_marine.yb_aquatic_animals_fish_crustaceans_and_molluscs_etc.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture marine, Aquatic animals (Fish, crustaceans and molluscs, etc.) (tonnes)'
+    fr: 'Production halieutique : aquaculture marine, Aquatic animals (Fish, crustaceans and molluscs, etc.) (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_marine (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Yearbook group (CL_FI_SPECIES_GROUPS) is 'Aquatic animals
+    (Fish, crustaceans and molluscs, etc.)'; measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_marine.yb_aquatic_animals_fish_crustaceans_and_molluscs_etc.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.aquaculture_marine.yb_other_aquatic_animals_products.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: aquaculture marine, Other aquatic animals & products (tonnes)'
+    fr: 'Production halieutique : aquaculture marine, Other aquatic animals & products (tonnes)'
+  definition: FAO FishStat global production, production source aquaculture_marine (FAO code list CL_FI_PRODUCTION_SOURCE_DET),
+    summed by REVA over FAO fishing areas and ASFIS species whose Yearbook group (CL_FI_SPECIES_GROUPS) is 'Other aquatic
+    animals & products'; measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.aquaculture_marine.yb_other_aquatic_animals_products.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.capture.mg_amphibia_reptilia.number
+  labels:
+    en: 'Fisheries/aquaculture production: capture, AMPHIBIA, REPTILIA (number)'
+    fr: 'Production halieutique : captures, AMPHIBIA, REPTILIA (nombre)'
+  definition: FAO FishStat global production, production source capture (FAO code list CL_FI_PRODUCTION_SOURCE_DET), summed
+    by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'AMPHIBIA, REPTILIA'; measure
+    Q_no_1 (number).
+  unit: number of individuals
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.capture.mg_amphibia_reptilia.number
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.capture.mg_amphibia_reptilia.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: capture, AMPHIBIA, REPTILIA (tonnes)'
+    fr: 'Production halieutique : captures, AMPHIBIA, REPTILIA (tonnes)'
+  definition: FAO FishStat global production, production source capture (FAO code list CL_FI_PRODUCTION_SOURCE_DET), summed
+    by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'AMPHIBIA, REPTILIA'; measure
+    Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.capture.mg_amphibia_reptilia.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.capture.mg_crustacea.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: capture, CRUSTACEA (tonnes)'
+    fr: 'Production halieutique : captures, CRUSTACEA (tonnes)'
+  definition: FAO FishStat global production, production source capture (FAO code list CL_FI_PRODUCTION_SOURCE_DET), summed
+    by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'CRUSTACEA'; measure Q_tlw
+    (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.capture.mg_crustacea.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.capture.mg_invertebrata_aquatica.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: capture, INVERTEBRATA AQUATICA (tonnes)'
+    fr: 'Production halieutique : captures, INVERTEBRATA AQUATICA (tonnes)'
+  definition: FAO FishStat global production, production source capture (FAO code list CL_FI_PRODUCTION_SOURCE_DET), summed
+    by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'INVERTEBRATA AQUATICA';
+    measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.capture.mg_invertebrata_aquatica.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.capture.mg_mammalia.number
+  labels:
+    en: 'Fisheries/aquaculture production: capture, MAMMALIA (number)'
+    fr: 'Production halieutique : captures, MAMMALIA (nombre)'
+  definition: FAO FishStat global production, production source capture (FAO code list CL_FI_PRODUCTION_SOURCE_DET), summed
+    by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'MAMMALIA'; measure Q_no_1
+    (number).
+  unit: number of individuals
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.capture.mg_mammalia.number
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.capture.mg_mammalia.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: capture, MAMMALIA (tonnes)'
+    fr: 'Production halieutique : captures, MAMMALIA (tonnes)'
+  definition: FAO FishStat global production, production source capture (FAO code list CL_FI_PRODUCTION_SOURCE_DET), summed
+    by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'MAMMALIA'; measure Q_tlw
+    (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.capture.mg_mammalia.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.capture.mg_mollusca.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: capture, MOLLUSCA (tonnes)'
+    fr: 'Production halieutique : captures, MOLLUSCA (tonnes)'
+  definition: FAO FishStat global production, production source capture (FAO code list CL_FI_PRODUCTION_SOURCE_DET), summed
+    by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'MOLLUSCA'; measure Q_tlw
+    (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.capture.mg_mollusca.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.capture.mg_pisces.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: capture, PISCES (tonnes)'
+    fr: 'Production halieutique : captures, PISCES (tonnes)'
+  definition: FAO FishStat global production, production source capture (FAO code list CL_FI_PRODUCTION_SOURCE_DET), summed
+    by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'PISCES'; measure Q_tlw (tonnes
+    live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.capture.mg_pisces.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.capture.mg_plantae_aquaticae.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: capture, PLANTAE AQUATICAE (tonnes)'
+    fr: 'Production halieutique : captures, PLANTAE AQUATICAE (tonnes)'
+  definition: FAO FishStat global production, production source capture (FAO code list CL_FI_PRODUCTION_SOURCE_DET), summed
+    by REVA over FAO fishing areas and ASFIS species whose Major group (CL_FI_SPECIES_GROUPS) is 'PLANTAE AQUATICAE'; measure
+    Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.capture.mg_plantae_aquaticae.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.capture.yb_algae_aquatic_plants.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: capture, Algae (Aquatic plants) (tonnes)'
+    fr: 'Production halieutique : captures, Algae (Aquatic plants) (tonnes)'
+  definition: FAO FishStat global production, production source capture (FAO code list CL_FI_PRODUCTION_SOURCE_DET), summed
+    by REVA over FAO fishing areas and ASFIS species whose Yearbook group (CL_FI_SPECIES_GROUPS) is 'Algae (Aquatic plants)';
+    measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.capture.yb_algae_aquatic_plants.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.capture.yb_aquatic_animals_fish_crustaceans_and_molluscs_etc.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: capture, Aquatic animals (Fish, crustaceans and molluscs, etc.) (tonnes)'
+    fr: 'Production halieutique : captures, Aquatic animals (Fish, crustaceans and molluscs, etc.) (tonnes)'
+  definition: FAO FishStat global production, production source capture (FAO code list CL_FI_PRODUCTION_SOURCE_DET), summed
+    by REVA over FAO fishing areas and ASFIS species whose Yearbook group (CL_FI_SPECIES_GROUPS) is 'Aquatic animals (Fish,
+    crustaceans and molluscs, etc.)'; measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.capture.yb_aquatic_animals_fish_crustaceans_and_molluscs_etc.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.capture.yb_other_aquatic_animals_products.number
+  labels:
+    en: 'Fisheries/aquaculture production: capture, Other aquatic animals & products (number)'
+    fr: 'Production halieutique : captures, Other aquatic animals & products (nombre)'
+  definition: FAO FishStat global production, production source capture (FAO code list CL_FI_PRODUCTION_SOURCE_DET), summed
+    by REVA over FAO fishing areas and ASFIS species whose Yearbook group (CL_FI_SPECIES_GROUPS) is 'Other aquatic animals
+    & products'; measure Q_no_1 (number).
+  unit: number of individuals
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.capture.yb_other_aquatic_animals_products.number
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.fishstat.capture.yb_other_aquatic_animals_products.tonnes
+  labels:
+    en: 'Fisheries/aquaculture production: capture, Other aquatic animals & products (tonnes)'
+    fr: 'Production halieutique : captures, Other aquatic animals & products (tonnes)'
+  definition: FAO FishStat global production, production source capture (FAO code list CL_FI_PRODUCTION_SOURCE_DET), summed
+    by REVA over FAO fishing areas and ASFIS species whose Yearbook group (CL_FI_SPECIES_GROUPS) is 'Other aquatic animals
+    & products'; measure Q_tlw (tonnes live weight).
+  unit: tonnes live weight
+  domain: ecology
+  subdomain: fisheries
+  theme: ecology
+  source_order:
+  - fishstat.production.capture.yb_other_aquatic_animals_products.tonnes
+  provider_declared: true
+  notes: FAO FishStat GlobalProduction_2026.1.0 (CC BY 4.0). A sum with any missing-symbol cell is flagged lower_bound; all-missing
+    sums are Missing, never zero.
+  tags:
+  - fao
+  - fisheries
+  - aquaculture
+- id: ecology.red_list_index
+  labels:
+    en: Red List Index (SDG 15.5.1)
+    fr: Indice de la Liste rouge (ODD 15.5.1)
+  definition: Red List Index (UN SDG Global Database series ER_RSK_LST, indicator 15.5.1; custodians IUCN and BirdLife International).
+    1 = no current extinction risk for the included species; 0 = all extinct.
+  unit: index (0-1)
+  domain: ecology
+  subdomain: extinction_risk
+  theme: ecology
+  source_order:
+  - un_sdg.sdg_headline.ER_RSK_LST|Reporting Type=G
+  provider_declared: true
+  notes: UN SDG API via atlas.un_sdg (series added by V4ECO). National RLIs weight each species by the fraction of its distribution
+    in the country (custodian methodology).
+  tags:
+  - sdg
+  - iucn
+  - biodiversity
+- id: ecology.living_planet_index.lpi_final
+  labels:
+    en: Living Planet Index
+    fr: Indice Planète vivante
+  definition: The Living Planet Index (LPI) is a measure of the state of global biological diversity based on population trends
+    of vertebrate species from around the world. The index value is measured relative to species' populations in 1970 (i.e.
+    1970 = 1). (OWID / WWF & ZSL, quoted)
+  unit: index (1970 = 1)
+  domain: ecology
+  subdomain: population_trends
+  theme: ecology
+  source_order:
+  - owid.g_living_planet_index.lpi_final
+  provider_declared: true
+  notes: 'Published LPI trends (WWF & ZSL, Living Planet Report 2026) for the world, IPBES regions and systems (freshwater,
+    marine, terrestrial) via the OWID grapher chart ''global-living-planet-index''. Licence: CC BY 4.0 per OWID origin metadata;
+    ZSL data-use policy: CC BY-SA 4.0 for published trends (stricter one applies). Regions/systems are LPI aggregates, not
+    countries.'
+  tags:
+  - lpi
+  - population_trends
+  - wwf
+  - zsl
+- id: ecology.living_planet_index.ci_high
+  labels:
+    en: Living Planet Index, upper confidence interval
+    fr: Indice Planète vivante, borne haute
+  definition: The Living Planet Index (LPI) is a measure of the state of global biological diversity based on population trends
+    of vertebrate species from around the world. The index value is measured relative to species' populations in 1970 (i.e.
+    1970 = 1). (OWID / WWF & ZSL, quoted)
+  unit: index (1970 = 1)
+  domain: ecology
+  subdomain: population_trends
+  theme: ecology
+  source_order:
+  - owid.g_living_planet_index.ci_high
+  provider_declared: true
+  notes: 'Published LPI trends (WWF & ZSL, Living Planet Report 2026) for the world, IPBES regions and systems (freshwater,
+    marine, terrestrial) via the OWID grapher chart ''global-living-planet-index''. Licence: CC BY 4.0 per OWID origin metadata;
+    ZSL data-use policy: CC BY-SA 4.0 for published trends (stricter one applies). Regions/systems are LPI aggregates, not
+    countries.'
+  tags:
+  - lpi
+  - population_trends
+  - wwf
+  - zsl
+- id: ecology.living_planet_index.ci_low
+  labels:
+    en: Living Planet Index, lower confidence interval
+    fr: Indice Planète vivante, borne basse
+  definition: The Living Planet Index (LPI) is a measure of the state of global biological diversity based on population trends
+    of vertebrate species from around the world. The index value is measured relative to species' populations in 1970 (i.e.
+    1970 = 1). (OWID / WWF & ZSL, quoted)
+  unit: index (1970 = 1)
+  domain: ecology
+  subdomain: population_trends
+  theme: ecology
+  source_order:
+  - owid.g_living_planet_index.ci_low
+  provider_declared: true
+  notes: 'Published LPI trends (WWF & ZSL, Living Planet Report 2026) for the world, IPBES regions and systems (freshwater,
+    marine, terrestrial) via the OWID grapher chart ''global-living-planet-index''. Licence: CC BY 4.0 per OWID origin metadata;
+    ZSL data-use policy: CC BY-SA 4.0 for published trends (stricter one applies). Regions/systems are LPI aggregates, not
+    countries.'
+  tags:
+  - lpi
+  - population_trends
+  - wwf
+  - zsl
+- id: ecology.livestock.1068
+  labels:
+    en: 'Livestock stocks: Ducks'
+    fr: 'Cheptel : Canards'
+  definition: FAOSTAT Production (QCL), item 1068 (Ducks), Stocks (5112).
+  unit: 1000 animals
+  domain: ecology
+  subdomain: livestock
+  theme: ecology
+  source_order:
+  - fao.qcl.1068|5112
+  provider_declared: true
+  notes: FAOSTAT QCL item added to atlas.fao by V4ECO (connector 1.0.3); cattle, buffalo, sheep, goats, pigs, chickens, camels,
+    horses and asses were already in the A-FAO catalog (food_agriculture.yaml).
+  tags:
+  - fao
+  - livestock
+- id: ecology.livestock.1072
+  labels:
+    en: 'Livestock stocks: Geese'
+    fr: 'Cheptel : Oies'
+  definition: FAOSTAT Production (QCL), item 1072 (Geese), Stocks (5112).
+  unit: 1000 animals
+  domain: ecology
+  subdomain: livestock
+  theme: ecology
+  source_order:
+  - fao.qcl.1072|5112
+  provider_declared: true
+  notes: FAOSTAT QCL item added to atlas.fao by V4ECO (connector 1.0.3); cattle, buffalo, sheep, goats, pigs, chickens, camels,
+    horses and asses were already in the A-FAO catalog (food_agriculture.yaml).
+  tags:
+  - fao
+  - livestock
+- id: ecology.livestock.1079
+  labels:
+    en: 'Livestock stocks: Turkeys'
+    fr: 'Cheptel : Dindes'
+  definition: FAOSTAT Production (QCL), item 1079 (Turkeys), Stocks (5112).
+  unit: 1000 animals
+  domain: ecology
+  subdomain: livestock
+  theme: ecology
+  source_order:
+  - fao.qcl.1079|5112
+  provider_declared: true
+  notes: FAOSTAT QCL item added to atlas.fao by V4ECO (connector 1.0.3); cattle, buffalo, sheep, goats, pigs, chickens, camels,
+    horses and asses were already in the A-FAO catalog (food_agriculture.yaml).
+  tags:
+  - fao
+  - livestock
+- id: ecology.livestock.1083
+  labels:
+    en: 'Livestock stocks: Other birds'
+    fr: 'Cheptel : Autres oiseaux'
+  definition: FAOSTAT Production (QCL), item 1083 (Other birds), Stocks (5112).
+  unit: 1000 animals
+  domain: ecology
+  subdomain: livestock
+  theme: ecology
+  source_order:
+  - fao.qcl.1083|5112
+  provider_declared: true
+  notes: FAOSTAT QCL item added to atlas.fao by V4ECO (connector 1.0.3); cattle, buffalo, sheep, goats, pigs, chickens, camels,
+    horses and asses were already in the A-FAO catalog (food_agriculture.yaml).
+  tags:
+  - fao
+  - livestock
+- id: ecology.livestock.1110
+  labels:
+    en: 'Livestock stocks: Mules and hinnies'
+    fr: 'Cheptel : Mulets et bardots'
+  definition: FAOSTAT Production (QCL), item 1110 (Mules and hinnies), Stocks (5111).
+  unit: animals
+  domain: ecology
+  subdomain: livestock
+  theme: ecology
+  source_order:
+  - fao.qcl.1110|5111
+  provider_declared: true
+  notes: FAOSTAT QCL item added to atlas.fao by V4ECO (connector 1.0.3); cattle, buffalo, sheep, goats, pigs, chickens, camels,
+    horses and asses were already in the A-FAO catalog (food_agriculture.yaml).
+  tags:
+  - fao
+  - livestock
+- id: ecology.livestock.1140
+  labels:
+    en: 'Livestock stocks: Rabbits and hares'
+    fr: 'Cheptel : Lapins et lièvres'
+  definition: FAOSTAT Production (QCL), item 1140 (Rabbits and hares), Stocks (5112).
+  unit: 1000 animals
+  domain: ecology
+  subdomain: livestock
+  theme: ecology
+  source_order:
+  - fao.qcl.1140|5112
+  provider_declared: true
+  notes: FAOSTAT QCL item added to atlas.fao by V4ECO (connector 1.0.3); cattle, buffalo, sheep, goats, pigs, chickens, camels,
+    horses and asses were already in the A-FAO catalog (food_agriculture.yaml).
+  tags:
+  - fao
+  - livestock
+- id: ecology.livestock.1150
+  labels:
+    en: 'Livestock stocks: Other rodents'
+    fr: 'Cheptel : Autres rongeurs'
+  definition: FAOSTAT Production (QCL), item 1150 (Other rodents), Stocks (5112).
+  unit: 1000 animals
+  domain: ecology
+  subdomain: livestock
+  theme: ecology
+  source_order:
+  - fao.qcl.1150|5112
+  provider_declared: true
+  notes: FAOSTAT QCL item added to atlas.fao by V4ECO (connector 1.0.3); cattle, buffalo, sheep, goats, pigs, chickens, camels,
+    horses and asses were already in the A-FAO catalog (food_agriculture.yaml).
+  tags:
+  - fao
+  - livestock
+- id: ecology.livestock.1157
+  labels:
+    en: 'Livestock stocks: Other camelids'
+    fr: 'Cheptel : Autres camélidés'
+  definition: FAOSTAT Production (QCL), item 1157 (Other camelids), Stocks (5111).
+  unit: animals
+  domain: ecology
+  subdomain: livestock
+  theme: ecology
+  source_order:
+  - fao.qcl.1157|5111
+  provider_declared: true
+  notes: FAOSTAT QCL item added to atlas.fao by V4ECO (connector 1.0.3); cattle, buffalo, sheep, goats, pigs, chickens, camels,
+    horses and asses were already in the A-FAO catalog (food_agriculture.yaml).
+  tags:
+  - fao
+  - livestock
+- id: ecology.livestock.1181
+  labels:
+    en: 'Livestock stocks: Bees (beehives)'
+    fr: 'Cheptel : Abeilles (ruches)'
+  definition: FAOSTAT Production (QCL), item 1181 (Bees (beehives)), Stocks (5114).
+  unit: number (hives)
+  domain: ecology
+  subdomain: livestock
+  theme: ecology
+  source_order:
+  - fao.qcl.1181|5114
+  provider_declared: true
+  notes: FAOSTAT QCL item added to atlas.fao by V4ECO (connector 1.0.3); cattle, buffalo, sheep, goats, pigs, chickens, camels,
+    horses and asses were already in the A-FAO catalog (food_agriculture.yaml).
+  tags:
+  - fao
+  - livestock

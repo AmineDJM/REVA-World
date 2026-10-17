@@ -1,0 +1,157 @@
+# Gravity elasticities (meta-analysis summaries) from Head & Mayer (agent PRED-EFFECT). Points are MEDIANS across
+# published gravity estimates; the s.d. across estimates is kept in `meta` (heterogeneity, not sampling error).
+schema: reva-effects-literature/1
+id: head_mayer_2013
+source_key: effects.literature
+citation:
+  text: "Keith Head and Thierry Mayer. Gravity Equations: Workhorse, Toolkit, and Cookbook. CEPII Document de travail / Working Paper No 2013-27, September 2013."
+  text_basis: assembled from the cover and title pages of the version read (CEPII working paper; the abstract calls it a chapter)
+  short: "Head & Mayer (2013), CEPII WP 2013-27"
+  authors: [Keith Head, Thierry Mayer]
+  title: "Gravity Equations: Workhorse, Toolkit, and Cookbook"
+  year: 2013
+  series: CEPII Working Paper No 2013-27
+  doi: null
+  url: https://www.cepii.fr/PDF_PUB/wp/2013/wp2013-27.pdf
+document:
+  url: https://www.cepii.fr/PDF_PUB/wp/2013/wp2013-27.pdf
+  media_type: application/pdf
+  sha256: d75221023df93cb6e1a09ea3c89a9defd98ffb2384ff8316da1a210912bef3f5
+  bytes: 738834
+  version_read: CEPII Working Paper 2013-27, September 2013 (working-paper version of a handbook chapter; the published chapter may differ)
+as_of: "2013-09-30"
+rights:
+  licence: "No licence statement in the document read (CEPII working paper, free download); treated as all rights reserved."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent PRED-EFFECT
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  effect: {kind: variable, id: trade.bilateral_trade_flow, transform: log_change,
+           definition: "bilateral trade (the dependent variable of the gravity equations summarised, in logs)"}
+  point_kind: median
+  method: meta_analysis
+  horizon: {kind: unspecified}
+  scope: {countries: [WLD], sample_note: "Estimates collected from published gravity equations; country coverage varies by paper"}
+estimates:
+  - id: trade_elasticity_full_sample
+    pdf_page: 38
+    cause: {kind: variable, id: trade.bilateral_trade_cost, transform: log_change,
+            definition: "ln τni, bilateral trade costs (mostly log of one plus the ad valorem bilateral tariff rate; in some papers freight rates, or exporter competitiveness proxies such as wages, exchange rates, prices)"}
+    measure: elasticity
+    unit: ratio
+    sign: negative
+    point: -3.19
+    as_printed: "-3.19"
+    uncertainty: {status: partial}
+    meta: {mean: -4.51, sd_across_estimates: 8.93, n_estimates: 744, n_studies: 32}
+    identification: "Descriptive statistics of 744 statistically significant price-elasticity coefficients from 32 gravity papers (regressions of bilateral trade on trade costs or exporter competitiveness)"
+    locator: "Table 5 'Descriptive statistics of price elasticities in gravity equations', row 'Full sample', column median (printed p.38)"
+    quote: "Full sample -3.19 -4.51 8.93 744"
+  - id: trade_elasticity_structural
+    pdf_page: 38
+    cause: {kind: variable, id: trade.bilateral_trade_cost, transform: log_change,
+            definition: "ln τni, bilateral trade costs or exporter competitiveness proxies, in structural gravity estimates (country fixed effects or ratio-type methods)"}
+    measure: elasticity
+    unit: ratio
+    sign: negative
+    point: -3.78
+    as_printed: "-3.78"
+    uncertainty: {status: partial}
+    meta: {mean: -5.13, sd_across_estimates: 9.37, n_estimates: 622}
+    identification: "Descriptive statistics of the structural-gravity subset (country fixed effects or ratios)"
+    locator: "Table 5, row 'Structural gravity', column median (printed p.38)"
+    quote: "Structural gravity -3.78 -5.13 9.37 622"
+  - id: trade_elasticity_tariff_identified_structural
+    pdf_page: 38
+    cause: {kind: variable, id: trade.bilateral_trade_cost, transform: log_change,
+            definition: "ln τni identified from tariffs or freight rates, in structural gravity estimates; the authors' preferred ε"}
+    measure: elasticity
+    unit: ratio
+    sign: negative
+    point: -5.03
+    as_printed: "-5.03"
+    uncertainty: {status: partial}
+    meta: {mean: -6.74, sd_across_estimates: 9.3, n_estimates: 435, authors_preferred: true}
+    identification: "Structural gravity estimates identified by tariff or freight-rate variation; text: 'our preferred estimate for ε is −5.03, the median coefficient obtained using tariff variation, while controlling for multilateral resistance terms'"
+    locator: "Table 5, split of structural estimates by identifying variable, row 'Tariffs/Freight rates', column median (printed p.38)"
+    quote: "Tariffs/Freight rates -5.03 -6.74 9.3 435"
+  - id: trade_elasticity_price_wage_fx_identified_structural
+    pdf_page: 38
+    cause: {kind: variable, id: trade.bilateral_trade_cost, transform: log_change,
+            definition: "exporter competitiveness identified from prices, wages or exchange rates, in structural gravity estimates"}
+    measure: elasticity
+    unit: ratio
+    sign: negative
+    point: -1.12
+    as_printed: "-1.12"
+    uncertainty: {status: partial}
+    meta: {mean: -1.38, sd_across_estimates: 8.46, n_estimates: 187}
+    identification: "Structural gravity estimates identified by price, wage or exchange-rate variation"
+    locator: "Table 5, split of structural estimates by identifying variable, row 'Price/Wage/Exchange rate', column median (printed p.38)"
+    quote: "Price/Wage/Exchange rate -1.12 -1.38 8.46 187"
+  - id: distance_elasticity_structural
+    pdf_page: 34
+    cause: {kind: variable, id: trade.bilateral_distance, transform: log_change,
+            definition: "Distance (log bilateral distance) in gravity equations"}
+    measure: elasticity
+    unit: ratio
+    sign: negative
+    point: -1.14
+    as_printed: "-1.14"
+    uncertainty: {status: partial}
+    meta: {mean: -1.1, sd_across_estimates: 0.41, n_estimates: 328, all_gravity: {median: -0.89, mean: -0.93, sd: 0.4, n: 1835}}
+    identification: "Descriptive statistics of distance coefficients in structural gravity papers (some use of country fixed effects or ratio-type method); outliers dropped at a 5% threshold"
+    locator: "Table 4 'Estimates of typical gravity variables', row 'Distance', Structural Gravity median (printed p.34)"
+    quote: "Distance -.89 -.93 .4 1835 -1.14 -1.1 .41 328"
+  - id: rta_fta_structural
+    pdf_page: 34
+    cause: {kind: variable, id: trade.rta_membership, transform: occurrence,
+            definition: "RTA/FTA dummy (the pair has a regional or free trade agreement)"}
+    measure: response
+    unit: log_points
+    shock: {size: 1, unit: occurrence}
+    sign: positive
+    point: 0.28
+    as_printed: ".28"
+    uncertainty: {status: partial}
+    meta: {mean: 0.36, sd_across_estimates: 0.42, n_estimates: 108, all_gravity: {median: 0.47, mean: 0.59, sd: 0.5, n: 257}}
+    identification: "Descriptive statistics of RTA/FTA dummy coefficients in structural gravity papers"
+    locator: "Table 4 'Estimates of typical gravity variables', row 'RTA/FTA', Structural Gravity median (printed p.34)"
+    quote: "RTA/FTA .47 .59 .5 257 .28 .36 .42 108"
+    source_caveats: "The numbers reported in Table 4 establish the typical findings but they should not be interpreted as preferred estimates of the causal effects of the policy variables."
+  - id: eu_structural
+    pdf_page: 34
+    cause: {kind: variable, id: trade.eu_membership, transform: occurrence,
+            definition: "EU dummy (both countries are EU members)"}
+    measure: response
+    unit: log_points
+    shock: {size: 1, unit: occurrence}
+    sign: positive
+    point: 0.19
+    as_printed: ".19"
+    uncertainty: {status: partial}
+    meta: {mean: 0.16, sd_across_estimates: 0.5, n_estimates: 26, all_gravity: {median: 0.23, mean: 0.14, sd: 0.56, n: 329}}
+    identification: "Descriptive statistics of EU dummy coefficients in structural gravity papers"
+    locator: "Table 4 'Estimates of typical gravity variables', row 'EU', Structural Gravity median (printed p.34)"
+    quote: "EU .23 .14 .56 329 .19 .16 .5 26"
+    source_caveats: "The numbers reported in Table 4 establish the typical findings but they should not be interpreted as preferred estimates of the causal effects of the policy variables."
+  - id: common_currency_structural
+    pdf_page: 34
+    cause: {kind: variable, id: trade.common_currency, transform: occurrence,
+            definition: "Common currency dummy (the pair shares a currency)"}
+    measure: response
+    unit: log_points
+    shock: {size: 1, unit: occurrence}
+    sign: positive
+    point: 0.98
+    as_printed: ".98"
+    uncertainty: {status: partial}
+    meta: {mean: 0.86, sd_across_estimates: 0.39, n_estimates: 37, all_gravity: {median: 0.87, mean: 0.79, sd: 0.48, n: 104}}
+    identification: "Descriptive statistics of common-currency dummy coefficients in structural gravity papers"
+    locator: "Table 4 'Estimates of typical gravity variables', row 'Common currency', Structural Gravity median (printed p.34)"
+    quote: "Common currency .87 .79 .48 104 .98 .86 .39 37"
+    source_caveats: "The numbers reported in Table 4 establish the typical findings but they should not be interpreted as preferred estimates of the causal effects of the policy variables."
+    applicability: "REVA note: the authors stress that currency-union and RTA coefficients from cross-section or pooled panels are not reliable causal estimates (endogeneity); pair fixed-effect studies find much smaller euro effects."

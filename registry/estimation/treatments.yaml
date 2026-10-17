@@ -1,0 +1,144 @@
+# Treatments of the event-study / local-projection engine (src/reva/estimation, agent PRED-EVENTSTUDY).
+#
+# A treatment is a coded event type with an onset date, read from the events layer (KG event entities written by
+# the dataset connectors, `source: kg`) or from a coded atlas series (`source: atlas`). `definition` is REVA's
+# description of the selection; `source_definition` quotes the provider verbatim when a quoted passage exists in
+# the connector that archived the codebook (never typed from memory). `event_type` is the id in
+# registry/events/taxonomy.yaml (used as `cause_id` of REVA-run effect estimates). Countries are mapped only by
+# identifiers the sources publish (Wikidata QIDs via registry/entities/country_qids.json, or the crosswalk key a
+# connector stored as a qualifier) -- never by names. Coverage = the years the dataset codes; country-years
+# outside it are not "at risk" (excluded from estimation samples, never treated as zero events).
+schema: reva-estimation-treatments/1
+treatments:
+  - id: banking_crisis_lv
+    event_type: banking_crisis
+    source: kg
+    definition: >-
+      Start year of a systemic banking crisis as coded by Laeven & Valencia (2020), Systemic Banking Crises
+      Database II (KG events ecrises:lv:systemic_banking:<ISO3>:<year>, onset = P580, country = P17).
+    citation: >-
+      Laeven, L. and Valencia, F. (2020), 'Systemic Banking Crises Database II', IMF Economic Review 68, 307-361,
+      doi:10.1057/s41308-020-00107-3 (data file: electronic supplementary material 1). (c) IMF.
+    coverage_years: [1970, 2017]
+    selection:
+      id_prefix: "ecrises:lv:systemic_banking:"
+      onset: {property: P580}
+      country: {property: P17, via: qid}
+      filters: []
+    notes: "Rights: IMF data terms, flagged for maintainer review by A-ECRISES (not an open licence)."
+
+  - id: currency_crisis_lv
+    event_type: currency_crisis
+    source: kg
+    definition: >-
+      Start year of a currency crisis as coded by Laeven & Valencia (2020) (KG events
+      ecrises:lv:currency:<ISO3>:<year>, onset = P580, country = P17).
+    citation: >-
+      Laeven, L. and Valencia, F. (2020), 'Systemic Banking Crises Database II', IMF Economic Review 68, 307-361,
+      doi:10.1057/s41308-020-00107-3 (data file: electronic supplementary material 1). (c) IMF.
+    coverage_years: [1970, 2017]
+    selection:
+      id_prefix: "ecrises:lv:currency:"
+      onset: {property: P580}
+      country: {property: P17, via: qid}
+      filters: []
+
+  - id: coup_archigos_military
+    event_type: coup
+    source: kg
+    definition: >-
+      Day a leader was removed from office by the military (Archigos 4.1 exitcode "Removed by Military, without
+      Foreign Support" or "Removed by Military, with Foreign Support"; KG events archigos:exit:<obsid>, onset =
+      P585, country = archigos:removed_from). Successful military removals only: failed coup attempts are not in
+      Archigos.
+    source_definition: >-
+      the great majority of irregular removals (277) are the result of action by domestic military actors
+      without foreign support, the classic "military coup." (Archigos 4.1 codebook, p. 10, as archived by
+      A-COUPS, src/reva/adapters/connectors/atlas_leaders.py CODEBOOK_DEFINITIONS)
+    citation: >-
+      Goemans, H. E., Gleditsch, K. S. and Chiozza, G. (2009), 'Introducing Archigos: A Dataset of Political
+      Leaders', Journal of Peace Research 46(2), 269-283; Archigos 4.1 data.
+    coverage_years: [1875, 2015]
+    selection:
+      id_prefix: "archigos:exit:"
+      onset: {property: P585}
+      country: {property: "archigos:removed_from", via: qid}
+      filters:
+        - property: "archigos:exit_manner"
+          qualifier: exitcode
+          in: ["Removed by Military, without Foreign Support", "Removed by Military, with Foreign Support"]
+
+  - id: earthquake_ncei_1000_deaths
+    event_type: earthquake
+    source: kg
+    definition: >-
+      Date of an NCEI/WDS significant earthquake with at least 1,000 deaths (NCEI field deaths, as reported),
+      attributed to the country NCEI records (KG events ncei_hazards:earthquake:<id>, onset = P585, country =
+      crosswalk key stored by the connector on ncei:country). The death threshold is REVA's choice; deaths are
+      an outcome-related severity measure, so this treatment selects on damage (see caveats).
+    citation: >-
+      NOAA National Centers for Environmental Information (NCEI) / World Data Service (WDS), Global Historical
+      Hazard Database: Significant Earthquake Database, doi:10.7289/V5TD9V7K.
+    coverage_years: [1900, 2025]
+    selection:
+      id_prefix: "ncei_hazards:earthquake:"
+      onset: {property: P585}
+      country: {property: "ncei:country", via: qualifier, key: crosswalk_key}
+      filters:
+        - {property: "ncei:deaths", min: 1000}
+
+  - id: earthquake_ncei_m7
+    event_type: earthquake
+    source: kg
+    definition: >-
+      Date of an NCEI/WDS significant earthquake with preferred magnitude (NCEI eqMagnitude) of at least 7.0,
+      attributed to the country NCEI records. Physical intensity only (no selection on damage); epicentres far
+      offshore are still attributed to the country NCEI names.
+    citation: >-
+      NOAA National Centers for Environmental Information (NCEI) / World Data Service (WDS), Global Historical
+      Hazard Database: Significant Earthquake Database, doi:10.7289/V5TD9V7K.
+    coverage_years: [1900, 2025]
+    selection:
+      id_prefix: "ncei_hazards:earthquake:"
+      onset: {property: P585}
+      country: {property: "ncei:country", via: qualifier, key: crosswalk_key}
+      filters:
+        - {property: "ncei:magnitude", where_qualifier: {key: ncei_field, equals: eqMagnitude}, min: 7.0}
+
+  - id: sanctions_ties_imposed
+    event_type: sanction_episode
+    source: kg
+    definition: >-
+      Imposition date of economic sanctions in a TIES case (ties:sanctions_imposed = yes; onset =
+      ties:imposition_start; country = ties:target), any sender.
+    citation: >-
+      Morgan, T. C., Bapat, N. and Kobayashi, Y. (2014), 'Threat and imposition of economic sanctions 1945-2005:
+      Updating the TIES dataset', Conflict Management and Peace Science 31(5), 541-558.
+    coverage_years: [1945, 2005]
+    selection:
+      id_prefix: "ties:case:"
+      onset: {property: "ties:imposition_start"}
+      country: {property: "ties:target", via: qid}
+      filters:
+        - {property: "ties:sanctions_imposed", equals: "yes"}
+
+  - id: banking_crisis_jst
+    event_type: banking_crisis
+    source: atlas
+    definition: >-
+      First year of a systemic financial crisis in the Jordà-Schularick-Taylor Macrohistory Database R6
+      (crisisJST = 1), 18 advanced economies.
+    source_definition: >-
+      The banking crisis variable (crisisJST) takes unity in the first year a country is experiencing a
+      systemic banking crisis, and zero else. An episode of banking distress is coded as a systemic banking
+      crisis if it is characterized by major bank failures, banking panics, substantial losses in the banking
+      sector, significant recapitalization, and/or significant government intervention. (JST Financial Crisis
+      Chronology, 25 February 2021, section 1; quoted by A-ECRISES in atlas_ecrises.JST_CRISIS_DEFINITION)
+    citation: >-
+      Jordà, Ò., Schularick, M. and Taylor, A. M. (2017), 'Macrofinancial History and the New Business Cycle
+      Facts', NBER Macroeconomics Annual 31; Macrohistory Database R6 (CC BY-NC-SA 4.0, non-commercial).
+    coverage_years: [1870, 2020]
+    selection:
+      series: jst.macrohistory.crisisJST
+      rule: {op: "==", value: 1}
+    notes: "Licence CC BY-NC-SA 4.0: results derived from JST data are non-commercial (flag carried in runs)."

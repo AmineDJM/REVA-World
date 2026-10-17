@@ -1,0 +1,24 @@
+# V4 (agent V4ECO): RESOLVE Ecoregions 2017 (Dinerstein et al. 2017). Only the attribute table
+# (Ecoregions2017.dbf) is read, by two HTTP byte ranges of the release zip (zip central directory + the dbf member);
+# the 243 MB polygon shapefile is never downloaded. Connector src/reva/adapters/connectors/atlas_ecoregions.py ->
+# KG entities resolve_eco:<ECO_ID>, resolve_biome:<BIOME_NUM>, resolve_realm:<REALM> and statements
+# resolve:in_biome / resolve:in_realm / resolve:nature_needs_half (no atlas table).
+source_key: resolve.ecoregions2017
+title: RESOLVE Ecoregions 2017 — 846 terrestrial ecoregions, 14 biomes, 8 realms (attribute table)
+provider_url: https://ecoregions.appspot.com/
+lineage_family: resolve_ecoregions
+rights:
+  licence: CC BY 4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: >-
+    Dinerstein, E. et al. (2017). An Ecoregion-Based Approach to Protecting Half the Terrestrial Realm.
+    BioScience 67(6): 534-545. Data: Ecoregions 2017 (c) Resolve.
+  licence_basis: "LICENSE attribute of every record of the release's attribute table (read and checked per run)"
+metadata:
+  allowed_hosts: [storage.googleapis.com]
+  archive: https://storage.googleapis.com/teow2016/Ecoregions2017.zip
+  authentication: none
+  not_loaded: >-
+    Ecoregion <-> country membership: the release has no such table; computing it needs the polygons (overlay,
+    a REVA derivation, never a located_in statement — see docs/dev/v4_v4eco.md).
+  cadence: static release (2017); yearly check of the archive ETag

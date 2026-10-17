@@ -19,3 +19,8 @@ mappings:
      subject_kinds: [facility], object_kinds: [energy_source]}
   - {property: P137, family: owned_by, subtype: operator, source: wikidata,
      note: "operator (Wikidata P137): the organisation that operates the facility; control of operations as Wikidata states it, not ownership or an equity share"}
+  - {property: "usgs_myb:country", family: located_in, subtype: country, source: usgs.sciencebase,
+     subject_kinds: [facility], object_kinds: [country]}
+  - {property: "usgs_myb:produces", family: produces, subtype: mineral_commodity, source: usgs.sciencebase,
+     subject_kinds: [facility], object_kinds: [commodity],
+     note: "USGS Minerals Yearbook 2024 facilities table: the facility's commodity entry (mine, plant, refinery...)"}

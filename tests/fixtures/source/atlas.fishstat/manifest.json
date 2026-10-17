@@ -1,0 +1,15 @@
+[
+ {
+  "request_fingerprint": "08c99760d625928988985b6ab528477867e555e81aee2349bdb80c7f890ab74b",
+  "url": "https://www.fao.org/fishery/static/Data/GlobalProduction_2026.1.0.zip",
+  "file": "08c99760d6259289.zip",
+  "sha256": "d8061db2b7ede0e12aab26e775533e17614e78917bb7f9739e116240b61071be",
+  "status": 200,
+  "headers": {
+   "content-type": "application/zip"
+  },
+  "retrieved_at": "2026-10-17T13:20:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms, quoted in ReadMe.txt)",
+  "excerpt": "A small zip REBUILT for tests from the real GlobalProduction_2026.1.0.zip (6,382,577 bytes, retrieved 2026-10-17): ReadMe.txt, CL_FI_COUNTRY_GROUPS.csv and CL_FI_PRODUCTION_SOURCE_DET.csv whole; Global_production_quantity.csv rows of UN codes 578 NOR, 250 FRA, 156 CHN, 604 PER, 058 Belgium-Luxembourg [former], 896 Other NEI, 830 Channel Islands for 2019+ plus the first 5 rows with status Q; CL_FI_SPECIES_GROUPS.csv rows of the species in those rows."
+ }
+]

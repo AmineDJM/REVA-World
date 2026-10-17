@@ -328,5 +328,72 @@
     "live_sha256": "266f2e2baad7975351bc9bb4aa061d22b1da9fe4c47d51d2ac6071e01e171f76",
     "live_bytes": 9229369,
     "excerpt": "header + rows France, Algeria, Kosovo, World, Africa (EI), Taiwan for years >= 2019"
+  },
+  {
+    "request_fingerprint": "15634145ae43819e0da2dcdb07172842207419b8c871c2429db038c48f37874e",
+    "url": "https://ourworldindata.org/grapher/global-living-planet-index.csv?v=1&csvType=full&useColumnShortNames=true",
+    "file": "15634145ae43819e.csv",
+    "sha256": "7dac39db8e502b0d1d1100dce3ea42841e57c93b16d5413fca05d3585aa7c92e",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv",
+      "last-modified": "Sat, 17 Oct 2026 13:50:32 GMT"
+    },
+    "retrieved_at": "2026-10-17T13:51:07.651562+00:00",
+    "licence": "WWF/ZSL Living Planet Index published trends: CC BY 4.0 per OWID origin metadata; ZSL LPI data-use policy: CC BY-SA 4.0 for published trends (V4ECO)"
+  },
+  {
+    "request_fingerprint": "05054e0a6d58239d920a80501bfb9cea1f2a64c0dae5f1128a2e7c34aa42adb4",
+    "url": "https://ourworldindata.org/grapher/global-living-planet-index.metadata.json?v=1&csvType=full&useColumnShortNames=true",
+    "file": "05054e0a6d58239d.json",
+    "sha256": "621920837b709a3f39c7d02dc07823cb4089bd75a9ea951dee48e3c3970b4459",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:51:07.918672+00:00",
+    "licence": "WWF/ZSL Living Planet Index published trends: CC BY 4.0 per OWID origin metadata; ZSL LPI data-use policy: CC BY-SA 4.0 for published trends (V4ECO)"
+  },
+  {
+    "request_fingerprint": "00b9db22360b23c7ea1b3c1e210817fb697642872a36b3bf279a6c6db3574e6d",
+    "url": "https://api.ourworldindata.org/v1/indicators/1324884.metadata.json",
+    "file": "00b9db22360b23c7.json",
+    "sha256": "a78893c062f61d3f4f3a93a7e77e41a8cb9854d8ac7ef7744509ee9a916a808a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "W/\"4275739ce3a403bb15cd0a0092be511c\"",
+      "last-modified": "Thu, 08 Oct 2026 05:38:48 GMT"
+    },
+    "retrieved_at": "2026-10-17T13:51:08.397482+00:00",
+    "licence": "WWF/ZSL Living Planet Index published trends: CC BY 4.0 per OWID origin metadata; ZSL LPI data-use policy: CC BY-SA 4.0 for published trends (V4ECO)"
+  },
+  {
+    "request_fingerprint": "a44e6e66ec90194855bec2456f96805f3c9cb0f45caf1f427ab0578d5d923e6e",
+    "url": "https://api.ourworldindata.org/v1/indicators/1324886.metadata.json",
+    "file": "a44e6e66ec901948.json",
+    "sha256": "797517731f3a03b98fd21d4cd3b867189ddbf3b5183192557772bce3d920113d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "W/\"5052371e5286a1dab8d8ff10e4cc27e6\"",
+      "last-modified": "Thu, 08 Oct 2026 05:38:48 GMT"
+    },
+    "retrieved_at": "2026-10-17T13:51:08.531459+00:00",
+    "licence": "WWF/ZSL Living Planet Index published trends: CC BY 4.0 per OWID origin metadata; ZSL LPI data-use policy: CC BY-SA 4.0 for published trends (V4ECO)"
+  },
+  {
+    "request_fingerprint": "fdfd924f4663b290baa092255fbbbcdece69751e89fe3ff8cfc03b569644a4d4",
+    "url": "https://api.ourworldindata.org/v1/indicators/1324885.metadata.json",
+    "file": "fdfd924f4663b290.json",
+    "sha256": "9c2235d7d7b73c9e9a9febeafa129f1431665d5b35ff58f4cd1b13f677380ecb",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "W/\"49a836b926030c6abeb1e1ea0d3e79ff\"",
+      "last-modified": "Thu, 08 Oct 2026 05:38:48 GMT"
+    },
+    "retrieved_at": "2026-10-17T13:51:08.642930+00:00",
+    "licence": "WWF/ZSL Living Planet Index published trends: CC BY 4.0 per OWID origin metadata; ZSL LPI data-use policy: CC BY-SA 4.0 for published trends (V4ECO)"
   }
 ]

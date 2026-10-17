@@ -77,6 +77,10 @@ HANDLERS: dict[str, str] = {
     # --- CAUSOPS (V3): causal claims from the KG current view (loader) + grades (grader), worker credentials
     "causal_refresh": "reva.operations.jobs:handle_causal_refresh",
     # --- end CAUSOPS
+    # --- PRED-REGISTRY (V5): prospective forecast registry -- issue (seal) / resolve (score) / pseudo-real-time
+    # back-test, worker credentials
+    "forecast_registry": "reva.evaluation.registry.service:handle_forecast_registry",
+    # --- end PRED-REGISTRY
 }
 
 # Job types that receive the separate reva_sim engine (numerical/simulation
