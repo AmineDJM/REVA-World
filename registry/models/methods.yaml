@@ -749,3 +749,183 @@ models:
     output_ports: [{name: point_forecast}, {name: predictive}]
     applicability: {frequencies: [M], min_components: 2}
     assumptions: [fixed equal weights; mean component spread]
+  # ---------------------------------------------------------------- V6 PRED-MODELS candidates (real-time evaluated;
+  # registered scopes, if any, in registry/forecasts/pred_models/registered_models.yaml; report docs/dev/v6_pred_models.md)
+  - model_key: forecast.direct_ar
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Direct h-step AR regression y[t+h] = c + sum a_i y[t-i] (OLS, p by BIC) on the data published at the origin;
+      Gaussian predictive (residual variance x (1 + leverage)). src/reva/models/forecasting/direct.py
+    input_ports: [{name: series, kind: regular_frequency_any_sign}]
+    output_ports: [{name: point_forecast}, {name: predictive_normal}]
+    applicability: {frequencies: [Q, A], min_obs: "15 (A) / 24-40 (Q)"}
+    assumptions: [linear direct projection; stable coefficients within the window]
+  - model_key: forecast.bvar_minnesota
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Three-variable BVAR(4) (GDP growth, inflation, unemployment) with a Minnesota prior (lambda1 0.2, lambda2 0.5,
+      lambda3 1; own-lag mean 0 for growth, 1 for inflation and unemployment), 500 predictive draws.
+      src/reva/models/forecasting/bvar.py
+    input_ports: [{name: panel, kind: quarterly_balanced_three_variables}]
+    output_ports: [{name: predictive_empirical}]
+    applicability: {frequencies: [Q], min_balanced_quarters: "28 (G7) / 40 (US)"}
+    assumptions: [Gaussian VAR; fixed hyper-parameters (not tuned on the evaluation sample)]
+  - model_key: forecast.dfm_nowcast
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      One-factor dynamic factor model (PCA + Kalman smoother over a ragged edge) on real-time monthly indicators
+      (OECD MEI editions: unemployment change, CPI y/y) and a bridge equation for quarterly GDP growth.
+      src/reva/models/forecasting/dfm.py
+    input_ports: [{name: monthly_indicators, kind: monthly_real_time}, {name: gdp_growth, kind: quarterly}]
+    output_ports: [{name: predictive_normal}]
+    applicability: {frequencies: [Q], targets: [nowcast quarter, previous quarter not yet published]}
+    assumptions: [one common factor; AR(1) factor; linear bridge]
+  - model_key: forecast.dfm_nowcast_x
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Same DFM with final-vintage industrial production and market rates added under stated publication lags:
+      pseudo-real-time, evaluated and reported only, never registered.
+    input_ports: [{name: monthly_indicators, kind: monthly_mixed_vintage}]
+    output_ports: [{name: predictive_normal}]
+    applicability: {registration: refused (not real-time)}
+    assumptions: [industrial production of month m known from m+2; market rates of month m known from m+1]
+  - model_key: forecast.combo_weo_ar
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      equal-weight WEO projection and direct AR; conformal density. Past errors pooled across series, normalised by each series' own 1-step volatility, only those whose
+      outcome was published at the origin (src/reva/evaluation/pred_models/derived.py, models/forecasting/combination.py).
+    input_ports: [{name: component_forecasts, kind: point_or_predictive}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}]
+    applicability: {min_past_errors: 15}
+    assumptions: [past and future normalised errors exchangeable (fails under regime change)]
+  - model_key: forecast.combo_weo_ar_persist
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      equal-weight WEO, direct AR and persistence; conformal density. Past errors pooled across series, normalised by each series' own 1-step volatility, only those whose
+      outcome was published at the origin (src/reva/evaluation/pred_models/derived.py, models/forecasting/combination.py).
+    input_ports: [{name: component_forecasts, kind: point_or_predictive}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}]
+    applicability: {min_past_errors: 15}
+    assumptions: [past and future normalised errors exchangeable (fails under regime change)]
+  - model_key: forecast.weo_bias_corrected
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      WEO + median past normalised WEO error known at the origin; centred conformal density. Past errors pooled across series, normalised by each series' own 1-step volatility, only those whose
+      outcome was published at the origin (src/reva/evaluation/pred_models/derived.py, models/forecasting/combination.py).
+    input_ports: [{name: component_forecasts, kind: point_or_predictive}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}]
+    applicability: {min_past_errors: 15}
+    assumptions: [past and future normalised errors exchangeable (fails under regime change)]
+  - model_key: forecast.weo_conformal
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      WEO projection + scaled past out-of-sample WEO errors known at the origin (calibrated density around the IMF point). Past errors pooled across series, normalised by each series' own 1-step volatility, only those whose
+      outcome was published at the origin (src/reva/evaluation/pred_models/derived.py, models/forecasting/combination.py).
+    input_ports: [{name: component_forecasts, kind: point_or_predictive}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}]
+    applicability: {min_past_errors: 15}
+    assumptions: [past and future normalised errors exchangeable (fails under regime change)]
+  - model_key: forecast.direct_ar_conformal
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      direct AR point + scaled past AR errors. Past errors pooled across series, normalised by each series' own 1-step volatility, only those whose
+      outcome was published at the origin (src/reva/evaluation/pred_models/derived.py, models/forecasting/combination.py).
+    input_ports: [{name: component_forecasts, kind: point_or_predictive}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}]
+    applicability: {min_past_errors: 15}
+    assumptions: [past and future normalised errors exchangeable (fails under regime change)]
+  - model_key: forecast.spf_conformal
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      SPF median + scaled past SPF errors known at the release (calibrated density around the SPF point). Past errors pooled across series, normalised by each series' own 1-step volatility, only those whose
+      outcome was published at the origin (src/reva/evaluation/pred_models/derived.py, models/forecasting/combination.py).
+    input_ports: [{name: component_forecasts, kind: point_or_predictive}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}]
+    applicability: {min_past_errors: 15}
+    assumptions: [past and future normalised errors exchangeable (fails under regime change)]
+  - model_key: forecast.combo_spf_bvar
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      equal-weight SPF median and BVAR; conformal density. Past errors pooled across series, normalised by each series' own 1-step volatility, only those whose
+      outcome was published at the origin (src/reva/evaluation/pred_models/derived.py, models/forecasting/combination.py).
+    input_ports: [{name: component_forecasts, kind: point_or_predictive}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}]
+    applicability: {min_past_errors: 15}
+    assumptions: [past and future normalised errors exchangeable (fails under regime change)]
+  - model_key: forecast.combo_spf_ar
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      equal-weight SPF median and direct AR; conformal density. Past errors pooled across series, normalised by each series' own 1-step volatility, only those whose
+      outcome was published at the origin (src/reva/evaluation/pred_models/derived.py, models/forecasting/combination.py).
+    input_ports: [{name: component_forecasts, kind: point_or_predictive}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}]
+    applicability: {min_past_errors: 15}
+    assumptions: [past and future normalised errors exchangeable (fails under regime change)]
+  - model_key: forecast.pool_bvar_ar
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      equal-weight linear pool of BVAR and direct AR. Past errors pooled across series, normalised by each series' own 1-step volatility, only those whose
+      outcome was published at the origin (src/reva/evaluation/pred_models/derived.py, models/forecasting/combination.py).
+    input_ports: [{name: component_forecasts, kind: point_or_predictive}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}]
+    applicability: {min_past_errors: 15}
+    assumptions: [past and future normalised errors exchangeable (fails under regime change)]
+  - model_key: forecast.bvar_conformal
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      BVAR median + scaled past BVAR errors. Past errors pooled across series, normalised by each series' own 1-step volatility, only those whose
+      outcome was published at the origin (src/reva/evaluation/pred_models/derived.py, models/forecasting/combination.py).
+    input_ports: [{name: component_forecasts, kind: point_or_predictive}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}]
+    applicability: {min_past_errors: 15}
+    assumptions: [past and future normalised errors exchangeable (fails under regime change)]
+  - model_key: forecast.combo_dfm_bvar
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      equal-weight DFM nowcast and BVAR; conformal density. Past errors pooled across series, normalised by each series' own 1-step volatility, only those whose
+      outcome was published at the origin (src/reva/evaluation/pred_models/derived.py, models/forecasting/combination.py).
+    input_ports: [{name: component_forecasts, kind: point_or_predictive}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}]
+    applicability: {min_past_errors: 15}
+    assumptions: [past and future normalised errors exchangeable (fails under regime change)]
+  - model_key: forecast.dfm_conformal
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      DFM nowcast + scaled past DFM errors. Past errors pooled across series, normalised by each series' own 1-step volatility, only those whose
+      outcome was published at the origin (src/reva/evaluation/pred_models/derived.py, models/forecasting/combination.py).
+    input_ports: [{name: component_forecasts, kind: point_or_predictive}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}]
+    applicability: {min_past_errors: 15}
+    assumptions: [past and future normalised errors exchangeable (fails under regime change)]

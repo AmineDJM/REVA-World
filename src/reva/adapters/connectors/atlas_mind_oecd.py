@@ -50,7 +50,11 @@ from reva.adapters.connectors.atlas_fiscal_common import Flow, FlowReport
 from reva.atlas.sources import AtlasSourceSpec
 
 CONNECTOR_NAME = "atlas.oecd.wellbeing"
-CONNECTOR_VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB from an in-progress copy of this module
+# 1.0.1: 1.0.0 was registered in the dev DB from an in-progress copy of this module.
+# 1.0.2 (FIX4C, AUDIT3 L5): the licence reservation is carried by every cell (flags.licence_review), not only by the
+#        table rights: the SDMX data and structure (DSD_HSL 1.1) state no upstream survey per observation, so no cell
+#        can be shown as cleared.
+CONNECTOR_VERSION = "1.0.2"
 PARSER_VERSION = "atlas_mind_oecd/1"
 CATALOG_FILE = "mind.yaml"
 
@@ -134,6 +138,14 @@ RIGHTS: dict[str, Any] = {
     ),
     "agent": "V4MIND",
 }
+#: Per-cell reservation (AUDIT3 L5). The OECD documents the upstream survey per measure outside the SDMX data; neither
+#: the SDMX-CSV rows nor the data structure carry a source attribute, so which cells are third-party is not stated in
+#: the bytes REVA reads: every cell carries the reservation until the owner review (docs/dev/v4_v4mind.md, decision 2).
+CELL_LICENCE_REVIEW = {
+    "licence_review": "third_party_upstream_possible",
+    "licence_review_basis": "OECD How's Life? compiles some measures from third-party surveys (e.g. Gallup World "
+    "Poll); the upstream survey is not stated per observation in the SDMX data or structure",
+}
 
 
 def _hints(dataset: str) -> dict[str, str]:
@@ -155,7 +167,10 @@ def build(flow: Flow, files: list[tuple[str, bytes, str]]) -> tuple[pl.DataFrame
     frame = frame.with_columns(
         pl.col("indicator").replace_strict(hints, default=None, return_dtype=pl.String).alias("concept_id"),
         pl.struct(flags=pl.col("flags"), name=names)
-        .map_elements(lambda s: fc.canon({**json.loads(s["flags"]), "measure_name": s["name"]}), return_dtype=pl.String)
+        .map_elements(
+            lambda s: fc.canon({**json.loads(s["flags"]), "measure_name": s["name"], **CELL_LICENCE_REVIEW}),
+            return_dtype=pl.String,
+        )
         .alias("flags"),
     )
     return frame, rep, note

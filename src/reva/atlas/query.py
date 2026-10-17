@@ -1330,8 +1330,13 @@ class AtlasQuery:
 # --------------------------------------------------------------------------- headline concepts (ATLASOPS)
 #: A cell is a projection when its provider says so: WEO/ILO-style estimate_kind, a truthy
 #: ``projection`` flag (WPP/WHO booleans, ILO text) or the WDI's ``period_after_vintage``.
+#: Cells that are not observations. ``estimate_kind = unknown_boundary`` (a provider series published without a
+#: history/forecast boundary, e.g. 16 EIA STEO series) is never an observation either: the boundary is unknown, so
+#: no period of it can be asserted as observed (FIX4B, audit AUDIT3 M6; same rule as
+#: ``reva.evaluation.registry.questions.PROJECTION_KINDS``).
 PROJECTION_SQL = (
-    "(coalesce(json_extract_string(x.flags, '$.estimate_kind'), '') = 'projection' "
+    "(coalesce(json_extract_string(x.flags, '$.estimate_kind'), '') IN ('projection', 'unknown_boundary', "
+    "'published_history_boundary_unknown') "
     "OR coalesce(json_extract_string(x.flags, '$.projection'), 'false') NOT IN ('false', '') "
     "OR coalesce(json_extract_string(x.flags, '$.period_after_vintage'), 'false') = 'true')"
 )

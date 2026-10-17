@@ -163,6 +163,7 @@ def questions(
 ) -> tuple[list[dict[str, Any]], int]:
     out: list[dict[str, Any]] = []
     oc_all = outcomes(conn, store, origin)
+    listed: set[str] = set()  # a supplementary batch (V6 PRED-MODELS) repeats sealed questions: list each once
     for b in batches(conn, origin):
         if cycle and b["cycle"] != cycle:
             continue
@@ -178,6 +179,9 @@ def questions(
                 continue
             if qtype and q["type"] != qtype:
                 continue
+            if q["question_id"] in listed:
+                continue
+            listed.add(q["question_id"])
             s = _summary(q, b, n_fc[q["question_id"]], oc_all.get(q["question_id"]))
             if status and s["status"] != status:
                 continue
@@ -198,6 +202,17 @@ def question(conn: Any, store: Any, question_id: str) -> dict[str, Any] | None:
                 if s["question_id"] == question_id:
                     scores[s["model"]] = s
         fcs = [f for f in m["forecasts"] if f["question_id"] == question_id]
+        for b2 in batches(conn, None):  # forecasts of supplementary batches (V6 PRED-MODELS) on the same question
+            if b2["batch_sha256"] == b["batch_sha256"]:
+                continue
+            m2 = CACHE.get(store, b2["batch_sha256"])
+            if m2.get("supplement_of") != b["batch_sha256"]:
+                continue
+            sc2 = {s["model"]: s for r in _score_rows(conn, None, b2["batch_sha256"])
+                   for s in r["metrics"].get("scores", []) if s["question_id"] == question_id}  # fmt: skip
+            scores.update(sc2)
+            fcs += [{**f, "supplement_batch_sha256": b2["batch_sha256"]} for f in m2["forecasts"]
+                    if f["question_id"] == question_id]  # fmt: skip
         return {
             "question": q,
             "forecasts": [{**f, "score": scores.get(f["model"])} for f in fcs],

@@ -109,6 +109,9 @@ async def test_oecd_wellbeing_measures_and_concepts() -> None:
         assert frame["value"].null_count() == 0  # rows without a value are not cells
         names = {json.loads(f)["measure_name"] for f in frame["flags"].to_list()}
         assert names <= set(oecd.MEASURE_NAMES.values())
+        # AUDIT3 L5: every cell carries the third-party licence reservation (no per-observation upstream is stated)
+        reviews = {json.loads(f).get("licence_review") for f in frame["flags"].to_list()}
+        assert reviews == {"third_party_upstream_possible"}
         if fl.dataset == "hsl_mind_current":
             ls = frame.filter(pl.col("indicator") == "11_1|unit_measure=0_TO_10|age=_T|sex=_T|education_lev=_T")
             assert ls.height > 0 and set(ls["concept_id"].unique().to_list()) == {"mind.oecd.life_satisfaction"}

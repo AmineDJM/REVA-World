@@ -71,9 +71,14 @@ verbatim DOI/ISBN citation per claim). Rule (`health_obo_common.RelationIndex.is
 1. R is causal when the Relation Ontology places it under `RO:0002410` "causally related to" (e.g. `RO:0014001`
    disease has infectious agent, `RO:0004003` has material basis in germline mutation in, `RO:0004019` disease has
    basis in and its children, `RO:0001022` has allergic trigger, `RO:0004005` has major susceptibility factor,
-   `RO:0004028` realized in response to stimulus), or when the ontology defines it as causation (DOID
-   `IDO:0000664`), or when its **label** carries a causal marker (cause, effect, material basis, basis in, trigger,
-   driver, predispos, susceptib, …; definitions are not word-matched).
+   `RO:0004028` realized in response to stimulus), or when it is on the reviewed allow-list of relations the
+   ontology defines as causation (`DEFINED_AS_CAUSATION`: DOID `IDO:0000664`, defining phrase checked verbatim).
+   **FIX4A (AUDIT3 M9): labels are never read** — the former label-marker rule made `RO:0007001` "has disease
+   driver" causal by the word "driver"; it is now the plain link `doid:has_disease_driver` (family context).
+   **FIX4A (M1):** `IDO:0000664` with a `GENO:` filler (mode of inheritance) is the KG statement
+   `doid:inheritance_mode`, never a claim. **FIX4A (H1):** for "disruption / dysfunction / alteration in structure"
+   relations the cause (or, for RO:0004024/0004025, the effect) is a REVA-made node `reva_state:<state>:<filler>`
+   ("disruption of GO:0003824"), never the normal process or structure. See docs/dev/v6_fix4a.md.
 2. A causal axiom is **never** a KG statement (no predicate in `predicates_health.yaml` is causal; the families
    drop-in maps none). It is one claim per (disease, relation, filler) through `reva.causal.load_dataset_claims`
    (via `causdata_common.deliver_claims`): cause = filler, effect = disease, except "disease causes
@@ -102,7 +107,9 @@ when V4CHEM / V4BIO load those ids.
 ## Gene–disease
 
 * Mondo "has material basis in germline mutation in" is RO-causal → T1 claims (above).
-* ClinGen gene-disease validity → `associated_with` only. A ClinGen classification grades the *evidence* for a
+* ClinGen gene-disease validity → `associated_with` only for Definitive / Strong / Moderate / Limited. **FIX4A
+  (AUDIT3 H2):** Refuted / Disputed / No Known Disease Relationship are `clingen:gene_disease_curation_negative`
+  (classification verbatim, unmapped in the families: never a relation hop). A ClinGen classification grades the *evidence* for a
   gene–disease relationship; REVA does not promote it to a causal claim (owner decision if wanted: the SOP
   definitions would have to be archived and quoted as codebook).
 * Ids exactly as published (`HGNC:n`, `MONDO:n`, `http://identifiers.org/hgnc/n`, `…/ncbigene/n`), never symbols.
@@ -171,7 +178,8 @@ machine-wide Wikidata lock); WDHARVEST should pin the QID after the first run.
 1. GBD (non-commercial licence) — load or not. 2. HPO licence review. 3. Reviewed pathogen-list → NCBI Taxonomy
 crosswalk. 4. Archiving the WHO GHE methods annex (CC BY-NC-SA 3.0 IGO) for the ICD-10 ↔ GHE-cause bridge. 5. Whether
 ClinGen *Definitive/Strong* classifications should become T1 claims (requires archiving the ClinGen SOP as codebook).
-6. Whether DOID inheritance-mode axioms (`geno:` causes) should be kept as claims or shown in a separate lane.
+6. ~~Whether DOID inheritance-mode axioms (`geno:` causes) should be kept as claims~~ — resolved by AUDIT3 M1 /
+FIX4A: they are not causes; KG statement `doid:inheritance_mode` (docs/dev/v6_fix4a.md).
 
 ## Tests
 

@@ -147,8 +147,16 @@ def energy_models() -> dict[str, tuple[str, str]]:
     return _em()
 
 
+def pred_models() -> dict[str, tuple[str, str]]:
+    """Forecasters registered on the locked real-time holdout (V6 PRED-MODELS) for a registry family; they issue
+    through supplementary sealed batches (``reva.evaluation.pred_models.issue``)."""
+    from reva.evaluation.pred_models.issue import registry_models
+
+    return registry_models()
+
+
 def all_models() -> dict[str, tuple[str, str]]:
-    return {**BASELINES, **REFERENCE_MODELS, **finance_models(), **conflict_models(), **energy_models()}
+    return {**BASELINES, **REFERENCE_MODELS, **finance_models(), **conflict_models(), **energy_models(), **pred_models()}
 
 
 __all__ = [

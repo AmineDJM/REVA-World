@@ -144,7 +144,7 @@ def _is_projection(flags: Mapping[str, Any] | None) -> bool:
     f = flags or {}
     proj = str(f.get("projection", "false")).lower()
     return (
-        str(f.get("estimate_kind") or "") == "projection"
+        str(f.get("estimate_kind") or "") in ("projection", "unknown_boundary", "published_history_boundary_unknown")
         or proj not in ("false", "")
         or str(f.get("period_after_vintage", "false")).lower() == "true"
     )

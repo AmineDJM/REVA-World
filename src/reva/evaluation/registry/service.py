@@ -869,7 +869,12 @@ def handle_forecast_registry(payload: dict[str, Any], ctx: Any) -> dict[str, Any
     if fams is not None and (not isinstance(fams, list) or not all(isinstance(x, str) for x in fams)):
         raise ValidationProblem("families must be a list of family keys")
     if action == "issue":
-        return issue_cycle(ctx.worker_engine, ctx.store, origin=origin, families=fams)
+        res = issue_cycle(ctx.worker_engine, ctx.store, origin=origin, families=fams)
+        if not fams:  # V6 PRED-MODELS: locked-holdout winners on the sealed open questions of this cycle
+            from reva.evaluation.pred_models.issue import issue_supplements
+
+            res["pred_models"] = issue_supplements(ctx.worker_engine, ctx.store, origin=origin)
+        return res
     if action == "resolve":
         return resolve_due(ctx.worker_engine, ctx.store, origin=origin)
     if action == "backtest":

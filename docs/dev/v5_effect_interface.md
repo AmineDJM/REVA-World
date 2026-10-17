@@ -86,6 +86,25 @@ Measure → allowed units: `elasticity` / `pass_through` → `ratio`, `percent_p
 `currency_per_currency`, `ratio`; `response` → `percent`, `percentage_points`, `log_points`; `identity_coefficient`
 → any.
 
+### Horizon convention (FIX4B, audit AUDIT3 M5a)
+
+`horizon_value` / `irf[].h` count periods **from the impact period**: h = 0 is the period of the shock or of the
+episode's onset (for an annual event study, the first year of the episode = the onset year), h = 1 the next
+period, and so on. A source that numbers years "1, 2, …" from the onset year is stored as h = 0, 1, …
+(`horizon_kind = impact` for its first year alone). PRED-ENGINE puts h = 0 on the decision's start year.
+
+### Level vs growth (FIX4B, audit AUDIT3 M3)
+
+A level response (percent / log change, cumulative sum of growth rates ≈ % change of the level) is stored on a
+**level** variable; a growth-rate response (pp) on a **growth-rate** variable or concept. Curated identifier links
+in `registry/effects/variables.yaml`: a level variable declares `growth_variable` (its growth rate as an effect
+variable, e.g. `output.real_gdp_per_capita` → `output.real_gdp_per_capita_growth`) and `growth_concepts` (atlas
+concepts that are its growth rate, e.g. `wb.ny.gdp.pcap.kd.zg`). The loader (`reva.effects.consistency`) rejects
+`level_transform_on_growth_concept`, `percent_response_on_growth_concept`, `cumulative_lhs_on_growth_concept`
+and `growth_rate_on_level_variable` (prefixed `cause_` / `effect_`); PRED-ENGINE refuses the same rows (excluded,
+`not_propagatable`) and never converts a level response into a growth rate (a difference of local-projection
+horizons is not exactly the growth response: each horizon is a separate regression).
+
 ## Effect variables (`registry/effects/variables.yaml`)
 
 Variables that published estimates talk about but that the atlas catalog does not (yet) carry, e.g.
