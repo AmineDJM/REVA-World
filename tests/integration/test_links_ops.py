@@ -94,6 +94,11 @@ def test_handler_materialises_then_reuses_unchanged_inputs(db: Any, monkeypatch:
     assert forced["reused"] is False and forced["materialisation_id"] > first["materialisation_id"]
     other_k = handle_links_materialise({**payload, "top_k": 4}, ctx)  # different inputs: a new materialisation
     assert other_k["reused"] is False
+    # Only this test's materialisations (other tests in the session DB materialise too): first, forced,
+    # other_k — the reused run added none.
     with db.owner.connect() as c:
-        n = c.execute(text("SELECT count(*) FROM kg.link_materialisation")).scalar_one()
+        n = c.execute(
+            text("SELECT count(*) FROM kg.link_materialisation WHERE id >= :first"),
+            {"first": first["materialisation_id"]},
+        ).scalar_one()
     assert n == 3

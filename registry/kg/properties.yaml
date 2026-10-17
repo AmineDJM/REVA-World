@@ -1791,6 +1791,84 @@ properties:
     wikidata_datatype: wikibase-item
     requested_by: KGSCIECO
     why: "IUCN protected areas category (national parks -> IUCN category II ...)."
+# merged property requests (wbgetentities labels|datatype 2026-10-17T00:00:37.307592+00:00 raw 814d725ccb1c,710aecb7ce95,aaf90819bb4c,19bb80123972,6234b5eb86ee,45839c56e0f0,a03d57e6bec5)
+  - property: P1923
+    reva_predicate: participating_team
+    inverse: "participating_team_in"
+    kind: entity
+    group: requested
+    expected_en: "participating team"
+    label_en: "participating team"
+    label_fr: "équipes participantes"
+    wikidata_datatype: wikibase-item
+    requested_by: EVENTS
+    why: "participating team (event -> team/side), e.g. the coalitions of a war or the teams of a contest; a participant role of the event view next to participant (P710)."
+  - property: P8031
+    reva_predicate: perpetrator
+    inverse: "perpetrator_of"
+    kind: entity
+    group: requested
+    expected_en: "perpetrator"
+    label_en: "perpetrator"
+    label_fr: "perpétrateur ou perpétratrice"
+    wikidata_datatype: wikibase-item
+    requested_by: EVENTS
+    why: "perpetrator (event -> person/group that carried it out), e.g. the assassin of an assassination or the organisers of a massacre; role 'perpetrator' of the event view."
+  - property: P8032
+    reva_predicate: victim
+    inverse: "victim_of"
+    kind: entity
+    group: requested
+    expected_en: "victim(s)"
+    label_en: "victim(s)"
+    label_fr: "victime"
+    wikidata_datatype: wikibase-item
+    requested_by: EVENTS
+    why: "victim(s) (event -> person/group harmed), e.g. the target of an assassination; role 'victim'."
+  - property: P726
+    reva_predicate: candidate
+    inverse: "candidate_in"
+    kind: entity
+    group: requested
+    expected_en: "candidate"
+    label_en: "candidate"
+    label_fr: "candidat ou candidate"
+    wikidata_datatype: wikibase-item
+    requested_by: EVENTS
+    why: "candidate (election -> candidate person/party); role 'candidate' of election events."
+  - property: P991
+    reva_predicate: successful_candidate
+    inverse: "elected_in"
+    kind: entity
+    group: requested
+    expected_en: "successful candidate"
+    label_en: "successful candidate"
+    label_fr: "élu ou élue"
+    wikidata_datatype: wikibase-item
+    requested_by: EVENTS
+    why: "successful candidate (election -> elected person/party); role 'winner' of election events."
+  - property: P1590
+    reva_predicate: number_of_casualties
+    inverse: null
+    kind: quantity
+    group: requested
+    expected_en: "number of casualties"
+    label_en: "number of casualties"
+    label_fr: "nombre de victimes"
+    wikidata_datatype: quantity
+    requested_by: EVENTS
+    why: "number of casualties (event -> quantity), next to number of deaths (P1120) for disasters and attacks."
+  - property: P1339
+    reva_predicate: number_of_injured
+    inverse: null
+    kind: quantity
+    group: requested
+    expected_en: "number of injured"
+    label_en: "number of injured"
+    label_fr: "nombre de blessés"
+    wikidata_datatype: quantity
+    requested_by: EVENTS
+    why: "number of injured (event -> quantity), for attacks, riots and disasters."
 # Qualifiers kept on statements (others are dropped). P580/P582/P585 become the statement's
 # temporal fields (with precision); the rest go to the qualifiers jsonb.
 qualifiers:

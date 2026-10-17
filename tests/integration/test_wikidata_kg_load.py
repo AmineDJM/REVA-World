@@ -38,7 +38,11 @@ async def test_seed_spec_loads_into_kg_tables(db: Any, tmp_path: Path) -> None:
     sink = hv.KgDbSink(db.worker, db.store, origin="test_fixture")
     allow = wd.load_allowlist()
     props = sink.register_properties(allow)
-    assert props["properties_inserted"] + props["unchanged"] == len(allow.properties)
+    # Every allow-listed property ends up registered with this definition: new, unchanged, or a new version of
+    # a pid another loader of the shared session DB registered first (``properties_inserted`` alone depends
+    # on test order).
+    assert props["versions_inserted"] + props["unchanged"] == len(allow.properties)
+    assert props["properties_inserted"] <= props["versions_inserted"]
     h = hv.Harvester(client, sink, allow=allow, state_dir=tmp_path / "state")
     rep = await h.run_spec(_spec(tmp_path, {**BASE, "entity_kind": "empire", "expand_hops": 1}))
     assert rep.status == "done", rep.failures

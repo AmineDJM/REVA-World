@@ -135,6 +135,18 @@ async def loaded(db: Any, tmp_path_factory: pytest.TempPathFactory) -> Any:
     return db
 
 
+def _source_keys() -> list[str]:
+    """KG source keys of the ingests run by :func:`loaded` (claims of other tests sharing the session DB, e.g.
+    the synthetic ``czapi.data`` graph of test_causal_api, are not this test's data)."""
+    keys: set[str] = set()
+    for module, names, _ in SOURCES:
+        specs = module.atlas_source()
+        for spec in specs if isinstance(specs, list) else [specs]:
+            if names is None or spec.name in names:
+                keys.add(spec.source_key)
+    return sorted(keys)
+
+
 def _family(qid: str) -> str:
     head = qid.split(":")[0]
     if head.startswith(("navco", "mec", "mmp", "ptcoup", "cowtc", "icowclaim")):
@@ -198,7 +210,11 @@ def test_causal_claims_attach_to_typed_events(loaded: Any, classified: dict[str,
         if not c.execute(text("SELECT to_regclass('kg.causal_claim_current')")).scalar():
             pytest.skip("CAUSCORE schema absent: claims were staged, not loaded")
         rows = c.execute(
-            text("SELECT source_key, cause_id, effect_id FROM kg.causal_claim_current WHERE origin = 'test_fixture'")
+            text(
+                "SELECT source_key, cause_id, effect_id FROM kg.causal_claim_current "
+                "WHERE origin = 'test_fixture' AND source_key = ANY(:keys)"
+            ),
+            {"keys": _source_keys()},
         ).all()
         extra = {e for _, a, b in rows for e in (a, b) if e not in classified}
         kinds = {

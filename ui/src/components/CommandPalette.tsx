@@ -113,7 +113,12 @@ export function CommandPalette({ screens }: { screens: PaletteScreen[] }) {
   const titleId = useId();
 
   const screenItems: PaletteItem[] = useMemo(
-    () => screens.map((s) => ({ id: s.to, kind: 'screen' as const, title: s.label, subtitle: s.to, keywords: [s.to.replace(/^\//, '')], href: s.to })),
+    // Options are keyed by route: keep the first screen per route so a repeated one cannot render two
+    // options under one React key.
+    () =>
+      screens
+        .filter((s, i) => screens.findIndex((t) => t.to === s.to) === i)
+        .map((s) => ({ id: s.to, kind: 'screen' as const, title: s.label, subtitle: s.to, keywords: [s.to.replace(/^\//, '')], href: s.to })),
     [screens],
   );
   const results = useMemo(() => rankItems([...screenItems, ...src.items], query, 40), [screenItems, src.items, query]);

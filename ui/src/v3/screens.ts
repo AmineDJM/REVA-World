@@ -23,13 +23,26 @@ export const V3_SCREENS: V3Screen[] = [
 ];
 
 /** Entries for the ⌘K palette (screens). */
-export const V3_PALETTE = [
+export interface V3PaletteEntry {
+  to: string;
+  label: string;
+}
+
+/**
+ * Keep the first entry per route: the palette keys its options by `to`, so a repeated route renders two
+ * options with one React key (the second one goes stale). A screen's own route already lists it.
+ */
+export function uniqueByRoute<T extends { to: string }>(entries: readonly T[]): T[] {
+  const seen = new Set<string>();
+  return entries.filter((e) => (seen.has(e.to) ? false : (seen.add(e.to), true)));
+}
+
+export const V3_PALETTE: V3PaletteEntry[] = uniqueByRoute([
   ...V3_SCREENS.map((s) => ({ to: s.to, label: s.label })),
   { to: '/v3/chemin?from=Q7322&to=Q155', label: 'Chemin — exemple : Christophe Colomb → Brésil' },
   { to: '/v3/neurones?qid=Q155', label: 'Neurones — exemple : Brésil' },
   { to: '/v3/pays/BRA', label: 'Dossier pays — Brésil' },
   { to: '/v3/pays/USA', label: 'Dossier pays — États-Unis' },
-  { to: '/v3/relation?a=BRA&b=PRT', label: 'Pays ↔ Pays — Brésil et Portugal' },
   { to: '/v3/relation?a=DZA&b=FRA', label: 'Pays ↔ Pays — Algérie et France' },
   { to: '/v3/causes?event=Q361', label: 'Causes & conséquences — Première Guerre mondiale' },
-];
+]);

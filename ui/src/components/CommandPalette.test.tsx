@@ -10,10 +10,10 @@ function Where() {
   return <p data-testid="where">{l.pathname + l.search}</p>;
 }
 
-function renderPalette() {
+function renderPalette(screens = [{ to: '/world', label: 'World' }, { to: '/map', label: 'Map' }]) {
   return render(
     <MemoryRouter initialEntries={['/world']}>
-      <CommandPalette screens={[{ to: '/world', label: 'World' }, { to: '/map', label: 'Map' }]} />
+      <CommandPalette screens={screens} />
       <button type="button">elsewhere</button>
       <Routes>
         <Route path="*" element={<Where />} />
@@ -41,6 +41,25 @@ function routes() {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('CommandPalette', () => {
+  it('renders one option per screen route even when a route is listed twice (unique keys)', async () => {
+    routes();
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    renderPalette([
+      { to: '/v3/relation?a=BRA&b=PRT', label: 'Pays ↔ Pays — tous les liens' },
+      { to: '/map', label: 'Map' },
+      { to: '/v3/relation?a=BRA&b=PRT', label: 'Pays ↔ Pays — Brésil et Portugal' },
+    ]);
+    await userEvent.keyboard('{Control>}k{/Control}');
+    await screen.findByRole('dialog');
+    await waitFor(() => expect(screen.queryByText('Loading catalogue…')).toBeNull());
+    await userEvent.type(screen.getByRole('combobox'), 'relation');
+    const opts = screen.getAllByRole('option').filter((o) => o.textContent?.includes('/v3/relation?a=BRA&b=PRT'));
+    expect(opts).toHaveLength(1);
+    expect(opts[0]).toHaveTextContent('tous les liens');
+    expect(err.mock.calls.some((c) => String(c[0]).includes('same key'))).toBe(false);
+    err.mockRestore();
+  });
+
   it('opens with Ctrl+K, searches deterministically and navigates with the keyboard', async () => {
     const { calls } = routes();
     renderPalette();

@@ -31,7 +31,7 @@ from typing import Any
 from sqlalchemy import Connection, Engine, text
 
 from reva.links.derive import DerivedSet, KgIndex, assert_all_evidenced, derive_all, merge_links
-from reva.links.model import Evidence, Link, PartialDate, Stmt, Temporal
+from reva.links.model import Evidence, Link, Stmt, Temporal
 from reva.links.taxonomy import LINK_TYPES_FILE
 
 log = logging.getLogger("reva.links.store")
@@ -115,24 +115,8 @@ def link_row(lk: Link, mid: int, qid_iso3: Mapping[str, str]) -> dict[str, Any]:
 
 
 def temporal_from_json(d: Mapping[str, Any]) -> Temporal:
-    p = PartialDate.parse
-    kind = d.get("kind", "undated")
-    if kind == "snapshot":
-        return Temporal("snapshot", year=int(d["year"]))
-    if kind == "point":
-        return Temporal("point", point=p(d["point"], _prec(d["point"])))
-    if kind == "interval":
-        return Temporal(
-            "interval",
-            p(d["start"], _prec(d["start"])) if d.get("start") else None,
-            p(d["end"], _prec(d["end"])) if d.get("end") else None,
-        )
-    return Temporal("undated")
-
-
-def _prec(iso: str) -> int:
-    body = iso.lstrip("-")
-    return {1: 9, 2: 10, 3: 11}[len(body.split("-"))]
+    """Read a stored ``temporal`` column (``YYYY``, ``YYYY-MM``, ``YYYY-MM-DD``, signed years)."""
+    return Temporal.from_json(d)
 
 
 def link_from_row(r: Mapping[str, Any]) -> Link:

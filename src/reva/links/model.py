@@ -46,7 +46,10 @@ class LinkError(ValueError):
 # Dates
 # ---------------------------------------------------------------------------
 
-_TIME_RE = re.compile(r"^([+-]?)(\d{1,16})-(\d{2})-(\d{2})")
+#: ``[+-]YYYY-MM[-DD]`` prefix of a Wikidata time / ISO date / datetime. The day is optional: the link store
+#: writes month-precision dates as ``YYYY-MM`` (see :meth:`PartialDate.iso`). ``00`` month/day = unknown.
+_TIME_RE = re.compile(r"^([+-]?)(\d{1,16})-(\d{2})(?:-(\d{2}))?(?![0-9])")
+_YEAR_ONLY_RE = re.compile(r"[+-]?\d{1,16}")
 
 
 @dataclass(frozen=True, order=True)
@@ -84,15 +87,29 @@ class PartialDate:
             p = 11 if precision is None else int(precision)
             return cls._at(int(value.year), int(value.month), int(value.day), p)
         s = str(value).strip()
-        if re.fullmatch(r"[+-]?\d{1,16}", s):
+        if _YEAR_ONLY_RE.fullmatch(s):
             return cls(int(s), None, None, YEAR_PRECISION if precision is None else min(int(precision), 9))
         m = _TIME_RE.match(s)
         if not m:
             raise LinkError(f"not a date: {value!r}")
         sign, y, mo, d = m.groups()
         year = -int(y) if sign == "-" else int(y)
-        p = 11 if precision is None else int(precision)
-        return cls._at(year, int(mo), int(d), p)
+        month, day = int(mo), int(d) if d is not None else 0
+        if month > 12 or day > 31:
+            raise LinkError(f"not a date: {value!r}")
+        p = (11 if d is not None else 10) if precision is None else int(precision)
+        return cls._at(year, month, day, p)
+
+    @classmethod
+    def from_iso(cls, value: str, precision: int | None = None) -> PartialDate:
+        """Inverse of :meth:`iso`: ``YYYY`` / ``YYYY-MM`` / ``YYYY-MM-DD`` (signed years allowed, ``-0044``).
+
+        The precision is read from the shape of the string unless ``precision`` is given (only needed for
+        coarser-than-year precisions, which :meth:`iso` writes as a plain year)."""
+        out = cls.parse(value, precision)
+        if out is None:
+            raise LinkError(f"not a date: {value!r}")
+        return out
 
     @classmethod
     def _at(cls, year: int, month: int, day: int, precision: int) -> PartialDate:
@@ -103,11 +120,15 @@ class PartialDate:
         return cls(year, None, None, min(precision, YEAR_PRECISION))
 
     def iso(self) -> str:
+        """``YYYY`` / ``YYYY-MM`` / ``YYYY-MM-DD`` as precise as the date; signed years keep 4 digits
+        (``-0044``), so :meth:`from_iso` reads every output back to an equal date (coarser-than-year
+        precisions need their precision passed back, see :meth:`Temporal.to_json`)."""
+        y = f"-{-self.year:04d}" if self.year < 0 else f"{self.year:04d}"
         if self.precision >= 11 and self.month and self.day:
-            return f"{self.year:04d}-{self.month:02d}-{self.day:02d}"
+            return f"{y}-{self.month:02d}-{self.day:02d}"
         if self.precision >= 10 and self.month:
-            return f"{self.year:04d}-{self.month:02d}"
-        return f"{self.year:04d}"
+            return f"{y}-{self.month:02d}"
+        return y
 
     def key(self) -> tuple[int, int, int]:
         """Sort key; unknown month/day sort as the start of the year/month."""
@@ -231,16 +252,37 @@ class Temporal:
         return ""
 
     def to_json(self) -> dict[str, Any]:
+        """Dates as :meth:`PartialDate.iso`. A coarser-than-year precision (decade, century...) cannot be
+        read from the string, so it is written next to it (``start_precision``...); see :meth:`from_json`."""
         d: dict[str, Any] = {"kind": self.kind}
-        if self.start:
-            d["start"] = self.start.iso()
-        if self.end:
-            d["end"] = self.end.iso()
-        if self.point:
-            d["point"] = self.point.iso()
+        for name in ("start", "end", "point"):
+            v: PartialDate | None = getattr(self, name)
+            if v:
+                d[name] = v.iso()
+                if v.precision < YEAR_PRECISION:
+                    d[f"{name}_precision"] = v.precision
         if self.year is not None:
             d["year"] = self.year
         return d
+
+    @classmethod
+    def from_json(cls, d: Mapping[str, Any]) -> Temporal:
+        """Inverse of :meth:`to_json` (the link store reads its ``temporal`` column with it)."""
+
+        def date(name: str) -> PartialDate | None:
+            v = d.get(name)
+            if v is None or v == "":
+                return None
+            return PartialDate.from_iso(str(v), d.get(f"{name}_precision"))
+
+        kind = d.get("kind", "undated")
+        if kind == "snapshot":
+            return cls("snapshot", year=int(d["year"]))
+        if kind == "point":
+            return cls("point", point=date("point"))
+        if kind == "interval":
+            return cls("interval", date("start"), date("end"))
+        return cls("undated")
 
 
 # ---------------------------------------------------------------------------

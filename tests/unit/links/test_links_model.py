@@ -40,6 +40,79 @@ def test_partial_date_parsing() -> None:
         D("sometime")
 
 
+@pytest.mark.parametrize(
+    ("date", "iso"),
+    [
+        (PartialDate(1998, 8, 15, 11), "1998-08-15"),
+        (PartialDate(1998, 8, None, 10), "1998-08"),
+        (PartialDate(1998, None, None, 9), "1998"),
+        (PartialDate(-43, None, None, 9), "-0043"),  # 44 BCE, as Wikidata writes it
+        (PartialDate(-43, 3, None, 10), "-0043-03"),
+        (PartialDate(-43, 3, 15, 11), "-0043-03-15"),
+        (PartialDate(0, None, None, 9), "0000"),  # astronomical year 0
+        (PartialDate(-1, 1, None, 10), "-0001-01"),
+        (PartialDate(-12000, None, None, 9), "-12000"),
+        (PartialDate(12000, 2, 29, 11), "12000-02-29"),
+        (PartialDate(7, 1, 1, 11), "0007-01-01"),
+    ],
+)
+def test_partial_date_iso_round_trip_every_precision(date: PartialDate, iso: str) -> None:
+    """What the link store writes (iso) it must read back (the /v1/links/path 500 on '1998-08')."""
+    assert date.iso() == iso
+    assert PartialDate.from_iso(iso) == date
+    assert D(iso) == date
+
+
+@pytest.mark.parametrize("precision", [6, 7, 8])
+def test_coarser_than_year_precision_round_trips_through_temporal_json(precision: int) -> None:
+    start = PartialDate(-500, None, None, precision)
+    t = Temporal.of(start, PartialDate(1998, 8, None, 10))
+    js = t.to_json()
+    assert js == {"kind": "interval", "start": "-0500", "start_precision": precision, "end": "1998-08"}
+    assert Temporal.from_json(js) == t
+
+
+@pytest.mark.parametrize(
+    "t",
+    [
+        Temporal.of(PartialDate(1998, 8, None, 10), PartialDate(2003, 1, 31, 11)),
+        Temporal.of(PartialDate(-43), None),
+        Temporal.of(None, PartialDate(-1, 12, None, 10)),
+        Temporal("point", point=PartialDate(1993, 1, None, 10)),
+        Temporal("snapshot", year=2019),
+        Temporal("undated"),
+    ],
+)
+def test_temporal_json_round_trip(t: Temporal) -> None:
+    assert Temporal.from_json(t.to_json()) == t
+
+
+def test_partial_date_parse_month_precision_and_wikidata_unknowns() -> None:
+    assert D("1998-08") == PartialDate(1998, 8, None, 10)
+    assert D("1998-08", 9) == PartialDate(1998, None, None, 9)  # an explicit precision wins
+    assert D("+1998-08-00T00:00:00Z", 10) == PartialDate(1998, 8, None, 10)
+    assert D("+1998-08-00T00:00:00Z") == PartialDate(1998, 8, None, 10)  # day 00 = unknown
+    assert D("-0044-03-15T00:00:00Z", 11) == PartialDate(-44, 3, 15, 11)
+    assert D("+1494") == PartialDate(1494)
+    assert D("1998-08-15T12:00:00+02:00") == PartialDate(1998, 8, 15, 11)
+    for bad in ("1998-13", "1998-08-32", "1998-081", "1998-8", "08/1998", ""):
+        if bad == "":
+            assert D(bad) is None
+            continue
+        with pytest.raises(LinkError):
+            D(bad)
+    with pytest.raises(LinkError):
+        PartialDate.from_iso("")
+
+
+def test_store_reads_month_precision_rows() -> None:
+    from reva.links.store import temporal_from_json
+
+    t = temporal_from_json({"kind": "interval", "start": "-0043-03", "end": "1998-08"})
+    assert t.start == PartialDate(-43, 3, None, 10) and t.end == PartialDate(1998, 8, None, 10)
+    assert temporal_from_json({"kind": "point", "point": "1993-01"}).point == PartialDate(1993, 1, None, 10)
+
+
 def test_temporal_overlap() -> None:
     a = Temporal.of(D(1949), D(1999))
     b = Temporal.of(D(1990), None)

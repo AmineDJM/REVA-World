@@ -134,12 +134,17 @@ async def test_same_as_from_evidence_only(datasets: Any) -> None:
         origin="test_fixture",
     )
     assert rep.rejected_total == 0, rep.rejected
+    pair = {"untc:treaty:XXVII-7-d", "Q21707860"}
     with db.worker.connect() as c:
-        report = sa.derive_links(c, origin="test_fixture")
-    rules = {x.rule for x in report.links}
+        full = sa.derive_links(c, origin="test_fixture")
+    # Other tests share the session DB (origin test_fixture) and may hold same_as evidence of their own: this
+    # test checks the links of its own pair, and that nothing else is linked to either end.
+    mine = [x for x in full.links if {x.left, x.right} & pair]
+    assert all({x.left, x.right} == pair for x in mine), [x.statement_id for x in mine]
+    rules = {x.rule for x in mine}
     assert {"untc_treaty_qids", "untc_mtdsg_number"} <= rules
-    assert all({x.left, x.right} == {"untc:treaty:XXVII-7-d", "Q21707860"} for x in report.links)
-    assert {s["rule"] for s in report.skipped_rules} >= {"ucdp_conflict_id_on_wikidata", "cow_war_number_on_wikidata"}
+    assert {s["rule"] for s in full.skipped_rules} >= {"ucdp_conflict_id_on_wikidata", "cow_war_number_on_wikidata"}
+    report = sa.SameAsReport(mine, full.ambiguous, full.skipped_rules)
     out = sa.load_links(db.worker, db.store, report, origin="test_fixture", rules_sha256=sa.rules_sha256())
     assert out.statements_inserted == len(report.links) and out.rejected_total == 0
     again = sa.load_links(db.worker, db.store, report, origin="test_fixture", rules_sha256=sa.rules_sha256())
@@ -151,6 +156,12 @@ async def test_same_as_from_evidence_only(datasets: Any) -> None:
     assert ev_types == {"mapping_table", "shared_identifier"}
     assert all(x["provenance"]["verification"] == "derived" for x in card["same_as"])
     # the evidence disappears (no active rule): the links are retracted, never silently kept
+    with db.api.connect() as c:
+        active = c.execute(
+            text("SELECT count(*) FROM kg.statement_current WHERE source_key = :sk AND origin = 'test_fixture'"),
+            {"sk": sa.SOURCE_KEY},
+        ).scalar_one()
+    assert active == len(report.links)  # loading this report retracted any earlier run's links
     empty = sa.SameAsReport([], [], [])
     gone = sa.load_links(db.worker, db.store, empty, origin="test_fixture")
     assert gone.retractions_inserted == len(report.links)
