@@ -51,3 +51,44 @@ async def test_unsd_classifications_fixture_ingest_and_concordance_path(db: Any)
     again = await _run(db, uc.NAME)
     k2 = again["summary"]["kg"]
     assert k2["statements_inserted"] == 0 and k2["entities_inserted"] == 0 and k2["retractions_inserted"] == 0
+
+
+async def test_wikidata_bridges_from_qlever_fixture(db: Any) -> None:
+    """atlas.v4link_qlever, pack `places` (trimmed live QLever responses): identity statements, best rank, the
+    ambiguous holder (Ile-de-France holds NUTS FR1 and FR10) not linked, best-rank P17 only, new item entities."""
+    from reva.adapters.connectors import atlas_v4link_wikidata as wd
+
+    ensure_registered(db.owner, db.store, get_source(wd.QL_NAME).spec)
+    out = await run_atlas_ingest(
+        db.settings, db.worker, db.store, wd.QL_NAME, mode="fixture", options={"packs": "places"}
+    )
+    assert out["status"] == "completed", out
+    s = out["summary"]
+    assert "Complete Wikidata" in s["qlever_index"]["name_index"]
+    pk = s["packs"]["places"]
+    assert not pk["kg"]["rejected_counts"], pk["kg"]["rejected_sample"]
+    assert pk["bridges"]["by_property"]["P605"]["ambiguous_holder"] == 2
+    with db.owner.connect() as c:
+        rows = {
+            (r.subject_qid, r.object_qid): r
+            for r in c.execute(
+                text("""SELECT subject_qid, object_qid, source_key, qualifiers, rank FROM kg.statement_current
+                        WHERE property_pid = 'v4link:wikidata_item'""")
+            )
+        }
+        assert ("iso3166_2:DE-BY", "Q980") in rows and ("nuts:DE2", "Q980") in rows
+        assert ("iso3166_2:FR-IDF", "Q13917") in rows and ("iso3166_2:FR-J", "Q13917") not in rows  # best rank
+        assert not any(k[0].startswith("nuts:FR1") for k in rows)  # ambiguous holder, never linked
+        r = rows[("iso3166_2:DE-BY", "Q980")]
+        assert r.source_key == "qlever.wikidata" and r.qualifiers["wikidata_statement_id"].startswith("Q980$")
+        countries = (
+            c.execute(
+                text("""SELECT object_qid FROM kg.statement_current WHERE subject_qid = 'Q980' AND property_pid = 'P17'
+                    AND source_key = 'qlever.wikidata'""")
+            )
+            .scalars()
+            .all()
+        )
+        assert countries == ["Q183"]  # the preferred statement only
+        res = kq.paths(c, "iso3166_2:DE-BY", "nuts:DE2", max_hops=2, allowed_properties=["v4link:wikidata_item"])
+        assert res["paths"], res
