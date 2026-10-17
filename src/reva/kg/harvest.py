@@ -187,8 +187,10 @@ def validate_spec(spec: Spec, allow: AllowList, *, known_ids: Iterable[str] = ()
             elif src not in ("countries", "list"):
                 errors.append(f"unknown split.source {src!r}")
     if used - unknown != need:
-        errors.append(f"placeholders {sorted(used - unknown)} do not match split {split and split['by']} "
-                      f"(expected {sorted(need)})")
+        errors.append(
+            f"placeholders {sorted(used - unknown)} do not match split {split and split['by']} "
+            f"(expected {sorted(need)})"
+        )
     cols = spec.columns
     if d["purpose"] == "statements":
         if bool(cols.get("property")) == bool(cols.get("property_var")):
@@ -196,8 +198,20 @@ def validate_spec(spec: Spec, allow: AllowList, *, known_ids: Iterable[str] = ()
         if cols.get("property") and cols["property"] not in allow:
             errors.append(f"property {cols['property']} is not allow-listed (registry/kg/properties.yaml)")
         variables = set(re.findall(r"\?([A-Za-z_][A-Za-z0-9_]*)", sparql))
-        for key in ("subject", "object", "property_var", "statement", "rank", "start", "end", "point_in_time",
-                    "start_precision", "end_precision", "point_in_time_precision", "object_precision"):
+        for key in (
+            "subject",
+            "object",
+            "property_var",
+            "statement",
+            "rank",
+            "start",
+            "end",
+            "point_in_time",
+            "start_precision",
+            "end_precision",
+            "point_in_time_precision",
+            "object_precision",
+        ):
             if cols.get(key) and cols[key] not in variables:
                 errors.append(f"columns.{key}: ?{cols[key]} does not occur in the query")
         for pid, var in (cols.get("qualifiers") or {}).items():
@@ -233,8 +247,9 @@ def validate_all(specs: Sequence[Spec], allow: AllowList) -> dict[str, list[str]
         if sid in seen:
             errs.append(f"duplicate id (also in {seen[sid]})")
         seen[sid] = s.path
-        out[str(s.path.relative_to(REPO_ROOT) if s.path.is_absolute() and REPO_ROOT in s.path.parents
-                else s.path)] = errs
+        out[str(s.path.relative_to(REPO_ROOT) if s.path.is_absolute() and REPO_ROOT in s.path.parents else s.path)] = (
+            errs
+        )
     return out
 
 
@@ -276,8 +291,9 @@ def _subst(query: str, values: Mapping[str, str]) -> str:
     return PLACEHOLDER.sub(lambda m: values[m.group(1)], query)
 
 
-def render_chunks(spec: Spec, *, state_dir: Path = STATE_DIR,
-                  qids_for_source: Callable[[str], list[str]] | None = None) -> list[Chunk]:
+def render_chunks(
+    spec: Spec, *, state_dir: Path = STATE_DIR, qids_for_source: Callable[[str], list[str]] | None = None
+) -> list[Chunk]:
     q = spec.data["sparql"]
     split = spec.split
     if not split:
@@ -296,8 +312,10 @@ def render_chunks(spec: Spec, *, state_dir: Path = STATE_DIR,
     if by == "qid_prefix":
         var = split.get("variable", "item")
         return [
-            Chunk(f"qid:{p}", _subst(q, {"qid_filter":
-                  f'FILTER(STRSTARTS(STR(?{var}), "http://www.wikidata.org/entity/Q{p}"))'}))
+            Chunk(
+                f"qid:{p}",
+                _subst(q, {"qid_filter": f'FILTER(STRSTARTS(STR(?{var}), "http://www.wikidata.org/entity/Q{p}"))'}),
+            )
             for p in split.get("prefixes") or [str(i) for i in range(1, 10)]
         ]
     if by == "values":
@@ -315,7 +333,7 @@ def render_chunks(spec: Spec, *, state_dir: Path = STATE_DIR,
         size = int(split.get("chunk_size", 50))
         out = []
         for i in range(0, len(qids), size):
-            part = qids[i:i + size]
+            part = qids[i : i + size]
             digest = hashlib.sha256(" ".join(part).encode()).hexdigest()[:12]
             out.append(Chunk(f"values:{i // size}:{digest}", _subst(q, {"values": " ".join(f"wd:{x}" for x in part)})))
         return out
@@ -344,8 +362,16 @@ class HarvestState:
 
     def reset_for(self, spec_sha: str) -> None:
         if self.data.get("spec_sha256") != spec_sha:
-            self.data = {"spec_sha256": spec_sha, "chunks": {}, "seeds": [], "subjects": [], "objects": [],
-                         "loaded_batches": [], "status": "running", "rows": 0}
+            self.data = {
+                "spec_sha256": spec_sha,
+                "chunks": {},
+                "seeds": [],
+                "subjects": [],
+                "objects": [],
+                "loaded_batches": [],
+                "status": "running",
+                "rows": 0,
+            }
 
     def save(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -406,8 +432,14 @@ class JsonlSink(NullSink):
         out = super().load(batch)
         for e in batch.entities:
             self._seen.add(e.qid)
-            self._f.write(json.dumps({"type": "entity", "source_key": batch.source_key, **entity_record(e)},
-                                     ensure_ascii=False, default=str) + "\n")
+            self._f.write(
+                json.dumps(
+                    {"type": "entity", "source_key": batch.source_key, **entity_record(e)},
+                    ensure_ascii=False,
+                    default=str,
+                )
+                + "\n"
+            )
         for s in batch.statements:
             self._f.write(json.dumps({"type": "statement", **s.as_dict()}, ensure_ascii=False, default=str) + "\n")
         self._f.flush()
@@ -422,11 +454,21 @@ class JsonlSink(NullSink):
 
 def entity_record(e: WdEntity) -> dict[str, Any]:
     return {
-        "qid": e.qid, "kind": e.kind_hint, "labels": e.labels, "descriptions": e.descriptions,
-        "aliases": e.aliases, "sitelinks_count": e.sitelinks_count, "sitelinks": e.sitelinks,
-        "lastrevid": e.lastrevid, "modified": e.modified, "instance_of": list(e.instance_of),
-        "claims_fetched": e.claims_fetched, "raw_sha256": e.raw_sha256,
-        "retrieved_at": e.retrieved_at.isoformat(), "statements": len(e.statements), "dropped": e.dropped,
+        "qid": e.qid,
+        "kind": e.kind_hint,
+        "labels": e.labels,
+        "descriptions": e.descriptions,
+        "aliases": e.aliases,
+        "sitelinks_count": e.sitelinks_count,
+        "sitelinks": e.sitelinks,
+        "lastrevid": e.lastrevid,
+        "modified": e.modified,
+        "instance_of": list(e.instance_of),
+        "claims_fetched": e.claims_fetched,
+        "raw_sha256": e.raw_sha256,
+        "retrieved_at": e.retrieved_at.isoformat(),
+        "statements": len(e.statements),
+        "dropped": e.dropped,
     }
 
 
@@ -450,8 +492,9 @@ def _kg_time(t: Mapping[str, Any] | None) -> Any:
     if t.get("astronomical"):
         return KgTime(str(t["time"]), int(t["precision"]), "gregorian")
     cal = t.get("calendar") or GREGORIAN
-    return wikibase_json_time({"time": t["time"], "precision": t["precision"],
-                               "calendarmodel": f"http://www.wikidata.org/entity/{cal}"})
+    return wikibase_json_time(
+        {"time": t["time"], "precision": t["precision"], "calendarmodel": f"http://www.wikidata.org/entity/{cal}"}
+    )
 
 
 def _kg_qualifier_value(v: Any) -> Any:
@@ -505,17 +548,28 @@ def to_kg_statement(s: WdStatement) -> Any:
         # WDQS results carry no entity revision. The revision is recorded as explicitly unknown, with the
         # query service's own data timestamp (schema:dateModified of <http://www.wikidata.org>, when probed)
         # and the retrieval time; the version label is the retrieval time.
-        quals["_revision"] = {"wikidata_revision": "unknown", "reason": "WDQS rows carry no entity revision",
-                              "wdqs_data_as_of": s.selector.get("wdqs_data_as_of"),
-                              "retrieved_at": s.retrieved_at.isoformat()}
+        quals["_revision"] = {
+            "wikidata_revision": "unknown",
+            "reason": "WDQS rows carry no entity revision",
+            "wdqs_data_as_of": s.selector.get("wdqs_data_as_of"),
+            "retrieved_at": s.retrieved_at.isoformat(),
+        }
         revision = f"wdqs@{s.retrieved_at.strftime('%Y-%m-%dT%H:%M:%SZ')}"
     return KgStatement(
-        subject_qid=s.subject, property_pid=s.property,
+        subject_qid=s.subject,
+        property_pid=s.property,
         object_qid=s.object_qid if s.value_kind == "entity" else None,
         value=None if s.value_kind == "entity" else kg_value(s.value_kind, s.value),
-        start=_kg_time(s.start), end=_kg_time(s.end), point_in_time=_kg_time(s.point_in_time),
-        qualifiers=quals, rank=s.rank, references=refs, source_key=s.source_key,
-        source_revision=revision, statement_id=s.statement_id, raw_sha256=s.raw_sha256,
+        start=_kg_time(s.start),
+        end=_kg_time(s.end),
+        point_in_time=_kg_time(s.point_in_time),
+        qualifiers=quals,
+        rank=s.rank,
+        references=refs,
+        source_key=s.source_key,
+        source_revision=revision,
+        statement_id=s.statement_id,
+        raw_sha256=s.raw_sha256,
     )
 
 
@@ -523,9 +577,15 @@ def to_kg_entity(e: WdEntity, *, kind: str | None = None) -> Any:
     from reva.kg.model import KgEntity
 
     rev = None if e.lastrevid is None else (str(e.lastrevid) if e.claims_fetched else f"{e.lastrevid}:labels")
-    return KgEntity(qid=e.qid, kind=kind or e.kind_hint or LABEL_KIND, labels=e.labels,
-                    descriptions=e.descriptions, aliases=e.aliases, sitelinks=e.sitelinks_count,
-                    source_revision=rev)
+    return KgEntity(
+        qid=e.qid,
+        kind=kind or e.kind_hint or LABEL_KIND,
+        labels=e.labels,
+        descriptions=e.descriptions,
+        aliases=e.aliases,
+        sitelinks=e.sitelinks_count,
+        source_revision=rev,
+    )
 
 
 def kg_properties(allow: AllowList) -> list[Any]:
@@ -533,9 +593,16 @@ def kg_properties(allow: AllowList) -> list[Any]:
 
     out = []
     for p in allow.properties.values():
-        out.append(KgProperty(pid=p.property, value_kind=KIND_TO_KG.get(p.kind, p.kind),
-                              reva_predicate=p.reva_predicate, label_en=p.label_en or p.reva_predicate,
-                              label_fr=p.label_fr, inverse_name=p.inverse))
+        out.append(
+            KgProperty(
+                pid=p.property,
+                value_kind=KIND_TO_KG.get(p.kind, p.kind),
+                reva_predicate=p.reva_predicate,
+                label_en=p.label_en or p.reva_predicate,
+                label_fr=p.label_fr,
+                inverse_name=p.inverse,
+            )
+        )
     return out
 
 
@@ -557,18 +624,25 @@ class KgDbSink:
         from reva.kg.model import register_properties
 
         r = register_properties(self.engine, kg_properties(allow))
-        return {"properties_inserted": r.properties_inserted, "versions_inserted": r.versions_inserted,
-                "unchanged": r.unchanged}
+        return {
+            "properties_inserted": r.properties_inserted,
+            "versions_inserted": r.versions_inserted,
+            "unchanged": r.unchanged,
+        }
 
     def load(self, batch: Batch) -> dict[str, Any]:
         from reva.kg.model import load_batch
 
         rep = load_batch(
-            self.engine, self.store,
+            self.engine,
+            self.store,
             entities=[to_kg_entity(e) for e in batch.entities],
             statements=[to_kg_statement(s) for s in batch.statements],
-            source_key=batch.source_key, raw_sha256s=sorted(set(batch.raw_sha256s)),
-            retrieved_at=batch.retrieved_at, origin=self.origin, parameters=batch.parameters,
+            source_key=batch.source_key,
+            raw_sha256s=sorted(set(batch.raw_sha256s)),
+            retrieved_at=batch.retrieved_at,
+            origin=self.origin,
+            parameters=batch.parameters,
         )
         d = rep.as_dict()
         for k, v in d.items():
@@ -588,9 +662,12 @@ class KgDbSink:
         out: set[str] = set()
         with self.engine.connect() as conn:
             for i in range(0, len(qids), 10_000):
-                out |= set(conn.execute(
-                    text("SELECT DISTINCT qid FROM kg.entity WHERE qid = ANY(:q) AND origin = :o"),
-                    {"q": list(qids[i:i + 10_000]), "o": self.origin}).scalars())
+                out |= set(
+                    conn.execute(
+                        text("SELECT DISTINCT qid FROM kg.entity WHERE qid = ANY(:q) AND origin = :o"),
+                        {"q": list(qids[i : i + 10_000]), "o": self.origin},
+                    ).scalars()
+                )
         return out
 
 
@@ -629,10 +706,18 @@ def _first_value(b: Mapping[str, Any], var: str | None) -> Mapping[str, str] | N
 
 
 class Harvester:
-    def __init__(self, client: WikidataClient, sink: Sink, *, allow: AllowList | None = None,
-                 state_dir: Path = STATE_DIR, entity_batch: int = 50,
-                 qids_for_source: Callable[[str], list[str]] | None = None, via: str = "wdqs",
-                 expand: bool = True) -> None:
+    def __init__(
+        self,
+        client: WikidataClient,
+        sink: Sink,
+        *,
+        allow: AllowList | None = None,
+        state_dir: Path = STATE_DIR,
+        entity_batch: int = 50,
+        qids_for_source: Callable[[str], list[str]] | None = None,
+        via: str = "wdqs",
+        expand: bool = True,
+    ) -> None:
         self.via = via
         self.expand = expand
         self.client = client
@@ -721,14 +806,18 @@ class Harvester:
                 rep.chunks_done += 1
                 continue
             limit = min(try_limit, 50) if try_limit is not None else max_rows + 1
-            res = await self.client.sparql(with_limit(ch.query, limit),
-                                           meta={"spec": spec.id, "chunk": ch.key, "spec_sha256": spec.sha256})
+            res = await self.client.sparql(
+                with_limit(ch.query, limit), meta={"spec": spec.id, "chunk": ch.key, "spec_sha256": spec.sha256}
+            )
             n = len(res.bindings)
             rows_total += n
             rep.rows += n
             if not trying and rows_total > max_rows:
-                raise RowBoundExceeded(f"{spec.id}: {rows_total} rows > max_rows {max_rows} (chunk {ch.key})",
-                                       rows=rows_total, max_rows=max_rows)
+                raise RowBoundExceeded(
+                    f"{spec.id}: {rows_total} rows > max_rows {max_rows} (chunk {ch.key})",
+                    rows=rows_total,
+                    max_rows=max_rows,
+                )
             if purpose == "seed_entities":
                 var = cols.get("item", "item")
                 for b in res.bindings:
@@ -750,9 +839,21 @@ class Harvester:
                     kept, fetched = await self.enrich_from_snapshots(spec, kept, rep)
                     snapshot_subjects.update(fetched)
                     if kept:
-                        self.sink.load(Batch(SOURCE_WDQS, [], kept, [res.raw_sha256], res.retrieved_at,
-                                             {"spec": spec.id, "chunk": ch.key, "query_sha256": res.query_sha256,
-                                              "harvester": HARVEST_VERSION}))
+                        self.sink.load(
+                            Batch(
+                                SOURCE_WDQS,
+                                [],
+                                kept,
+                                [res.raw_sha256],
+                                res.retrieved_at,
+                                {
+                                    "spec": spec.id,
+                                    "chunk": ch.key,
+                                    "query_sha256": res.query_sha256,
+                                    "harvester": HARVEST_VERSION,
+                                },
+                            )
+                        )
                 rep.statements += len(kept)
             rep.chunks_done += 1
             if state is not None:
@@ -771,8 +872,9 @@ class Harvester:
             # bound applies to the accepted instances (checked after loading), candidates get 20x headroom.
             bound = max_rows * 20 if info.get("method") == "whatlinkshere" else max_rows
             if rows_total > bound:
-                raise RowBoundExceeded(f"{spec.id}: {rows_total} search results > bound {bound}",
-                                       rows=rows_total, max_rows=max_rows)
+                raise RowBoundExceeded(
+                    f"{spec.id}: {rows_total} search results > bound {bound}", rows=rows_total, max_rows=max_rows
+                )
             for q in found:
                 seeds.setdefault(q)
             if info.get("window_exceeded"):
@@ -788,27 +890,49 @@ class Harvester:
         assert state is not None
         if purpose == "seed_entities":
             a = spec.get("api_search") or {}
-            require = set(a.get("instance_of") or []) if (self.via == "api" and a.get("discover") == "whatlinkshere") \
+            require = (
+                set(a.get("instance_of") or [])
+                if (self.via == "api" and a.get("discover") == "whatlinkshere")
                 else None
-            new_objects = await self.fetch_entities(spec, list(seeds), state, rep, full=True,
-                                                    kind=spec.get("entity_kind"), properties=spec.get("properties"),
-                                                    require_p31=require)
+            )
+            new_objects = await self.fetch_entities(
+                spec,
+                list(seeds),
+                state,
+                rep,
+                full=True,
+                kind=spec.get("entity_kind"),
+                properties=spec.get("properties"),
+                require_p31=require,
+            )
             if require is not None and rep.entities_full > max_rows:
-                rep.failures.append({"code": "row_bound_exceeded", "error": f"{rep.entities_full} accepted "
-                                     f"instances > max_rows {max_rows} (loaded; raise max_rows after review)"})
+                rep.failures.append(
+                    {
+                        "code": "row_bound_exceeded",
+                        "error": f"{rep.entities_full} accepted "
+                        f"instances > max_rows {max_rows} (loaded; raise max_rows after review)",
+                    }
+                )
             for q in new_objects:
                 objects.setdefault(q)
         else:
             todo = [s for s in subjects if s not in snapshot_subjects]
             known = self.sink.known_entities(todo)
-            await self.fetch_entities(spec, [s for s in todo if s not in known], state, rep, full=False,
-                                      kind=spec.get("entity_kind") or LABEL_KIND)
+            await self.fetch_entities(
+                spec,
+                [s for s in todo if s not in known],
+                state,
+                rep,
+                full=False,
+                kind=spec.get("entity_kind") or LABEL_KIND,
+            )
         if int(spec.get("expand_hops", 0)) >= 1 and self.expand:
             already = set(seeds) | set(subjects)
             todo = [o for o in objects if o not in already]
             known = self.sink.known_entities(todo)
-            await self.fetch_entities(spec, [o for o in todo if o not in known], state, rep, full=False,
-                                      kind=LABEL_KIND, tag="objects")
+            await self.fetch_entities(
+                spec, [o for o in todo if o not in known], state, rep, full=False, kind=LABEL_KIND, tag="objects"
+            )
         state.data["status"] = "done"
         state.data["finished_at"] = datetime.now(UTC).isoformat()
         state.data["report"] = rep.as_dict()
@@ -816,8 +940,9 @@ class Harvester:
         rep.status = "done"
 
     # -- WDQS rows -> snapshot statements (revision, references, exact time precision) ----------------
-    async def enrich_from_snapshots(self, spec: Spec, stmts: list[WdStatement],
-                                    rep: SpecReport) -> tuple[list[WdStatement], set[str]]:
+    async def enrich_from_snapshots(
+        self, spec: Spec, stmts: list[WdStatement], rep: SpecReport
+    ) -> tuple[list[WdStatement], set[str]]:
         """Replace WDQS rows that carry a statement id by the same claim read from the subject's wbgetentities
         snapshot (``lastrevid`` as revision, references, exact precision and calendar). The subject snapshot
         replaces the label snapshot it would get anyway (same number of requests). Returns the WDQS rows that
@@ -829,14 +954,19 @@ class Harvester:
         by_id: dict[str, WdStatement] = {}
         fetched: set[str] = set()
         for i in range(0, len(need), self.entity_batch):
-            part = need[i:i + self.entity_batch]
+            part = need[i : i + self.entity_batch]
             res = await self.client.get_entities(part, props=ENTITY_PROPS, meta={"spec": spec.id, "mode": "enrich"})
             ents: list[WdEntity] = []
             for qid, raw in res.entities.items():
                 if not qid.startswith("Q"):
                     continue
-                e = extract_entity(raw, self.allow, raw_sha256=res.raw_sha_by_id[qid], retrieved_at=res.retrieved_at,
-                                   kind_hint=spec.get("entity_kind") or LABEL_KIND)
+                e = extract_entity(
+                    raw,
+                    self.allow,
+                    raw_sha256=res.raw_sha_by_id[qid],
+                    retrieved_at=res.retrieved_at,
+                    kind_hint=spec.get("entity_kind") or LABEL_KIND,
+                )
                 ents.append(e)
                 fetched.add(qid)
                 for st in e.statements:
@@ -845,9 +975,21 @@ class Harvester:
             wanted = {s.statement_id.lower() for s in stmts if s.statement_id and s.subject in set(part)}
             matched = [by_id[k] for k in sorted(wanted) if k in by_id]
             if ents:
-                self.sink.load(Batch(SOURCE_WBAPI, ents, matched, list(res.raw_sha256s), res.retrieved_at,
-                                     {"spec": spec.id, "mode": "enrich", "harvester": HARVEST_VERSION,
-                                      "allowlist_sha256": self.allow.sha256}))
+                self.sink.load(
+                    Batch(
+                        SOURCE_WBAPI,
+                        ents,
+                        matched,
+                        list(res.raw_sha256s),
+                        res.retrieved_at,
+                        {
+                            "spec": spec.id,
+                            "mode": "enrich",
+                            "harvester": HARVEST_VERSION,
+                            "allowlist_sha256": self.allow.sha256,
+                        },
+                    )
+                )
             rep.entities_labels += len(ents)
             rep.statements_enriched += len(matched)
         left = [s for s in stmts if not (s.statement_id and s.statement_id.lower() in by_id)]
@@ -868,13 +1010,21 @@ class Harvester:
                 found, sh = await self.client.links_to(c, meta={"spec": spec.id})
                 cands.extend(found)
                 wshas.extend(sh)
-            return list(dict.fromkeys(cands)), {"method": "whatlinkshere", "instance_of": classes,
-                                                "candidates": len(set(cands)), "raw_sha256": wshas,
-                                                "filter": "P31 claim must contain one of instance_of"}
+            return list(dict.fromkeys(cands)), {
+                "method": "whatlinkshere",
+                "instance_of": classes,
+                "candidates": len(set(cands)),
+                "raw_sha256": wshas,
+                "filter": "P31 claim must contain one of instance_of",
+            }
         frontier = list(classes)
         shas: list[str] = []
-        info: dict[str, Any] = {"method": "cirrussearch", "instance_of": classes,
-                                "subclass_depth": int(a.get("subclass_depth", 0)), "window_exceeded": []}
+        info: dict[str, Any] = {
+            "method": "cirrussearch",
+            "instance_of": classes,
+            "subclass_depth": int(a.get("subclass_depth", 0)),
+            "window_exceeded": [],
+        }
         for _depth in range(int(a.get("subclass_depth", 0))):
             new: list[str] = []
             for q in or_groups("haswbstatement:", [f"P279={c}" for c in frontier]):
@@ -899,9 +1049,19 @@ class Harvester:
         return list(dict.fromkeys(seeds)), info
 
     # -- entities ---------------------------------------------------------------------------------
-    async def fetch_entities(self, spec: Spec, qids: Sequence[str], state: HarvestState, rep: SpecReport, *,
-                             full: bool, kind: str | None, properties: Sequence[str] | None = None,
-                             tag: str = "", require_p31: set[str] | None = None) -> list[str]:
+    async def fetch_entities(
+        self,
+        spec: Spec,
+        qids: Sequence[str],
+        state: HarvestState,
+        rep: SpecReport,
+        *,
+        full: bool,
+        kind: str | None,
+        properties: Sequence[str] | None = None,
+        tag: str = "",
+        require_p31: set[str] | None = None,
+    ) -> list[str]:
         """Fetch + load snapshots in batches of 50 (resumable per batch). Returns object QIDs referenced."""
         done = set(state.data.get("loaded_batches") or [])
         objects: dict[str, None] = {}
@@ -909,7 +1069,7 @@ class Harvester:
         mode = "full" if full else "labels"
         ordered = sorted(set(qids), key=lambda q: int(q[1:]))
         for i in range(0, len(ordered), self.entity_batch):
-            part = ordered[i:i + self.entity_batch]
+            part = ordered[i : i + self.entity_batch]
             key = f"{mode}{tag}:{hashlib.sha256(' '.join(part).encode()).hexdigest()[:16]}"
             if key in done:
                 continue
@@ -919,8 +1079,14 @@ class Harvester:
             for qid, raw in res.entities.items():
                 if not qid.startswith("Q"):
                     continue
-                e = extract_entity(raw, self.allow, raw_sha256=res.raw_sha_by_id[qid],
-                                   retrieved_at=res.retrieved_at, kind_hint=kind, properties=properties)
+                e = extract_entity(
+                    raw,
+                    self.allow,
+                    raw_sha256=res.raw_sha_by_id[qid],
+                    retrieved_at=res.retrieved_at,
+                    kind_hint=kind,
+                    properties=properties,
+                )
                 if require_p31 is not None and not (set(e.instance_of) & require_p31):
                     rep.candidates_rejected += 1  # linked to the class, but not an instance of it
                     continue
@@ -936,9 +1102,22 @@ class Harvester:
             if norev:
                 rep.failures.append({"code": "missing_revision", "ids": norev[:50]})
             if ents:
-                self.sink.load(Batch(SOURCE_WBAPI, ents, stmts, list(res.raw_sha256s), res.retrieved_at,
-                                     {"spec": spec.id, "mode": mode, "redirects": res.redirects,
-                                      "harvester": HARVEST_VERSION, "allowlist_sha256": self.allow.sha256}))
+                self.sink.load(
+                    Batch(
+                        SOURCE_WBAPI,
+                        ents,
+                        stmts,
+                        list(res.raw_sha256s),
+                        res.retrieved_at,
+                        {
+                            "spec": spec.id,
+                            "mode": mode,
+                            "redirects": res.redirects,
+                            "harvester": HARVEST_VERSION,
+                            "allowlist_sha256": self.allow.sha256,
+                        },
+                    )
+                )
             if full:
                 rep.entities_full += len(ents)
             else:
@@ -977,9 +1156,12 @@ class Harvester:
                 out.append(None)
                 continue
             sid = statement_id_from_uri((_first_value(b, cols.get("statement")) or {}).get("value"))
-            temporal = {k: with_precision(time_value_from_binding(_first_value(b, cols.get(k))),
-                                          _first_value(b, cols.get(f"{k}_precision")))
-                        for k in ("start", "end", "point_in_time")}
+            temporal = {
+                k: with_precision(
+                    time_value_from_binding(_first_value(b, cols.get(k))), _first_value(b, cols.get(f"{k}_precision"))
+                )
+                for k in ("start", "end", "point_in_time")
+            }
             if kind == "time":
                 value = with_precision(value, _first_value(b, cols.get("object_precision"))) or value
             quals: dict[str, list[Any]] = {}
@@ -988,21 +1170,44 @@ class Harvester:
                 if vb:
                     k2, o2, v2 = binding_to_value(vb)
                     quals.setdefault(qp, []).append(o2 if k2 == "entity" else v2)
-            ident = (subj, pid, obj or json.dumps(value, sort_keys=True), sid,
-                     json.dumps(temporal, sort_keys=True, default=str), json.dumps(quals, sort_keys=True))
+            ident = (
+                subj,
+                pid,
+                obj or json.dumps(value, sort_keys=True),
+                sid,
+                json.dumps(temporal, sort_keys=True, default=str),
+                json.dumps(quals, sort_keys=True),
+            )
             if ident in seen:  # OPTIONAL fan-out duplicates
                 continue
             seen.add(ident)
-            out.append(WdStatement(
-                subject=subj, property=pid, rank=rank, value_kind=kind, object_qid=obj, value=value,
-                statement_id=sid, start=temporal["start"], end=temporal["end"],
-                point_in_time=temporal["point_in_time"], qualifiers=quals, references=[],
-                source_key=SOURCE_WDQS, source_revision=None, raw_sha256=res.raw_sha256,
-                retrieved_at=res.retrieved_at,
-                selector={"spec": spec.id, "query_sha256": res.query_sha256,
-                          "rank_selected": bool(cols.get("rank")), "statement_id": sid,
-                          "wdqs_data_as_of": self.wdqs_as_of},
-            ))
+            out.append(
+                WdStatement(
+                    subject=subj,
+                    property=pid,
+                    rank=rank,
+                    value_kind=kind,
+                    object_qid=obj,
+                    value=value,
+                    statement_id=sid,
+                    start=temporal["start"],
+                    end=temporal["end"],
+                    point_in_time=temporal["point_in_time"],
+                    qualifiers=quals,
+                    references=[],
+                    source_key=SOURCE_WDQS,
+                    source_revision=None,
+                    raw_sha256=res.raw_sha256,
+                    retrieved_at=res.retrieved_at,
+                    selector={
+                        "spec": spec.id,
+                        "query_sha256": res.query_sha256,
+                        "rank_selected": bool(cols.get("rank")),
+                        "statement_id": sid,
+                        "wdqs_data_as_of": self.wdqs_as_of,
+                    },
+                )
+            )
         return out, skipped
 
 
@@ -1023,15 +1228,20 @@ def with_precision(t: dict[str, Any] | None, binding: Mapping[str, str] | None) 
 
 
 # --------------------------------------------------------------------------- run many
-async def run_specs(h: Harvester, specs: Sequence[Spec], *, force: bool = False,
-                    on_report: Callable[[SpecReport], None] | None = None) -> list[SpecReport]:
+async def run_specs(
+    h: Harvester, specs: Sequence[Spec], *, force: bool = False, on_report: Callable[[SpecReport], None] | None = None
+) -> list[SpecReport]:
     reports = []
     failed: set[str] = set()
     for s in order_specs(specs):
         deps = set(s.get("depends_on") or [])
         if deps & failed:
-            r = SpecReport(s.id, s.data.get("purpose", "?"), status="failed",
-                           failures=[{"code": "dependency_failed", "error": sorted(deps & failed)}])
+            r = SpecReport(
+                s.id,
+                s.data.get("purpose", "?"),
+                status="failed",
+                failures=[{"code": "dependency_failed", "error": sorted(deps & failed)}],
+            )
         else:
             r = await h.run_spec(s, force=force)
         if r.status == "failed":
@@ -1060,8 +1270,7 @@ def harvest_settings(db_name: str) -> Any:
         raise SpecError("REVA_MIGRATION_DATABASE_URL is not configured")
     url = base.migration_url().set(database=db_name).render_as_string(hide_password=False)
     data = base.model_dump()
-    data.update(reva_migration_database_url=url, reva_db_name=db_name, reva_env="test",
-                reva_object_root=OBJECT_ROOT)
+    data.update(reva_migration_database_url=url, reva_db_name=db_name, reva_env="test", reva_object_root=OBJECT_ROOT)
     return Settings.model_validate(data)
 
 
@@ -1097,11 +1306,19 @@ def live_http(*, max_bytes: int = 52_428_800, timeout_seconds: float = 75.0, pro
     from reva.adapters.http.rate_limit import HostPolicy, RateLimiter
     from reva.adapters.http.safe_client import SafeHttpClient
 
-    policies = {h: HostPolicy(min_interval_seconds=DEFAULT_MIN_INTERVAL, max_concurrency=1,
-                              max_retry_after_seconds=900.0) for h in ALLOWED_HOSTS}
-    return SafeHttpClient(allowed_hosts=ALLOWED_HOSTS, timeout_seconds=timeout_seconds, max_bytes=max_bytes,
-                          max_attempts=1, rate_limiter=RateLimiter(policies), proxy_mode=proxy_mode,  # type: ignore[arg-type]
-                          contact_email=None)  # the request carries the generic project User-Agent only
+    policies = {
+        h: HostPolicy(min_interval_seconds=DEFAULT_MIN_INTERVAL, max_concurrency=1, max_retry_after_seconds=900.0)
+        for h in ALLOWED_HOSTS
+    }
+    return SafeHttpClient(
+        allowed_hosts=ALLOWED_HOSTS,
+        timeout_seconds=timeout_seconds,
+        max_bytes=max_bytes,
+        max_attempts=1,
+        rate_limiter=RateLimiter(policies),
+        proxy_mode=proxy_mode,  # type: ignore[arg-type]
+        contact_email=None,
+    )  # the request carries the generic project User-Agent only
 
 
 @dataclass
@@ -1114,9 +1331,15 @@ class BudgetedSession:
 
 
 @contextlib.asynccontextmanager
-async def budgeted_client(*, purpose: str, db_name: str = DEFAULT_DB, planned_wdqs: int = 1,
-                          planned_wbapi: int = 1, mode: str = "api",
-                          reuse_hours: float = 0.0) -> AsyncIterator[BudgetedSession]:
+async def budgeted_client(
+    *,
+    purpose: str,
+    db_name: str = DEFAULT_DB,
+    planned_wdqs: int = 1,
+    planned_wbapi: int = 1,
+    mode: str = "api",
+    reuse_hours: float = 0.0,
+) -> AsyncIterator[BudgetedSession]:
     """The only live Wikidata entry point (invariant 30): reserve -> meter every request -> settle.
 
     The ledger lives in the throwaway harvest database. ``reserve_ingest`` refuses a run that does not fit the
@@ -1142,14 +1365,31 @@ async def budgeted_client(*, purpose: str, db_name: str = DEFAULT_DB, planned_wd
         # One ledger operation per source key: with a shared job id both reservations had the same
         # operation_id (the wbapi row was dropped by ON CONFLICT DO NOTHING and every wbapi request was
         # charged to the wdqs account; settling overwrote one count with the other) -- WDRUN 2026-10-16.
-        res_q = reserve_ingest(engine, job_id=f"{run_id}-wdqs", attempt=1, source_key=SOURCE_WDQS,
-                               planned_requests=planned_wdqs, budget=budget)
-        res_a = reserve_ingest(engine, job_id=f"{run_id}-wbapi", attempt=1, source_key=SOURCE_WBAPI,
-                               planned_requests=planned_wbapi, budget=budget)
+        res_q = reserve_ingest(
+            engine,
+            job_id=f"{run_id}-wdqs",
+            attempt=1,
+            source_key=SOURCE_WDQS,
+            planned_requests=planned_wdqs,
+            budget=budget,
+        )
+        res_a = reserve_ingest(
+            engine,
+            job_id=f"{run_id}-wbapi",
+            attempt=1,
+            source_key=SOURCE_WBAPI,
+            planned_requests=planned_wbapi,
+            budget=budget,
+        )
         wdqs = metered(inner, engine, res_q, budget=budget)
         wbapi = metered(inner, engine, res_a, budget=budget)
-        client = WikidataClient(wdqs, wbapi, archive=Archive(store, REPO_ROOT / "var" / "kg" / "archive_index.jsonl"),
-                                mode=mode, reuse_seconds=reuse_hours * 3600.0)
+        client = WikidataClient(
+            wdqs,
+            wbapi,
+            archive=Archive(store, REPO_ROOT / "var" / "kg" / "archive_index.jsonl"),
+            mode=mode,
+            reuse_seconds=reuse_hours * 3600.0,
+        )
         session = BudgetedSession(client, engine, store, run_id)
         yield session
     finally:
@@ -1160,20 +1400,39 @@ async def budgeted_client(*, purpose: str, db_name: str = DEFAULT_DB, planned_wd
         engine.dispose()
 
 
-async def run_into_db(paths: Sequence[Path] | None, *, db_name: str = DEFAULT_DB, force: bool = False,
-                      planned_wdqs: int = 50, planned_wbapi: int = 100, via: str = "wdqs",
-                      expand: bool = True, mode: str = "api", reuse_hours: float = 0.0) -> dict[str, Any]:
+async def run_into_db(
+    paths: Sequence[Path] | None,
+    *,
+    db_name: str = DEFAULT_DB,
+    force: bool = False,
+    planned_wdqs: int = 50,
+    planned_wbapi: int = 100,
+    via: str = "wdqs",
+    expand: bool = True,
+    mode: str = "api",
+    reuse_hours: float = 0.0,
+) -> dict[str, Any]:
     """Run specs into the throwaway database through :func:`budgeted_client`."""
     allow = load_allowlist()
     specs = discover_specs(paths or None)
     bad = {k: v for k, v in validate_all(specs, allow).items() if v}
     if bad:
         raise SpecError(f"invalid specs: {json.dumps(bad)[:1500]}")
-    out: dict[str, Any] = {"database": db_name, "started_at": datetime.now(UTC).isoformat(),
-                           "allowlist_sha256": allow.sha256, "specs": []}
+    out: dict[str, Any] = {
+        "database": db_name,
+        "started_at": datetime.now(UTC).isoformat(),
+        "allowlist_sha256": allow.sha256,
+        "specs": [],
+    }
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
-    async with budgeted_client(purpose="harvest", db_name=db_name, planned_wdqs=planned_wdqs,
-                               planned_wbapi=planned_wbapi, mode=mode, reuse_hours=reuse_hours) as sess:
+    async with budgeted_client(
+        purpose="harvest",
+        db_name=db_name,
+        planned_wdqs=planned_wdqs,
+        planned_wbapi=planned_wbapi,
+        mode=mode,
+        reuse_hours=reuse_hours,
+    ) as sess:
         out["run_id"] = sess.run_id
         report_path = REPORT_DIR / f"{sess.run_id}.json"
         sink = KgDbSink(sess.engine, sess.store)
@@ -1184,15 +1443,25 @@ async def run_into_db(paths: Sequence[Path] | None, *, db_name: str = DEFAULT_DB
             out["client"] = client.stats.as_dict()
             out["load_totals"] = dict(sink.totals)
             report_path.write_text(json.dumps(out, indent=2, default=str))
-            log.info("spec %s: %s rows=%s seeds=%s full=%s labels=%s statements=%s req=%s %.0fs", r.spec_id,
-                     r.status, r.rows, r.seeds, r.entities_full, r.entities_labels, r.statements, r.requests,
-                     r.seconds)
+            log.info(
+                "spec %s: %s rows=%s seeds=%s full=%s labels=%s statements=%s req=%s %.0fs",
+                r.spec_id,
+                r.status,
+                r.rows,
+                r.seeds,
+                r.entities_full,
+                r.entities_labels,
+                r.statements,
+                r.requests,
+                r.seconds,
+            )
 
         try:
             out["properties"] = sink.register_properties(allow)
             out["via"], out["expand"], out["mode"] = via, expand, mode
-            await run_specs(Harvester(client, sink, allow=allow, via=via, expand=expand), specs, force=force,
-                            on_report=save)
+            await run_specs(
+                Harvester(client, sink, allow=allow, via=via, expand=expand), specs, force=force, on_report=save
+            )
         finally:
             out["client"] = client.stats.as_dict()
             out["load_totals"] = dict(sink.totals)
@@ -1206,10 +1475,17 @@ async def run_into_db(paths: Sequence[Path] | None, *, db_name: str = DEFAULT_DB
 
 # --------------------------------------------------------------------------- country QIDs
 CROSSWALK = REPO_ROOT / "registry" / "entities" / "country_crosswalk.json"
-COUNTRY_CLASSES = {"Q6256": "country", "Q3624078": "sovereign state", "Q161243": "dependent territory",
-                   "Q46395": "British Overseas Territory", "Q15634554": "state with limited recognition",
-                   "Q1763527": "constituent country", "Q202216": "overseas department and region of France",
-                   "Q1048835": "political territorial entity", "Q10711424": "state with limited recognition"}
+COUNTRY_CLASSES = {
+    "Q6256": "country",
+    "Q3624078": "sovereign state",
+    "Q161243": "dependent territory",
+    "Q46395": "British Overseas Territory",
+    "Q15634554": "state with limited recognition",
+    "Q1763527": "constituent country",
+    "Q202216": "overseas department and region of France",
+    "Q1048835": "political territorial entity",
+    "Q10711424": "state with limited recognition",
+}
 #: Disambiguation order for items sharing an ISO code: states first, then territories, then the broad class.
 CLASS_TIERS = (
     frozenset({"Q6256", "Q3624078", "Q15634554", "Q10711424"}),
@@ -1226,8 +1502,9 @@ MAP_QUERY = """SELECT ?item ?code ?rank ?end ?dissolved ?class WHERE {
 }"""
 
 
-async def map_countries(client: WikidataClient, *, out_path: Path = COUNTRY_QIDS,
-                        manual_titles: Mapping[str, str] | None = None) -> dict[str, Any]:
+async def map_countries(
+    client: WikidataClient, *, out_path: Path = COUNTRY_QIDS, manual_titles: Mapping[str, str] | None = None
+) -> dict[str, Any]:
     """Map every crosswalk entity to a Wikidata QID.
 
     Method 1 (``P298``): items holding a non-deprecated ISO 3166-1 alpha-3 (P298) statement with that code,
@@ -1246,8 +1523,9 @@ async def map_countries(client: WikidataClient, *, out_path: Path = COUNTRY_QIDS
         q = qid_from_uri(b["item"]["value"])
         if not q:
             continue
-        c = cand.setdefault(code, {}).setdefault(q, {"ended": False, "dissolved": False, "classes": set(),
-                                                      "rank": RANKS.get(b["rank"]["value"], "normal")})
+        c = cand.setdefault(code, {}).setdefault(
+            q, {"ended": False, "dissolved": False, "classes": set(), "rank": RANKS.get(b["rank"]["value"], "normal")}
+        )
         c["ended"] |= "end" in b
         c["dissolved"] |= "dissolved" in b
         if "class" in b:
@@ -1271,8 +1549,12 @@ async def map_countries(client: WikidataClient, *, out_path: Path = COUNTRY_QIDS
             elif len(preferred) == 1:
                 pick, note = preferred[0], "several country-classed items; kept the preferred-rank statement"
         if pick:
-            countries[code] = {"qid": pick, "method": "P298", "crosswalk_label": ents[code]["label"],
-                               "classes": sorted(live[pick]["classes"] & set(COUNTRY_CLASSES))}
+            countries[code] = {
+                "qid": pick,
+                "method": "P298",
+                "crosswalk_label": ents[code]["label"],
+                "classes": sorted(live[pick]["classes"] & set(COUNTRY_CLASSES)),
+            }
             if note:
                 countries[code]["note"] = note
                 countries[code]["other_candidates"] = sorted(q for q in live if q != pick)
@@ -1285,18 +1567,32 @@ async def map_countries(client: WikidataClient, *, out_path: Path = COUNTRY_QIDS
     sitelink_raw: list[str] = []
     for code, title in titles.items():
         url = WBAPI_SITELINK.format(title=title.replace(" ", "_"))
-        result, sha = await client._request(client.wbapi_http, url, endpoint="wbapi", accept="application/json",
-                                            meta={"kind": "wbgetentities_sitelink", "title": title})
+        result, sha = await client._request(
+            client.wbapi_http,
+            url,
+            endpoint="wbapi",
+            accept="application/json",
+            meta={"kind": "wbgetentities_sitelink", "title": title},
+        )
         sitelink_raw.append(sha)
         doc = json.loads(result.body)
         found = [q for q, e in (doc.get("entities") or {}).items() if q.startswith("Q") and "missing" not in e]
         if len(found) == 1:
-            countries[code] = {"qid": found[0], "method": "enwiki_sitelink", "enwiki_title": title,
-                               "crosswalk_label": ents[code]["label"], "raw_sha256": sha}
+            countries[code] = {
+                "qid": found[0],
+                "method": "enwiki_sitelink",
+                "enwiki_title": title,
+                "crosswalk_label": ents[code]["label"],
+                "raw_sha256": sha,
+            }
             unmapped.remove(code)
     # labels (en/fr) of the mapped items: one labels-only wbgetentities pass
-    lab = await client.get_entities([v["qid"] for v in countries.values()], props=("labels",),
-                                    languages=("en", "fr"), meta={"purpose": "country_qids_labels"})
+    lab = await client.get_entities(
+        [v["qid"] for v in countries.values()],
+        props=("labels",),
+        languages=("en", "fr"),
+        meta={"purpose": "country_qids_labels"},
+    )
     for v in countries.values():
         e = lab.entities.get(lab.redirects.get(v["qid"], v["qid"])) or {}
         v["label_en"] = (e.get("labels") or {}).get("en", {}).get("value")
@@ -1308,17 +1604,26 @@ async def map_countries(client: WikidataClient, *, out_path: Path = COUNTRY_QIDS
         "note": "Extends registry/entities/country_crosswalk.json (unchanged): crosswalk key -> Wikidata QID.",
         "method": map_countries.__doc__.strip() if map_countries.__doc__ else "",
         "sources": {
-            "wdqs": {"query_sha256": res.query_sha256, "raw_sha256": res.raw_sha256,
-                     "retrieved_at": res.retrieved_at.isoformat()},
+            "wdqs": {
+                "query_sha256": res.query_sha256,
+                "raw_sha256": res.raw_sha256,
+                "retrieved_at": res.retrieved_at.isoformat(),
+            },
             "sitelink_lookups_raw_sha256": sitelink_raw,
             "labels_raw_sha256": list(lab.raw_sha256s),
             "licence": "CC0-1.0 (Wikidata)",
         },
         "crosswalk_sha256": hashlib.sha256(CROSSWALK.read_bytes()).hexdigest(),
-        "stats": {"crosswalk_entities": len(ents), "mapped": len(countries), "unmapped": len(unmapped),
-                  "by_method": {m: sum(1 for v in countries.values() if v["method"] == m)
-                                for m in sorted({v["method"] for v in countries.values()})},
-                  "distinct_qids": len({v["qid"] for v in countries.values()})},
+        "stats": {
+            "crosswalk_entities": len(ents),
+            "mapped": len(countries),
+            "unmapped": len(unmapped),
+            "by_method": {
+                m: sum(1 for v in countries.values() if v["method"] == m)
+                for m in sorted({v["method"] for v in countries.values()})
+            },
+            "distinct_qids": len({v["qid"] for v in countries.values()}),
+        },
         "countries": dict(sorted(countries.items())),
         "unmapped": unmapped,
     }
@@ -1344,10 +1649,14 @@ def or_groups(prefix: str, terms: Sequence[str], suffix: str = "") -> list[str]:
     return out
 
 
-async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNTRY_QIDS,
-                               manual_titles: Mapping[str, str] | None = None,
-                               extra_codes: Sequence[str] = ("TWN",),
-                               candidates_via: str = "search") -> dict[str, Any]:
+async def map_countries_search(
+    client: WikidataClient,
+    *,
+    out_path: Path = COUNTRY_QIDS,
+    manual_titles: Mapping[str, str] | None = None,
+    extra_codes: Sequence[str] = ("TWN",),
+    candidates_via: str = "search",
+) -> dict[str, Any]:
     """Map every crosswalk entity to a QID through the Wikibase API only (no WDQS).
 
     Method ``P298``: CirrusSearch ``haswbstatement:P298=<a>|P298=<b>|...`` (OR groups under the 300-character
@@ -1366,8 +1675,13 @@ async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNT
     if candidates_via == "whatlinkshere":
         # Every item with a P298 statement links to Property:P298; the page view is served outside the action
         # API limiter. It only supplies candidates: codes come from the items' own P298 claims below.
-        result, sha = await client._request(client.wbapi_http, WHATLINKSHERE_P298, endpoint="pages",
-                                            accept="text/html", meta={"kind": "whatlinkshere", "target": "P298"})
+        result, sha = await client._request(
+            client.wbapi_http,
+            WHATLINKSHERE_P298,
+            endpoint="pages",
+            accept="text/html",
+            meta={"kind": "whatlinkshere", "target": "P298"},
+        )
         raws.append(sha)
         found = re.findall(r'href="/wiki/(Q[0-9]+)"', result.body.decode("utf-8", "replace"))
         cands = list(dict.fromkeys(found))
@@ -1379,20 +1693,27 @@ async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNT
             raws.extend(shas)
             cands.extend(hits)
     cands = sorted(set(cands), key=lambda q: int(q[1:]))
-    res = await client.get_entities(cands, props=("info", "claims", "labels"), languages=("en", "fr"),
-                                    meta={"purpose": "country_qids"})
+    res = await client.get_entities(
+        cands, props=("info", "claims", "labels"), languages=("en", "fr"), meta={"purpose": "country_qids"}
+    )
     raws.extend(res.raw_sha256s)
     by_code: dict[str, list[str]] = {}
     info: dict[str, dict[str, Any]] = {}
     for qid, ent in res.entities.items():
         claims = ent.get("claims") or {}
         dissolved = any(c.get("rank") != "deprecated" for c in claims.get("P576", []))
-        classes = {((c.get("mainsnak") or {}).get("datavalue") or {}).get("value", {}).get("id")
-                   for c in claims.get("P31", []) if c.get("rank") != "deprecated"}
-        info[qid] = {"classes": sorted(x for x in classes & set(COUNTRY_CLASSES)), "lastrevid": ent.get("lastrevid"),
-                     "label_en": (ent.get("labels") or {}).get("en", {}).get("value"),
-                     "label_fr": (ent.get("labels") or {}).get("fr", {}).get("value"),
-                     "raw_sha256": res.raw_sha_by_id.get(qid)}
+        classes = {
+            ((c.get("mainsnak") or {}).get("datavalue") or {}).get("value", {}).get("id")
+            for c in claims.get("P31", [])
+            if c.get("rank") != "deprecated"
+        }
+        info[qid] = {
+            "classes": sorted(x for x in classes & set(COUNTRY_CLASSES)),
+            "lastrevid": ent.get("lastrevid"),
+            "label_en": (ent.get("labels") or {}).get("en", {}).get("value"),
+            "label_fr": (ent.get("labels") or {}).get("fr", {}).get("value"),
+            "raw_sha256": res.raw_sha_by_id.get(qid),
+        }
         if dissolved:
             continue
         for c in claims.get("P298", []):
@@ -1414,20 +1735,35 @@ async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNT
             for tier, tier_classes in enumerate(CLASS_TIERS, start=1):
                 classed = [q for q in opts if set(info[q]["classes"]) & tier_classes]
                 if len(classed) == 1:
-                    suggestion = {"qid": classed[0], "rule": f"only candidate classed in tier {tier} ("
-                                  f"{', '.join(sorted(COUNTRY_CLASSES[c] for c in tier_classes))})"}
+                    suggestion = {
+                        "qid": classed[0],
+                        "rule": f"only candidate classed in tier {tier} ("
+                        f"{', '.join(sorted(COUNTRY_CLASSES[c] for c in tier_classes))})",
+                    }
                     break
                 if len(classed) > 1:
                     break
-            ambiguous_detail[code] = {"candidates": [
-                {"qid": q, "label_en": info[q]["label_en"], "classes": info[q]["classes"],
-                 "lastrevid": info[q]["lastrevid"], "raw_sha256": info[q]["raw_sha256"]} for q in opts],
-                "suggested_by_class_tier": suggestion}
+            ambiguous_detail[code] = {
+                "candidates": [
+                    {
+                        "qid": q,
+                        "label_en": info[q]["label_en"],
+                        "classes": info[q]["classes"],
+                        "lastrevid": info[q]["lastrevid"],
+                        "raw_sha256": info[q]["raw_sha256"],
+                    }
+                    for q in opts
+                ],
+                "suggested_by_class_tier": suggestion,
+            }
             ambiguous[code] = opts
         if pick:
-            countries[code] = {"qid": pick, "method": "P298", **{k: info[pick][k] for k in
-                               ("label_en", "label_fr", "classes", "lastrevid", "raw_sha256")},
-                               "crosswalk_label": (ents.get(code) or {}).get("label")}
+            countries[code] = {
+                "qid": pick,
+                "method": "P298",
+                **{k: info[pick][k] for k in ("label_en", "label_fr", "classes", "lastrevid", "raw_sha256")},
+                "crosswalk_label": (ents.get(code) or {}).get("label"),
+            }
             if note:
                 countries[code].update(note=note, other_candidates=[q for q in opts if q != pick])
             if code not in ents:
@@ -1442,27 +1778,43 @@ async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNT
             continue
         if client.mode == "api":
             url = WBAPI_SITELINK.format(title=title.replace(" ", "_"))
-            result, sha = await client._request(client.wbapi_http, url, endpoint="wbapi", accept="application/json",
-                                                meta={"kind": "wbgetentities_sitelink", "title": title})
+            result, sha = await client._request(
+                client.wbapi_http,
+                url,
+                endpoint="wbapi",
+                accept="application/json",
+                meta={"kind": "wbgetentities_sitelink", "title": title},
+            )
             doc = json.loads(result.body)
         else:  # Special:ItemByTitle redirects to the item; its snapshot then comes from Special:EntityData
             url = ITEM_BY_TITLE.format(title=title.replace(" ", "_"))
-            result, sha = await client._request(client.wbapi_http, url, endpoint="pages", accept="text/html",
-                                                meta={"kind": "item_by_title", "title": title})
+            result, sha = await client._request(
+                client.wbapi_http,
+                url,
+                endpoint="pages",
+                accept="text/html",
+                meta={"kind": "item_by_title", "title": title},
+            )
             target = qid_from_uri("http://www.wikidata.org/entity/" + result.final_url.rstrip("/").rsplit("/", 1)[-1])
-            snap = await client.get_entities([target] if target else [], props=("info", "labels"),
-                                             languages=("en", "fr"))
+            snap = await client.get_entities(
+                [target] if target else [], props=("info", "labels"), languages=("en", "fr")
+            )
             raws.extend(snap.raw_sha256s)
             doc = {"entities": snap.entities}
         raws.append(sha)
         found = [(q, e) for q, e in (doc.get("entities") or {}).items() if q.startswith("Q") and "missing" not in e]
         if len(found) == 1:
             q, e = found[0]
-            countries[code] = {"qid": q, "method": "enwiki_sitelink", "enwiki_title": title,
-                               "label_en": (e.get("labels") or {}).get("en", {}).get("value"),
-                               "label_fr": (e.get("labels") or {}).get("fr", {}).get("value"),
-                               "lastrevid": e.get("lastrevid"), "raw_sha256": sha,
-                               "crosswalk_label": (ents.get(code) or {}).get("label")}
+            countries[code] = {
+                "qid": q,
+                "method": "enwiki_sitelink",
+                "enwiki_title": title,
+                "label_en": (e.get("labels") or {}).get("en", {}).get("value"),
+                "label_fr": (e.get("labels") or {}).get("fr", {}).get("value"),
+                "lastrevid": e.get("lastrevid"),
+                "raw_sha256": sha,
+                "crosswalk_label": (ents.get(code) or {}).get("label"),
+            }
             unmapped.remove(code)
     dup: dict[str, list[str]] = {}
     for code, v in countries.items():
@@ -1473,14 +1825,24 @@ async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNT
         "built_by": f"reva.kg.harvest map-countries ({HARVEST_VERSION}, agent WDHARVEST)",
         "note": "Extends registry/entities/country_crosswalk.json (unchanged): crosswalk key -> Wikidata QID.",
         "method": (map_countries_search.__doc__ or "").strip(),
-        "sources": {"endpoint": "www.wikidata.org API (CirrusSearch + wbgetentities), CC0",
-                    "retrieved_at": res.retrieved_at.isoformat(), "raw_sha256": raws},
+        "sources": {
+            "endpoint": "www.wikidata.org API (CirrusSearch + wbgetentities), CC0",
+            "retrieved_at": res.retrieved_at.isoformat(),
+            "raw_sha256": raws,
+        },
         "crosswalk_sha256": hashlib.sha256(CROSSWALK.read_bytes()).hexdigest(),
-        "stats": {"crosswalk_entities": len(ents), "mapped": len(countries),
-                  "mapped_crosswalk": sum(1 for c in countries if c in ents), "unmapped": len(unmapped),
-                  "by_method": {m: sum(1 for v in countries.values() if v["method"] == m)
-                                for m in sorted({v["method"] for v in countries.values()})},
-                  "distinct_qids": len(dup), "shared_qids": {q: c for q, c in dup.items() if len(c) > 1}},
+        "stats": {
+            "crosswalk_entities": len(ents),
+            "mapped": len(countries),
+            "mapped_crosswalk": sum(1 for c in countries if c in ents),
+            "unmapped": len(unmapped),
+            "by_method": {
+                m: sum(1 for v in countries.values() if v["method"] == m)
+                for m in sorted({v["method"] for v in countries.values()})
+            },
+            "distinct_qids": len(dup),
+            "shared_qids": {q: c for q, c in dup.items() if len(c) > 1},
+        },
         "countries": dict(sorted(countries.items())),
         "unmapped": sorted(unmapped),
         "ambiguous": ambiguous_detail,
@@ -1491,19 +1853,29 @@ async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNT
 
 
 ITEM_BY_TITLE = "https://www.wikidata.org/wiki/Special:ItemByTitle/enwiki/{title}"
-WHATLINKSHERE_P298 = ("https://www.wikidata.org/w/index.php?title=Special:WhatLinksHere/Property:P298"
-                      "&limit=500&namespace=0")
-WBAPI_SITELINK = ("https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={title}"
-                  "&props=info&format=json&maxlag=5")
+WHATLINKSHERE_P298 = (
+    "https://www.wikidata.org/w/index.php?title=Special:WhatLinksHere/Property:P298&limit=500&namespace=0"
+)
+WBAPI_SITELINK = (
+    "https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={title}"
+    "&props=info&format=json&maxlag=5"
+)
 MANUAL_TITLES = {"CHI": "Channel Islands", "XKX": "Kosovo"}
 
 
 # --------------------------------------------------------------------------- property requests
 PROPERTIES_FILE = REPO_ROOT / "registry" / "kg" / "properties.yaml"
 REQUESTS_DIR = REPO_ROOT / "registry" / "kg" / "property_requests"
-DATATYPE_KIND = {"wikibase-item": "entity", "time": "time", "quantity": "quantity",
-                 "monolingualtext": "monolingualtext", "external-id": "external_id", "url": "url",
-                 "globe-coordinate": "coordinate", "string": "string"}
+DATATYPE_KIND = {
+    "wikibase-item": "entity",
+    "time": "time",
+    "quantity": "quantity",
+    "monolingualtext": "monolingualtext",
+    "external-id": "external_id",
+    "url": "url",
+    "globe-coordinate": "coordinate",
+    "string": "string",
+}
 NAME_RE = re.compile(r"^[a-z][a-z0-9_]{0,63}$")
 
 
@@ -1511,8 +1883,9 @@ def _q(v: Any) -> str:
     return json.dumps(v, ensure_ascii=False) if v is not None else "null"
 
 
-async def merge_property_requests(client: WikidataClient, *, path: Path = PROPERTIES_FILE,
-                                  requests_dir: Path = REQUESTS_DIR) -> dict[str, Any]:
+async def merge_property_requests(
+    client: WikidataClient, *, path: Path = PROPERTIES_FILE, requests_dir: Path = REQUESTS_DIR
+) -> dict[str, Any]:
     """Merge ``property_requests/*.yaml`` into the allow-list after checking each id against Wikidata.
 
     A request is accepted when the property exists, its Wikidata datatype matches the requested ``kind``
@@ -1541,9 +1914,12 @@ async def merge_property_requests(client: WikidataClient, *, path: Path = PROPER
     result: dict[str, Any] = {"accepted": [], "rejected": [], "qualifiers_added": []}
     if not ids:
         return result
-    res = await client.get_entities(ids, props=("labels", "datatype"), languages=("en", "fr"),
-                                    meta={"purpose": "property_requests"})
-    stamp = f"wbgetentities labels|datatype {res.retrieved_at.isoformat()} raw {','.join(x[:12] for x in res.raw_sha256s)}"
+    res = await client.get_entities(
+        ids, props=("labels", "datatype"), languages=("en", "fr"), meta={"purpose": "property_requests"}
+    )
+    stamp = (
+        f"wbgetentities labels|datatype {res.retrieved_at.isoformat()} raw {','.join(x[:12] for x in res.raw_sha256s)}"
+    )
     blocks: list[str] = []
     for who, r in main_req:
         pid = r["property"]
@@ -1568,16 +1944,25 @@ async def merge_property_requests(client: WikidataClient, *, path: Path = PROPER
         names.add(r["reva_predicate"])
         en = (ent.get("labels") or {}).get("en", {}).get("value")
         fr = (ent.get("labels") or {}).get("fr", {}).get("value")
-        lines = [f"  - property: {pid}", f"    reva_predicate: {r['reva_predicate']}", f"    inverse: {_q(inv)}",
-                 f"    kind: {kind}", f"    group: {r.get('group') or 'requested'}",
-                 f"    expected_en: {_q(r.get('label_en'))}", f"    label_en: {_q(en)}", f"    label_fr: {_q(fr)}",
-                 f"    wikidata_datatype: {ent.get('datatype')}", f"    requested_by: {who.upper()}",
-                 f"    why: {_q(r.get('why'))}"]
+        lines = [
+            f"  - property: {pid}",
+            f"    reva_predicate: {r['reva_predicate']}",
+            f"    inverse: {_q(inv)}",
+            f"    kind: {kind}",
+            f"    group: {r.get('group') or 'requested'}",
+            f"    expected_en: {_q(r.get('label_en'))}",
+            f"    label_en: {_q(en)}",
+            f"    label_fr: {_q(fr)}",
+            f"    wikidata_datatype: {ent.get('datatype')}",
+            f"    requested_by: {who.upper()}",
+            f"    why: {_q(r.get('why'))}",
+        ]
         if inv and inv == r["reva_predicate"]:
             lines.append("    symmetric: true")
         blocks.append("\n".join(lines))
-        result["accepted"].append({"property": pid, "by": who, "label_en": en,
-                                   "label_matches_request": en == r.get("label_en")})
+        result["accepted"].append(
+            {"property": pid, "by": who, "label_en": en, "label_matches_request": en == r.get("label_en")}
+        )
     qlines: list[str] = []
     for who, r in qual_req:
         pid = r["property"]
@@ -1587,14 +1972,21 @@ async def merge_property_requests(client: WikidataClient, *, path: Path = PROPER
             continue
         en = (ent.get("labels") or {}).get("en", {}).get("value")
         fr = (ent.get("labels") or {}).get("fr", {}).get("value")
-        qlines.append(f"  - {{property: {pid}, expected_en: {_q(r.get('label_en'))}, label_en: {_q(en)}, "
-                      f"label_fr: {_q(fr)}, requested_by: {who.upper()}}}")
+        qlines.append(
+            f"  - {{property: {pid}, expected_en: {_q(r.get('label_en'))}, label_en: {_q(en)}, "
+            f"label_fr: {_q(fr)}, requested_by: {who.upper()}}}"
+        )
         result["qualifiers_added"].append(pid)
     text_lines = path.read_text().splitlines()
     qi = next(i for i, ln in enumerate(text_lines) if ln.startswith("# Qualifiers kept"))
     ri = next(i for i, ln in enumerate(text_lines) if ln.startswith("# Reference properties kept"))
-    new = (text_lines[:qi] + ([f"# merged property requests ({stamp})", *blocks] if blocks else [])
-           + text_lines[qi:ri] + qlines + text_lines[ri:])
+    new = (
+        text_lines[:qi]
+        + ([f"# merged property requests ({stamp})", *blocks] if blocks else [])
+        + text_lines[qi:ri]
+        + qlines
+        + text_lines[ri:]
+    )
     path.write_text("\n".join(new) + "\n")
     load_allowlist(path)  # parses and has no duplicates
     return result
@@ -1627,23 +2019,39 @@ def main(argv: Sequence[str] | None = None) -> int:
     sub.add_parser("merge-property-requests", help="merge registry/kg/property_requests into the allow-list")
     mc = sub.add_parser("map-countries", help="write registry/entities/country_qids.json (crosswalk -> QID)")
     mc.add_argument("--via-wdqs", action="store_true", help="one SPARQL query instead of API searches")
-    mc.add_argument("--candidates", choices=("search", "whatlinkshere"), default="search",
-                    help="where candidate items come from (whatlinkshere: page view, outside the API limiter)")
+    mc.add_argument(
+        "--candidates",
+        choices=("search", "whatlinkshere"),
+        default="search",
+        help="where candidate items come from (whatlinkshere: page view, outside the API limiter)",
+    )
     r = sub.add_parser("run", help="run specs into a throwaway database (never 'reva'), budget-metered")
     r.add_argument("paths", nargs="*", type=Path)
     r.add_argument("--db", default=DEFAULT_DB)
     r.add_argument("--force", action="store_true", help="re-run specs already completed with the same sha256")
     r.add_argument("--planned-wdqs", type=int, default=50)
     r.add_argument("--planned-wbapi", type=int, default=100)
-    r.add_argument("--via", choices=("wdqs", "api"), default="wdqs",
-                   help="api: select seeds with the specs' api_search blocks (CirrusSearch) instead of WDQS")
+    r.add_argument(
+        "--via",
+        choices=("wdqs", "api"),
+        default="wdqs",
+        help="api: select seeds with the specs' api_search blocks (CirrusSearch) instead of WDQS",
+    )
     r.add_argument("--no-expand", action="store_true", help="skip label snapshots of object entities")
-    r.add_argument("--reuse-hours", type=float, default=24.0,
-                   help="reuse archived Special:EntityData snapshots younger than this (cites their sha/time)")
+    r.add_argument(
+        "--reuse-hours",
+        type=float,
+        default=24.0,
+        help="reuse archived Special:EntityData snapshots younger than this (cites their sha/time)",
+    )
     for sp in (r, mc):
-        sp.add_argument("--api-mode", choices=("api", "linked_data", "hybrid", "auto"), default="api",
-                        help="api: action API; linked_data: Special:EntityData + REST search; hybrid: action-API "
-                             "search + Special:EntityData; auto: wbgetentities per 50 ids, EntityData on 429")
+        sp.add_argument(
+            "--api-mode",
+            choices=("api", "linked_data", "hybrid", "auto"),
+            default="api",
+            help="api: action API; linked_data: Special:EntityData + REST search; hybrid: action-API "
+            "search + Special:EntityData; auto: wbgetentities per 50 ids, EntityData on 429",
+        )
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
     allow = load_allowlist()
@@ -1655,10 +2063,17 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 1 if bad else 0
     if args.cmd == "status":
         specs = discover_specs(args.paths or None)
-        _print({s.id: {k: v for k, v in HarvestState(STATE_DIR, s.id).data.items()
-                       if k in ("status", "rows", "finished_at", "report")} | {"spec_changed":
-                       HarvestState(STATE_DIR, s.id).data.get("spec_sha256") not in (None, s.sha256)}
-                for s in specs})
+        _print(
+            {
+                s.id: {
+                    k: v
+                    for k, v in HarvestState(STATE_DIR, s.id).data.items()
+                    if k in ("status", "rows", "finished_at", "report")
+                }
+                | {"spec_changed": HarvestState(STATE_DIR, s.id).data.get("spec_sha256") not in (None, s.sha256)}
+                for s in specs
+            }
+        )
         return 0
     if args.cmd == "try":
         if args.limit > 50:
@@ -1678,13 +2093,19 @@ def main(argv: Sequence[str] | None = None) -> int:
                 sink = NullSink()
                 h = Harvester(client, sink, allow=allow)
                 chunks = render_chunks(spec)
-                res = await client.sparql(with_limit(chunks[0].query, min(args.limit, 50)),
-                                          meta={"spec": spec.id, "mode": "try"})
+                res = await client.sparql(
+                    with_limit(chunks[0].query, min(args.limit, 50)), meta={"spec": spec.id, "mode": "try"}
+                )
                 rows = [{k: v.get("value") for k, v in b.items()} for b in res.bindings]
-                out: dict[str, Any] = {"spec": spec.id, "chunk": chunks[0].key, "chunks": len(chunks),
-                                       "rows": len(rows), "sample": rows[:min(args.limit, 50)],
-                                       "elapsed_seconds": round(res.elapsed_seconds, 2),
-                                       "raw_sha256": res.raw_sha256}
+                out: dict[str, Any] = {
+                    "spec": spec.id,
+                    "chunk": chunks[0].key,
+                    "chunks": len(chunks),
+                    "rows": len(rows),
+                    "sample": rows[: min(args.limit, 50)],
+                    "elapsed_seconds": round(res.elapsed_seconds, 2),
+                    "raw_sha256": res.raw_sha256,
+                }
                 if spec.data["purpose"] == "statements":
                     stmts, skipped = h.rows_to_statements(spec, res)
                     out["statements"] = len([s for s in stmts if s])
@@ -1698,34 +2119,61 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _budget_guard(go)
     if args.cmd == "run":
         try:
-            run_out = asyncio.run(run_into_db(args.paths or None, db_name=args.db, force=args.force,
-                                              planned_wdqs=args.planned_wdqs,
-                                              planned_wbapi=args.planned_wbapi, via=args.via,
-                                              expand=not args.no_expand, mode=args.api_mode,
-                                              reuse_hours=args.reuse_hours))
+            run_out = asyncio.run(
+                run_into_db(
+                    args.paths or None,
+                    db_name=args.db,
+                    force=args.force,
+                    planned_wdqs=args.planned_wdqs,
+                    planned_wbapi=args.planned_wbapi,
+                    via=args.via,
+                    expand=not args.no_expand,
+                    mode=args.api_mode,
+                    reuse_hours=args.reuse_hours,
+                )
+            )
         except BudgetExhausted as e:
             _print({"status": "budget_exhausted", "message": e.message, **e.details})
             return 3
-        keys = ("spec_id", "status", "rows", "seeds", "entities_full", "entities_labels", "statements", "requests",
-                "bytes", "seconds", "failures")
+        keys = (
+            "spec_id",
+            "status",
+            "rows",
+            "seeds",
+            "entities_full",
+            "entities_labels",
+            "statements",
+            "requests",
+            "bytes",
+            "seconds",
+            "failures",
+        )
         spec_reports: list[dict[str, Any]] = run_out["specs"]
-        _print({k: v for k, v in run_out.items() if k != "specs"}
-               | {"specs": [{k: r[k] for k in keys} for r in spec_reports]})
+        _print(
+            {k: v for k, v in run_out.items() if k != "specs"}
+            | {"specs": [{k: r[k] for k in keys} for r in spec_reports]}
+        )
         return 0 if all(r["status"] in ("done", "skipped") for r in spec_reports) else 1
     if args.cmd == "map-countries":
+
         async def mapc() -> int:
-            async with budgeted_client(purpose="mapcountries", planned_wdqs=0, planned_wbapi=30,
-                                       mode=args.api_mode) as sess:
+            async with budgeted_client(
+                purpose="mapcountries", planned_wdqs=0, planned_wbapi=30, mode=args.api_mode
+            ) as sess:
                 if args.via_wdqs:
                     _print(await map_countries(sess.client, manual_titles=MANUAL_TITLES))
                 else:
-                    _print(await map_countries_search(sess.client, manual_titles=MANUAL_TITLES,
-                                                      candidates_via=args.candidates))
+                    _print(
+                        await map_countries_search(
+                            sess.client, manual_titles=MANUAL_TITLES, candidates_via=args.candidates
+                        )
+                    )
             _print({"budget": sess.usage.get("budget")})
             return 0
 
         return _budget_guard(mapc)
     if args.cmd == "merge-property-requests":
+
         async def merge() -> int:
             async with budgeted_client(purpose="properties", planned_wdqs=0, planned_wbapi=2, mode="auto") as sess:
                 _print(await merge_property_requests(sess.client))

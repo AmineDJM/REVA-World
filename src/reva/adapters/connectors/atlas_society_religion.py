@@ -75,7 +75,9 @@ CATALOG_FILE = "society.yaml"
 
 # ----------------------------------------------------------------------------- RCS-Dem 2.0 (OSF)
 RCS_CONNECTOR = "atlas.rcs_dem"
-RCS_VERSION = "1.0.1"  # ATLASOPS: patch bump, code changed after 1.0.0 was registered in the dev DB (TWNMAP/agent edits)
+# ATLASOPS: 1.0.1, code changed after 1.0.0 was registered in the dev DB (TWNMAP/agent edits).
+# SWEEP2: 1.0.2, `ruff format` changed the module source and so the code digest.
+RCS_VERSION = "1.0.2"
 RCS_SOURCE_KEY = "rcs_dem.osf"
 RCS_ATLAS_SOURCE = "rcs"
 RCS_DATASET = "dem2"
@@ -401,7 +403,9 @@ def parse_rcs(body: bytes, *, raw_sha256: str, min_rows: int = RCS_MIN_ROWS) -> 
 
 # ----------------------------------------------------------------------------- WRP (COW)
 WRP_CONNECTOR = "atlas.wrp"
-WRP_VERSION = "1.0.1"  # ATLASOPS: patch bump, code changed after 1.0.0 was registered in the dev DB (TWNMAP/agent edits)
+# ATLASOPS: 1.0.1, code changed after 1.0.0 was registered in the dev DB (TWNMAP/agent edits).
+# SWEEP2: 1.0.2, `ruff format` changed the module source and so the code digest.
+WRP_VERSION = "1.0.2"
 WRP_SOURCE_KEY = "cow.data"
 WRP_ATLAS_SOURCE = "wrp"
 WRP_DATASET = "national"

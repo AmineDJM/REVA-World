@@ -65,9 +65,14 @@ Self-loops are stored (they exist in sources) and reported by `/consistency`.
 
 ```python
 from reva.causal import (
-    Codebook, DatasetClaim, load_dataset_claims,      # T1/T2 dataset agents
-    CandidateIn, insert_candidates,                    # CAUSCAND
-    load_kg_claims, grade_claims, refresh,             # loader / grader (worker)
+    Codebook,
+    DatasetClaim,
+    load_dataset_claims,  # T1/T2 dataset agents
+    CandidateIn,
+    insert_candidates,  # CAUSCAND
+    load_kg_claims,
+    grade_claims,
+    refresh,  # loader / grader (worker)
 )
 ```
 
@@ -75,44 +80,46 @@ from reva.causal import (
 
 ```python
 rep = load_dataset_claims(
-    engine,                      # reva_worker engine
-    store,                       # artifact store: unregistered raws present in the store are registered
-    source_key="icb.data",       # like kg source keys: ^[a-z0-9][a-z0-9_.-]*$
-    dataset="icb2",              # dataset name within the source (^[a-z0-9][a-z0-9_.-]*$)
-    dataset_revision="v16",      # source's version label (required)
-    codebook=Codebook(           # required for T1: the definition the coded relation rests on
+    engine,  # reva_worker engine
+    store,  # artifact store: unregistered raws present in the store are registered
+    source_key="icb.data",  # like kg source keys: ^[a-z0-9][a-z0-9_.-]*$
+    dataset="icb2",  # dataset name within the source (^[a-z0-9][a-z0-9_.-]*$)
+    dataset_revision="v16",  # source's version label (required)
+    codebook=Codebook(  # required for T1: the definition the coded relation rests on
         name="International Crisis Behavior, actor-level codebook",
-        version="16", url="https://...",
+        version="16",
+        url="https://...",
         definitions={"trigger": "verbatim definition text from the codebook"},
     ),
-    raw_sha256s=[sha],           # raw artifacts the rows were parsed from (verified or in store)
-    retrieved_at=retrieved_at,   # tz-aware
-    origin="live",               # or "test_fixture"
+    raw_sha256s=[sha],  # raw artifacts the rows were parsed from (verified or in store)
+    retrieved_at=retrieved_at,  # tz-aware
+    origin="live",  # or "test_fixture"
     claims=[
         DatasetClaim(
-            cause_id="icb:crisis:412:trigger", effect_id="icb:crisis:412",
-            relation="coded_trigger",            # closed vocabulary above
+            cause_id="icb:crisis:412:trigger",
+            effect_id="icb:crisis:412",
+            relation="coded_trigger",  # closed vocabulary above
             selector={"file": "icb2v16.csv", "row": 412, "columns": ["TRIGGR"]},  # dataset row selector
-            raw_sha256=sha,                      # one of raw_sha256s (default: the only one)
-            codebook_term="trigger",             # key in codebook.definitions (T1: required)
-            source_claim_id="412:trigger",       # optional stable id; default sha of the selector
-            polarity=None,                       # "promotes" | "inhibits" when the source states it
-            mechanism=None,                      # verbatim source text only, never paraphrased
-            scope={},                            # {"place": [...], "period": {...}, "population": "..."}
-            stance="asserts",                    # or "denies" (a source denying the link)
-            contests=(),                         # claim keys this source explicitly contests
-            tier="T1",                           # "T1" or "T2" (T2 requires citation)
-            citation=None,                       # T2: {"doi": "10...."} / {"isbn": "..."} verbatim
+            raw_sha256=sha,  # one of raw_sha256s (default: the only one)
+            codebook_term="trigger",  # key in codebook.definitions (T1: required)
+            source_claim_id="412:trigger",  # optional stable id; default sha of the selector
+            polarity=None,  # "promotes" | "inhibits" when the source states it
+            mechanism=None,  # verbatim source text only, never paraphrased
+            scope={},  # {"place": [...], "period": {...}, "population": "..."}
+            stance="asserts",  # or "denies" (a source denying the link)
+            contests=(),  # claim keys this source explicitly contests
+            tier="T1",  # "T1" or "T2" (T2 requires citation)
+            citation=None,  # T2: {"doi": "10...."} / {"isbn": "..."} verbatim
         ),
     ],
-    complete=True,   # the delivery is the whole dataset: claims of (source_key, dataset) absent from it
-                     # are retracted; reason derived (FIXA): reclassified_by_reva when its raw artifact is in this
-                     # delivery, else source_row_present(stored claim) -> False removed_at_source / True
-                     # reclassified_by_reva, else absent_from_delivery. False = partial delivery, nothing retracted.
+    complete=True,  # the delivery is the whole dataset: claims of (source_key, dataset) absent from it
+    # are retracted; reason derived (FIXA): reclassified_by_reva when its raw artifact is in this
+    # delivery, else source_row_present(stored claim) -> False removed_at_source / True
+    # reclassified_by_reva, else absent_from_delivery. False = partial delivery, nothing retracted.
     source_row_present=None,  # optional callable(stored claim: selector, raw_sha256, ...) -> bool | None
 )
 rep.as_dict()  # {"load_id", "inserted", "new_revision", "unchanged", "reinstated", "retracted",
-               #  "rejected_counts", "rejected_sample", "unknown_entities", ...}
+#  "rejected_counts", "rejected_sample", "unknown_entities", ...}
 ```
 
 Claim key: `ds:<source_key>:<dataset>:<source_claim_id or sha(selector)[:32]>`. Idempotent: an identical
@@ -125,17 +132,26 @@ agent loads them through `reva.kg.model.load_batch`.
 
 ```python
 rep = insert_candidates(
-    engine, store,
-    extractor_id="causcand.patterns", extractor_version="1",
-    source_key="wikipedia.en", raw_sha256s=[sha], retrieved_at=dt, origin="live",
+    engine,
+    store,
+    extractor_id="causcand.patterns",
+    extractor_version="1",
+    source_key="wikipedia.en",
+    raw_sha256s=[sha],
+    retrieved_at=dt,
+    origin="live",
     candidates=[
         CandidateIn(
-            cause_id="Q131074", effect_id="Q8698", relation="has_cause",
-            tier="T5",                                   # T5 text-mined, T6 model-proposed
-            source_revision="1234567890",                # required: revision-pinned
+            cause_id="Q131074",
+            effect_id="Q8698",
+            relation="has_cause",
+            tier="T5",  # T5 text-mined, T6 model-proposed
+            source_revision="1234567890",  # required: revision-pinned
             source_sentence="exact sentence, verbatim",  # required
             selector={"page": "Great_Depression", "section": "Causes", "sentence": 3},
-            raw_sha256=sha, polarity=None, mechanism=None,
+            raw_sha256=sha,
+            polarity=None,
+            mechanism=None,
         ),
     ],
 )

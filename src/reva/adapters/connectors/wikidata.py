@@ -131,8 +131,14 @@ class MachineLock:
     ``last_end`` (wall clock of the end of the last request, any process) and ``cooldown_until``.
     """
 
-    def __init__(self, directory: Path | None = None, *, min_interval: float = DEFAULT_MIN_INTERVAL,
-                 clock: Any = time.time, sleep: Any = asyncio.sleep) -> None:
+    def __init__(
+        self,
+        directory: Path | None = None,
+        *,
+        min_interval: float = DEFAULT_MIN_INTERVAL,
+        clock: Any = time.time,
+        sleep: Any = asyncio.sleep,
+    ) -> None:
         self.dir = Path(directory) if directory else default_lock_dir()
         self.dir.mkdir(parents=True, exist_ok=True)
         self.lock_path = self.dir / "wikidata.lock"
@@ -206,9 +212,12 @@ class MachineLock:
                 finally:
                     end = self._clock()
                     state = self._read_state()
-                    new = {k: v for k, v in state.items()
-                           if (k.startswith(("cooldown_until:", "recovering_until:")) and v > end)
-                           or k.startswith("last_end:")}
+                    new = {
+                        k: v
+                        for k, v in state.items()
+                        if (k.startswith(("cooldown_until:", "recovering_until:")) and v > end)
+                        or k.startswith("last_end:")
+                    }
                     new["last_end"] = end
                     new[f"last_end:{endpoint}"] = end
                     new["pid"] = float(os.getpid())
@@ -237,8 +246,7 @@ class Archive:
     compress: bool = True
     _ed_index: dict[str, tuple[str, str, str]] | None = field(default=None, repr=False)
     _ed_index_size: int = field(default=-1, repr=False)
-    _snap_index: dict[str, list[tuple[str, str, str, frozenset[str] | None]]] = field(default_factory=dict,
-                                                                                       repr=False)
+    _snap_index: dict[str, list[tuple[str, str, str, frozenset[str] | None]]] = field(default_factory=dict, repr=False)
     _snap_offset: int = field(default=0, repr=False)
     _snap_cache: dict[str, Any] = field(default_factory=dict, repr=False)
 
@@ -256,10 +264,22 @@ class Archive:
         if self.index_path is not None:
             self.index_path.parent.mkdir(parents=True, exist_ok=True)
             with self.index_path.open("a") as f:
-                f.write(json.dumps({"sha256": sha, "body_sha256": body_sha, "bytes": len(body),
-                                    "stored_bytes": len(data), "media_type": media_type,
-                                    "encoding": "gzip" if self.compress else "identity", **meta},
-                                   sort_keys=True, default=str) + "\n")
+                f.write(
+                    json.dumps(
+                        {
+                            "sha256": sha,
+                            "body_sha256": body_sha,
+                            "bytes": len(body),
+                            "stored_bytes": len(data),
+                            "media_type": media_type,
+                            "encoding": "gzip" if self.compress else "identity",
+                            **meta,
+                        },
+                        sort_keys=True,
+                        default=str,
+                    )
+                    + "\n"
+                )
         return sha
 
     def recent_entitydata(self, eid: str, max_age_seconds: float) -> tuple[bytes, str, datetime] | None:
@@ -299,8 +319,9 @@ class Archive:
             return None
         return (gzip.decompress(data) if enc == "gzip" else data), sha, retrieved
 
-    def recent_snapshot(self, eid: str, max_age_seconds: float,
-                        props: Sequence[str]) -> tuple[dict[str, Any], str, datetime] | None:
+    def recent_snapshot(
+        self, eid: str, max_age_seconds: float, props: Sequence[str]
+    ) -> tuple[dict[str, Any], str, datetime] | None:
         """The most recent archived snapshot of ``eid`` (Special:EntityData, or a successful ``wbgetentities``
         response whose props cover ``props``) younger than ``max_age_seconds``: (raw entity, archived sha,
         original retrieval time). Lets overlapping specs reuse what was fetched for another spec instead of
@@ -409,16 +430,24 @@ class ClientStats:
     by_endpoint: dict[str, int] = field(default_factory=dict)
 
     def as_dict(self) -> dict[str, Any]:
-        return {"requests": self.requests, "bytes": self.bytes, "retries": self.retries,
-                "throttled": self.throttled, "timeouts": self.timeouts, "maxlag_relaxed": self.maxlag_relaxed, "reused": self.reused,
-                "lock_wait_seconds": round(self.lock_wait_seconds, 2), "by_endpoint": dict(self.by_endpoint)}
+        return {
+            "requests": self.requests,
+            "bytes": self.bytes,
+            "retries": self.retries,
+            "throttled": self.throttled,
+            "timeouts": self.timeouts,
+            "maxlag_relaxed": self.maxlag_relaxed,
+            "reused": self.reused,
+            "lock_wait_seconds": round(self.lock_wait_seconds, 2),
+            "by_endpoint": dict(self.by_endpoint),
+        }
 
 
 def qid_from_uri(value: str | None) -> str | None:
     if not value:
         return None
     if value.startswith(ENTITY_PREFIX):
-        tail = value[len(ENTITY_PREFIX):]
+        tail = value[len(ENTITY_PREFIX) :]
         return tail if tail[:1] in ("Q", "P", "L") and tail[1:].isdigit() else None
     return value if value[:1] in ("Q", "P") and value[1:].isdigit() else None
 
@@ -484,18 +513,27 @@ class WikidataClient:
         self.stats = ClientStats()
 
     # -- core request loop -------------------------------------------------------------------------
-    async def _request(self, http: Any, url: str, *, endpoint: str, accept: str, meta: Mapping[str, Any],
-                       max_bytes: int | None = None, max_retries: int | None = None) -> tuple[Any, str]:
+    async def _request(
+        self,
+        http: Any,
+        url: str,
+        *,
+        endpoint: str,
+        accept: str,
+        meta: Mapping[str, Any],
+        max_bytes: int | None = None,
+        max_retries: int | None = None,
+    ) -> tuple[Any, str]:
         if len(url) > MAX_GET_URL and endpoint == "wdqs":
-            raise WikidataError(f"query URL too long ({len(url)} chars): reduce the VALUES chunk size",
-                                reason="url_too_long")
+            raise WikidataError(
+                f"query URL too long ({len(url)} chars): reduce the VALUES chunk size", reason="url_too_long"
+            )
         headers = {"User-Agent": self.ua, "Accept": accept}
         attempt = 0
         qs_lag = 0  # consecutive maxlag errors caused by query-service (WDQS updater) lag
         while True:
             attempt += 1
-            kw: dict[str, Any] = {"headers": headers,
-                                  "accept_status": (200, 400, 403, 404, 429, 500, 502, 503, 504)}
+            kw: dict[str, Any] = {"headers": headers, "accept_status": (200, 400, 403, 404, 429, 500, 502, 503, 504)}
             if max_bytes:
                 kw["max_bytes"] = max_bytes
             async with self.lock.slot(endpoint) as slot:
@@ -512,9 +550,11 @@ class WikidataClient:
                     delay = retry_after if retry_after is not None else min(300.0, 5.0 * 2 ** (attempt - 1))
                     slot.cooldown(delay)  # every process waits, not only this one
             if status == 200 and not maxlag:
-                sha = self.archive.put(result.body, result.media_type or "application/json",
-                                       {**meta, "endpoint": endpoint,
-                                        "retrieved_at": result.retrieved_at.isoformat(), "status": status})
+                sha = self.archive.put(
+                    result.body,
+                    result.media_type or "application/json",
+                    {**meta, "endpoint": endpoint, "retrieved_at": result.retrieved_at.isoformat(), "status": status},
+                )
                 return result, sha
             if maxlag and _maxlag_type(result.body) == "wikibase-queryservice":
                 # Wikidata folds the WDQS *updater* lag into maxlag to slow down edits; it says nothing
@@ -529,9 +569,14 @@ class WikidataClient:
                 if attempt > (self.max_retries if max_retries is None else max_retries):
                     raise RateLimited(f"{endpoint}: still throttled after {attempt} attempts", status=status)
                 self.stats.retries += 1
-                log.warning("%s throttled (HTTP %s%s, retry-after=%s): %s", endpoint, status,
-                            " maxlag" if maxlag else "", result.headers.get("retry-after"),
-                            _first_line(result.body[:600].decode("utf-8", "replace"))[:200])
+                log.warning(
+                    "%s throttled (HTTP %s%s, retry-after=%s): %s",
+                    endpoint,
+                    status,
+                    " maxlag" if maxlag else "",
+                    result.headers.get("retry-after"),
+                    _first_line(result.body[:600].decode("utf-8", "replace"))[:200],
+                )
                 continue  # the shared cool-down is applied when the next slot is taken
             body_head = result.body[:4000].decode("utf-8", "replace")
             timed_out = "TimeoutException" in body_head or (status in (500, 504) and "timeout" in body_head.lower())
@@ -543,8 +588,7 @@ class WikidataClient:
             if status == 400:
                 raise SparqlSyntaxError(f"{endpoint}: HTTP 400: {_first_line(body_head)}", status=status)
             if status == 403:
-                raise WikidataError(f"{endpoint}: HTTP 403 (User-Agent policy or ban)", status=status,
-                                    retryable=False)
+                raise WikidataError(f"{endpoint}: HTTP 403 (User-Agent policy or ban)", status=status, retryable=False)
             if attempt > 3:
                 raise WikidataError(f"{endpoint}: HTTP {status} after {attempt} attempts", status=status)
             self.stats.retries += 1
@@ -558,60 +602,88 @@ class WikidataClient:
         self.archive.put(qbytes, "application/sparql-query", {"kind": "sparql_query", **(meta or {})})
         url = f"{WDQS_URL}?{urlencode({'query': q, 'format': 'json'})}"
         t0 = time.monotonic()
-        result, sha = await self._request(self.wdqs_http, url, endpoint="wdqs",
-                                          accept="application/sparql-results+json",
-                                          meta={"kind": "sparql_results", "query_sha256": query_sha, **(meta or {})})
+        result, sha = await self._request(
+            self.wdqs_http,
+            url,
+            endpoint="wdqs",
+            accept="application/sparql-results+json",
+            meta={"kind": "sparql_results", "query_sha256": query_sha, **(meta or {})},
+        )
         doc = _json(result.body)
         try:
             variables = tuple(doc["head"]["vars"])
             bindings = list(doc["results"]["bindings"])
         except (KeyError, TypeError) as e:
             raise SourceResponseError("WDQS response is not SPARQL JSON results", retryable=False) from e
-        return SparqlResult(variables, bindings, query_sha, sha, len(result.body), result.retrieved_at,
-                            time.monotonic() - t0)
+        return SparqlResult(
+            variables, bindings, query_sha, sha, len(result.body), result.retrieved_at, time.monotonic() - t0
+        )
 
     # -- search (CirrusSearch, Wikibase API host) ---------------------------------------------------
-    async def search_items(self, query: str, *, limit: int = 50, offset: int = 0,
-                           meta: Mapping[str, Any] | None = None) -> tuple[list[str], str]:
+    async def search_items(
+        self, query: str, *, limit: int = 50, offset: int = 0, meta: Mapping[str, Any] | None = None
+    ) -> tuple[list[str], str]:
         """Item ids matching a CirrusSearch query (e.g. ``haswbstatement:P298=FRA``) on www.wikidata.org.
 
         Uses the Wikibase API host (not WDQS). Returns (QIDs in result order, raw sha256)."""
         hits, _total, sha = await self.search_page(query, limit=limit, offset=offset, meta=meta)
         return hits, sha
 
-    async def search_page(self, query: str, *, limit: int = 500, offset: int = 0,
-                          meta: Mapping[str, Any] | None = None) -> tuple[list[str], int, str]:
+    async def search_page(
+        self, query: str, *, limit: int = 500, offset: int = 0, meta: Mapping[str, Any] | None = None
+    ) -> tuple[list[str], int, str]:
         """One page of a CirrusSearch query: (QIDs, total hits, raw sha256). CirrusSearch serves at most
         10,000 results per query (offset + limit <= 10,000)."""
         if self.mode == "linked_data":
             if offset > 0:  # the REST search has no paging
                 return [], 0, ""
             url = f"{REST_SEARCH_URL}?{urlencode({'q': query, 'limit': '100'})}"
-            result, sha = await self._request(self.wbapi_http, url, endpoint="rest", accept="application/json",
-                                              meta={"kind": "rest_search", "query": query[:2000], **(meta or {})})
-            pages = (_json(result.body).get("pages") or [])
+            result, sha = await self._request(
+                self.wbapi_http,
+                url,
+                endpoint="rest",
+                accept="application/json",
+                meta={"kind": "rest_search", "query": query[:2000], **(meta or {})},
+            )
+            pages = _json(result.body).get("pages") or []
             hits = [str(p.get("key", "")) for p in pages]
             hits = [h for h in hits if h[:1] == "Q" and h[1:].isdigit()]
             # no total is reported: a full page may be truncated -> report "at least one more"
             return hits, (len(hits) + 1 if len(pages) >= 100 else len(hits)), sha
-        params = {"action": "query", "list": "search", "srsearch": query, "srnamespace": "0",
-                  "srlimit": str(min(max(1, limit), 500)), "sroffset": str(max(0, offset)), "srprop": "",
-                  "srinfo": "totalhits", "format": "json", "maxlag": "5"}
+        params = {
+            "action": "query",
+            "list": "search",
+            "srsearch": query,
+            "srnamespace": "0",
+            "srlimit": str(min(max(1, limit), 500)),
+            "sroffset": str(max(0, offset)),
+            "srprop": "",
+            "srinfo": "totalhits",
+            "format": "json",
+            "maxlag": "5",
+        }
         url = f"{WBAPI_URL}?{urlencode(params)}"
-        result, sha = await self._request(self.wbapi_http, url, endpoint="wbapi", accept="application/json",
-                                          meta={"kind": "search", "query": query[:2000], "offset": offset,
-                                                **(meta or {})})
+        result, sha = await self._request(
+            self.wbapi_http,
+            url,
+            endpoint="wbapi",
+            accept="application/json",
+            meta={"kind": "search", "query": query[:2000], "offset": offset, **(meta or {})},
+        )
         doc = _json(result.body)
         if "error" in doc:
-            raise WikidataError(f"search error {doc['error'].get('code')}: {str(doc['error'].get('info'))[:200]}",
-                                api_code=doc["error"].get("code"))
+            raise WikidataError(
+                f"search error {doc['error'].get('code')}: {str(doc['error'].get('info'))[:200]}",
+                api_code=doc["error"].get("code"),
+            )
         q = doc.get("query") or {}
         hits = [h.get("title", "") for h in q.get("search") or []]
         total = int((q.get("searchinfo") or {}).get("totalhits") or 0)
         return [h for h in hits if h[:1] == "Q" and h[1:].isdigit()], total, sha
 
-    async def search_all(self, query: str, *, meta: Mapping[str, Any] | None = None,
-                         max_results: int = 10_000) -> tuple[list[str], int, list[str]]:
+    async def search_all(
+        self, query: str, *, meta: Mapping[str, Any] | None = None, max_results: int = 10_000
+    ) -> tuple[list[str], int, list[str]]:
         """Every page of a search (up to CirrusSearch's 10,000-result window).
         Returns (QIDs, total hits reported, raw sha256s); total > len(QIDs) means the window was exceeded."""
         out: list[str] = []
@@ -626,18 +698,25 @@ class WikidataClient:
                 break
         return list(dict.fromkeys(out)), total, shas
 
-    async def links_to(self, qid: str, *, meta: Mapping[str, Any] | None = None,
-                       max_pages: int = 40) -> tuple[list[str], list[str]]:
+    async def links_to(
+        self, qid: str, *, meta: Mapping[str, Any] | None = None, max_pages: int = 40
+    ) -> tuple[list[str], list[str]]:
         """Items (namespace 0) linking to ``qid`` — Special:WhatLinksHere page views (5,000 per page), used to
         discover candidates when the action API is saturated. Candidates only: callers check the items' claims."""
         out: list[str] = []
         shas: list[str] = []
         frm = 0
         for _ in range(max_pages):
-            url = (f"https://www.wikidata.org/w/index.php?title=Special:WhatLinksHere/{qid}&namespace=0&limit=5000"
-                   + (f"&from={frm}&back=0" if frm else ""))
-            result, sha = await self._request(self.wbapi_http, url, endpoint="pages", accept="text/html",
-                                              meta={"kind": "whatlinkshere", "target": qid, "from": frm, **(meta or {})})
+            url = f"https://www.wikidata.org/w/index.php?title=Special:WhatLinksHere/{qid}&namespace=0&limit=5000" + (
+                f"&from={frm}&back=0" if frm else ""
+            )
+            result, sha = await self._request(
+                self.wbapi_http,
+                url,
+                endpoint="pages",
+                accept="text/html",
+                meta={"kind": "whatlinkshere", "target": qid, "from": frm, **(meta or {})},
+            )
             shas.append(sha)
             html = result.body.decode("utf-8", "replace")
             out.extend(re.findall(r'<li>(?:<bdi[^>]*>)?<a href="/wiki/(Q[0-9]+)"', html))
@@ -647,15 +726,20 @@ class WikidataClient:
             frm = int(nxt.group(1))
         return [q for q in dict.fromkeys(out) if q != qid], shas
 
-    async def _api_chunk(self, chunk: Sequence[str], props: Sequence[str], languages: Sequence[str],
-                         meta: Mapping[str, Any] | None) -> tuple[dict[str, Any], list[str], dict[str, str], str, int,
-                                                                  datetime] | None:
+    async def _api_chunk(
+        self, chunk: Sequence[str], props: Sequence[str], languages: Sequence[str], meta: Mapping[str, Any] | None
+    ) -> tuple[dict[str, Any], list[str], dict[str, str], str, int, datetime] | None:
         """One wbgetentities call without retry (auto mode); None when the answer cannot be used."""
         url = self.entities_url(chunk, props, languages)
         try:
-            result, sha = await self._request(self.wbapi_http, url, endpoint="wbapi", accept="application/json",
-                                              meta={"kind": "wbgetentities", "ids": list(chunk), "props": list(props),
-                                                    **(meta or {})}, max_retries=0)
+            result, sha = await self._request(
+                self.wbapi_http,
+                url,
+                endpoint="wbapi",
+                accept="application/json",
+                meta={"kind": "wbgetentities", "ids": list(chunk), "props": list(props), **(meta or {})},
+                max_retries=0,
+            )
         except UnsafeRequest:
             return None
         doc = _json(result.body)
@@ -676,15 +760,28 @@ class WikidataClient:
 
     # -- wbgetentities -----------------------------------------------------------------------------
     @staticmethod
-    def entities_url(ids: Sequence[str], props: Sequence[str] = ENTITY_PROPS,
-                     languages: Sequence[str] = LANGUAGES) -> str:
-        params = {"action": "wbgetentities", "ids": "|".join(ids), "props": "|".join(props),
-                  "languages": "|".join(languages), "format": "json", "maxlag": "5"}
+    def entities_url(
+        ids: Sequence[str], props: Sequence[str] = ENTITY_PROPS, languages: Sequence[str] = LANGUAGES
+    ) -> str:
+        params = {
+            "action": "wbgetentities",
+            "ids": "|".join(ids),
+            "props": "|".join(props),
+            "languages": "|".join(languages),
+            "format": "json",
+            "maxlag": "5",
+        }
         return f"{WBAPI_URL}?{urlencode(params, safe='|')}"
 
-    async def get_entities(self, ids: Iterable[str], *, props: Sequence[str] = ENTITY_PROPS,
-                           languages: Sequence[str] = LANGUAGES, batch_size: int = MAX_IDS_PER_CALL,
-                           meta: Mapping[str, Any] | None = None) -> EntitiesResult:
+    async def get_entities(
+        self,
+        ids: Iterable[str],
+        *,
+        props: Sequence[str] = ENTITY_PROPS,
+        languages: Sequence[str] = LANGUAGES,
+        batch_size: int = MAX_IDS_PER_CALL,
+        meta: Mapping[str, Any] | None = None,
+    ) -> EntitiesResult:
         """Snapshots of ``ids`` (≤ 50 per call). Oversized responses are retried in halves."""
         todo = sorted({i for i in ids if i}, key=_id_sort_key)
         entities: dict[str, dict[str, Any]] = {}
@@ -717,7 +814,7 @@ class WikidataClient:
             todo = live
         if self.mode in ("linked_data", "hybrid"):
             batch_size = 1
-        queue: list[list[str]] = [todo[i:i + batch_size] for i in range(0, len(todo), batch_size)]
+        queue: list[list[str]] = [todo[i : i + batch_size] for i in range(0, len(todo), batch_size)]
         if self.mode == "auto":
             per_entity: list[list[str]] = []
             for chunk in queue:
@@ -749,8 +846,12 @@ class WikidataClient:
                 else:
                     try:
                         result, sha = await self._request(
-                            self.wbapi_http, ENTITYDATA_URL.format(id=eid0), endpoint="entitydata",
-                            accept="application/json", meta={"kind": "entitydata", "ids": [eid0], **(meta or {})})
+                            self.wbapi_http,
+                            ENTITYDATA_URL.format(id=eid0),
+                            endpoint="entitydata",
+                            accept="application/json",
+                            meta={"kind": "entitydata", "ids": [eid0], **(meta or {})},
+                        )
                     except EntityMissing:
                         missing.append(eid0)
                         continue
@@ -770,9 +871,13 @@ class WikidataClient:
             chunk = queue.pop(0)
             url = self.entities_url(chunk, props, languages)
             try:
-                result, sha = await self._request(self.wbapi_http, url, endpoint="wbapi", accept="application/json",
-                                                  meta={"kind": "wbgetentities", "ids": chunk,
-                                                        "props": list(props), **(meta or {})})
+                result, sha = await self._request(
+                    self.wbapi_http,
+                    url,
+                    endpoint="wbapi",
+                    accept="application/json",
+                    meta={"kind": "wbgetentities", "ids": chunk, "props": list(props), **(meta or {})},
+                )
             except UnsafeRequest as e:
                 if "exceeds limit" in e.message and len(chunk) > 1:
                     half = len(chunk) // 2
@@ -786,8 +891,9 @@ class WikidataClient:
             doc = _json(result.body)
             if "error" in doc:
                 err = doc["error"]
-                raise WikidataError(f"wbgetentities error {err.get('code')}: {str(err.get('info'))[:200]}",
-                                    api_code=err.get("code"))
+                raise WikidataError(
+                    f"wbgetentities error {err.get('code')}: {str(err.get('info'))[:200]}", api_code=err.get("code")
+                )
             for key, ent in (doc.get("entities") or {}).items():
                 if "missing" in ent:
                     missing.append(key)
@@ -807,8 +913,11 @@ class WikidataClient:
 def _prune(ent: dict[str, Any], props: Sequence[str], languages: Sequence[str]) -> dict[str, Any]:
     """Special:EntityData returns every language and prop: keep what wbgetentities would have returned."""
     keep_lang = set(languages)
-    out = {k: v for k, v in ent.items()
-           if k not in ("labels", "descriptions", "aliases", "claims", "sitelinks") or k in props}
+    out = {
+        k: v
+        for k, v in ent.items()
+        if k not in ("labels", "descriptions", "aliases", "claims", "sitelinks") or k in props
+    }
     for k in ("labels", "descriptions", "aliases"):
         if k in out and isinstance(out[k], dict):
             out[k] = {lang: v for lang, v in out[k].items() if lang in keep_lang}
@@ -906,8 +1015,16 @@ def load_allowlist(path: Path | None = None) -> AllowList:
         pid = p["property"]
         if pid in props:
             raise ValueError(f"duplicate property {pid} in allow-list")
-        props[pid] = PropertyDef(pid, p["reva_predicate"], p.get("inverse"), p["kind"], p.get("group", ""),
-                                 p.get("label_en"), p.get("label_fr"), bool(p.get("symmetric", False)))
+        props[pid] = PropertyDef(
+            pid,
+            p["reva_predicate"],
+            p.get("inverse"),
+            p["kind"],
+            p.get("group", ""),
+            p.get("label_en"),
+            p.get("label_fr"),
+            bool(p.get("symmetric", False)),
+        )
     quals = frozenset(q["property"] for q in doc.get("qualifiers") or [])
     refs = frozenset(r["property"] for r in doc.get("references") or [])
     return AllowList(props, quals | frozenset(TEMPORAL_QUALIFIERS), refs, hashlib.sha256(raw).hexdigest())
@@ -932,8 +1049,15 @@ def datavalue_to_value(snak: Mapping[str, Any]) -> tuple[str, str | None, dict[s
         eid = v.get("id") or (f"Q{v['numeric-id']}" if v.get("entity-type") == "item" else None)
         return "entity", eid, {"id": eid}
     if t == "time" and isinstance(v, dict):
-        return "time", None, {"time": v.get("time"), "precision": v.get("precision"),
-                              "calendar": qid_from_uri(v.get("calendarmodel")) or v.get("calendarmodel")}
+        return (
+            "time",
+            None,
+            {
+                "time": v.get("time"),
+                "precision": v.get("precision"),
+                "calendar": qid_from_uri(v.get("calendarmodel")) or v.get("calendarmodel"),
+            },
+        )
     if t == "quantity" and isinstance(v, dict):
         unit = v.get("unit")
         out = {"amount": v.get("amount"), "unit": None if unit in (None, "1") else (qid_from_uri(unit) or unit)}
@@ -944,8 +1068,16 @@ def datavalue_to_value(snak: Mapping[str, Any]) -> tuple[str, str | None, dict[s
     if t == "monolingualtext" and isinstance(v, dict):
         return "monolingualtext", None, {"text": v.get("text"), "language": v.get("language")}
     if t == "globecoordinate" and isinstance(v, dict):
-        return "coordinate", None, {"lat": v.get("latitude"), "lon": v.get("longitude"),
-                                    "precision": v.get("precision"), "globe": qid_from_uri(v.get("globe"))}
+        return (
+            "coordinate",
+            None,
+            {
+                "lat": v.get("latitude"),
+                "lon": v.get("longitude"),
+                "precision": v.get("precision"),
+                "globe": qid_from_uri(v.get("globe")),
+            },
+        )
     if t == "string":
         kind = {"external-id": "external_id", "url": "url"}.get(str(datatype), "string")
         return kind, None, {"value": v}
@@ -1022,9 +1154,16 @@ def _time_of(snaks: Sequence[Mapping[str, Any]]) -> dict[str, Any] | None:
     return None
 
 
-def extract_entity(raw: Mapping[str, Any], allow: AllowList, *, raw_sha256: str, retrieved_at: datetime,
-                   kind_hint: str | None = None, properties: Iterable[str] | None = None,
-                   source_key: str = SOURCE_WBAPI) -> WdEntity:
+def extract_entity(
+    raw: Mapping[str, Any],
+    allow: AllowList,
+    *,
+    raw_sha256: str,
+    retrieved_at: datetime,
+    kind_hint: str | None = None,
+    properties: Iterable[str] | None = None,
+    source_key: str = SOURCE_WBAPI,
+) -> WdEntity:
     """wbgetentities entity JSON -> :class:`WdEntity` with allow-listed, non-deprecated statements."""
     qid = str(raw["id"])
     rev = raw.get("lastrevid")
@@ -1052,38 +1191,68 @@ def extract_entity(raw: Mapping[str, Any], allow: AllowList, *, raw_sha256: str,
             }
             refs: list[dict[str, list[Any]]] = []
             for ref in c.get("references") or []:
-                compact = {p: [_compact_snak_value(s) for s in snaks]
-                           for p, snaks in (ref.get("snaks") or {}).items() if p in allow.references}
+                compact = {
+                    p: [_compact_snak_value(s) for s in snaks]
+                    for p, snaks in (ref.get("snaks") or {}).items()
+                    if p in allow.references
+                }
                 if compact:
                     refs.append(compact)
             sid = c.get("id")
-            statements.append(WdStatement(
-                subject=qid, property=pid, rank=rank, value_kind=kind, object_qid=obj, value=value,
-                statement_id=sid, start=temporal["start"], end=temporal["end"],
-                point_in_time=temporal["point_in_time"], qualifiers=qualifiers, references=refs,
-                source_key=source_key, source_revision=int(rev) if rev is not None else None,
-                raw_sha256=raw_sha256, retrieved_at=retrieved_at,
-                selector={"entity": qid, "statement_id": sid, "lastrevid": rev},
-            ))
+            statements.append(
+                WdStatement(
+                    subject=qid,
+                    property=pid,
+                    rank=rank,
+                    value_kind=kind,
+                    object_qid=obj,
+                    value=value,
+                    statement_id=sid,
+                    start=temporal["start"],
+                    end=temporal["end"],
+                    point_in_time=temporal["point_in_time"],
+                    qualifiers=qualifiers,
+                    references=refs,
+                    source_key=source_key,
+                    source_revision=int(rev) if rev is not None else None,
+                    raw_sha256=raw_sha256,
+                    retrieved_at=retrieved_at,
+                    selector={"entity": qid, "statement_id": sid, "lastrevid": rev},
+                )
+            )
     labels = {k: v["value"] for k, v in (raw.get("labels") or {}).items() if isinstance(v, dict)}
     descriptions = {k: v["value"] for k, v in (raw.get("descriptions") or {}).items() if isinstance(v, dict)}
     aliases = {k: [a["value"] for a in v] for k, v in (raw.get("aliases") or {}).items() if isinstance(v, list)}
     sitelinks_raw = raw.get("sitelinks") or {}
-    sitelinks = {str(k): str(v.get("title")) for k, v in sitelinks_raw.items()
-                 if k in SITELINKS_KEPT and isinstance(v, dict) and v.get("title")}
+    sitelinks = {
+        str(k): str(v.get("title"))
+        for k, v in sitelinks_raw.items()
+        if k in SITELINKS_KEPT and isinstance(v, dict) and v.get("title")
+    }
     p31 = tuple(s.object_qid for s in statements if s.property == "P31" and s.object_qid)
     if not p31 and claims_fetched:
         p31 = tuple(
             datavalue_to_value(c.get("mainsnak") or {})[1] or ""
-            for c in (claims or {}).get("P31", []) if c.get("rank") != "deprecated"
+            for c in (claims or {}).get("P31", [])
+            if c.get("rank") != "deprecated"
         )
         p31 = tuple(x for x in p31 if x)
     return WdEntity(
-        qid=qid, kind_hint=kind_hint, labels=labels, descriptions=descriptions, aliases=aliases,
-        sitelinks_count=len(sitelinks_raw), sitelinks=sitelinks,
-        lastrevid=int(rev) if rev is not None else None, modified=raw.get("modified"),
-        instance_of=p31, statements=tuple(statements), raw_sha256=raw_sha256, retrieved_at=retrieved_at,
-        claims_fetched=claims_fetched, dropped=dropped,
+        qid=qid,
+        kind_hint=kind_hint,
+        labels=labels,
+        descriptions=descriptions,
+        aliases=aliases,
+        sitelinks_count=len(sitelinks_raw),
+        sitelinks=sitelinks,
+        lastrevid=int(rev) if rev is not None else None,
+        modified=raw.get("modified"),
+        instance_of=p31,
+        statements=tuple(statements),
+        raw_sha256=raw_sha256,
+        retrieved_at=retrieved_at,
+        claims_fetched=claims_fetched,
+        dropped=dropped,
     )
 
 

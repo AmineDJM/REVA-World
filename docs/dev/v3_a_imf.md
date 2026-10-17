@@ -166,7 +166,8 @@ B) are both present and differ, e.g. 2024 USA imports from CHN = 438.9 bn USD vs
 
 ```python
 from reva.adapters.connectors import atlas_imf
-atlas_imf.register_connector(owner_engine, store)            # once per database
+
+atlas_imf.register_connector(owner_engine, store)  # once per database
 res = await atlas_imf.ingest(worker_engine, store, http, origin="live")
 # res.tables / res.stats / res.raws / res.failures; a failed request leaves its table unregistered
 ```

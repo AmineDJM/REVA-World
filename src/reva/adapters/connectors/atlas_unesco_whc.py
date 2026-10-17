@@ -54,12 +54,29 @@ DATASET = "whc001"
 HOST = "data.unesco.org"
 PARSER_VERSION = "unesco-whc-parse-1"
 CONNECTOR_NAME = "atlas.unesco_whc"
-CONNECTOR_VERSION = "1.0.0"
+# SWEEP2: 1.0.1, `ruff format` changed the module source and so the code digest.
+CONNECTOR_VERSION = "1.0.1"
 
 SELECT_FIELDS: tuple[str, ...] = (
-    "id_no", "name_en", "name_fr", "date_inscribed", "secondary_dates", "danger", "date_end",
-    "danger_list", "cultural_criteria", "natural_criteria", "criteria_txt", "category", "states_names",
-    "iso_codes", "region", "transboundary", "area_hectares", "uuid", "components_count",
+    "id_no",
+    "name_en",
+    "name_fr",
+    "date_inscribed",
+    "secondary_dates",
+    "danger",
+    "date_end",
+    "danger_list",
+    "cultural_criteria",
+    "natural_criteria",
+    "criteria_txt",
+    "category",
+    "states_names",
+    "iso_codes",
+    "region",
+    "transboundary",
+    "area_hectares",
+    "uuid",
+    "components_count",
 )
 METADATA_URL = f"https://{HOST}/api/explore/v2.1/catalog/datasets/{DATASET}"
 EXPORT_URL = f"https://{HOST}/api/explore/v2.1/catalog/datasets/{DATASET}/exports/json?select=" + ",".join(
@@ -271,8 +288,9 @@ def unmapped(props: Iterable[WhProperty]) -> list[dict[str, Any]]:
     out = []
     for p in props:
         if not p.iso2:
-            out.append({"id_no": p.id_no, "name_en": p.name_en, "states_names": list(p.states_names),
-                        "reason": "no_iso_code"})
+            out.append(
+                {"id_no": p.id_no, "name_en": p.name_en, "states_names": list(p.states_names), "reason": "no_iso_code"}
+            )
         for c in p.iso2:
             if country_iso3(c, "iso2") is None:
                 out.append({"id_no": p.id_no, "name_en": p.name_en, "iso2": c, "reason": "iso2_not_in_crosswalk"})
@@ -341,20 +359,46 @@ def atlas_rows(
         plist = by_geo[geo]
         for indicator, (concept, pred) in SNAPSHOT_INDICATORS.items():
             ids = sorted((p.id_no for p in plist if pred(p)), key=int)
-            rows.append(_row(indicator, concept, geo, snap, len(ids), raw_sha256,
-                             {"dataset": DATASET, "geo": geo, "filter": indicator, "id_no": ids}, base_flags))
+            rows.append(
+                _row(
+                    indicator,
+                    concept,
+                    geo,
+                    snap,
+                    len(ids),
+                    raw_sha256,
+                    {"dataset": DATASET, "geo": geo, "filter": indicator, "id_no": ids},
+                    base_flags,
+                )
+            )
         per_year: Counter[int] = Counter(p.inscribed_year for p in plist)
         for year in sorted(per_year):
             ids = sorted((p.id_no for p in plist if p.inscribed_year == year), key=int)
-            rows.append(_row(YEARLY_INDICATOR[0], YEARLY_INDICATOR[1], geo,
-                             (date(year, 1, 1), date(year + 1, 1, 1)), per_year[year], raw_sha256,
-                             {"dataset": DATASET, "geo": geo, "field": "date_inscribed", "year": year, "id_no": ids},
-                             {**base_flags, "counts_only_properties_on_list_at_revision": True}))
+            rows.append(
+                _row(
+                    YEARLY_INDICATOR[0],
+                    YEARLY_INDICATOR[1],
+                    geo,
+                    (date(year, 1, 1), date(year + 1, 1, 1)),
+                    per_year[year],
+                    raw_sha256,
+                    {"dataset": DATASET, "geo": geo, "field": "date_inscribed", "year": year, "id_no": ids},
+                    {**base_flags, "counts_only_properties_on_list_at_revision": True},
+                )
+            )
     return rows
 
 
-def _row(indicator: str, concept: str, geo: str, period: tuple[date, date], n: int, raw_sha256: str,
-         selector: dict[str, Any], flags: dict[str, Any]) -> dict[str, Any]:
+def _row(
+    indicator: str,
+    concept: str,
+    geo: str,
+    period: tuple[date, date],
+    n: int,
+    raw_sha256: str,
+    selector: dict[str, Any],
+    flags: dict[str, Any],
+) -> dict[str, Any]:
     return {
         "source": ATLAS_SOURCE,
         "dataset": ATLAS_DATASET,
@@ -434,17 +478,20 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         raise WhcParseError("; ".join(problems), retryable=False, kind="incomplete")
     meta_sha = run.archive(raw_meta)
     export_sha = run.archive(raw_export)
-    rows = atlas_rows(props, raw_sha256=export_sha, source_revision=str(meta["modified"]),
-                      retrieved_at=raw_export.retrieved_at)
+    rows = atlas_rows(
+        props, raw_sha256=export_sha, source_revision=str(meta["modified"]), retrieved_at=raw_export.retrieved_at
+    )
     out = run.register(
         dataset=ATLAS_DATASET,
         frame=atlas_frame(rows),
         raw_sha256s=[meta_sha, export_sha],
         geo_scheme="iso2",
         rights=dict(RIGHTS),
-        coverage_note=(f"UNESCO World Heritage List (whc001, revision {meta['modified']}): {len(props)} properties; "
-                       "counts per State Party; properties removed from the List are absent; a property without "
-                       "a State Party code is kept as an unmapped geography"),
+        coverage_note=(
+            f"UNESCO World Heritage List (whc001, revision {meta['modified']}): {len(props)} properties; "
+            "counts per State Party; properties removed from the List are absent; a property without "
+            "a State Party code is kept as an unmapped geography"
+        ),
     )
     return {
         "source_revision": meta["modified"],

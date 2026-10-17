@@ -36,14 +36,16 @@ Helpers: `year_period(y)`, `missing_flags(reason, **extra)`, `json_obj(**kw)`, `
 from reva.atlas.tables import register_atlas_table, country_iso3, year_period, json_obj, missing_flags
 
 summary = register_atlas_table(
-    worker_engine, store,
-    source="wb", dataset="wdi",
-    frame=df,                       # polars.DataFrame in ATLAS_SCHEMA
-    raw_sha256s=[raw_sha],          # every raw artifact used; each must be an evidence.acquisition
+    worker_engine,
+    store,
+    source="wb",
+    dataset="wdi",
+    frame=df,  # polars.DataFrame in ATLAS_SCHEMA
+    raw_sha256s=[raw_sha],  # every raw artifact used; each must be an evidence.acquisition
     parser_version="atlas_wb_wdi/1",
-    origin="live",                  # or "test_fixture" (tests)
+    origin="live",  # or "test_fixture" (tests)
     coverage_note="WDI bulk CSV; 217 economies + 49 aggregates (aggregates unmapped, kept)",
-    geo_scheme="wb",                # optional: map provider_geo -> iso3 through the crosswalk
+    geo_scheme="wb",  # optional: map provider_geo -> iso3 through the crosswalk
 )
 # -> {dataset_id, dataset_key "atlas.wb.wdi", artifact_sha256, manifest_sha256, row_count,
 #     created, unmapped_provider_geo [{provider_geo, rows}], coverage {...}}
@@ -146,30 +148,37 @@ atlas connectors are **not** `builtin_connectors()`. Instead (`src/reva/atlas/so
 # src/reva/adapters/connectors/atlas_imf.py  (discovered by module name: atlas_*.py, nothing to register)
 from reva.atlas.sources import AtlasSourceSpec
 
-def atlas_source() -> AtlasSourceSpec:          # or a list of specs (only this function name counts)
+
+def atlas_source() -> AtlasSourceSpec:  # or a list of specs (only this function name counts)
     return AtlasSourceSpec(
-        name="atlas.imf", version="1.0.0",       # connector name (atlas.*) + version (bump on change)
-        source_key="imf.sdmx",                   # registry/sources/*.yaml key (also the budget key)
-        atlas_source="imf",                      # atlas table `source` (no dots)
-        provider="International Monetary Fund", licence="...",
-        allowed_hosts=("api.imf.org",), datasets=("weo", "bop"), dataset_ids=("IMF.RES:WEO",),
+        name="atlas.imf",
+        version="1.0.0",  # connector name (atlas.*) + version (bump on change)
+        source_key="imf.sdmx",  # registry/sources/*.yaml key (also the budget key)
+        atlas_source="imf",  # atlas table `source` (no dots)
+        provider="International Monetary Fund",
+        licence="...",
+        allowed_hosts=("api.imf.org",),
+        datasets=("weo", "bop"),
+        dataset_ids=("IMF.RES:WEO",),
         cadence_seconds=30 * 86400,
-        planned_requests=40,                     # reserved before the run; extra requests are topped up or refused
-        max_response_bytes=300_000_000,          # <= 1 GiB per response (bulk files); daily bytes still apply
-        min_interval_seconds=1.0,                # politeness per host
-        parser_version="atlas_imf/1", code_digest="sha256:...",  # optional
-        budget_key="",                           # default = source_key; set to share another source's budget
+        planned_requests=40,  # reserved before the run; extra requests are topped up or refused
+        max_response_bytes=300_000_000,  # <= 1 GiB per response (bulk files); daily bytes still apply
+        min_interval_seconds=1.0,  # politeness per host
+        parser_version="atlas_imf/1",
+        code_digest="sha256:...",  # optional
+        budget_key="",  # default = source_key; set to share another source's budget
     )
 
-async def atlas_ingest(run) -> dict:             # run: reva.atlas.ingest.AtlasRun
+
+async def atlas_ingest(run) -> dict:  # run: reva.atlas.ingest.AtlasRun
     for ds in ("weo", "bop"):
-        if not run.wants(ds):                    # honours --dataset
+        if not run.wants(ds):  # honours --dataset
             continue
         raw = await run.get(url, key=f"{ds}:2025-10", media_types=("application/xml",), headers={...})
-        sha = run.archive(raw)                   # evidence.acquisition of connector atlas.imf@1.0.0
-        frame = parse(raw.body, sha)             # polars frame in ATLAS_SCHEMA
+        sha = run.archive(raw)  # evidence.acquisition of connector atlas.imf@1.0.0
+        frame = parse(raw.body, sha)  # polars frame in ATLAS_SCHEMA
         run.register(dataset=ds, frame=frame, raw_sha256s=[sha], geo_scheme="iso3", coverage_note="...")
-    return {"datasets": [...]}                   # anything JSON-able
+    return {"datasets": [...]}  # anything JSON-able
 ```
 
 * **Never build an HTTP client in an atlas module.** `run.http` (and `run.get`) is the

@@ -48,7 +48,9 @@ from reva.ports.connectors import (
 )
 
 CONNECTOR_NAME = "atlas.cckp_climatology"
-CONNECTOR_VERSION = "1.0.1"  # ATLASOPS: patch bump, code changed after 1.0.0 was registered in the dev DB (TWNMAP/agent edits)
+# ATLASOPS: 1.0.1, code changed after 1.0.0 was registered in the dev DB (TWNMAP/agent edits).
+# SWEEP2: 1.0.2, `ruff format` changed the module source and so the code digest.
+CONNECTOR_VERSION = "1.0.2"
 SOURCE_KEY = "worldbank.cckp"
 PARSER_VERSION = "atlas-cckp-climatology/1"
 ATLAS_SOURCE = "cckp"

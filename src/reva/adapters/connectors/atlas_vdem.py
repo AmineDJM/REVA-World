@@ -72,7 +72,9 @@ from reva.ports.connectors import FetchItem, RawAcquisition
 SOURCE = "vdem"
 SOURCE_KEY = "vdem.vdemdata"
 CONNECTOR_NAME = "atlas.vdem"
-CONNECTOR_VERSION = "1.0.1"  # ATLASOPS: patch bump, code changed after 1.0.0 was registered in the dev DB (TWNMAP/agent edits)
+# ATLASOPS: 1.0.1, code changed after 1.0.0 was registered in the dev DB (TWNMAP/agent edits).
+# SWEEP2: 1.0.2, `ruff format` changed the module source and so the code digest.
+CONNECTOR_VERSION = "1.0.2"
 PARSER_VERSION = "atlas_vdem/1"
 HOST = "raw.githubusercontent.com"
 BASE_URL = f"https://{HOST}/vdeminstitute/vdemdata/master"

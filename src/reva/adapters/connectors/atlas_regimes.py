@@ -54,7 +54,9 @@ from reva.ports.connectors import FetchItem, RawAcquisition
 
 LIED_CONNECTOR = "atlas.lied"
 BMR_CONNECTOR = "atlas.bmr"
-CONNECTOR_VERSION = "1.0.1"  # ATLASOPS: patch bump, code changed after 1.0.0 was registered in the dev DB (TWNMAP/agent edits)
+# ATLASOPS: 1.0.1, code changed after 1.0.0 was registered in the dev DB (TWNMAP/agent edits).
+# SWEEP2: 1.0.2, `ruff format` changed the module source and so the code digest.
+CONNECTOR_VERSION = "1.0.2"
 PARSER_VERSION = "atlas_regimes/1"
 DATAVERSE = "dataverse.harvard.edu"
 S3_HOST = "dvn-cloud-iqss.s3.amazonaws.com"  # Dataverse /api/access redirects (303) to signed S3 URLs
