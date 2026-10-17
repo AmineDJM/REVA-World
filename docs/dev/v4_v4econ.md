@@ -168,6 +168,9 @@ flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.imf_hf
 # the lead then runs: reva atlas snapshot --skip-unchanged ; reva links materialise
 ```
 
+Note: the connector code digests include `atlas_fiscal_common.py` (all five) and `atlas_imf.py` (`atlas.imf_hf`);
+if either changes, `run_atlas_ingest` refuses the run until the V4ECON connector version is bumped and re-seeded.
+
 Check after loading: `SELECT property_pid, count(*) FROM kg.statement_current WHERE source_key IN
 ('eurostat.dissemination','oecd.sdmx') AND (property_pid LIKE 'nuts:%' OR property_pid LIKE 'oecdreg:%' OR
 property_pid = 'econ:measured_by') GROUP BY 1;`
