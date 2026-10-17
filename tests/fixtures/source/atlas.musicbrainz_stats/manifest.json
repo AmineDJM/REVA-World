@@ -2,8 +2,8 @@
   {
     "request_fingerprint": "bffcd958874ecf550684a1f2faa93a1e7a9abc9892120536541d05e6a70384d8",
     "url": "https://musicbrainz.org/statistics/countries",
-    "file": "bffcd958874ecf55.html",
-    "sha256": "1c2cc70b385029e508244c1dff1d0b6d9fa2f6a5430389898c287609a6caa3f4",
+    "file": "trimmed_4c2022c982ad67a2.html",
+    "sha256": "4c2022c982ad67a288ba48521fe44d99a60a7acf4973980308244db3e6094d25",
     "status": 200,
     "headers": {
       "content-type": "text/html; charset=utf-8"
@@ -11,13 +11,13 @@
     "retrieved_at": "2026-10-17T16:33:01.003901+00:00",
     "licence": "CC0-1.0 (MusicBrainz core data counts)",
     "excerpt_of_sha256": "4798cfeb4b5edad2962caf69ecd17cb7f8498b26a8afd42d64b28d3a6b034b67",
-    "note": "EXCERPT: the live page with only the table rows of ['AN', 'BR', 'CN', 'CS', 'DE', 'FR', 'GB', 'IN', 'JP', 'KI', 'NG', 'PS', 'PT', 'SU', 'TK', 'TW', 'US', 'XC', 'XE', 'XG', 'XK', 'XW', 'YU', 'null'] kept verbatim (all other <tr> rows removed); tests parse it with full=False; all 12 <script> elements removed (they embed a third-party Mapbox access token; the parser reads only the tables and the 'Last updated' text)"
+    "note": "TRIMMED EXCERPT of the live page (excerpt_of_sha256 = sha256 of the full live response): only the 'Last updated' line and the id'd statistics tables are kept, with the table rows of the codes listed in the tests copied verbatim; page head, navigation and all <script> elements (the live page embeds a third-party Mapbox token) are removed; tests parse it with full=False"
   },
   {
     "request_fingerprint": "20c574f6bc02d13ffde7f9bc48bd17dd684478b4f5b011149bc0493dc9204ee1",
     "url": "https://musicbrainz.org/statistics/languages-scripts",
-    "file": "20c574f6bc02d13f.html",
-    "sha256": "b7b119a677fa4580e299606d343a7f9349bc700e09745ab25756e20576a541ca",
+    "file": "trimmed_d5d19abe4f7326c0.html",
+    "sha256": "d5d19abe4f7326c060c9853d408b8a4ea04e2ef8395c1bbe8c3ba5f40aee0695",
     "status": 200,
     "headers": {
       "content-type": "text/html; charset=utf-8"
@@ -25,6 +25,6 @@
     "retrieved_at": "2026-10-17T16:33:03.458586+00:00",
     "licence": "CC0-1.0 (MusicBrainz core data counts)",
     "excerpt_of_sha256": "4d2afe5fba6d2c2731d6b43334af4fc3f4ab0823bb034cc3952a18c5e19cde62",
-    "note": "EXCERPT: the live page with only the table rows of ['Arab', 'Cyrl', 'Jpan', 'Latn', 'Qaaa', 'ara', 'eng', 'fan', 'fra', 'jpn', 'mul', 'null', 'por', 'spa', 'swa', 'zxx'] kept verbatim (all other <tr> rows removed); tests parse it with full=False; all 12 <script> elements removed (they embed a third-party Mapbox access token; the parser reads only the tables and the 'Last updated' text)"
+    "note": "TRIMMED EXCERPT of the live page (excerpt_of_sha256 = sha256 of the full live response): only the 'Last updated' line and the id'd statistics tables are kept, with the table rows of the codes listed in the tests copied verbatim; page head, navigation and all <script> elements (the live page embeds a third-party Mapbox token) are removed; tests parse it with full=False"
   }
 ]
