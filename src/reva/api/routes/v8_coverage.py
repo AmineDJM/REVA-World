@@ -18,6 +18,7 @@ from reva.api.auth import require_scope
 from reva.api.deps import read_conn
 from reva.api.errors import NotFound
 from reva.v8.coverage import service as svc
+from reva.v8.coverage.pending import PendingRegistry
 
 router = APIRouter(prefix="/v1/v8/coverage", tags=["v8-coverage"], dependencies=[Depends(require_scope("read"))])
 
@@ -136,7 +137,7 @@ def _cov() -> svc.Coverage:
         ) from e
 
 
-def _pending() -> svc.PendingRegistry:
+def _pending() -> PendingRegistry:
     reg = svc.safe_pending()
     if reg is None:
         raise NotFound("registry/coverage/pending.yaml is invalid (run `uv run reva v8 coverage check-pending`)")
@@ -153,9 +154,7 @@ def coverage_matrix(
 
 
 @router.get("/domains/{domain}", response_model=DomainDetail, summary="One domain: tables, countries, KG kinds, gaps")
-def coverage_domain(
-    domain: str = Path(pattern="^[a-z_]{2,40}$"), conn: Connection = Depends(read_conn)
-) -> Any:
+def coverage_domain(domain: str = Path(pattern="^[a-z_]{2,40}$"), conn: Connection = Depends(read_conn)) -> Any:
     c = _cov()
     if domain not in c.domain_ids:
         raise NotFound("unknown coverage domain", domain=domain, known=c.domain_ids)

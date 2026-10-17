@@ -176,6 +176,6 @@ def observe(item: Item, acquisitions: Mapping[str, Mapping[str, Any]], tables: I
                 "met": ok_v and not missing,
             }
         )
-    met = sum(r["met"] for r in rows)
+    met = sum(1 for r in rows if r["met"])
     state = "done" if met == len(rows) else ("partial" if met else "not_seen")
     return {"state": state, "checks": rows}

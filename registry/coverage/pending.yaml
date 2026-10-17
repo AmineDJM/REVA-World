@@ -38,10 +38,10 @@ items:
     disk_mb: 55
     source_docs: [docs/dev/v6_politics.md, lead:final4_todo]
     check:
-      - {connector: atlas.parlgov_cabinets}
-      - {connector: atlas.nelda}
-      - {connector: atlas.whogov}
-      - {connector: atlas.oxcgrt}
+      - {connector: atlas.parlgov_cabinets, tables: [atlas.parlgov.cabinets]}
+      - {connector: atlas.nelda, tables: [atlas.nelda.elections_cy]}
+      - {connector: atlas.whogov, tables: [atlas.whogov.cabinet_cy]}
+      - {connector: atlas.oxcgrt, tables: [atlas.oxcgrt.indices_daily]}
       - {connector: atlas.bis_cbpol_changes, tables: [atlas.bis.cbpol_d_changes]}
       - {connector: atlas.oecd_cit_changes, tables: [atlas.oecd.cts_cit_changes]}
   - id: load.v6signals.gdelt
@@ -64,8 +64,8 @@ items:
     disk_mb: 95
     source_docs: [docs/dev/v6_signals.md, lead:final4_todo]
     check:
-      - {connector: atlas.gdelt_events}
-      - {connector: atlas.gdelt_doc}
+      - {connector: atlas.gdelt_events, tables: [atlas.gdelt.events_cd]}
+      - {connector: atlas.gdelt_doc, tables: [atlas.gdelt.doc_theme_d]}
   - id: load.v4eco.pending
     type: load
     kind: disk
@@ -86,7 +86,7 @@ items:
     disk_mb: 20
     source_docs: [docs/dev/v4_v4eco.md, docs/dev/v6_opsload.md, lead:final4_todo]
     check:
-      - {connector: atlas.gbif_occ}
+      - {connector: atlas.gbif_occ, tables: [atlas.gbif_occ.country_year]}
       - {connector: atlas.un_sdg, min_version: 1.1.1}
       - {connector: atlas.owid, min_version: 1.1.1, tables: [atlas.owid.g_living_planet_index]}
       - {connector: atlas.fao, min_version: 1.0.3, tables: [atlas.fao.qcl]}
@@ -108,9 +108,7 @@ items:
     status: queued
     disk_mb: 10
     source_docs: [docs/dev/v6_opsload.md, docs/dev/v5_pred_engine.md, lead:final4_todo]
-    check:
-      - {connector: eurostat.demography}
-      - {connector: eurostat.labour_pensions}
+    # no automatic check: a partial demography run (cursor) is an acquisition too; completion = FRA covered.
   - id: load.v6migration
     type: load
     kind: disk
@@ -131,9 +129,9 @@ items:
     disk_mb: 20
     source_docs: [docs/dev/v6_migration.md, lead:final4_todo]
     check:
-      - {connector: atlas.idmc_national}
-      - {connector: atlas.unhcr_asylum}
-      - {connector: atlas.iom_mmp}
+      - {connector: atlas.idmc_national, tables: [atlas.idmc.gidd_national]}
+      - {connector: atlas.unhcr_asylum, tables: [atlas.unhcr.asylum_applications]}
+      - {connector: atlas.iom_mmp, tables: [atlas.iom.mmp_monthly]}
       - {connector: atlas.eurostat_asylum, tables: [atlas.eurostat.asylum_applicants_m]}
   - id: load.v6infra
     type: load
@@ -155,10 +153,10 @@ items:
     disk_mb: 67
     source_docs: [docs/dev/v6_infra.md, lead:final4_todo]
     check:
-      - {connector: atlas.unlocode}
-      - {connector: atlas.imf_portwatch}
+      - {connector: atlas.unlocode, tables: [atlas.unlocode.locations]}
+      - {connector: atlas.imf_portwatch, tables: [atlas.portwatch.country_monthly]}
       - {connector: atlas.nga_wpi, min_version: 1.1.1}
-      - {connector: atlas.rcs_dem}
+      - {connector: atlas.rcs_dem, tables: [atlas.rcs.dem2]}
   - id: load.v6culture
     type: load
     kind: disk
@@ -179,9 +177,9 @@ items:
     disk_mb: 6
     source_docs: [docs/dev/v6_culture.md, lead:final4_todo]
     check:
-      - {connector: atlas.openlibrary_subjects}
-      - {connector: atlas.uis_culture}
-      - {connector: atlas.olympics_medals}
+      - {connector: atlas.openlibrary_subjects, tables: [atlas.openlibrary.subjects]}
+      - {connector: atlas.uis_culture, tables: [atlas.uis.culture]}
+      - {connector: atlas.olympics_medals, tables: [atlas.olympics.medal_tables]}
   - id: load.v6digital
     type: load
     kind: disk
@@ -199,8 +197,8 @@ items:
     disk_mb: 5
     source_docs: [docs/dev/v6_digital.md, lead:final4_todo]
     check:
-      - {connector: atlas.keepiton}
-      - {connector: atlas.cfr_cyber}
+      - {connector: atlas.keepiton, tables: [atlas.keepiton.shutdowns_cy]}
+      - {connector: atlas.cfr_cyber, tables: [atlas.cfr_cyber.sponsor_year]}
   - id: load.fix4a.reruns
     type: load
     kind: disk
@@ -244,10 +242,10 @@ items:
     disk_mb: 137
     source_docs: [docs/dev/v6_agri.md, lead:final4_todo]
     check:
-      - {connector: atlas.ifpri_er}
-      - {connector: atlas.usda_psd}
-      - {connector: atlas.usda_wasde}
-      - {connector: atlas.fao_tm}
+      - {connector: atlas.ifpri_er, tables: [atlas.ifpri_er.measures]}
+      - {connector: atlas.usda_psd, tables: [atlas.usda_psd.grains]}
+      - {connector: atlas.usda_wasde, tables: [atlas.usda_wasde.wasde]}
+      - {connector: atlas.fao_tm, tables: [atlas.fao_tm.tm_staples_asia]}
   - id: load.v6findata
     type: load
     kind: disk
@@ -267,10 +265,10 @@ items:
     disk_mb: 59
     source_docs: [docs/dev/v6_findata.md, lead:final4_todo]
     check:
-      - {connector: atlas.bis_fin}
-      - {connector: atlas.bis_fin_bulk}
-      - {connector: atlas.ecb_fin}
-      - {connector: atlas.frb_h41}
+      - {connector: atlas.bis_fin, tables: [atlas.bis.lbs_rep]}
+      - {connector: atlas.bis_fin_bulk, tables: [atlas.bis.gli]}
+      - {connector: atlas.ecb_fin, tables: [atlas.ecb.yc_d]}
+      - {connector: atlas.frb_h41, tables: [atlas.frb.h41_w]}
   - id: load.fix6.ucdp
     type: load
     kind: disk
@@ -355,7 +353,7 @@ items:
     disk_mb: 1
     source_docs: [docs/dev/v6_drugs.md, lead:final4_todo]
     check:
-      - {connector: atlas.ctgov}
+      - {connector: atlas.ctgov, tables: [atlas.ctgov.studies_by_country]}
   - id: load.v6tradehf
     type: load
     kind: disk
@@ -374,8 +372,8 @@ items:
     disk_mb: 70
     source_docs: [docs/dev/v6_trade_hf.md]
     check:
-      - {connector: atlas.imf_imts_m}
-      - {connector: atlas.eurostat_comext}
+      - {connector: atlas.imf_imts_m, tables: [atlas.imf.imts_m]}
+      - {connector: atlas.eurostat_comext, tables: [atlas.eurostat.comext_hs2_m]}
   - id: load.v4bio.vertebrates
     type: load
     kind: disk

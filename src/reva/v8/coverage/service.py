@@ -130,7 +130,11 @@ def columns(c: Coverage, level: str) -> list[dict[str, Any]]:
                 "region": p["region"],
                 "subregion": p["subregion"],
                 "countries": 1,
-                **({"placement": "reva", "placement_basis": p.get("placement_basis")} if p["placement"] == "reva" else {}),
+                **(
+                    {"placement": "reva", "placement_basis": p.get("placement_basis")}
+                    if p["placement"] == "reva"
+                    else {}
+                ),
             }
             for p in ps
         ]
@@ -264,8 +268,21 @@ def domain_detail(c: Coverage, domain: str, pending: PendingRegistry | None, obs
         if n:
             kinds.append({"kind": k["kind"], "entities": n, "sources": k["sources"], "last_recorded_at": k.get("last")})
     connectors = [
-        {k: x[k] for k in ("name", "atlas_source", "provider", "licence", "tables_expected", "tables_loaded",
-                           "acquired", "last_retrieved_at", "cadence_seconds", "version")}
+        {
+            k: x[k]
+            for k in (
+                "name",
+                "atlas_source",
+                "provider",
+                "licence",
+                "tables_expected",
+                "tables_loaded",
+                "acquired",
+                "last_retrieved_at",
+                "cadence_seconds",
+                "version",
+            )
+        }
         for x in c.doc["connectors"]
         if x.get("domain") == domain
     ]
@@ -293,9 +310,29 @@ def domain_detail(c: Coverage, domain: str, pending: PendingRegistry | None, obs
 
 def _table_out(t: dict[str, Any]) -> dict[str, Any]:
     keep = (
-        "key", "source", "dataset", "domain", "domain_basis", "rows", "indicators", "countries", "rows_without_country",
-        "period_min", "period_max", "latest_past_year", "future_rows", "recorded_at", "first_recorded_at", "versions",
-        "last_fetch_at", "cadence_seconds", "licence", "licence_class", "coverage_note", "missing_cells", "read_error",
+        "key",
+        "source",
+        "dataset",
+        "domain",
+        "domain_basis",
+        "rows",
+        "indicators",
+        "countries",
+        "rows_without_country",
+        "period_min",
+        "period_max",
+        "latest_past_year",
+        "future_rows",
+        "recorded_at",
+        "first_recorded_at",
+        "versions",
+        "last_fetch_at",
+        "cadence_seconds",
+        "licence",
+        "licence_class",
+        "coverage_note",
+        "missing_cells",
+        "read_error",
     )
     out = {k: t.get(k) for k in keep}
     out["overdue"] = _overdue(t)
@@ -340,8 +377,11 @@ def country_detail(c: Coverage, iso3: str, pending: PendingRegistry | None) -> d
         )
     tables.sort(key=lambda x: (x["domain"], -x["rows"]))
     kinds = sorted(
-        ({"kind": k, "entities": v[iso3]} for k, v in ((c.doc.get("kg") or {}).get("kind_countries") or {}).items()
-         if v.get(iso3)),
+        (
+            {"kind": k, "entities": v[iso3]}
+            for k, v in ((c.doc.get("kg") or {}).get("kind_countries") or {}).items()
+            if v.get(iso3)
+        ),
         key=lambda x: -x["entities"],
     )
     return {
@@ -385,7 +425,7 @@ def freshness(c: Coverage) -> dict[str, Any]:
                         "cadence_seconds": t["cadence_seconds"],
                         "overdue": _overdue(t),
                     }
-                    for t in sorted(ts, key=lambda t: (t["latest_past_year"] or -99999), reverse=True)
+                    for t in sorted(ts, key=lambda t: t["latest_past_year"] or -99999, reverse=True)
                 ],
             }
         )
@@ -418,7 +458,7 @@ def observations(conn: Connection, reg: PendingRegistry, origin: str = "live") -
         for r in conn.execute(text(ACQ_SQL), {"o": origin, "names": names}).mappings()
     }
     tabs = {r[0] for r in conn.execute(text(TABLES_SQL), {"o": origin, "keys": keys})}
-    out = {i.id: observe(i, acq, tabs) for i in reg.items}
+    out: dict[str, Any] = {i.id: observe(i, acq, tabs) for i in reg.items}
     out["_checked_at"] = datetime.now(UTC).isoformat()
     with _LOCK:
         _OBS[key] = (now, out)
@@ -426,7 +466,7 @@ def observations(conn: Connection, reg: PendingRegistry, origin: str = "live") -
 
 
 def _item(i: Any, obs: dict[str, Any]) -> dict[str, Any]:
-    d = i.model_dump(mode="json")
+    d: dict[str, Any] = i.model_dump(mode="json")
     d["kind_label"] = KIND_FR[i.kind]
     d["observed"] = obs.get(i.id)
     return d
@@ -439,8 +479,13 @@ def pending_view(reg: PendingRegistry, obs: dict[str, Any], type_: str) -> dict[
         g = [x for x in items if x["kind"] == k]
         if g:
             groups.append({"kind": k, "label": KIND_FR[k], "items": g})
-    open_loads = [x for x in items if x["type"] == "load" and (x["observed"] or {}).get("state") != "done"
-                  and x["status"] not in ("done", "dropped")]
+    open_loads = [
+        x
+        for x in items
+        if x["type"] == "load"
+        and (x["observed"] or {}).get("state") != "done"
+        and x["status"] not in ("done", "dropped")
+    ]
     return {
         "type": type_,
         "updated": reg.updated,

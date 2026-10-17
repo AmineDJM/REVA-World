@@ -10,14 +10,15 @@ committed before W3 was run). Result files: `docs/dev/v7_beat_energy_result.json
 
 ONE Holm family of **127** pre-registered tests (alpha 0.05, one-sided DM-HLN; points vs STEO's point on absolute
 error; densities vs STEO's *fair* density on CRPS; never point vs density). **Genuine, Holm-significant wins:
-6 + W3 (see §4), all of the *timeliness* kind**: between two STEO releases, REVA's nowcast of the **current month's
+6 of 127, all of the *timeliness* kind**: between two STEO releases, REVA's nowcast of the **current month's
 mean Brent and WTI spot price** from EIA daily prices (conservatively lagged 9 days) beats the latest STEO available at
 that date — Brent MAE −56 % (0.44×), WTI −48 % (0.52×), by the daily nowcast, its combination with STEO and its
 density. This is "REVA, updating weekly with fresher data, beats the latest STEO for the current month", **not**
 "REVA forecasts oil better than EIA": at the STEO's own availability date (offset 0, informational) the same nowcast is
 **worse** than STEO (Brent 1.15×, WTI 1.22×), and for the next month and the month after (h = 1, 2) no test survives
 Holm (best: Brent h1 0.87×, p 0.09; WTI h1 density 0.86×, p 0.022). Henry Hub h0 improves 0.59× but is not
-Holm-significant (p 0.0056). **Bias correction of STEO from its past errors loses** on most of the 8 quantity series
+Holm-significant (p 0.0056); weekly WPSR data (W3) cut the current-month crude-stock error by 35 % (p 0.0043, not
+Holm-significant) and do not help on production. **Bias correction of STEO from its past errors loses** on most of the 8 quantity series
 not used in V6 (STEO significantly better, two-sided p < 0.05 unadjusted, in 14 cells — 12 bias-correction cells (U.S. natural-gas storage, U.S. stocks, consumption) and 2 combination cells);
 combinations of STEO with REVA's AR/seasonal model are neutral to worse (ratios 0.87–1.20; none better after Holm, best COPR_OPEC h3 0.95× p 0.008; 2 cells significantly worse). The single
 formal W2 "win" (bias-corrected non-OPEC liquids h3, p 0.00033) is **void**: its outcome series was redefined
@@ -184,9 +185,25 @@ Bias corrections then move mechanically toward the restated total. Robustness on
 The non-OPEC h3 "win" is therefore declared **void (invalid outcome definition)**, not sealed. The same check shows
 bias correction also loses badly on world and U.S. consumption (1.31–1.64×) — STEO's past errors do not persist.
 
-## 4. W3 — weekly WPSR data (pending section, filled below)
+## 4. W3 — weekly WPSR data (evaluated after the WPSR load; same family of 127)
 
-W3_PLACEHOLDER
+\`atlas.eia_wpsr\` was loaded live after W1/W2 had been run (table \`atlas.eia.wpsr_w\`, 13,392 rows, artifact
+\`cd09f9ae…\`; 7 requests, 1.47 MB raw). W3 code was pinned and committed first (\`w3_addendum.yaml\`, commit
+\`daeabf5\`); its p-values replace the p = 1 placeholders in the same Holm family (digest \`76873f9e…\`). 712 forecasts
+(178 per test), 53 issues each:
+
+| series | h | wpsr_nowcast MAE | STEO MAE | ratio | p (better) | verdict |
+|---|---|---|---|---|---|---|
+| U.S. crude production \`COPRPUS\` (Mb/d) | 0 | 0.230 | 0.253 | 0.911 | 0.15 | not significant |
+| U.S. crude production \`COPRPUS\` | 1 | 0.352 | 0.292 | 1.207 | 0.99 | **STEO better** (two-sided p 0.022) |
+| U.S. crude stocks ex-SPR \`COSXPUS\` (Mb) | 0 | 9.10 | 14.12 | 0.645 | 0.0043 | not Holm-significant (rank 9; threshold ≈ 0.0004) |
+| U.S. crude stocks ex-SPR \`COSXPUS\` | 1 | 15.29 | 18.45 | 0.829 | 0.10 | not significant |
+
+Reading: weekly data help on the current month's crude stocks (−35 % MAE, promising but not significant under the
+family), not on production (EIA's own STEO already embeds its weekly production estimates; carrying the latest week
+forward one month is worse than STEO's projection). The registered stock candidate used the month **mean** of weekly
+levels for an end-of-month stock (as pre-registered); an end-of-period variant is a candidate for a new registration,
+not for this family.
 
 ## 5. Prospective (sealed) forecasts — winners only
 
@@ -212,7 +229,10 @@ The STEO archive table holds quarterly issues only, so seals are possible in Jan
 32/day). EIA data-browser weekly history pages `LeafHandler.ashx?n=PET&s=<S>&f=W` for WCRFPUS2 (crude field
 production, kb/d), WCESTUS1 (crude stocks ex-SPR), WCSSTUS1 (SPR), WCRRIUS2 (refiner net crude input), WGTSTUS1
 (gasoline stocks), WDISTUS1 (distillate stocks) + EIA copyright page (public-domain quote checked, fail closed).
-Full live pages parse to **13,392 weekly cells** (1982-08 → week ending 2026-10-09); ~1.4 MB raw. Table
+Loaded live: **13,392 weekly cells** (1982-08 → week ending 2026-10-09), 1.47 MB raw. Version 1.0.1 (1.0.0
+was registered by a concurrent agent's seed from a pre-fix working-tree state). Disk: 5.5 GB free when the load was
+decided, 5.2 GB before the re-seed, 4.9 GB measured after the shared seed and before the ingest (other agents'
+writes) — the 1.5 MB ingest proceeded; stated here for the lead. Table
 `eia.wpsr_w`: period = the 7 days ending the printed Friday, `flags.week_end`, `flags.first_available` = week end +
 7 d, release date of the page; thousands separators normalised (`value_normalised`); EIA notation → no row. Licence:
 U.S. public domain (EIA survey data). Fixtures `tests/fixtures/source/atlas.eia_wpsr/` (64 KB, verbatim row excerpts,

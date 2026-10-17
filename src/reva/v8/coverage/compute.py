@@ -115,9 +115,7 @@ def per_country(frame: pl.DataFrame, today: date) -> tuple[dict[str, list[Any]],
             pl.col("fut").sum().alias("nf"),
         )
     )
-    countries = {
-        str(r["iso3"]): [int(r["n"]), r["y0"], r["y1"], int(r["nf"])] for r in g.iter_rows(named=True)
-    }
+    countries = {str(r["iso3"]): [int(r["n"]), r["y0"], r["y1"], int(r["nf"])] for r in g.iter_rows(named=True)}
     h = f.group_by("y").agg(pl.len().alias("n"))
     hist: dict[int, int] = {}
     before = 0
@@ -188,7 +186,9 @@ def compute(
         domain, basis = reg.domain_of_table(key, source, themes_of.get((source, dataset), ()), conns)
         rights = table_rights(t["rights"], source)
         try:
-            frame = pl.read_parquet(io.BytesIO(store.get("normalised", t["artifact_sha256"])), columns=["iso3", "period_start"])
+            frame = pl.read_parquet(
+                io.BytesIO(store.get("normalised", t["artifact_sha256"])), columns=["iso3", "period_start"]
+            )
             countries, h, before, unmapped, latest = per_country(frame, today)
             read_error = None
         except Exception as e:  # an unreadable artifact is reported, never counted as empty
@@ -210,7 +210,11 @@ def compute(
             hist[domain][y] += n
         hist_before[domain] += before
         last_fetch = max(
-            (connectors[c]["last_retrieved_at"] for c in conns if c in connectors and connectors[c]["last_retrieved_at"]),
+            (
+                connectors[c]["last_retrieved_at"]
+                for c in conns
+                if c in connectors and connectors[c]["last_retrieved_at"]
+            ),
             default=None,
         )
         cadence = min((s["cadence_seconds"] for s in specs if s["name"] in conns), default=None)
@@ -255,9 +259,9 @@ def compute(
         conn_row = connectors.get(s["name"])
         expected = [f"atlas.{s['atlas_source']}.{ds}" for ds in s["datasets"]]
         doms = [loaded[k]["domain"] for k in expected if k in loaded]
-        domain = reg.by_connector.get(s["name"]) or reg.by_source.get(s["atlas_source"])
-        if domain is None and doms:
-            domain = max(set(doms), key=doms.count)
+        cdom: str | None = reg.by_connector.get(s["name"]) or reg.by_source.get(s["atlas_source"])
+        if cdom is None and doms:
+            cdom = max(set(doms), key=doms.count)
         declared.append(
             {
                 **s,
@@ -266,11 +270,11 @@ def compute(
                 "acquired": conn_row is not None,
                 "versions_acquired": sorted(conn_row["versions"]) if conn_row else [],
                 "last_retrieved_at": _iso(conn_row["last_retrieved_at"]) if conn_row else None,
-                "domain": domain or reg.other.id,
+                "domain": cdom or reg.other.id,
             }
         )
 
-    doc = {
+    doc: dict[str, Any] = {
         "schema": SCHEMA,
         "computed_at": datetime.now(UTC).isoformat(),
         "db_time": _iso(db_time),
@@ -419,8 +423,14 @@ def _kg(conn: Any, reg: DomainRegistry, origin: str, log: Callable[[str], None])
     for r in kinds:
         k = by_kind.setdefault(
             str(r["kind"]),
-            {"kind": r["kind"], "domain": reg.domain_of_kind(str(r["kind"])), "entities": 0, "sources": {}, "last": None,
-             "by_domain": {}},
+            {
+                "kind": r["kind"],
+                "domain": reg.domain_of_kind(str(r["kind"])),
+                "entities": 0,
+                "sources": {},
+                "last": None,
+                "by_domain": {},
+            },
         )
         sd = reg.domain_of_kind(str(r["kind"]), str(r["source_key"]))
         k["by_domain"][sd] = k["by_domain"].get(sd, 0) + int(r["n"])
