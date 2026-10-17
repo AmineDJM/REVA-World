@@ -298,25 +298,28 @@ def check_item(it: Item, parsed: Parsed, *, whole_world: bool) -> None:
 def check_annual_monthly(annual: Parsed, monthly: Parsed) -> list[str]:
     """Annual pr = sum of monthly pr; annual tas = day-weighted mean of monthly tas (provider's own products)."""
     problems: list[str] = []
+
+    def months(var: str, geo: str, year: int) -> list[Decimal] | None:
+        m = (monthly.get(var) or {}).get(geo) or {}
+        vals = [m.get(f"{year}-{i:02d}") for i in range(1, 13)]
+        return None if any(x is None for x in vals) else [x for x in vals if x is not None]
+
     for geo, cells in (annual.get("pr") or {}).items():
-        m = (monthly.get("pr") or {}).get(geo) or {}
         for k, v in cells.items():
-            y = k[:4]
-            ms = [m.get(f"{y}-{i:02d}") for i in range(1, 13)]
-            if any(x is None for x in ms):
+            ms = months("pr", geo, int(k[:4]))
+            if ms is None:
                 continue
-            s = sum(ms, Decimal(0))  # type: ignore[arg-type]
+            s = sum(ms, Decimal(0))
             if abs(s - v) > max(Decimal(1), abs(v) * Decimal("0.005")):
-                problems.append(f"pr {geo} {y}: monthly sum {s} != annual {v}")
+                problems.append(f"pr {geo} {k[:4]}: monthly sum {s} != annual {v}")
     for geo, cells in (annual.get("tas") or {}).items():
-        m = (monthly.get("tas") or {}).get(geo) or {}
         for k, v in cells.items():
             y = int(k[:4])
-            ms = [m.get(f"{y}-{i:02d}") for i in range(1, 13)]
-            if any(x is None for x in ms):
+            ms = months("tas", geo, y)
+            if ms is None:
                 continue
             days = [calendar.monthrange(y, i)[1] for i in range(1, 13)]
-            mean = sum((x * d for x, d in zip(ms, days, strict=True)), Decimal(0)) / sum(days)  # type: ignore[operator]
+            mean = sum((x * d for x, d in zip(ms, days, strict=True)), Decimal(0)) / sum(days)
             if abs(mean - v) > Decimal("0.03"):
                 problems.append(f"tas {geo} {y}: day-weighted monthly mean {mean:.3f} != annual {v}")
     return problems
@@ -479,7 +482,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             rights={**RIGHTS, "source_key": SOURCE_KEY},
             coverage_note=f"CCKP national aggregates, {scope}; KSV->XKX alias; codes outside the crosswalk kept "
             f"unmapped; provider-null series omitted: {','.join(nulls) or 'none'}"
-            + ("; CMIP6 rows are projections/model simulations (flags.estimate_kind)" if ds.startswith("cmip6") else ""),
+            + (
+                "; CMIP6 rows are projections/model simulations (flags.estimate_kind)" if ds.startswith("cmip6") else ""
+            ),
         )
         tables.append(
             {

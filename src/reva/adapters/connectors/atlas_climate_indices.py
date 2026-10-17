@@ -99,11 +99,19 @@ FILES: tuple[File, ...] = (
     File("cpc_oni", "enso_oni", "https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt"),
     File("psl_oni", "enso_oni", "https://psl.noaa.gov/data/correlation/oni.data"),
     *(
-        File(f"nsidc_{h}_{m:02d}", "sea_ice", f"{NSIDC}{'north' if h == 'N' else 'south'}/monthly/data/{h}_{m:02d}_extent_v4.0.csv")
+        File(
+            f"nsidc_{h}_{m:02d}",
+            "sea_ice",
+            f"{NSIDC}{'north' if h == 'N' else 'south'}/monthly/data/{h}_{m:02d}_extent_v4.0.csv",
+        )
         for h in ("N", "S")
         for m in range(1, 13)
     ),
-    File("star_gmsl", "sea_level", "https://www.star.nesdis.noaa.gov/socd/lsa/SeaLevelRise/slr/slr_sla_gbl_free_ref_90.csv"),
+    File(
+        "star_gmsl",
+        "sea_level",
+        "https://www.star.nesdis.noaa.gov/socd/lsa/SeaLevelRise/slr/slr_sla_gbl_free_ref_90.csv",
+    ),
     File("epa_sea_level", "sea_level", "https://www.epa.gov/system/files/other-files/2024-06/sea-level_fig-1.csv"),
 )
 BY_KEY = {f.key: f for f in FILES}
@@ -204,46 +212,148 @@ class Series:
 
 
 SERIES: tuple[Series, ...] = (
-    Series("co2_mlo", "noaa_gml", "co2_mlo|average", "MLO", "ppm", "Mauna Loa monthly mean CO2",
-           "CO2 moyen mensuel à Mauna Loa"),  # fmt: skip
-    Series("co2_mlo_deseasonalized", "noaa_gml", "co2_mlo|deseasonalized", "MLO", "ppm",
-           "Mauna Loa monthly CO2, seasonal cycle removed", "CO2 mensuel à Mauna Loa, désaisonnalisé"),  # fmt: skip
-    Series("co2_global", "noaa_gml", "co2_gl|average", "GLOBAL", "ppm", "Global marine surface monthly mean CO2",
-           "CO2 moyen mensuel global (surface marine)"),  # fmt: skip
-    Series("ch4_global", "noaa_gml", "ch4_gl|average", "GLOBAL", "ppb", "Global marine surface monthly mean CH4",
-           "CH4 moyen mensuel global (surface marine)"),  # fmt: skip
-    Series("n2o_global", "noaa_gml", "n2o_gl|average", "GLOBAL", "ppb", "Global marine surface monthly mean N2O",
-           "N2O moyen mensuel global (surface marine)"),  # fmt: skip
-    Series("gistemp_global", "gistemp", "land_ocean_anomaly", "GLOBAL", "°C",
-           "GISTEMP v4 global land-ocean temperature anomaly", "Anomalie de température globale terre-océan GISTEMP v4",
-           "1951-1980"),  # fmt: skip
-    Series("hadcrut5_global", "hadcrut5", "anomaly", "GLOBAL", "°C",
-           "HadCRUT5 global near-surface temperature anomaly", "Anomalie de température globale HadCRUT5", "1961-1990"),  # fmt: skip
-    Series("berkeley_global_air_ice", "berkeley", "anomaly|sea_ice=air", "GLOBAL", "°C",
-           "Berkeley Earth global land/ocean anomaly (air temperature over sea ice)",
-           "Anomalie globale Berkeley Earth terre/océan (température de l'air sur la banquise)", "Jan 1951-Dec 1980"),  # fmt: skip
-    Series("berkeley_global_water_ice", "berkeley", "anomaly|sea_ice=water", "GLOBAL", "°C",
-           "Berkeley Earth global land/ocean anomaly (water temperature under sea ice)",
-           "Anomalie globale Berkeley Earth terre/océan (température de l'eau sous la banquise)", "Jan 1951-Dec 1980"),  # fmt: skip
-    Series("oni", "enso_oni", "oni_anomaly", "NINO34", "°C", "Oceanic Niño Index (ONI, ENSO)",
-           "Indice océanique Niño (ONI, ENSO)"),  # fmt: skip
-    Series("sea_ice_extent_arctic", "sea_ice", "extent", "NH", "10^6 km2", "Arctic sea ice extent (monthly)",
-           "Étendue de la banquise arctique (mensuelle)"),  # fmt: skip
-    Series("sea_ice_extent_antarctic", "sea_ice", "extent", "SH", "10^6 km2", "Antarctic sea ice extent (monthly)",
-           "Étendue de la banquise antarctique (mensuelle)"),  # fmt: skip
-    Series("gmsl_altimetry", "sea_level", "gmsl_anomaly|mission=all", "GLOBAL", "mm",
-           "Global mean sea level anomaly from satellite altimetry (NOAA STAR)",
-           "Anomalie du niveau moyen global des mers par altimétrie satellitaire (NOAA STAR)"),  # fmt: skip
-    Series("gmsl_csiro_reconstruction", "sea_level", "csiro_adjusted_sea_level", "GLOBAL", "inches",
-           "Global average absolute sea level change, CSIRO reconstruction (EPA indicator)",
-           "Variation du niveau absolu moyen des mers, reconstruction CSIRO (indicateur EPA)", "1880"),  # fmt: skip
+    Series(
+        "co2_mlo",
+        "noaa_gml",
+        "co2_mlo|average",
+        "MLO",
+        "ppm",
+        "Mauna Loa monthly mean CO2",
+        "CO2 moyen mensuel à Mauna Loa",
+    ),
+    Series(
+        "co2_mlo_deseasonalized",
+        "noaa_gml",
+        "co2_mlo|deseasonalized",
+        "MLO",
+        "ppm",
+        "Mauna Loa monthly CO2, seasonal cycle removed",
+        "CO2 mensuel à Mauna Loa, désaisonnalisé",
+    ),
+    Series(
+        "co2_global",
+        "noaa_gml",
+        "co2_gl|average",
+        "GLOBAL",
+        "ppm",
+        "Global marine surface monthly mean CO2",
+        "CO2 moyen mensuel global (surface marine)",
+    ),
+    Series(
+        "ch4_global",
+        "noaa_gml",
+        "ch4_gl|average",
+        "GLOBAL",
+        "ppb",
+        "Global marine surface monthly mean CH4",
+        "CH4 moyen mensuel global (surface marine)",
+    ),
+    Series(
+        "n2o_global",
+        "noaa_gml",
+        "n2o_gl|average",
+        "GLOBAL",
+        "ppb",
+        "Global marine surface monthly mean N2O",
+        "N2O moyen mensuel global (surface marine)",
+    ),
+    Series(
+        "gistemp_global",
+        "gistemp",
+        "land_ocean_anomaly",
+        "GLOBAL",
+        "°C",
+        "GISTEMP v4 global land-ocean temperature anomaly",
+        "Anomalie de température globale terre-océan GISTEMP v4",
+        "1951-1980",
+    ),
+    Series(
+        "hadcrut5_global",
+        "hadcrut5",
+        "anomaly",
+        "GLOBAL",
+        "°C",
+        "HadCRUT5 global near-surface temperature anomaly",
+        "Anomalie de température globale HadCRUT5",
+        "1961-1990",
+    ),
+    Series(
+        "berkeley_global_air_ice",
+        "berkeley",
+        "anomaly|sea_ice=air",
+        "GLOBAL",
+        "°C",
+        "Berkeley Earth global land/ocean anomaly (air temperature over sea ice)",
+        "Anomalie globale Berkeley Earth terre/océan (température de l'air sur la banquise)",
+        "Jan 1951-Dec 1980",
+    ),
+    Series(
+        "berkeley_global_water_ice",
+        "berkeley",
+        "anomaly|sea_ice=water",
+        "GLOBAL",
+        "°C",
+        "Berkeley Earth global land/ocean anomaly (water temperature under sea ice)",
+        "Anomalie globale Berkeley Earth terre/océan (température de l'eau sous la banquise)",
+        "Jan 1951-Dec 1980",
+    ),
+    Series(
+        "oni",
+        "enso_oni",
+        "oni_anomaly",
+        "NINO34",
+        "°C",
+        "Oceanic Niño Index (ONI, ENSO)",
+        "Indice océanique Niño (ONI, ENSO)",
+    ),
+    Series(
+        "sea_ice_extent_arctic",
+        "sea_ice",
+        "extent",
+        "NH",
+        "10^6 km2",
+        "Arctic sea ice extent (monthly)",
+        "Étendue de la banquise arctique (mensuelle)",
+    ),
+    Series(
+        "sea_ice_extent_antarctic",
+        "sea_ice",
+        "extent",
+        "SH",
+        "10^6 km2",
+        "Antarctic sea ice extent (monthly)",
+        "Étendue de la banquise antarctique (mensuelle)",
+    ),
+    Series(
+        "gmsl_altimetry",
+        "sea_level",
+        "gmsl_anomaly|mission=all",
+        "GLOBAL",
+        "mm",
+        "Global mean sea level anomaly from satellite altimetry (NOAA STAR)",
+        "Anomalie du niveau moyen global des mers par altimétrie satellitaire (NOAA STAR)",
+    ),
+    Series(
+        "gmsl_csiro_reconstruction",
+        "sea_level",
+        "csiro_adjusted_sea_level",
+        "GLOBAL",
+        "inches",
+        "Global average absolute sea level change, CSIRO reconstruction (EPA indicator)",
+        "Variation du niveau absolu moyen des mers, reconstruction CSIRO (indicateur EPA)",
+        "1880",
+    ),
 )
 
 KG_PREDICATES: dict[str, tuple[str, str, str, str]] = {
     "climind:atlas_series": ("string", "climind_atlas_series", "atlas series", "série de l'atlas"),
     "climind:unit": ("string", "climind_unit", "unit (as published)", "unité (publiée)"),
-    "climind:provider_definition": ("string", "climind_provider_definition", "provider definition (verbatim)",
-                                    "définition du fournisseur (verbatim)"),  # fmt: skip
+    "climind:provider_definition": (
+        "string",
+        "climind_provider_definition",
+        "provider definition (verbatim)",
+        "définition du fournisseur (verbatim)",
+    ),
     "climind:baseline": ("string", "climind_baseline", "anomaly baseline period", "période de référence de l'anomalie"),
     "climind:licence": ("string", "climind_licence", "licence of the values", "licence des valeurs"),
     "climind:provider_file": ("url", "climind_provider_file", "provider file", "fichier du fournisseur"),
@@ -280,10 +390,15 @@ def parse_gml(f: Fetched, rows: cc.ValueRows, report: dict[str, Any]) -> dict[st
     rdr = csv.DictReader(io.StringIO("\n".join(data)), skipinitialspace=True)
     gas, geo_code = f.key.split("_mm_")
     unit = "ppm" if gas == "co2" else "ppb"
-    unit_line = next((h for h in header if "expressed as a mole fraction" in h or "Units are ppm" in h), "")
-    if not unit_line or unit not in " ".join(header):
-        raise _err(f"{f.key}: unit sentence ({unit}) not found in the file header")
     geo = "MLO" if geo_code == "mlo" else "GLOBAL"
+    if geo_code == "mlo":  # the MLO file states the method, not the unit (ppm per gml.noaa.gov/ccgg/trends)
+        unit_line = next((h for h in header if h.startswith("Monthly mean CO2 constructed from daily mean")), "")
+        unit_note = "ppm: unit not stated in co2_mm_mlo.csv (NOAA GML trends pages); same series family as co2_mm_gl"
+    else:
+        unit_line = next((h for h in header if "expressed as a mole fraction" in h), "")
+        unit_note = None
+    if not unit_line or (geo_code != "mlo" and f"abbreviated as {unit}" not in unit_line):
+        raise _err(f"{f.key}: definition/unit sentence ({unit}) not found in the file header")
     prefix = f"{gas}_{geo_code}"
     if geo_code == "mlo":
         cols = {"average": "average", "deseasonalized": "deseasonalized"}
@@ -302,6 +417,8 @@ def parse_gml(f: Fetched, rows: cc.ValueRows, report: dict[str, Any]) -> dict[st
                 report.setdefault("sentinels", []).append(f"{f.key}:{y}-{m:02d}:{col}")
                 continue
             fl = _flags("noaa_gml", gas=gas.upper(), definition=unit_line)
+            if unit_note:
+                fl["unit_note"] = unit_note
             if geo_code == "mlo":
                 fl |= {"ndays": r["ndays"], "sdev": r["sdev"], "unc": r["unc"]}
                 if Decimal(r["sdev"]) < 0 or Decimal(r["unc"]) < 0:
@@ -494,7 +611,7 @@ def parse_nsidc(f: Fetched, rows: cc.ValueRows, report: dict[str, Any]) -> None:
         if r["region"] != hemi:
             raise _err(f"{f.key} row {i + 1}: region {r['region']} != {hemi}")
         y, m = int(r["year"]), int(r["mo"])
-        if f"_{m:02d}_" not in f.key:
+        if not f.key.endswith(f"_{m:02d}"):
             raise _err(f"{f.key} row {i + 1}: month {m}")
         for col in ("extent", "area"):
             v = cc.decimal_text(r[col])
@@ -518,7 +635,11 @@ def decimal_year_day(x: Decimal) -> date:
 
 def parse_star(f: Fetched, rows: cc.ValueRows, report: dict[str, Any]) -> str:
     lines = _lines(f.text)
-    head = {ln[1:].split("=", 1)[0].strip(): ln[1:].split("=", 1)[1].strip() for ln in lines if ln.startswith("#") and "=" in ln}
+    head = {
+        ln[1:].split("=", 1)[0].strip(): ln[1:].split("=", 1)[1].strip()
+        for ln in lines
+        if ln.startswith("#") and "=" in ln
+    }
     title = head.get("title", "")
     if "mean sea level anomaly global ocean" not in title:
         raise _err(f"STAR title changed: {title[:80]!r}")
@@ -549,7 +670,9 @@ def parse_star(f: Fetched, rows: cc.ValueRows, report: dict[str, Any]) -> str:
 def parse_epa(f: Fetched, rows: cc.ValueRows, report: dict[str, Any]) -> str:
     lines = _lines(f.text.lstrip("﻿"))
     title = lines[0].split(",")[0].strip('"')
-    if "Global Average Absolute Sea Level Change" not in title or not any(ln.startswith("Units: inches") for ln in lines):
+    if "Global Average Absolute Sea Level Change" not in title or not any(
+        ln.startswith("Units: inches") for ln in lines
+    ):
         raise _err("EPA sea level file header changed")
     start = next(i for i, ln in enumerate(lines) if ln.startswith("Year,"))
     rdr = csv.DictReader(io.StringIO("\n".join(lines[start:])))
@@ -579,7 +702,9 @@ def parse_epa(f: Fetched, rows: cc.ValueRows, report: dict[str, Any]) -> str:
     return title
 
 
-def build(files: Mapping[str, Fetched], wanted: tuple[str, ...] = DATASETS) -> tuple[dict[str, cc.ValueRows], dict[str, Any]]:
+def build(
+    files: Mapping[str, Fetched], wanted: tuple[str, ...] = DATASETS
+) -> tuple[dict[str, cc.ValueRows], dict[str, Any]]:
     out = {ds: cc.ValueRows(ATLAS_SOURCE, ds) for ds in wanted}
     report: dict[str, Any] = {}
     defs: dict[str, str] = {}
@@ -616,7 +741,9 @@ SERIES_FILE = {
 }  # fmt: skip
 
 
-def kg_items(files: Mapping[str, Fetched], defs: Mapping[str, str], wanted: tuple[str, ...]) -> tuple[list[Any], list[Any]]:
+def kg_items(
+    files: Mapping[str, Fetched], defs: Mapping[str, str], wanted: tuple[str, ...]
+) -> tuple[list[Any], list[Any]]:
     from reva.kg.model import KgEntity, KgStatement
 
     ents: list[Any] = []
@@ -642,10 +769,15 @@ def kg_items(files: Mapping[str, Fetched], defs: Mapping[str, str], wanted: tupl
             "climind:baseline": s.baseline,
             "climind:licence": RIGHTS[s.dataset]["licence"],
             "climind:provider_definition": {
-                "co2_mlo": defs.get("co2_mlo"), "co2_mlo_deseasonalized": defs.get("co2_mlo"),
-                "co2_global": defs.get("co2_gl"), "ch4_global": defs.get("ch4_gl"), "n2o_global": defs.get("n2o_gl"),
-                "oni": psl_def or None, "gmsl_altimetry": defs.get("star"), "gmsl_csiro_reconstruction": defs.get("epa"),
-            }.get(s.key),  # fmt: skip
+                "co2_mlo": defs.get("co2_mlo"),
+                "co2_mlo_deseasonalized": defs.get("co2_mlo"),
+                "co2_global": defs.get("co2_gl"),
+                "ch4_global": defs.get("ch4_gl"),
+                "n2o_global": defs.get("n2o_gl"),
+                "oni": psl_def or None,
+                "gmsl_altimetry": defs.get("star"),
+                "gmsl_csiro_reconstruction": defs.get("epa"),
+            }.get(s.key),
         }
         for pid, v in vals.items():
             if v:
@@ -693,9 +825,16 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             "loaded": True,
             "entities": len(ents),
             "statements": len(sts),
-            "report": cc.load_kg(run.engine, run.store, entities=ents, statements=sts, source_key=SOURCE_KEY,
-                                 raw_sha256s=[f.sha for f in files.values()],
-                                 retrieved_at=max(f.retrieved_at for f in files.values()), origin=run.origin,
-                                 parameters={"connector": NAME, "parser": PARSER_VERSION}),  # fmt: skip
+            "report": cc.load_kg(
+                run.engine,
+                run.store,
+                entities=ents,
+                statements=sts,
+                source_key=SOURCE_KEY,
+                raw_sha256s=[f.sha for f in files.values()],
+                retrieved_at=max(f.retrieved_at for f in files.values()),
+                origin=run.origin,
+                parameters={"connector": NAME, "parser": PARSER_VERSION},
+            ),
         }
     return {"ok": True, "tables": tables, "kg": kg, "report": {k: v for k, v in report.items() if k != "definitions"}}

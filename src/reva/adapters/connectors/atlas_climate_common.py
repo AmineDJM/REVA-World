@@ -104,7 +104,9 @@ class ValueRows:
         return pl.DataFrame({c: [r[c] for r in self.rows] for c in cols}, schema=ATLAS_SCHEMA)
 
 
-def kg_ref(*, file: str, url: str, raw_sha256: str, retrieved_at: datetime, licence: str, **extra: Any) -> dict[str, Any]:
+def kg_ref(
+    *, file: str, url: str, raw_sha256: str, retrieved_at: datetime, licence: str, **extra: Any
+) -> dict[str, Any]:
     return {
         "source_file": file,
         "url": url,
@@ -119,7 +121,9 @@ def statement_hash(*parts: str) -> str:
     return hashlib.sha256("\x1f".join(parts).encode()).hexdigest()[:24]
 
 
-def register_props(engine: Any, namespaced: Mapping[str, tuple[str, str, str, str]], wikidata_pids: Sequence[str]) -> Any:
+def register_props(
+    engine: Any, namespaced: Mapping[str, tuple[str, str, str, str]], wikidata_pids: Sequence[str]
+) -> Any:
     """Register ``{pid: (value_kind, reva_predicate, label_en, label_fr)}`` plus Wikidata pids (WDHARVEST defs)."""
     from reva.adapters.connectors.wikidata import load_allowlist
     from reva.kg.harvest import kg_properties as wd_props

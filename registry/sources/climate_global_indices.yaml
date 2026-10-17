@@ -1,0 +1,34 @@
+# V4 (agent V4CLIMATE): global climate indicator files (src/reva/adapters/connectors/atlas_climate_indices.py,
+# atlas source atlas.climate_indices -> atlas tables climind.*; KG entities climind:* of kind climate_index).
+source_key: climate.global_indices
+title: Global climate indicators (NOAA GML/CPC/PSL/STAR/NSIDC, NASA GISTEMP, Met Office HadCRUT5, Berkeley Earth, US EPA)
+provider_url: https://gml.noaa.gov/ccgg/trends/
+lineage_family: climate_global_indices
+rights:
+  licence: per file (see metadata.files)
+  non_commercial_parts: [berkeley-earth-temperature.s3.us-west-1.amazonaws.com Land_and_Ocean_complete.txt (CC BY-NC 4.0)]
+  terms_quotes:
+    noaa_gml: "These data are made freely available to the public and the scientific community ... please include relevant citation text in publications."
+    hadcrut5: "HadCRUT5 is subject to Crown copyright protection and is provided under the Open Government License v3."
+    berkeley: "In general, Berkeley Earth's data is licensed under Creative Commons BY-NC 4.0 International for non-commercial use only."
+    nsidc: "As a condition of using these data, you must cite the use of this data set."
+    noaa_star: "Altimetry data are provided by NOAA Laboratory for Satellite Altimetry."
+metadata:
+  allowed_hosts: [berkeley-earth-temperature.s3.us-west-1.amazonaws.com, data.giss.nasa.gov, gml.noaa.gov, noaadata.apps.nsidc.org, psl.noaa.gov, www.cpc.ncep.noaa.gov, www.epa.gov, www.metoffice.gov.uk, www.star.nesdis.noaa.gov]
+  authentication: none
+  files:
+    - {url: "https://gml.noaa.gov/webdata/ccgg/trends/co2/co2_mm_mlo.csv", licence: "US Government work (NOAA)"}
+    - {url: "https://gml.noaa.gov/webdata/ccgg/trends/{co2,ch4,n2o}/<gas>_mm_gl.csv", licence: "US Government work (NOAA)"}
+    - {url: "https://data.giss.nasa.gov/gistemp/tabledata_v4/GLB.Ts+dSST.csv", licence: "US Government work (NASA); cite GISTEMP Team"}
+    - {url: "https://www.metoffice.gov.uk/hadobs/hadcrut5/data/HadCRUT.5.2.0.0/analysis/diagnostics/HadCRUT.5.2.0.0.analysis.summary_series.global.monthly.csv", licence: "Open Government Licence v3"}
+    - {url: "https://berkeley-earth-temperature.s3.us-west-1.amazonaws.com/Global/Land_and_Ocean_complete.txt", licence: "CC BY-NC 4.0"}
+    - {url: "https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt", licence: "US Government work (NOAA)"}
+    - {url: "https://psl.noaa.gov/data/correlation/oni.data", licence: "US Government work (NOAA)"}
+    - {url: "https://noaadata.apps.nsidc.org/NOAA/G02135/{north,south}/monthly/data/{N,S}_<MM>_extent_v4.0.csv", licence: "NOAA@NSIDC, citation required (doi:10.7265/a98x-0f50)"}
+    - {url: "https://www.star.nesdis.noaa.gov/socd/lsa/SeaLevelRise/slr/slr_sla_gbl_free_ref_90.csv", licence: "US Government work (NOAA); acknowledgement"}
+    - {url: "https://www.epa.gov/system/files/other-files/2024-06/sea-level_fig-1.csv", licence: "US Government work (EPA)"}
+  not_used:
+    - "Copernicus CDS / ERA5 direct: needs a CDS account (ERA5 enters only through the World Bank CCKP aggregates)"
+    - "NASA PO.DAAC GMSL (GSFC): needs an Earthdata login"
+    - "CSIRO sea level host www.cmar.csiro.au: connection failed 2026-10-17 (the EPA indicator republishes the CSIRO reconstruction)"
+  cadence: monthly re-download
