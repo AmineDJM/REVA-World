@@ -5,11 +5,11 @@ before this work: `docs/strategy/world_map.md` §1 / §5.3 — "**0** prévision
 
 ## 1. Result in one paragraph
 
-The registry now runs for real in the dev DB. **575 questions** (434 + 141, see §5) were generated from atlas
-series and **2,243 forecasts** (2,132 baseline + 111 attributed IMF WEO projections) were frozen and **sealed** on 2026-10-17 (cycle `2026-Q4`, origin `live`):
+The registry now runs for real in the dev DB. **586 questions** (434 + 141 + 11, see §5) were generated from atlas
+series and **2,287 forecasts** (2,176 baseline + 111 attributed IMF WEO projections) were frozen and **sealed** on 2026-10-17 (cycle `2026-Q4`, origin `live`):
 inflation (WEO annual, FAOSTAT monthly CPI and food inflation, Eurostat HICP), unemployment (WEO, Eurostat monthly),
 GDP growth (WEO annual, Eurostat quarterly), residential property prices (BIS quarterly), FX (IMF annual average),
-policy rates (IMF annual) and the FAO Food Price Index, for 21 G20+ economies, 10 EU countries and the
+policy rates (IMF annual), the FAO Food Price Index and Brent (EIA STEO), for 21 G20+ economies, 10 EU countries and the
 world benchmarks, 1–12 months / 1–8 quarters / current and next year ahead. Only **baselines** forecast (persistence,
 seasonal naive, AR(p) fitted as of issue, historical quantiles) plus the IMF WEO projection **attributed to the IMF**
 (point only). Nothing is resolved yet (earliest expected resolutions: early December 2026 for the FFPI, mid December for HICP). A daily resolution job and a weekly issue job are scheduled; a **final-vintage pseudo-real-time**
@@ -82,7 +82,7 @@ queries cheaper (today the API reads the cached, verified manifests) — not nee
 |---|---|---|---|
 | `96c6ad48167100d5f5ee8d8195cb1a785d206f493cd9fa12f1937c54a0f001c5` | 2026-10-17 14:02:32 | 434 (211 quantity, 169 interval, 54 binary) | weo.cpi_inflation 40, weo.gdp_growth 38, weo.unemployment 37, fao.cpi_inflation_yoy 84, fao.food_inflation 126, bis.property_prices_real_yoy 68, imf.fx_usd_annual_avg 17, imf.policy_rate_annual 24 |
 | `da05d33693745d42cff4635ade809912812480f7a6a59046c46127cdc67e7b35` | 2026-10-17 14:21:07 | 141 (84 quantity, 44 interval, 13 binary) | eurostat.hicp_inflation 50, eurostat.unemployment 40, eurostat.gdp_growth_yoy 40, fao.food_price_index 11 — tables V4ECON registered at 14:05–14:11, picked up by the second run (what the weekly schedule does) |
-| not yet sealed: `--family eia.brent_monthly` | re-queued on the dev-DB lock (a first attempt timed out waiting for it); otherwise the weekly `forecast_registry:issue:live` run issues it | 11 (dry run) | eia.brent_monthly (STEO `BREPUUS`, monthly; the family's geography was corrected to EIA's verbatim `USA` after batch 2) |
+| `179421efa0abf1ea133ed2320ac5770f1f0e503abd3fa4397736a78f4a155938` | 2026-10-17 15:32:03 | 11 (4 quantity, 4 interval, 3 binary; 44 forecasts) | eia.brent_monthly (STEO `BREPUUS`, monthly; the family's geography was corrected to EIA's verbatim `USA` after batch 2) |
 
 Forecasts batch 1: persistence 434, hist_quantile 432 (2 abstained: < 10 changes), AR 424 (8 non-stationary fits,
 2 too short), seasonal naive 278 (156 abstentions: annual series), IMF WEO reference 111 (4: no projection cell).
@@ -189,7 +189,7 @@ numbers; WEO real-time results belong to PRED-VINTAGE (`src/reva/evaluation/vint
 1. Publish the registry (public pre-registration = credibility) or keep it private (world_map §7 Q18)?
 2. Accept FAOSTAT estimated (`E`) cells as outcomes, or void such questions?
 3. FFPI non-commercial terms: keep FFPI questions only for private evaluation?
-4. Success criterion at 6 months (world_map Q20, e.g. 300 pre-registered / 100 resolved): today 575 / 0.
+4. Success criterion at 6 months (world_map Q20, e.g. 300 pre-registered / 100 resolved): today 586 / 0.
 
 ## 13. Commands
 
