@@ -160,8 +160,9 @@ def parse_page(body: bytes, key: str, what: str) -> tuple[list[dict[str, Any]], 
     return rows, total, pm.get("next")
 
 
-def parse_mapping(body: bytes) -> tuple[str, list[tuple[str, str, str, str]]]:
-    """(release, [(uniprot accession, target id, target name, target type)]) of chembl_uniprot_mapping.txt."""
+def parse_mapping(body: bytes) -> tuple[str, list[tuple[int, str, str, str, str]]]:
+    """(release, [(line, accession, target id, target name, target type)]) of chembl_uniprot_mapping.txt. The
+    accession is a UniProt accession for proteins; ChEMBL also lists Ensembl gene ids for nucleic-acid targets."""
     try:
         lines = body.decode("utf-8").splitlines()
     except UnicodeDecodeError as e:
@@ -181,7 +182,7 @@ def parse_mapping(body: bytes) -> tuple[str, list[tuple[str, str, str, str]]]:
         acc, tid, name, ttype = (p.strip() for p in parts)
         if not CHEMBL_ID_RE.match(tid) or not acc or len(acc) > 40 or not re.match(r"^[A-Za-z0-9_.-]+$", acc):
             raise dc.err(f"chembl_uniprot_mapping.txt line {n}: not an accession / target id")
-        out.append((acc, tid, name, ttype))
+        out.append((n, acc, tid, name, ttype))
     return m.group(1).lower(), out
 
 
@@ -222,7 +223,7 @@ def build(
     mechanisms: Sequence[Mapping[str, Any]],
     targets: Sequence[Mapping[str, Any]],
     indications: Sequence[Mapping[str, Any]],
-    mapping: Sequence[tuple[str, str, str, str]] | None,
+    mapping: Sequence[tuple[int, str, str, str, str]] | None,
     raws: Mapping[str, str],
 ) -> tuple[list[Any], list[Any], dict[str, Any]]:
     """(entities, statements, report). ``raws`` maps a part (molecules, mechanisms, targets, indications, mapping)
@@ -354,8 +355,11 @@ def build(
     missing_targets = sorted(target_ids - seen_t)
     components = 0
     if mapping is not None:
-        for line, (acc, tid, name, ttype) in enumerate(mapping, start=2):
+        for line, acc, tid, name, ttype in mapping:
             if tid not in target_ids:
+                continue
+            if not UNIPROT_RE.match(acc):
+                skipped["component_not_uniprot_accession"] += 1
                 continue
             components += 1
             st(f"chembl:{tid}", "chembl:target_component", raw=raws["mapping"], obj=f"uniprot:{acc}",
@@ -544,7 +548,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     targets, raws["targets"] = await _by_ids(run, targets_url, tids, "chembl:targets", "targets", "targets")
     mbody, msha = await _fetch(run, MAPPING_URL, "chembl:uniprot_mapping", media=("text/plain",))
     map_release, mapping = parse_mapping(mbody)
-    mapping_used: Sequence[tuple[str, str, str, str]] | None = mapping
+    mapping_used: Sequence[tuple[int, str, str, str, str]] | None = mapping
     note = None
     if map_release != release.lower():
         mapping_used, note = None, f"mapping file is {map_release}, API is {release}: components not loaded"

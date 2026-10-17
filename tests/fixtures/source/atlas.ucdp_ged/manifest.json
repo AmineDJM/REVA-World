@@ -1,0 +1,177 @@
+[
+  {
+    "request_fingerprint": "b9eef8431dd6ce91332e4c3d72337b48cd197fb07148d7eb992874261b488888",
+    "url": "https://cran.r-project.org/src/contrib/countrycode_1.9.0.tar.gz",
+    "file": "b9eef8431dd6ce91.tar.gz",
+    "sha256": "464dac3ea4eadab18afa167729abc2d905d60f6a5c543af6fa1f804f9522ef41",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-15T22:05:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "slice of countrycode_1.9.0.tar.gz (CRAN): only data/codelist_panel.rda, byte-identical member; real tarball sha256 d560b1c2011e19ebf21f7576ba0be9f5bad573082eda1f555f9153b0ba5ae7da"
+  },
+  {
+    "request_fingerprint": "e5f80eabaa227a7da4606df279a05d8241f5e5776bf6ef7286a4f3c249e38b40",
+    "url": "https://ucdp.uu.se/downloads/",
+    "file": "6739bd1dcc85b5e3.html",
+    "sha256": "6739bd1dcc85b5e3467342c0da4e38577375eba8ac94470e6a78f49c77d97f2a",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-17T16:24:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "real downloads page (2026-10-17)"
+  },
+  {
+    "request_fingerprint": "ab46b9a72a368f8531b9bcdc9ecfe91d2d0e527ba7984e3efa89a42fdb045719",
+    "url": "https://ucdp.uu.se/downloads/ged/ged261.pdf",
+    "file": "f767380ebbf365ae.pdf",
+    "sha256": "f767380ebbf365aec7586f98b6d100cafb69fb54010a908604d53bd9ad655972",
+    "status": 200,
+    "headers": {
+      "content-type": "application/pdf"
+    },
+    "retrieved_at": "2026-10-17T16:24:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "real GED 26.1 codebook"
+  },
+  {
+    "request_fingerprint": "c30ecf5e7a3df7f49018ce34769bdcfb0bb8e90e8e845c3f0518a7141283a1f6",
+    "url": "https://ucdp.uu.se/downloads/candidateged/ucdp-candidate-codebook1.5.pdf",
+    "file": "0107eac75e0b0bf0.pdf",
+    "sha256": "0107eac75e0b0bf0c0c1f2146dd1818af8ec943e254471b73453f53a64384d33",
+    "status": 200,
+    "headers": {
+      "content-type": "application/pdf"
+    },
+    "retrieved_at": "2026-10-17T16:24:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "real Candidate codebook 1.5"
+  },
+  {
+    "request_fingerprint": "5ce91121b5a02a2e5facc8235d7ef4c9a26011e90cb239fee8dfa9c3e15f9d84",
+    "url": "https://ucdp.uu.se/downloads/ged/ged261-csv.zip",
+    "file": "233067a86d100b0b.zip",
+    "sha256": "233067a86d100b0beec429c381aba1ce948a2c4bab4f9e348fb18a3656a55dc5",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-zip-compressed"
+    },
+    "retrieved_at": "2026-10-17T16:24:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "slice of ged261-csv.zip: 168 of 417968 events, values unchanged"
+  },
+  {
+    "request_fingerprint": "9da9e7cbf19747797dcd9c62c85d495352d71ddd0e334a47e45ea95869384c9f",
+    "url": "https://ucdp.uu.se/downloads/candidateged/GEDEvent_v26_01_26_06.csv",
+    "file": "1995a7a507191335.csv",
+    "sha256": "1995a7a50719133598278c31ed10184e6cf392cf1ddd566f34acda76039123ea",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T16:24:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "slice of GEDEvent_v26_01_26_06.csv: 42 of 10051 events (all ids shared with another release kept)"
+  },
+  {
+    "request_fingerprint": "21507771744b0b158ea0aa0d25354e29debf289e8b934fd5b07c5d79a6e795de",
+    "url": "https://ucdp.uu.se/downloads/candidateged/GEDEvent_v26_0_7.csv",
+    "file": "155817f7ad9b0a8a.csv",
+    "sha256": "155817f7ad9b0a8a003301d2a7daec723fe92babcf7277a992965aabd294b0e1",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T16:24:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "slice of GEDEvent_v26_0_7.csv: 56 of 1828 events (all ids shared with another release kept)"
+  },
+  {
+    "request_fingerprint": "12efbbf9bda78d528ae5acedf6d346d467b8d3ab4464b2ce915348bd99024a7a",
+    "url": "https://ucdp.uu.se/downloads/candidateged/GEDEvent_v26_0_8.csv",
+    "file": "21846a51dfdb337d.csv",
+    "sha256": "21846a51dfdb337d792681916a675b9a9d420e6cc86ad3081bd7e8d4ef5103fa",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T16:24:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "slice of GEDEvent_v26_0_8.csv: 44 of 1806 events (all ids shared with another release kept)"
+  },
+  {
+    "request_fingerprint": "fe2d848fc26fc14dd450d6959cdafc228aca3a5010fa87580f8e1e73e7367c8d",
+    "url": "https://ucdp.uu.se/downloads/nsos/ucdp-nonstate-261-csv.zip",
+    "file": "8c5222a896f37985.zip",
+    "sha256": "8c5222a896f37985faf534d2d797ec2aede9c98f99dbdb3ac6f28bcb909a4158",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-zip-compressed"
+    },
+    "retrieved_at": "2026-10-17T16:24:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "slice of ucdp-nonstate-261-csv.zip: 23 of 1821 rows, values unchanged"
+  },
+  {
+    "request_fingerprint": "c48a10cfc234d7f5a0d6a6b24bbae1aa2c6842978c7a5b8530ac1ab5c8cdbaba",
+    "url": "https://ucdp.uu.se/downloads/nsos/ucdp-onesided-261-csv.zip",
+    "file": "a0a1d41f7e893a0a.zip",
+    "sha256": "a0a1d41f7e893a0a8fa7d98342cd1a58aa0114809ef70657c2331601b3fb4e9e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-zip-compressed"
+    },
+    "retrieved_at": "2026-10-17T16:24:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "slice of ucdp-onesided-261-csv.zip: 141 of 1408 rows, values unchanged"
+  },
+  {
+    "request_fingerprint": "ca1a47ab7785eaf3c52e7a2d2596c633852c393f479125632e709816b2ba4543",
+    "url": "https://ucdp.uu.se/downloads/actor/ucdp-actor-261-csv.zip",
+    "file": "5e5b3f46d0ed4d2a.zip",
+    "sha256": "5e5b3f46d0ed4d2a56f76c42337b8260f3dfcdad6d03f75eabacd6778c286d79",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-zip-compressed"
+    },
+    "retrieved_at": "2026-10-17T16:24:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "slice of ucdp-actor-261-csv.zip: 22 of 1987 rows (cp1252)"
+  },
+  {
+    "request_fingerprint": "9a5a66e5468b9b0a9be9fd4ba291f4f18526c80cafb997f4c57ba4e7dc37b26b",
+    "url": "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_1_states_provinces.zip",
+    "file": "4d5e747dde7d2d9b.zip",
+    "sha256": "4d5e747dde7d2d9b21f1476901bf2b4e9b17f8ddd311c01ee1ce085e36ccacc8",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-17T16:24:00+00:00",
+    "licence": "Public domain (Natural Earth)",
+    "note": "derived excerpt: 306 Natural Earth admin-1 features",
+    "derived": {
+      "kind": "derived_excerpt",
+      "by": "tests/fixtures/source/atlas.ucdp_ged/cut_fixture.py",
+      "source_sha256": "efc59726337323058f9446210adc96673179cd344e053666ee3d28cb58ba2b05",
+      "iso_a2": [
+        "AF",
+        "IL",
+        "PS",
+        "SD",
+        "SS",
+        "BA",
+        "AZ",
+        "AM",
+        "SY",
+        "TR",
+        "CO"
+      ],
+      "features": 306
+    }
+  }
+]

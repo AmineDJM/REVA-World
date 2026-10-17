@@ -288,3 +288,8 @@ variables:
     definition: Aggregate real economic activity as measured by the cited study (real GDP or an industrial production index); used where a survey reports output effects without naming the measure.
     unit: index or constant-price currency
     atlas_concepts: []
+  - id: prices.inflation_rate
+    labels: {en: Consumer price inflation rate (as measured by the study), fr: Taux d'inflation des prix à la consommation (selon la mesure de l'étude)}
+    definition: Twelve-month (or annual) percent change of a consumer or retail price index as measured by the cited study (e.g. CPI, HICP, RPIX); changes are in percentage points.
+    unit: percent
+    atlas_concepts: []

@@ -1,0 +1,122 @@
+# Effects of UK monetary policy shocks (narrative, forecast-based measure) (agent EFFECTS-MORE, V6).
+schema: reva-effects-literature/1
+id: cloyne_hurtgen_2014
+source_key: effects.literature
+citation:
+  text: "James Cloyne and Patrick Hürtgen. The macroeconomic effects of monetary policy: a new measure for the United Kingdom. Bank of England Working Paper No. 493, March 2014."
+  text_basis: assembled from the title page of the version read (Bank of England staff working paper)
+  short: "Cloyne & Hürtgen (2014), Bank of England WP 493"
+  authors: [James Cloyne, Patrick Hürtgen]
+  title: "The macroeconomic effects of monetary policy: a new measure for the United Kingdom"
+  year: 2014
+  series: Bank of England Working Paper No. 493
+  doi: null
+  url: https://www.bankofengland.co.uk/working-paper/2014/the-macroeconomic-effects-of-monetary-policy-a-new-measure-for-the-uk
+document:
+  url: https://www.bankofengland.co.uk/-/media/boe/files/working-paper/2014/the-macroeconomic-effects-of-monetary-policy-a-new-measure-for-the-uk.pdf
+  media_type: application/pdf
+  sha256: 019306e8fa6895d491fea94844162bb73877835e03037e231da7a5c4706addc1
+  bytes: 959302
+  version_read: "Bank of England Working Paper No. 493, March 2014 (the journal version may differ)"
+as_of: "2014-03-01"
+rights:
+  licence: "© Bank of England 2014 (notice in the document read; no further licence statement captured); treated as all rights reserved; short quotation with credit."
+  restricted: true
+  archived_for: provenance only (raw store); not redistributed
+curation:
+  curated_by: agent EFFECTS-MORE
+  curated_at: "2026-10-17"
+  review_status: maintainer_review_pending
+defaults:
+  shock_profile: one_time_impulse
+  cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change,
+          definition: "a one percentage point positive innovation to the monetary policy target rate (Bank Rate), measured with the authors' new forecast-based (Romer-Romer type) series"}
+  measure: response
+  shock: {size: 1, unit: percentage point}
+  method: var
+  point_kind: point
+  uncertainty: {status: not_reported}
+  scope: {countries: [GBR], period: {from: "1975", to: "2007"}, frequency: monthly}
+  identification: "Romer-Romer approach for the UK: policy-rate changes purged of the Bank of England's and other real-time forecasts; the new shock series enters a VAR with industrial production, RPIX inflation and commodity prices (bands in figures only)"
+estimates:
+  - id: var_industrial_production_peak
+    pdf_page: 23
+    effect: {kind: variable, id: output.industrial_production, transform: log_level,
+             definition: "industrial production, peak decline (two years after the shock)"}
+    unit: percent
+    sign: negative
+    point: -0.61
+    as_printed: "-0.61"
+    horizon: {kind: peak, value: 24, unit: month}
+    locator: "Section 4 (baseline VAR results), discussion of Figure 4 (printed p.18)"
+    quote: "In response to a one percentage point positive innovation to the monetary policy target rate, the inflation rate falls by up to -1.00 percentage points.23 Industrial production has a peak decline of -0.61 per cent."
+  - id: var_inflation_peak
+    pdf_page: 23
+    effect: {kind: variable, id: prices.inflation_rate, transform: pp_change,
+             definition: "inflation rate (RPIX, 12-month), largest fall"}
+    unit: percentage_points
+    sign: negative
+    point: -1.00
+    as_printed: "-1.00"
+    horizon: {kind: peak}
+    locator: "Section 4 (baseline VAR results), discussion of Figure 4 (printed p.18); the abstract says 'after two to three years'"
+    quote: "In response to a one percentage point positive innovation to the monetary policy target rate, the inflation rate falls by up to -1.00 percentage points."
+  - id: quarterly_var_gdp_trough
+    pdf_page: 31
+    effect: {kind: variable, id: output.real_gdp_level, transform: log_level,
+             definition: "GDP (quarterly VAR with National Accounts data), minimum of the response"}
+    unit: percent
+    sign: negative
+    point: -0.5
+    as_printed: "-0.5"
+    horizon: {kind: peak}
+    scope: {countries: [GBR], frequency: quarterly, sample_note: "Quarterly VAR with GDP, RPIX inflation, commodity prices and the shock measure cumulated to a quarterly series (section 5.3)"}
+    locator: "Section 5.3 'Quarterly VAR with GDP' (printed p.26)"
+    quote: "GDP significantly falls below zero to a minimum of -0.5 per cent, slightly smaller than the effect on industrial production found earlier."
+  - id: quarterly_var_inflation_peak
+    pdf_page: 31
+    effect: {kind: variable, id: prices.inflation_rate, transform: pp_change,
+             definition: "RPIX inflation (quarterly VAR), peak decline"}
+    unit: percentage_points
+    sign: negative
+    point: -0.88
+    as_printed: "0.88"
+    printed_transform: negated
+    horizon: {kind: peak}
+    scope: {countries: [GBR], frequency: quarterly, sample_note: "Quarterly VAR with GDP, RPIX inflation, commodity prices and the shock measure cumulated to a quarterly series (section 5.3)"}
+    locator: "Section 5.3 'Quarterly VAR with GDP' (printed p.26), Figure 8 panel C"
+    quote: "peak decline in inflation is 0.88 percentage points (see Panel C in Figure 8)."
+    applicability: "REVA note: printed as a decline of 0.88 points; stored as -0.88 (printed_transform: negated)."
+  - id: adl_industrial_production_permanent_innovation
+    pdf_page: 8
+    shock_profile: sustained
+    method: time_series_regression
+    cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change,
+            definition: "a one percentage point permanent contractionary monetary innovation (ADL models in first differences implicitly assume a permanent shock to the level of the policy rate)"}
+    effect: {kind: variable, id: output.industrial_production, transform: log_level,
+             definition: "industrial production, fall after two to three years (single-equation ADL)"}
+    unit: percent
+    sign: negative
+    point: -2.3
+    as_printed: "2.3"
+    printed_transform: negated
+    horizon: {kind: unspecified}
+    locator: "Section 1 (introduction), summary of the autoregressive distributed lag (ADL) results (printed p.3); Figure 2 discussion gives 'a minimum of around -2.3 per cent after around 24 months'"
+    quote: "A one percentage point permanent contractionary monetary innovation causes a significant fall in inflation of 1.5 percentage points and a 2.3 per cent fall in industrial production after two to three years."
+    applicability: "REVA note: single-equation ADL estimate whose implied policy-rate path is a permanent rise (the authors explain the larger size by this profile); 'after two to three years' recorded as horizon unspecified."
+  - id: adl_inflation_permanent_innovation
+    pdf_page: 8
+    shock_profile: sustained
+    method: time_series_regression
+    cause: {kind: atlas_concept, id: imf.policy_rate, transform: pp_change,
+            definition: "a one percentage point permanent contractionary monetary innovation (ADL models in first differences implicitly assume a permanent shock to the level of the policy rate)"}
+    effect: {kind: variable, id: prices.inflation_rate, transform: pp_change,
+             definition: "inflation (RPIX), fall after two to three years (single-equation ADL)"}
+    unit: percentage_points
+    sign: negative
+    point: -1.5
+    as_printed: "1.5"
+    printed_transform: negated
+    horizon: {kind: unspecified}
+    locator: "Section 1 (introduction), summary of the ADL results (printed p.3)"
+    quote: "A one percentage point permanent contractionary monetary innovation causes a significant fall in inflation of 1.5 percentage points and a 2.3 per cent fall in industrial production after two to three years."

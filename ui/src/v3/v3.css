@@ -134,6 +134,19 @@
   color: var(--v3-causal);
   border: 1px solid #f0cf96;
 }
+.v3-badge-identity {
+  background: #eef6f0;
+  color: #2c5e3a;
+  border: 1px dashed #9cc7a8;
+}
+.v3-required-notices {
+  margin: 6px 0;
+  font-size: 0.85rem;
+}
+.v3-required-notices h4 {
+  font-size: 0.85rem;
+  margin: 2px 0;
+}
 .v3-badge-uncited {
   background: #fde8e7;
   color: #b42318;
