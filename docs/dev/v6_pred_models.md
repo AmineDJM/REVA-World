@@ -151,6 +151,15 @@ hypothesis).
 error-fan benchmark none of the three wins on development (§12). Status: WEO densities on probation (issue with the
 fair benchmark `forecast.weo_error_fan` sealed next to them; gate `issue.fair_gate`); SPF density issues nothing.
 
+*FIX6 (AUDIT4 L4) — outcome-vintage mismatch:* the WEO densities were validated (development and holdout) against
+the first WEO vintage on/after 1 October of the following year (`realtime.weo_cases`), but the registry family
+`weo.gdp_growth` resolves on the first vintage in which the year is an actual (April of the following year). The two
+differ materially: for 2015–2024, 71–138 of 142–193 countries per year differ by > 0.05 pp, mean absolute difference
+0.27–1.29 pp (p90 0.67–2.0 pp; measured on the archived WEO vintages, descriptive only — the holdout is spent and is
+not re-opened). The holdout coverage (0.75) is therefore not evidence of calibration on the resolving vintage;
+prospective coverage on resolved registry questions is the real test. Flag appended to both WEO entries of
+`registered_models.yaml` (`outcome_vintage_mismatch`).
+
 What these models are: **REVA's calibrated uncertainty around the IMF's / SPF panel's point forecast** (points are
 the IMF's and the SPF's, attributed; the WEO bias correction moves the point by a median past error, AE ×0.999 —
 equal to the WEO). They do not make REVA a better point forecaster than the IMF or the SPF.
