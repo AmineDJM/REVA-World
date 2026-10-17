@@ -8,9 +8,12 @@ requests:
     # api.checklistbank.org (dataset 53147 = GBIF backbone): rank listings (kingdom..family ~34 pages of 1,000),
     # species of the scope groups (Mammalia 22 + Aves 15 pages); api.gbif.org: 178 scope species records, the
     # dataset record and ~30-80 higherTaxonKey facet partitions (<= 1.5 MB each). CC BY 4.0.
-    daily_requests: 800
+    daily_requests: 1200
     expected_bytes_per_day: 130000000
-    reason: "one full run ~330 requests (~100 MB); 800/day allows one retried run"
+    reason: >-
+      one full run ~150-250 requests (~100 MB; scope species 100 ids per request, facet partitions on kingdoms..orders
+      only); 1,200/day because the first live run (2026-10-17, connector 1.0.1) opened a facet partition per family and
+      consumed the whole 800 before loading -- the 1.0.2 re-run must fit the same budget day
   - source_key: col.checklistbank
     # api.checklistbank.org: COL latest release record, import metrics, 5 rank listings, 2 TAXON_ID facets. CC BY 4.0.
     daily_requests: 30
@@ -39,7 +42,7 @@ requests:
     expected_bytes_per_day: 20000000
     reason: "one run = 5 requests (~8 MB)"
 daily_totals_increase:
-  http_requests_total: "+1081"
+  http_requests_total: "+1481"
   http_bytes_total: "+258_000_000"
 notes: >-
   GBIF / ChecklistBank / WDQS reset connections intermittently through the egress proxy (seen 2026-10-17);

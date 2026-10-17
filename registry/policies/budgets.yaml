@@ -1,6 +1,6 @@
-policy_version: "budgets-1.3.24"
+policy_version: "budgets-1.3.25"
 daily:
-  http_requests_total: 19903
+  http_requests_total: 20000
   http_bytes_total: 3221225472
 per_source_daily_requests:
   worldbank.wdi: 200
@@ -88,7 +88,7 @@ per_source_daily_requests:
   # gapminder.fasttrack: requested by A-HISTECON (a_histecon.yaml)
   gapminder.fasttrack: 20
   # gbif.backbone: requested by V4BIO (v4bio.yaml)
-  gbif.backbone: 800
+  gbif.backbone: 1200
   # gbif.occurrence: requested by V4ECO (v4eco.yaml)
   gbif.occurrence: 600
   # gcat.planet4589: requested by A-INFRA (a_infra.yaml)

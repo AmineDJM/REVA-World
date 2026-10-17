@@ -103,15 +103,16 @@ def test_clb_usages_and_species_classification_give_genera() -> None:
 
 
 def test_scope_record_check_refuses_anything_but_the_stated_accepted_species() -> None:
-    rec = json.loads(_fx("atlas.gbif_backbone", "gbif_species_2436436.json"))
+    res, _t, _l = tx.parse_clb_page(_fx("atlas.gbif_backbone", "clb_scope_0.json"), what="scope")
+    rec = next(r for r in res if r["id"] == "2436436")
     sp = tx.ScopeSpecies(2436436, "Homo sapiens", "model_organisms")
     assert tx.check_scope_record(rec, sp) is None
-    u = tx.usage_from_gbif_species(rec, raw="c" * 64)
-    assert u.parent_id == "2436435" and u.classification[-2] == ("2436435", "Homo", "genus")
-    assert (
-        tx.check_scope_record(rec, tx.ScopeSpecies(2436436, "Homo neanderthalensis", "x")) == "canonical_name_differs"
-    )
-    assert tx.check_scope_record({**rec, "taxonomicStatus": "SYNONYM"}, sp) == "status_SYNONYM"
+    u = tx.usage_from_clb(rec, raw="c" * 64, selector={})
+    assert u is not None and u.parent_id == "2436435" and u.classification[-2] == ("2436435", "Homo", "genus")
+    other = tx.ScopeSpecies(2436436, "Homo neanderthalensis", "x")
+    assert tx.check_scope_record(rec, other) == "scientific_name_differs"
+    syn = {**rec, "usage": {**rec["usage"], "status": "synonym"}}
+    assert tx.check_scope_record(syn, sp) == "status_synonym"
 
 
 class _FacetHttp:

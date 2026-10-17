@@ -102,7 +102,7 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   Wikidata identifier bridges read from QLever while WDQS throttles the shared egress); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "d317af43b591b7ab46415c0428b955cb424376477f1c563627020e2098e28a5e",
+    "budgets.yaml": "71a53b3e1c6c96d4ea4dac90e231180e53e98391a5c37f7618d8e27c090cbf41",
 }
 
 

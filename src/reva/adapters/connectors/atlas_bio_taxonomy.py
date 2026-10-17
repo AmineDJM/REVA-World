@@ -14,9 +14,10 @@ Three atlas sources (KG only, no atlas table: nothing here is per country):
     * entities ``gbif:<key>`` (kind ``taxon``) for every **accepted** usage of rank kingdom, phylum, class, order and
       family; the accepted species (and their genera, from each species' own classification) of the species groups
       of ``registry/bio/taxon_scope.yaml`` (vertebrate classes...); the curated scope species (crops, livestock,
-      pathogens, model organisms, iconic species: REVA's selection of *which* keys to load, each key read from GBIF's
-      ``/species/{key}`` and loaded only if GBIF's canonical name, rank and status equal what the scope file states).
-    * statements ``gbif:parent`` (the usage's ``parentId`` / ``parentKey``, or the next classification element for a
+      pathogens, model organisms, iconic species: REVA's selection of *which* keys to load, read by id through
+      ChecklistBank ``USAGE_ID`` searches, 100 per request, and loaded only if the backbone's scientific name, rank
+      and status equal what the scope file states).
+    * statements ``gbif:parent`` (the usage's ``parentId``, or the next classification element for a
       genus read from a species' classification), ``gbif:rank``, ``gbif:authorship``, ``gbif:accepted_species_count``.
     * counts: GBIF species-search facet ``higherTaxonKey`` over usages with ``rank=SPECIES`` and
       ``status=ACCEPTED`` of the backbone. A facet lists at most 50,000 values (GBIF answers 500 above that and
@@ -24,7 +25,9 @@ Three atlas sources (KG only, no atlas table: nothing here is per country):
       the partition taxon, recursively, until every loaded taxon has a count or no deeper partition exists. A listed
       facet value is an exact count; a taxon absent from a *complete* (non-truncated) partition containing it has no
       accepted species under that definition: its count is stated as 0 with ``basis: absent_from_exhaustive_facet``.
-      A taxon only under truncated partitions gets no count statement (reported as missing).
+      A taxon only under truncated partitions gets no count statement (reported as missing). Partitions are opened
+      on kingdoms, phyla, classes and orders only (never on a family: thousands of families have no accepted species
+      and no facet lists them; a first live run that opened families one by one spent its request budget).
 
 ``atlas.col_checklist`` (source key ``col.checklistbank``)
     The latest **Catalogue of Life** release (ChecklistBank ``3LR``, CC BY 4.0, DOI per release): release metrics
@@ -61,7 +64,7 @@ import yaml
 from reva.adapters.connectors import bio_common as bc
 from reva.atlas.sources import AtlasSourceSpec
 
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 PARSER_VERSION = "atlas_bio_taxonomy/1"
 
 GBIF_NAME = "atlas.gbif_backbone"
