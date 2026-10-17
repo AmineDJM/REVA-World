@@ -236,7 +236,9 @@ def test_05_void_by_registry_rule_is_appended_never_edited(env: Env, monkeypatch
     out = svc.void_questions(env.worker, env.store, void, origin="test_fixture")
     assert out["batches"][0]["status"] == "already_handled"  # resolved questions are never re-closed
     with env.worker.connect() as c:
-        before = c.execute(text("SELECT count(*) FROM model.evaluation WHERE metrics->>'kind' = 'registry_score'")).scalar()
+        before = c.execute(
+            text("SELECT count(*) FROM model.evaluation WHERE metrics->>'kind' = 'registry_score'")
+        ).scalar()
     monkeypatch.setattr(svc, "handled_questions", lambda conn, sha: set())  # pretend it is still open
     out = svc.void_questions(env.worker, env.store, void, origin="test_fixture")
     b = out["batches"][0]
@@ -249,5 +251,7 @@ def test_05_void_by_registry_rule_is_appended_never_edited(env: Env, monkeypatch
             text("SELECT metrics FROM model.evaluation WHERE metrics->>'kind' = 'registry_score' "
                  "AND metrics->>'resolution_sha256' = :s"), {"s": b["resolution_sha256"]}
         ).scalars().all()  # fmt: skip
-        after = c.execute(text("SELECT count(*) FROM model.evaluation WHERE metrics->>'kind' = 'registry_score'")).scalar()
+        after = c.execute(
+            text("SELECT count(*) FROM model.evaluation WHERE metrics->>'kind' = 'registry_score'")
+        ).scalar()
     assert after == before + len(rows) and rows and all(r["n_void"] == 1 and r["scores"] == [] for r in rows)
