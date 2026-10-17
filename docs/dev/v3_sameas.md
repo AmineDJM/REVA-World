@@ -8,7 +8,7 @@ CAUSCORE (`reva.causal`). Dev database `reva`, origin `live`.
 **Bottom line.** Of the identifiers the loaded event datasets carry, **only provider-published crosswalks** connect
 records of two sources; **Wikidata holds no identifier property** for any of the loaded event datasets (COW, UCDP,
 ICB, MID, Archigos, NAVCO, Mass Mobilization, TIES, EUSANCT, PRIO, NCEI hazard events, IDMC/GLIDE). REVA now loads
-__LINKS__ evidenced `events:same_as` links and the grader and the chain search resolve them, but **no claim reaches
+**915** evidenced `events:same_as` links and the grader and the chain search resolve them, but **no claim reaches
 grade A through them in the dev DB**: the only cross-provider identity that carried causal claims on both sides
 (PA-X ↔ UCDP peace agreements) lost those claims in the same hour, when the causal audit (M6) and CAUSMORE
 reclassified "conflict → agreement" as context in both datasets. Details, numbers and what would change it below.
@@ -114,7 +114,58 @@ chain is not narrated by `causal_chain` yet (it is shown by the API and the UI).
 
 ## 4. Dev DB run (2026-10-17)
 
-__RUN__
+Sequence (each dev-DB write under `flock /tmp/reva-devdb.lock`): `reva db bootstrap` (register CAUSMORE's
+connectors) → `reva atlas ingest atlas.pax` (1.0.0: 2,440 entities, 24,440 statements, 3,334 claims; first attempts
+were refused by the safe client on `Content-Encoding: none`, fixed) → `reva events same-as --origin live` →
+`reva causal refresh --origin live` (02:22, run by the queue) → CAUSMORE's same-day `atlas.pax` 1.1.0 (budget
+`budgets-1.3.10`: pax 6 → 12/day) → `reva events same-as` (unchanged) → `reva causal refresh --origin live` (02:31).
+
+**same_as links (current, live): 915**, all clusters of 2 records, 13 values ambiguous (never linked):
+
+| rule | links | ambiguous | independent |
+|---|---:|---:|---|
+| `navco12_navco21_campaign` | 375 | 0 | no |
+| `pax_ucdp_agreement_id` | 313 | 2 (UCDP 1070 on 2 PA-X agreements, 1113 on 4) | yes |
+| `colonial_independence_key` | 143 | 11 (9 values on > 2 records, 2 on two records of one source) | — |
+| `eusanct_ties_case` | 84 | 0 | no |
+| `untc_mtdsg_number`, `untc_treaty_qids` | 0 | 0 | — |
+
+Statement keys look like `reva.events.same_as:eusanct_ties_case:eusanct:case:1990122101=ties:case:1990122101`
+(qualifiers: rule, evidence with the provider statement key / raw sha256, `independent_sources`,
+`derivation: evidence_linked_identity`); the evidence document is archived raw (load 368).
+
+**Grades.** Before (02:05, rules version 1): 28,461 graded current claims, **A = 0** (B 26,792, C 311, D 1,280, E 78; 27,791 at the CAUSOPS load).
+After (02:31, rules version 2, 52,376 current claims incl. CAUSMORE's IDMC/COW loads and CAUSWD imports):
+B 50,692 · C 154 · D 1,482 · E 48 · **A 0**; 0 ungraded. The grader read 915 links (915 clusters of 2; 459 links
+declared not independent).
+
+* **Interim A grades (kept in history, superseded).** The 02:22 refresh (load 32) graded **604 claims A** through
+  identity: **302 UCDP** `reaction_to` claims "conflict → peace agreement" and the **302 PA-X** claims coding the
+  same conflict → its own record of the same agreement (e.g. `ds:ucdp.downloads:peace_agreements:31:11345`
+  `ucdp:conflict:11345 → ucdp:pa:31` corroborated by `ds:pax.peaceagreements:pax:879:ucdp:11345`
+  `ucdp:conflict:11345 → pax:agt:879`, with `pax:agt:879 ≡ ucdp:pa:31` by PA-X's `UcdpAgr`; rule ids
+  `tier.T1, temporal.consistent, corroboration.corroborated, contest.none, corroboration.via_same_as,
+  grade.A.expert_consistent_corroborated`). The mechanism works on real data.
+* **Why A is 0 now.** The causal audit (`docs/dev/review_v3_causal_audit.md` M6) judged "conflict → agreement" a
+  codebook *association*, not a causal assertion, in both datasets: atlas.pax 1.1.0 (02:30) retracted the 3,334
+  PA-X claims and atlas.ucdp_term 1.1.0 (AUDFIX, committed, not yet re-ingested in the dev DB) will retract the
+  382 UCDP ones. The 02:31 refresh wrote 302 new rows: the UCDP claims back to B (single source). No other pair of
+  sources codes the same pair of events causally: in the dev DB, 0 (cause, effect) pairs are asserted by two
+  source keys, 0 two-claim chains join two sources (shared ids or same_as), and the remaining links join records
+  that are derived from each other (EUSANCT/TIES, NAVCO 1.2/2.1 — counted once by design) or carry no claims
+  (colonial independences).
+
+**Chains across identity (dev DB).** Identity-crossing shapes that exist: identity → claim 3,648 (NAVCO 1.2 record
+≡ NAVCO 2.1 campaign → its coded events: 3,444; TIES case ≡ EUSANCT case → EUSANCT outcome / policy result: 204),
+claim → identity 321 (UCDP conflict → UCDP agreement ≡ PA-X agreement), claim → identity → claim **0**. Example
+(`reva.causal.graph.chain`, origin live): `ties:case:1990122101` → `eusanct:policy_result:1990122101`: found,
+1 causal hop + 1 identity hop, grade B — hop 1 identity `ties:case:1990122101 ≡ eusanct:case:1990122101`
+(rule `eusanct_ties_case`, evidence `provider_identity_statement`, statement
+`reva.events.same_as:eusanct_ties_case:eusanct:case:1990122101=ties:case:1990122101`), hop 2 claim
+`eusanct:case:1990122101 → eusanct:policy_result:1990122101` (eusanct.kondata, `contributing_factor`, B); wording
+"Composition by REVA of 1 separately asserted claim(s) … It crosses 1 identity link(s) …". `ucdp:pa:31` →
+`pax:agt:879`: refused, "from and to are records of the same event (evidenced same_as link)". A chain whose two
+claim hops come from two different sources (A→B in one, B'→C in another) does not exist in the loaded data.
 
 ## 5. Honesty notes
 

@@ -165,6 +165,13 @@ A value held by more than two records is reported `ambiguous`, never linked. Lin
 a run retracts links whose evidence disappeared (`removed_at_source`). Tested: links from both rules, idempotent
 reload, card display, retraction.
 
+**Update 2026-10-17 (SAMEAS, `docs/dev/v3_sameas.md`):** rules version 2 adds provider crosswalks
+(`pax_ucdp_agreement_id`, `eusanct_ties_case`, `navco12_navco21_campaign`; kinds `statement_link`,
+`one_value_per_holder`, `independent_sources`), a full-text Wikidata property search confirming that no property holds
+COW / UCDP / ICB / MID / NCEI-event / GLIDE ids (`registry/events/_recorded/wikidata_property_search.json`), the CLI
+`reva events same-as`, and corroboration / chain search over same_as clusters (`reva.causal.identity`). Dev DB: 915
+links.
+
 ## 6. Harvester specs (`registry/kg/queries/events/`, domain `history`, ids `history.events.*`)
 
 | Spec | Root classes (api_search depth) | Bound |
