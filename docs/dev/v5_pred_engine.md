@@ -358,3 +358,83 @@ Every result: « scénario non validé — pas une probabilité ».
   elasticities, not a price response; deriving one would be REVA's own calculation).
 * **India rice export ban:** stops — no estimate for `trade.export_restriction` (CEPR source refused, 403).
 * **France 65 in 2027:** stops — the retirement model's Eurostat inputs are not pinned in the release.
+
+## 7c. Re-run after EFFECTS-MORE (V6, 2026-10-17 ~21:00 UTC)
+
+`uv run python -m reva.predict.run --reference all --draws 2000 --seed 0` (read-only) after agent EFFECTS-MORE
+loaded 225 more published estimates (`docs/dev/v6_effects_more.md`; 302 current estimates in all). Every result
+remains « scénario non validé — pas une probabilité »; all new numbers are degenerate scenario points (the model
+simulations and text-quoted responses publish no uncertainty), so every fan is flagged incomplete.
+
+* **ECB +50 bp (2027Q1): first country-specific, dated chains, including unemployment.** For DEU, FRA, ITA, ESP,
+  NLD the engine now picks the exact-scope rows of the Eurosystem common simulation (van Els et al. 2001, ECB WP 94,
+  100 bp for two years, scaled ×0.5): real GDP DEU −0.14 % (year 1) / −0.165 % (year 2), FRA −0.075 / −0.14, ITA
+  −0.13 / −0.30, ESP −0.06 / −0.215, NLD −0.10 / −0.135; unemployment rate +0.01 to +0.03 pp (year 1) and +0.03
+  (ITA) to +0.155 pp (ESP) in year 2; consumption deflator −0.02 to −0.075 % (year 1). Flag: models of 2001, more
+  than 20 years before the decision. CPI inflation stays on the OP 377 meta-analysis (peak −0.06 pp, undated). The
+  CPI level link reports an **unresolved tie** (gap) between the two sustained-50 bp euro-area simulations of ECB WP
+  114 (−0.21 % and −0.15 % after three years for 50 bp, i.e. −0.42 and −0.30 per percentage point; none chosen, never averaged) — the engine's correct refusal.
+* **OPEC+ −2 mb/d: the first link now has a number.** Caldara–Cavallo–Iacoviello (2016): a 1 % decline in global
+  crude supply (≈ 0.8 mb/d, the authors' equivalence) raises oil prices 5 % within a month → +12.5 % in 2027Q1
+  (linear scaling, impact only; no published uncertainty; later quarters not computed). Second hops via
+  Baumeister–Hamilton elasticities (world consumption −4.27 log points, production +1.90) are attached to every
+  country of the decision because the engine carries world variables per listed geography (engine artefact to fix:
+  WLD-scoped variables should stay at WLD). World IP (BH 12-month response) stays missing: the price path exists only
+  at the impact quarter (never interpolated).
+* **EU ban on Russian oil:** unchanged structure (TIES event-study run and Gutmann et al. side by side; the latter now
+  on the growth variable after FIX4B). The new Iran estimates (Laudati–Pesaran) are scoped to IRN and correctly
+  excluded for RUS.
+* **India rice export ban:** still stops. EFFECTS-MORE loaded export-restriction estimates (WTO ERSD-2012-08:
+  elasticity of world food prices to the share of trade covered by restrictions 1.103, SE 0.584; Anderson–Ivanic–
+  Martin: all countries' 2006–08 insulation raised the world rice price 51.9 %), but their causes are
+  `trade.export_restriction_share` / `trade.price_insulation_global`, not a single country's ban
+  (`trade.export_restriction`); converting India's ban into a share of world rice trade needs trade data and is REVA's
+  own computation (not done).
+* **France 65 in 2027:** still stops on unpinned retirement-model inputs; the 26 new pension-age estimates
+  (employment and retirement rates at the affected ages, exit/claiming age slopes) cannot enter a level-transform
+  decision variable by design (target level, not a change).
+
+## 7c. Re-run after the FIX4B corrections (agent FIX4B, 2026-10-17 ~20:50 UTC)
+
+`uv run python -m reva.predict.run --reference all --draws 2000 --seed 0` (read-only) after the audit fixes M3, M4,
+M5, L3 (`docs/dev/v6_fix4b.md`), with **301 current effect estimates** (296 published — EFFECTS-MORE's loads landed
+in the meantime — and 5 REVA event-study runs, re-written as new revisions). Every result: « scénario non validé —
+pas une probabilité ». What changed in the engine: level vs growth consistency gate (a level response on a growth
+concept is excluded, never converted), declared variant preferences (`registry/predict/estimate_preferences.yaml`)
+instead of the alphabetical last rule, an unresolved tie is a gap `unresolved_tie` (no estimate chosen),
+applicability `panel_member` for pooled panels that list the country, h = 0 = onset year.
+
+* **EU ban on Russian oil (2027Q1), RUS** — two *different* variables now (they were crossed before):
+  * `output.real_gdp_per_capita` (level, % vs country-years without onset) from REVA run
+    `run:es-1b3eff04653ec3971c9c:h5` (TIES impositions, LP; cumulative growth ≈ level change): 2027 (h = 0)
+    median +0.18 % (5–95 % −0.38…+0.77), 2028 (h = 1) −0.20 % (−0.79…+0.43) — no detectable association.
+    Applicability `panel_member`: "pooled panel (205 countries; RUS is in the listed sample): an average over the
+    panel, not an estimate specific to RUS" (was `exact`). Alternative listed, not summed: Gutmann et al.
+    `gdp_pc_level_first_two_years` (−2.82 %, undated cumulative, no published uncertainty).
+  * `output.real_gdp_per_capita_growth` (growth rate, pp) from Gutmann–Neuenkirch–Neumeier (2022)
+    `gdp_pc_growth_years_1_2` (one lag profile replacing the two single-horizon rows, withdrawn by curator): 2027
+    (first year of the episode, h = 0) −1.32 pp, 2028 −1.50 pp, later years `lag_not_published`; scenario points
+    (no published uncertainty); "pooled panel ('158 countries', verbatim); RUS membership not checked". Before the
+    fix this was −1.32 pp placed in **2028** on the *level* variable.
+* **ECB +50 bp (2027Q1), DEU/FRA/ITA/ESP/NLD**:
+  * CPI inflation (`imf.inflation_cpi_avg`, peak, undated): −0.06 pp = ECB OP 377 **median** (declared rule
+    `median_over_mean`; no bias-corrected inflation figure is published), shown with "variante retenue : médiane";
+    the mean (−0.10 pp) is listed as alternative. Before: the mean, chosen alphabetically.
+  * Real GDP level: now van Els et al. (2001) country-specific model responses (applicability `exact`), e.g. DEU
+    −0.14 % in 2027Q1, −0.165 % in 2028Q1; the ECB OP 377 variants are alternatives in declared order
+    (bias-corrected median, bias-corrected mean, median, mean), never averaged.
+  * Consumer price level: **no number** — gap `unresolved_tie` between Angeloni et al. (2002) AWM and EMM model
+    responses (equal on every declared rule; no preference declared between two models of one paper). Listed in
+    the gap with both keys; the engine does not pick one.
+  * Unemployment rate and consumption deflator: van Els et al. country rows (degenerate draws, no published
+    uncertainty).
+* **OPEC+ −2 mb/d**: now propagates through EFFECTS-MORE's Caldara–Cavallo–Iacoviello price response (+12.5 % in
+  2027Q1, later quarters `lag_not_published`) and Baumeister–Hamilton elasticities (not changed by FIX4B; note:
+  `oil.world_consumption` / `oil.world_production` / `output.world_industrial_production` are world quantities but
+  are expanded per country of interest — they are not declared `global` in `registry/predict/variables.yaml`;
+  owner: PRED-ENGINE / EFFECTS-MORE).
+* **India rice export ban**, **France 65 in 2027**: unchanged (no estimate for `trade.export_restriction`;
+  retirement inputs not pinned).
+* Exclusions: 317 `out_of_scope`, 21 `not_propagatable` (std-dev shocks), 6 `unit_mismatch`; **0** estimate
+  excluded for level/growth inconsistency (all 301 current rows pass the new rule; the 4 mislabelled REVA rows were
+  re-written on level variables before the run).
