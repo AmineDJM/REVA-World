@@ -90,8 +90,8 @@ LIVE_RESULTS_PLACEHOLDER
 | `atlas.ncbi_genomes` (1.0.1) | 5 | 7.7 MB | 1,922 assemblies (+ new taxa) | 16,530 | reference annotated genomes: 1,364 Vertebrata + 558 Viridiplantae; 7,748 gene-count statements; 1,094 RefSeq↔INSDC pairings |
 | `atlas.col_checklist` (1.0.2) | 9 | 4.3 MB | 649 (648 taxa + release) | 1,912 | COL26.10 (2026-10-14, doi:10.48580/dgzh4): 3 domains, 10 realms, 24 kingdoms, 146 phyla, 465 classes; 602 species counts (facet top 50,000: 237 small taxa without a count); 28 release metrics |
 | `atlas.gbif_backbone` (1.0.2) | 161 (+800 by 1.0.1, see below) | 78.8 MB | 58,785 taxa | 175,327 | 8 kingdoms, 257 phyla, 749 classes, 2,791 orders, 27,015 families, 21,100 Mammalia species + 6,740 genera, 170/178 scope species; 36,641 species counts from 101 facet partitions (4 truncated: root, Animalia, Arthropoda, Insecta); 6,144 taxa stated 0 (absent from an exhaustive partition), 920 without count (only under truncated partitions) |
-| `atlas.bio_wikidata` (1.0.2) | WD_REQ | WD_MB | — | WD_ST | WD_NOTE |
-| **Total** | | **WD_TOTAL MB** (≤ 150 MB bound) | **~180k** | **~750k** | rejected statements: 0 in every load |
+| `atlas.bio_wikidata` (1.0.2) | 0 answered | 0 | — | 0 | **not loaded**: WDQS answered `429 ... 1 req / min ... active wdqs outage` with `Retry-After: 1000`; two attempts (the first lost to a container restart, the second stopped after 20 min so as not to hold the shared dev-DB lock while cooling down). Code + fixture test pass; run the command below when WDQS is healthy |
+| **Total** | 333 | **128.0 MB** (≤ 150 MB bound; 631 distinct raw artifacts) | **~165k** | **732,677** | rejected statements: 0 in every load |
 
 Examples (ids in the dev DB):
 
