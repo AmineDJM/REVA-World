@@ -1,0 +1,87 @@
+schema: reva-beat-health-protocol/1
+version: "1.0.0"
+agent: BEAT-HEALTH (V7)
+registered_on: "2026-10-17"
+binding_protocol: docs/roadmap/v7_beat_official.md
+question: >-
+  Does a REVA post-processed / stacked forecast beat the CDC hub ensemble published for the same round
+  (FluSight-ensemble for NHSN influenza admissions, CovidHub-ensemble for NHSN COVID-19 admissions) on WIS?
+  A win is stated exactly as "REVA's <candidate>, which takes the hub ensemble as an input, beats the hub ensemble
+  alone"; it is never a claim that REVA beats the hub's member models without the ensemble.
+frozen_code:
+  module: src/reva/evaluation/health_registry/beat.py
+  module_sha256: PENDING
+  cli: src/reva/cli/beat_health.py
+  note: the holdout run refuses to execute when the module's sha256 differs from this value
+candidates:
+  beat.qa_blend: >-
+    quantile averaging w*ensemble + (1-w)*REVA health.blend (V6 model, as-of vintage of the round); w in
+    {0, 0.05, ..., 1} per horizon minimising the summed past WIS over every location (US + states, the hub's own
+    location codes; pooled = hierarchical pooling with one shared weight); w = 1 until 200 past scored tasks exist
+  beat.width_recal: >-
+    ensemble quantiles stretched around its median, m + s(q - m), s in {0.8, 0.9, 1.0, 1.1, 1.2, 1.35, 1.5} per
+    horizon minimising the summed past WIS (calibration correction from the ensemble's own past errors); s = 1
+    until 200 past scored tasks exist
+information_set: >-
+  round R (reference date R): ensemble quantiles of round R; NHSN vintage dated R-7 (flu) / R-3 (COVID) exactly as
+  the V6 as-of back-test; past WIS computed only against values published in round R's vintage (no later
+  revision); no external signal in any candidate
+excluded_from_candidates:
+  flunet_signals: >-
+    FluNet positivity (USA, CAN, MEX; southern hemisphere) exists only as a final (revised) vintage in the atlas,
+    so it cannot be used without look-ahead; dev check (informational) made the ensemble worse (rel. WIS 1.05-1.19)
+  erviss: European surveillance; no plausible information for US states at 0-3 week horizons; not tested
+  gdelt_health_themes: not loaded in the atlas (no gdelt table)
+  weather_cckp: CCKP/CRU/ERA5 monthly series in the atlas do not reach the forecast dates (no as-of availability)
+  school_calendars: no open source loaded
+truths:
+  final: value in the latest target table at evaluation time (as the hubs and V6 score)
+  first_release: value in the earliest NHSN vintage publishing the week (what the V6 sealed registry resolves on)
+decision_rule:
+  primary_truth: final
+  secondary: [first_release, coverage50, coverage90, by-horizon relative WIS]   # reported, never used to declare a win
+  test: >-
+    Diebold-Mariano with Harvey-Leybourne-Newbold correction on per-round mean WIS differences (candidate minus
+    ensemble), Newey-West lag 3; win = relative WIS (sum candidate / sum ensemble) < 1 AND mean difference < 0 AND
+    Holm-adjusted p < alpha over the single family below
+  alpha: 0.05
+  family:   # ONE Holm family for the whole holdout evaluation; declared tests that cannot run count as p = 1
+    - H1|nhsn.flu_hosp|beat.qa_blend
+    - H1|nhsn.flu_hosp|beat.width_recal
+    - H1|nhsn.covid_hosp|beat.qa_blend
+    - H1|nhsn.covid_hosp|beat.width_recal
+    - H2|nhsn.flu_hosp|beat.qa_blend
+    - H2|nhsn.flu_hosp|beat.width_recal
+  dev_admission: >-
+    the same rule applied to the development rounds (one Holm family of the 4 dev tests) admits a candidate to
+    prospective sealing; admission is never evidence of skill (QA-PRED X4)
+development_set:
+  description: every hub round already used by the V6 as-of back-test (reference dates 2024-11-23 ... 2026-10-10)
+  status: spent (V6) - used here for method design; results are selection data, not evidence
+holdouts:
+  H1:
+    description: >-
+      hub rounds never scored by anyone at registration (no truth existed on 2026-10-17): the 2026-27 season
+    families: [nhsn.flu_hosp, nhsn.covid_hosp]
+    first_reference_date: "2026-10-17"
+    last_reference_date: "2027-05-29"
+    evaluate_not_before: "2027-07-03"
+    single_look: true
+    requires: weekly ingest of atlas.cdc.{flusight,covidhub}_{target,vintages,ensemble} through 2027-06
+  H2:
+    description: >-
+      FluSight 2023-24 season (rounds REVA never loaded; the V6 connector starts at 2024-11-01), as-of only:
+      evaluated only if the hub's archived target-data vintages for that season exist and are ingested; never with
+      final-vintage histories
+    families: [nhsn.flu_hosp]
+    first_reference_date: "2023-10-01"
+    last_reference_date: "2024-06-01"
+    requires: atlas_cdc_resp_hubs FIRST_REFERENCE_DATE lowered to 2023-10-01 (disk >= 5 GB; ~25 MB raw)
+    caveat: "2023-24 target = HHS Protect-era NHSN series; untouched season; candidates start at the prior (w=1, s=1) until 200 past tasks"
+prospective_sealing: >-
+  only candidates admitted by dev_admission are sealed (registry under flock /tmp/reva-devdb.lock); none admitted
+  at registration (see docs/dev/v7_beat_health.md) -> nothing sealed; H1 is evaluated from archived vintages with the
+  frozen module instead
+other_targets:
+  ecdc_erviss: "no official forecaster in the atlas (RespiCast model output not ingestible - GitHub API blocked, disk < 5 GB); no test"
+  who_flunet: "no official forecaster exists for FluNet positivity; no beat-official test"
