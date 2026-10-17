@@ -29,14 +29,14 @@
     "request_fingerprint": "119b386cedf49633b1561a97fe3a843ecd06b181c778f8e78165fe512d580146",
     "url": "https://opensource.unicc.org/un/unece/uncefact/vocab-locode/-/jobs/artifacts/2025-1/download?job=package-release",
     "file": "119b386cedf49633.zip",
-    "sha256": "c13e61dbb02b22bc51572d6d33cde2649e6af495d4174f52fc152ca2367591ae",
+    "sha256": "a73e00f52643deab74869a9c12d24004e5dd919fd8ce6bb2fd763e134c7a2d93",
     "status": 200,
     "headers": {
       "content-type": "application/zip"
     },
     "retrieved_at": "2026-10-17T12:00:00+00:00",
     "licence": "UN/LOCODE: conflicting statements (CC BY 4.0 footer vs non-commercial site terms)",
-    "note": "EXCERPT: code list and subdivision rows of ['FR', 'DZ', 'NL', 'SG', 'EG', 'PA', 'MA', 'AD', 'XZ']; SKOS file cut before the countries",
+    "note": "EXCERPT: code list and subdivision rows of ['DZ', 'NL', 'SG', 'EG', 'PA', 'MA', 'AD', 'XZ']; SKOS file cut before the countries",
     "derived": {
       "kind": "derived_excerpt",
       "by": "tests/fixtures/source/atlas.unlocode/cut_v6infra_fixtures.py",
@@ -47,14 +47,14 @@
     "request_fingerprint": "9a5a66e5468b9b0a9be9fd4ba291f4f18526c80cafb997f4c57ba4e7dc37b26b",
     "url": "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_1_states_provinces.zip",
     "file": "9a5a66e5468b9b0a.zip",
-    "sha256": "19e9bf9d5b1cb421c6777897d8d33d1088a54cdba038bd6a47c897b2cacd559c",
+    "sha256": "f68f80f2bef0886f65a799c56e01a1b62333729ebdf9ceef07cbf2f1da22be8e",
     "status": 200,
     "headers": {
       "content-type": "application/zip"
     },
     "retrieved_at": "2026-10-17T12:00:00+00:00",
     "licence": "Public domain (Natural Earth)",
-    "note": "EXCERPT: admin-1 features with iso_a2 in ['FR', 'DZ', 'NL', 'SG', 'EG', 'PA', 'MA', 'AD', 'MC', 'TV']",
+    "note": "EXCERPT: admin-1 features with iso_a2 in ['DZ', 'NL', 'SG', 'EG', 'PA', 'MA', 'AD', 'MC', 'TV']",
     "derived": {
       "kind": "derived_excerpt",
       "by": "tests/fixtures/source/atlas.unlocode/cut_v6infra_fixtures.py",

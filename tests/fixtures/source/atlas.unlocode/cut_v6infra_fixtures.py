@@ -23,8 +23,8 @@ import zipfile
 from datetime import UTC, datetime
 from typing import Any
 
-NE_ISO_A2 = ("FR", "DZ", "NL", "SG", "EG", "PA", "MA", "AD", "MC", "TV")
-COUNTRIES2 = ("FR", "DZ", "NL", "SG", "EG", "PA", "MA", "AD", "XZ")
+NE_ISO_A2 = ("DZ", "NL", "SG", "EG", "PA", "MA", "AD", "MC", "TV")
+COUNTRIES2 = ("DZ", "NL", "SG", "EG", "PA", "MA", "AD", "XZ")
 COUNTRIES3 = ("FRA", "DZA", "NLD", "SGP", "EGY", "PAN", "MAR")
 CHOKEPOINTS = ("chokepoint1", "chokepoint2", "chokepoint6")
 WHEN = datetime(2026, 10, 17, 12, 0, tzinfo=UTC).isoformat()
