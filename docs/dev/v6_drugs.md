@@ -14,12 +14,12 @@ Rules held throughout: an indication or an essential-medicine listing is an **as
 |---|---|---|---|
 | `atlas.chembl_drugs` (`chembl.api`) | ChEMBL API: `status.json` (release pinned, re-checked at the end), `molecule.json?max_phase=4` (5 pages, selected fields), `mechanism.json?max_phase=4` (4 pages), `target.json?target_chembl_id__in=` (scalar fields, chunks of 100), `drug_indication.json?max_phase_for_ind=4` (9 pages, with references); FTP `ChEMBLdb/latest/chembl_uniprot_mapping.txt` (header release must equal the API release) | **CC BY-SA 3.0** (ShareAlike flagged); ChEMBL ids preserved and release `ChEMBL_37` on every statement as `REQUIRED.ATTRIBUTION` asks; ATC codes = WHOCC material, flagged `licence_noncommercial` | 30 requests, 16.9 MB |
 | `atlas.unichem` (`unichem.mapping`) | UniChem whole-source mappings ChEMBL→ChEBI (src7), →DrugBank (src2), →FDA SRS/UNII (src14) | EMBL-EBI terms, no licence file → `licence_review`; only identifier pairs (same standard InChI); DrugBank content (CC BY-NC) not fetched | 3 requests, 0.9 MB |
-| `atlas.who_eml` (`who.eeml`) | WHO eEML list page, every medicine page, every recommendation page (HTML; the XLSX export has no ids) | **CC BY 3.0 IGO** with WHO's restrictions (no advertising/promotion use, no endorsement suggestion, no logo) and attribution/adaptation disclaimer | EML_RUN |
-| `atlas.openfda` (`openfda.api`) | openFDA `count` aggregations only: FAERS reports per year × occurrence country (2004–2026), recall enforcement reports per year × class (2012–2026), top-100 substances by FAERS reports, top-1,000 by labels, substances in recalls, serious / non-serious report counts per substance in scope | **CC0 1.0**; FDA caveat quoted verbatim on every FAERS value | FDA_RUN |
-| `atlas.ctgov` (`ctgov.api`) | ClinicalTrials.gov API v2: `/version`, `/stats/field/values` (7 fields, top 250 values), study **counts** (`countTotal`, one NCT id returned) per country × phase 1–4 and per condition MeSH × phase 1–4 | public domain (NLM) with ClinicalTrials.gov terms → `licence_review` | CT_RUN |
+| `atlas.who_eml` (`who.eeml`) | WHO eEML list page, every medicine page, every recommendation page (HTML; the XLSX export has no ids) | **CC BY 3.0 IGO** with WHO's restrictions (no advertising/promotion use, no endorsement suggestion, no logo) and attribution/adaptation disclaimer | run 1 stopped at medicine 403 (an equivalent-only page without recommendations: parser 1.0.0 treated it as drift, nothing loaded); connector 1.0.1 re-run: 1,772 requests, 31.1 MB |
+| `atlas.openfda` (`openfda.api`) | openFDA `count` aggregations only: FAERS reports per year × occurrence country (2004–2026), recall enforcement reports per year × class (2012–2026), top-100 substances by FAERS reports, top-1,000 by labels, substances in recalls, serious / non-serious report counts per substance in scope | **CC0 1.0**; FDA caveat quoted verbatim on every FAERS value | run 1 (before eEML was loaded, scope empty): 41 requests, 0.3 MB; run 2: 641 requests, 0.5 MB |
+| `atlas.ctgov` (`ctgov.api`) | ClinicalTrials.gov API v2: `/version`, `/stats/field/values` (7 fields, top 250 values), study **counts** (`countTotal`, one NCT id returned) per country × phase 1–4 and per condition MeSH × phase 1–4 | public domain (NLM) with ClinicalTrials.gov terms → `licence_review` | **not run live**: free disk had fallen to 3–4.8 GB (< 5 GB rule) when its turn came; connector + fixtures + tests done, command below |
 | WHO ATC/DDD index | **not fetched**: WHOCC terms "Copying and distribution for commercial purposes is not allowed. Changing or manipulating the material is not allowed." ATC *codes* appear only as published inside ChEMBL / eEML records, flagged non-commercial; no ATC level names or DDDs are loaded | — | — |
 
-Raw archive written by V6DRUGS: RAW_TOTAL (cap 100 MB). Budgets: `registry/atlas/budget_requests/v6drugs.yaml`
+Raw archive written by V6DRUGS: ≈ 50 MB (ChEMBL 16.9 + UniChem 0.9 + eEML 31.1 + openFDA 0.8; the stopped first eEML run adds at most ~5 MB of pages whose bytes differed) (cap 100 MB). Budgets: `registry/atlas/budget_requests/v6drugs.yaml`
 (merged: chembl.api 120, unichem.mapping 10, who.eeml 2000, openfda.api 900, ctgov.api 2200 per day).
 
 ## Code and registry files
@@ -71,7 +71,15 @@ FAERS / label / recall counts, study counts.
 
 ## Loaded (live, dev DB `reva`, origin `live`)
 
-LOADED_TABLE
+| Source | Entities | KG statements | Atlas |
+|---|---|---|---|
+| ChEMBL_37 | 7,020 (4,225 `drug`, 850 `drug_target`, MeSH descriptors, EFO/HP/Orphanet/GO terms) | 46,164: 3,416 mechanisms, 1,851 target components, 831 target organisms, 8,457 indications (EFO 5,619, Mondo 1,822, HP 940, Orphanet 43, DOID 18, GO 15) + 8,683 MeSH indications, molecule literals/ATC/flags/parents | — |
+| UniChem | 3,250 `drug_substance` (UNII) | 8,655: ChEBI 3,288 (3,177 drugs; 105 one-to-many), DrugBank 2,117, UNII 3,250 | — |
+| WHO eEML | 1,226 (650 medicines, 190 sections, 384 ICD-11 categories, 2 lists) | 9,829: 1,121 recommendations (1,088 with ICD-11, 33 text only; 723 with EMLc badge), 597 DrugBank ids, **458 medicines linked to one approved ChEMBL drug** (139 DrugBank ids without one; 0 ambiguous), ATC, status history, sections, alternatives | — |
+| openFDA | 1,530 UNII substances (733 new) | 2,737: 100 top-FAERS counts, 1,000 label counts, 857 recall counts, serious/non-serious report counts for 393 substances (scope 653 UNIIs of eEML-linked drugs and their salts, capped at 600 requests/run; 207 had no harmonised match → recorded "not found", no statement) | `atlas.openfda.faers_country` 3,215 rows (2004–2026, 13 non-ISO codes unmapped: EU, A1, XK, YU, ...), `atlas.openfda.recalls` 46 rows (2012–2026 × class) |
+| ClinicalTrials.gov | (fixture only) | (fixture only) | (fixture only) |
+
+Zero rejected rows, zero entity conflicts in every live load.
 
 ## Examples (live ids)
 
@@ -89,8 +97,8 @@ LOADED_TABLE
   curates them).
 * **Chemistry bridge**: `chembl:CHEMBL941` —`unichem:chebi`→ `chebi:45783`; aspirin `chembl:CHEMBL25` →
   `chebi:15365` (V4CHEM's ChEBI subset holds 44 of the 3,288 ChEBI targets today; the rest wait for a larger ChEBI load).
-* **Reports, not causation**: FDA_EXAMPLE
-* **Trials**: CT_EXAMPLE
+* **Reports, not causation**: `unii:8A1O1M485B` (imatinib mesylate, `chembl:CHEMBL1642 —unichem:fda_unii→`) `openfda:faers_reports` 33,363 serious / 8,053 non-serious reports (as of FAERS `last_updated` 2026-07-30), each with FDA's caveat; `unii:BKJ8M8G5HI` (imatinib base) has no harmonised match → no count (not zero).
+* **Trials**: (fixture, 2026-10-16 data timestamp) `ctgov:condition_mesh:D003924` (type 2 diabetes) —`ctgov:condition_mesh`→ `mesh:D003924` (the same MeSH id ChEMBL indications use) with 9,983 registered studies and counts per phase 1–4; atlas `ctgov.studies_by_country`: France 43,116 studies, of which phase 3 counted separately.
 
 Cross-layer resolution today: 1,810 of 1,822 Mondo indication edges point to existing V4HEALTH Mondo entities;
 1,241 of 1,851 target components to existing V4BIO UniProt entities (V4BIO loads reviewed human entries; the rest
@@ -147,7 +155,10 @@ aggregate scope).
 ```bash
 df -h /                                                        # >= 5 GB free
 flock /tmp/reva-devdb.lock uv run reva seed                    # registers atlas_drugs_* connector versions
-for s in atlas.chembl_drugs atlas.unichem atlas.who_eml atlas.openfda atlas.ctgov; do   # order matters (scopes)
+# still to run live (disk was < 5 GB): ClinicalTrials.gov, ~1,910 count requests, < 1 MB, ~45 min
+flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.ctgov
+# refresh (order matters: UniChem scopes on ChEMBL drugs, eEML bridges through UniChem, openFDA scopes on eEML)
+for s in atlas.chembl_drugs atlas.unichem atlas.who_eml atlas.openfda atlas.ctgov; do
   flock /tmp/reva-devdb.lock uv run reva atlas ingest $s
 done
 # with an openFDA key / more substances: --option max_substances=3000 (needs the key's 120k/day quota)
