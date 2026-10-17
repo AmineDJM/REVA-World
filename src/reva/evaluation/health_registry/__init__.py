@@ -2,5 +2,5 @@
 forecasts scored by WIS, as-of back-tests against the US CDC forecast hubs' ensembles, sealed issues.
 
 Pure parts: :mod:`.core` (specs, periods, series extraction, questions, forecasts, back-tests). Database parts:
-:mod:`.service` (pins, seal, resolve, stored back-tests). CLI: ``python -m reva.evaluation.health_registry``.
+:mod:`.service` (pins, seal, resolve, stored back-tests). CLI: ``python -m reva.cli.health_registry``.
 """
