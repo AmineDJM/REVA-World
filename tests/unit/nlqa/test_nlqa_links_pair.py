@@ -169,7 +169,7 @@ PAIR_OP = op("s1", "links_pair", country="BRA", other_country="PRT", link_kinds=
 
 
 def test_plan_schema_and_validation() -> None:
-    assert PROMPT_VERSION == "nlqa-plan-1.2.0"  # 1.1.0 added links_pair; 1.2.0 added why / causal_chain
+    assert PROMPT_VERSION == "nlqa-plan-1.3.0"  # 1.1.0 added links_pair; 1.2.0 added why / causal_chain
     props = output_schema()["properties"]["operations"]["items"]["properties"]
     assert "links_pair" in props["op"]["enum"] and "other_country" in props
     q = "Quels liens entre le Brésil et le Portugal ?"

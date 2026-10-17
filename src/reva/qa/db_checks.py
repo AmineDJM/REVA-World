@@ -685,6 +685,9 @@ def causal_checks(
         rows = be.rows(
             "SELECT c.source_key, COUNT(*) AS n, MIN(c.claim_key) AS ex FROM kg.causal_claim_current c "
             f"WHERE c.origin = {lit(origin)} AND ({conds}) AND CAST(c.qualifiers AS TEXT) NOT LIKE '%source_relation%' "
+            # FIX4A: the filler replaced by a REVA-made altered-state node (reva_state:<state>:<filler>, verbatim
+            # source relation + label in the selector) is the fix, not an "X causes" claim
+            "AND c.cause_id NOT LIKE 'reva_state:%' AND c.effect_id NOT LIKE 'reva_state:%' "
             "GROUP BY c.source_key"
         )
         n = sum(int(r["n"]) for r in rows)
@@ -698,7 +701,10 @@ def causal_checks(
                 total,
                 [{"source_key": r["source_key"], "claim_key": r["ex"]} for r in rows],
                 [{"source_key": r["source_key"], "claims": int(r["n"])} for r in rows],
-                note="AUDIT3 H1: relations " + ", ".join(rels) + "; fixed when qualifiers carry source_relation.",
+                note="AUDIT3 H1: relations "
+                + ", ".join(rels)
+                + "; fixed when qualifiers carry source_relation or the filler "
+                "is replaced by a REVA-made reva_state: node (FIX4A).",
             )
         )
     return out

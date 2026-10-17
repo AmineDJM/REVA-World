@@ -486,7 +486,7 @@ def test_why_answers_from_real_causal_claims_with_source_and_tier(env: Env, caus
     assert causal_claims["loaded"]["inserted"] >= 1, causal_claims
     b = ask(env, "Quelles sont les causes du traité de Tordesillas ?").json()
     cited(b)
-    assert b["planner"] == "keyword_fallback" and b["prompt_version"] == "nlqa-plan-1.2.0"
+    assert b["planner"] == "keyword_fallback" and b["prompt_version"] == "nlqa-plan-1.3.0"
     assert [o["op"] for o in b["plan"]["operations"]] == ["entity_lookup", "why"]
     causal = [s for s in b["sentences"] if s["kind"] == "causal"]
     assert len(causal) == 1, b["answer_text"]

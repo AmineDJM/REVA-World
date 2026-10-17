@@ -77,7 +77,8 @@ predicates:
      label_en: "mode of inheritance (Disease Ontology 'has material basis in' an inheritance pattern; not a cause)",
      label_fr: "mode de transmission (Disease Ontology « has material basis in » un mode de transmission ; pas une cause)",
      inverse_name: doid_inheritance_mode_of, inverse_label_en: "is the mode of inheritance of (Disease Ontology)", inverse_label_fr: "est le mode de transmission de (Disease Ontology)"}
-  - {pid: "doid:has_disease_driver", value_kind: item, reva_predicate: doid_has_disease_driver, family: context, ro: "RO:0007001",
+  # unmapped in the families (not traversed): see registry/kg/relations_v4.d/v4health.yaml
+  - {pid: "doid:has_disease_driver", value_kind: item, reva_predicate: doid_has_disease_driver, ro: "RO:0007001",
      label_en: "has disease driver (Disease Ontology, RO:0007001; not under RO 'causally related to')",
      label_fr: "a pour facteur de maladie (Disease Ontology, RO:0007001 « has disease driver » ; hors de la branche causale de RO)",
      inverse_name: doid_disease_driver_of, inverse_label_en: "is a disease driver of (Disease Ontology, RO:0007001)", inverse_label_fr: "est un facteur de la maladie (Disease Ontology, RO:0007001)"}

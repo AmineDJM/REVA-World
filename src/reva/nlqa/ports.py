@@ -216,6 +216,8 @@ class Concept:
     review_status: str = "provider_declared"
     #: explicit catalog declaration (``rankable: false``); ``None`` = derived from the unit
     rankable: bool | None = None
+    #: catalog sub-domain (e.g. ``causes_of_death``), when the catalog declares one
+    subdomain: str | None = None
 
     def label(self, lang: str) -> str:
         return pick_label(self.labels, lang, self.id)
@@ -587,6 +589,126 @@ class EntitySearchPort(Protocol):
     def search(self, text: str, *, lang: str, limit: int) -> list[EntityMatch]: ...
 
 
+# --------------------------------------------------------------------------- V6 domains (agent NLQA6)
+@dataclass(frozen=True)
+class FamilyNeighbour:
+    """One neighbour of an entity in a relation family (``reva.kg.family_query``): the sourced statement, the
+    reading of the relation from the entity (fr/en), the share the source states (``None`` = Missing) and the
+    licence of the raw artifact the statement was read from."""
+
+    family: str
+    reading: Mapping[str, str]
+    inverse: bool
+    neighbour: Entity
+    statement: KgStatement
+    share: Mapping[str, Any] | None = None
+    rights: Mapping[str, Any] | None = None
+    subtype: str | None = None
+    identity: bool = False
+
+
+@dataclass(frozen=True)
+class FamilyGroup:
+    family: str
+    label: Mapping[str, str]
+    count: int
+    neighbours: tuple[FamilyNeighbour, ...]
+    count_is_lower_bound: bool = False
+
+
+@dataclass(frozen=True)
+class FamilyView:
+    """Neighbours of one entity grouped by relation family; ``literals`` are the entity's literal statements
+    (names as published, quantities) with the licence of their raw artifact."""
+
+    qid: str
+    labels: Mapping[str, str]
+    groups: tuple[FamilyGroup, ...] = ()
+    literals: tuple[tuple[KgStatement, Mapping[str, Any] | None], ...] = ()
+    identities: tuple[FamilyNeighbour, ...] = ()
+    kind: str | None = None
+
+
+@dataclass(frozen=True)
+class CrossRow:
+    """An entity linked to A (edge ``a``) and to B (edge ``b``): two sourced statements."""
+
+    entity: Entity
+    a: FamilyNeighbour
+    b: FamilyNeighbour
+
+
+@dataclass(frozen=True)
+class CrossResult:
+    rows: tuple[CrossRow, ...]
+    total: int
+    total_is_lower_bound: bool = False
+
+
+@runtime_checkable
+class FamiliesPort(Protocol):
+    """Relation families of the KG (V4CORE ``/v1/kg/entities/{id}/families``)."""
+
+    name: str
+
+    def families(self, qid: str, *, families: Sequence[str], per_family: int) -> FamilyView: ...
+
+    def cross(
+        self, a_qid: str, a_families: Sequence[str] | None, b_qid: str, b_families: Sequence[str], *, limit: int
+    ) -> CrossResult: ...
+
+
+@dataclass(frozen=True)
+class EffectTerm:
+    """A cause/effect id of the effect-estimate layer with its registry labels (variable, atlas concept, event
+    type): what a question's words are matched against (registry labels, never entity names)."""
+
+    kind: str
+    id: str
+    labels: Mapping[str, str]
+
+
+@runtime_checkable
+class EffectsPort(Protocol):
+    """Attributed effect estimates (PRED-EFFECT ``/v1/effects``); each estimate is a dict as ``estimate_json``."""
+
+    name: str
+
+    def terms(self) -> list[EffectTerm]: ...
+
+    def estimates(
+        self, cause_ids: Sequence[str], effect_ids: Sequence[str], *, country: str | None, limit: int
+    ) -> list[Mapping[str, Any]]: ...
+
+
+@runtime_checkable
+class ForecastPort(Protocol):
+    """The prospective forecast registry (PRED-REGISTRY ``/v1/forecasts``): sealed questions and forecasts."""
+
+    name: str
+
+    def families(self) -> list[Mapping[str, Any]]: ...
+
+    def questions(self, family: str, geo: str | None, *, limit: int) -> list[Mapping[str, Any]]: ...
+
+    def question(self, question_id: str) -> Mapping[str, Any] | None: ...
+
+    def models(self) -> Mapping[str, tuple[str, str]]: ...
+
+
+@runtime_checkable
+class DecisionPort(Protocol):
+    """The decision engine (PRED-ENGINE ``/v1/predict/decision``): unvalidated scenarios, never probabilities."""
+
+    name: str
+
+    def references(self) -> list[Mapping[str, Any]]: ...
+
+    def instruments(self) -> list[Mapping[str, Any]]: ...
+
+    def run(self, decision: Mapping[str, Any], *, draws: int, seed: int) -> Mapping[str, Any]: ...
+
+
 @dataclass
 class Backends:
     """The adapters an executor runs against; ``None`` = capability unavailable on this server."""
@@ -597,4 +719,8 @@ class Backends:
     links: LinksPort | None = None
     search: EntitySearchPort | None = None
     causal: CausalPort | None = None
+    families: FamiliesPort | None = None
+    effects: EffectsPort | None = None
+    forecasts: ForecastPort | None = None
+    decisions: DecisionPort | None = None
     notes: list[str] = field(default_factory=list)

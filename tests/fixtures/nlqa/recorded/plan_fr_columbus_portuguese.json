@@ -2,7 +2,7 @@
  "fixture_kind": "synthetic_plan",
  "label": "fr_columbus_portuguese",
  "note": "Hand-written planner output (NOT a model recording): live capture on 2026-10-15 failed (OpenAI 429 insufficient_quota, Gemini 402; see failures/). Re-capture with `uv run python -m reva.nlqa.recorded` when provider credits are restored.",
- "prompt_version": "nlqa-plan-1.2.0",
+ "prompt_version": "nlqa-plan-1.3.0",
  "text": "Comment Christophe Colomb est-il lié au fait que les Brésiliens parlent portugais ?",
  "text_sha256": "c0163f079e840c3359780ab7f0c666dab6c1ddb707b39edbd772aac08a0cd119",
  "output": {

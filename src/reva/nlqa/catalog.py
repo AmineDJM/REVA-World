@@ -170,6 +170,7 @@ def concepts_from_docs(docs: Iterable[Mapping[str, Any]]) -> list[Concept]:
                 source_order=_source_order(c),
                 review_status=str(c.get("review_status") or doc.get("review_status") or "provider_declared"),
                 rankable=c["rankable"] if isinstance(c.get("rankable"), bool) else None,
+                subdomain=str(c["subdomain"]) if c.get("subdomain") else None,
             )
     return [out[k] for k in sorted(out)]
 
@@ -309,6 +310,8 @@ class QaCatalog:
     properties: Mapping[str, KgProperty]
     link_kinds: tuple[str, ...] = LINK_KINDS
     concepts_source: str = "registry/atlas/catalog"
+    #: relation families of the KG (``registry/kg/relations_v4.yaml``): id -> {fr, en} label (V6 NLQA6)
+    families: Mapping[str, Mapping[str, str]] = field(default_factory=lambda: relation_families())
 
     def digest(self) -> str:
         h = hashlib.sha256()
@@ -368,6 +371,7 @@ class QaCatalog:
             ],
             "link_kinds": list(self.link_kinds),
             "entity_kinds": list(ENTITY_KINDS),
+            "relation_families": [{"id": k, **dict(v)} for k, v in sorted(self.families.items())],
         }
 
 
@@ -395,9 +399,22 @@ def atlas_catalog_concepts() -> list[Concept] | None:
             source_order=tuple(s.key for s in c.source_order),
             review_status="provider_declared_not_human_reviewed",
             rankable=_rankable(c),
+            subdomain=getattr(c, "subdomain", None) or None,
         )
         for c in sorted(cat.concepts.values(), key=lambda c: c.id)
     ]
+
+
+@lru_cache(maxsize=1)
+def relation_families() -> dict[str, dict[str, str]]:
+    """Family ids and labels of V4CORE's relation registry (``reva.kg.families``); empty when absent."""
+    try:
+        from reva.kg.families import load_registry
+
+        reg = load_registry()
+    except Exception:  # an absent or broken registry leaves the family operations unavailable, never guessed
+        return {}
+    return {fid: {"fr": f.label.get("fr", fid), "en": f.label.get("en", fid)} for fid, f in reg.families.items()}
 
 
 def build_catalog(

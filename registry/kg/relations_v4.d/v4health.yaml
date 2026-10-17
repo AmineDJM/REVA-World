@@ -6,7 +6,10 @@
 # are deliberately unmapped (an equivalence is not a relation family; V4LINK / same_as handles identity).
 # FIX4A (audit AUDIT3 H2): clingen:gene_disease_curation_negative (Refuted / Disputed / No Known Disease Relationship)
 # is deliberately unmapped too: a refuted or disputed curation is not an association and is never a family hop.
-# FIX4A (M1, M9, H1): doid:inheritance_mode, doid:has_disease_driver and the REVA-made altered-state links are context.
+# FIX4A (M9): doid:has_disease_driver (RO:0007001, under RO:0007000 "has driver", whose definition says the factor
+# "directly or indirectly causes a change") is neither a causal claim (not under RO:0002410) nor a family hop:
+# unmapped, kept as a statement for review (owner decision: add RO:0007001 to DEFINED_AS_CAUSATION or not).
+# FIX4A (M1, H1): doid:inheritance_mode and the REVA-made altered-state links are context.
 version: 1
 agent: V4HEALTH
 note: >-
@@ -28,7 +31,6 @@ mappings:
   - {property: 'doid:onset_during', family: occurs_during, subtype: doid_existence_starts_during, source: doid.obo, subject_kinds: [disease], note: 'source relation RO:0002488'}
   - {property: 'doid:adjacent_to', family: context, subtype: doid_adjacent_to, source: doid.obo, subject_kinds: [disease], note: 'source relation RO:0002220'}
   - {property: 'doid:inheritance_mode', family: context, subtype: doid_inheritance_mode, source: doid.obo, subject_kinds: [disease], note: 'DOID has material basis in (IDO:0000664) with a GENO inheritance-pattern filler; a mode of inheritance, not a cause (FIX4A, AUDIT3 M1)'}
-  - {property: 'doid:has_disease_driver', family: context, subtype: doid_has_disease_driver, source: doid.obo, subject_kinds: [disease], note: 'source relation RO:0007001 (under RO:0007000 has driver, not under RO:0002410 causally related to; FIX4A, AUDIT3 M9)'}
   - {property: 'doid:altered_state_of', family: context, subtype: doid_altered_state_of, source: doid.obo, subject_kinds: [reva_altered_state], note: 'REVA-made node -> the process or structure it is a disruption / dysfunction / alteration of (FIX4A, AUDIT3 H1)'}
   - {property: 'mondo:altered_state_of', family: context, subtype: mondo_altered_state_of, source: mondo.obo, subject_kinds: [reva_altered_state], note: 'REVA-made node -> the process or structure it is a disruption / dysfunction / alteration of (FIX4A, AUDIT3 H1)'}
   - {property: 'doid:has_origin', family: context, subtype: doid_has_origin, source: doid.obo, subject_kinds: [disease], note: source relation so#has_origin}

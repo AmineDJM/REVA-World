@@ -41,7 +41,20 @@ OPS: tuple[str, ...] = (
     "links_pair",
     "why",
     "causal_chain",
+    # V6 (agent NLQA6): relation families, cross-family lists, effect estimates, sealed forecasts, decision
+    # scenarios and geography-free atlas series
+    "kg_families",
+    "kg_cross",
+    "effects",
+    "forecast",
+    "decision",
+    "atlas_period",
 )
+#: Reading of a family from the looked-up entity: as the source states it (``forward``), its inverse, or both.
+READINGS = ("forward", "inverse", "any")
+#: Units a decision magnitude may be stated in (normalised by the keyword planner; checked against the instrument).
+DECISION_UNITS = ("bp", "pp", "percent", "mb/d", "years", "share")
+_MAGNITUDE_RE = re.compile(r"^-?\d{1,6}(\.\d{1,4})?$")
 #: Causal operations (v3_causality.md): answered only from claims asserted by named sources (T1–T4).
 CAUSAL_DIRECTIONS = ("causes", "effects")
 MAX_CHAIN_HOPS = 6
@@ -223,7 +236,13 @@ def validate_plan(raw: Any, catalog: QaCatalog, question: str, *, planner: str =
             args = _validate_args(name, o, catalog, lookups, plan)
             if name == "entity_lookup" and not lookup_from_question(args["text"], question):
                 raise _Reject("lookup_not_in_question")
-            if name in ("kg_path", "causal_chain"):
+            if name == "effects" and not all(
+                lookup_from_question(args[k], question) for k in ("cause_text", "effect_text") if args.get(k)
+            ):
+                raise _Reject("text_not_in_question")
+            if name in ("forecast", "decision") and not lookup_from_question(args["text"], question):
+                raise _Reject("text_not_in_question")
+            if name in ("kg_path", "causal_chain", "kg_cross"):
                 if n_paths >= MAX_PATH_OPERATIONS:
                     raise _Reject("too_many_path_operations")
                 n_paths += 1
@@ -347,6 +366,62 @@ def _validate_args(
             plan.warnings.append(f"max_hops_capped: {hops} -> {MAX_CHAIN_HOPS}")
             hops = MAX_CHAIN_HOPS
         return {"from_entity": a, "to_entity": b, "max_hops": int(hops)}
+    if name == "kg_families":
+        fams = _families(o.get("families"), catalog, required=True)
+        reading = o.get("reading") or "forward"
+        if reading not in READINGS:
+            raise ValueError("reading must be forward, inverse or any")
+        return {
+            "entity": _ref(o, "entity", lookups),
+            "families": fams,
+            "reading": reading,
+            "count": bool(o.get("count")),
+        }
+    if name == "kg_cross":
+        a, b = _ref(o, "entity", lookups), _ref(o, "other_entity", lookups)
+        if a == b:
+            raise _Reject("path_to_itself")
+        return {
+            "entity": a,
+            "families": _families(o.get("families"), catalog, required=False),
+            "other_entity": b,
+            "other_families": _families(o.get("other_families"), catalog, required=True),
+            "limit": _limit(o, plan),
+        }
+    if name == "effects":
+        cause, effect = _clean(o.get("cause_text"), MAX_LOOKUP_CHARS), _clean(o.get("effect_text"), MAX_LOOKUP_CHARS)
+        if not cause and not effect:
+            raise ValueError("cause_text or effect_text required")
+        country = o.get("country")
+        return {
+            "cause_text": cause,
+            "effect_text": effect,
+            "country": None if country in (None, "") else _country(o, catalog, lookups, allow_all=False),
+        }
+    if name == "forecast":
+        text = _clean(o.get("text"), MAX_LOOKUP_CHARS + 1)
+        if not text or len(text) > MAX_LOOKUP_CHARS:
+            raise ValueError("forecast text empty or too long")
+        country = o.get("country")
+        return {
+            "text": text,
+            "country": None if country in (None, "") else _country(o, catalog, lookups, allow_all=False),
+        }
+    if name == "decision":
+        text = _clean(o.get("text"), MAX_TEXT_CHARS)
+        if not text:
+            raise ValueError("decision text empty")
+        mag, unit = o.get("magnitude"), o.get("unit")
+        if mag is not None and (not isinstance(mag, str) or not _MAGNITUDE_RE.match(mag)):
+            raise ValueError("magnitude must be a decimal string")
+        if unit is not None and unit not in DECISION_UNITS:
+            raise _Reject("unit_not_in_list", value=_clean(unit, 20))
+        if (mag is None) != (unit is None):
+            raise ValueError("magnitude and unit go together")
+        return {"text": text, "magnitude": mag, "unit": unit}
+    if name == "atlas_period":
+        f, t = _range(o)
+        return {"concept": _concept(o, catalog), "from_year": f, "to_year": t}
     if name == "atlas_value":
         return {
             "concept": _concept(o, catalog),
@@ -386,6 +461,19 @@ def _validate_args(
             "limit": _limit(o, plan),
         }
     raise _Reject("unknown_operation")
+
+
+def _families(v: Any, catalog: QaCatalog, *, required: bool) -> list[str]:
+    if v is None:
+        v = []
+    if not isinstance(v, list):
+        raise ValueError("families must be a list")
+    bad = [f for f in v if not (isinstance(f, str) and f in catalog.families)]
+    if bad:
+        raise _Reject("family_not_in_list", value=", ".join(_clean(b, 30) for b in bad[:5]))
+    if required and not v:
+        raise ValueError("families must name at least one relation family")
+    return list(dict.fromkeys(v))[:8]
 
 
 def _range(o: Mapping[str, Any]) -> tuple[int | None, int | None]:
@@ -524,6 +612,53 @@ def restate(plan: QueryPlan, catalog: QaCatalog) -> str:
                 if fr
                 else f"the links ({kinds}{span}) between {country(a['country'])} and {country(a['other_country'])}"
             )
+        elif o.op in ("kg_families", "kg_cross"):
+            fams = ", ".join(
+                (catalog.families.get(f) or {}).get(plan.language, f) for f in (a.get("families") or [])
+            ) or ("toute relation" if fr else "any relation")
+            if o.op == "kg_families":
+                what = ("le nombre de rattachements" if fr else "the number of links") if a["count"] else (
+                    "les relations" if fr else "the relations"
+                )
+                inv = {"inverse": " (lecture inverse)" if fr else " (inverse reading)", "any": ""}.get(a["reading"], "")
+                parts.append(
+                    f"{what} « {fams} »{inv} de {ent(a['entity'])}" if fr else f"{what} “{fams}”{inv} of {ent(a['entity'])}"
+                )
+            else:
+                other = ", ".join(
+                    (catalog.families.get(f) or {}).get(plan.language, f) for f in a["other_families"]
+                )
+                parts.append(
+                    f"les entités reliées à {ent(a['entity'])} ({fams}) et à {ent(a['other_entity'])} ({other})"
+                    if fr
+                    else f"the entities linked to {ent(a['entity'])} ({fams}) and to {ent(a['other_entity'])} ({other})"
+                )
+        elif o.op == "effects":
+            c = f"« {a['cause_text']} »" if fr else f"“{a['cause_text']}”"
+            e = f"« {a['effect_text']} »" if fr else f"“{a['effect_text']}”"
+            where = f", {country(a['country'])}" if a.get("country") else ""
+            parts.append(
+                f"les estimations d'effet publiées de {c} sur {e}{where}"
+                if fr
+                else f"the published effect estimates of {c} on {e}{where}"
+            )
+        elif o.op == "forecast":
+            where = f", {country(a['country'])}" if a.get("country") else ""
+            parts.append(
+                f"les prévisions scellées du registre REVA pour « {a['text']} »{where}"
+                if fr
+                else f"the sealed forecasts of REVA's registry for “{a['text']}”{where}"
+            )
+        elif o.op == "decision":
+            mag = f" ({a['magnitude']} {a['unit']})" if a.get("magnitude") else ""
+            parts.append(
+                f"un scénario du moteur de décision (non validé) pour la décision décrite{mag}"
+                if fr
+                else f"a decision-engine scenario (unvalidated) for the decision described{mag}"
+            )
+        elif o.op == "atlas_period":
+            span = f"{a['from_year'] or '…'}–{a['to_year'] or '…'}"
+            parts.append(f"{concept(a['concept'])}, {span}")
     head = "Question interprétée comme : " if fr else "Question read as: "
     if not parts:
         body = "aucune requête exécutable" if fr else "no executable query"

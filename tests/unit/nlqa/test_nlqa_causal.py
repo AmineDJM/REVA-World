@@ -47,7 +47,7 @@ def evidence(x) -> dict[str, dict[str, Any]]:
 
 
 def test_schema_prompt_and_version() -> None:
-    assert PROMPT_VERSION == "nlqa-plan-1.2.0"
+    assert PROMPT_VERSION == "nlqa-plan-1.3.0"
     props = output_schema()["properties"]["operations"]["items"]["properties"]
     assert {"why", "causal_chain"} <= set(props["op"]["enum"]) and {"why", "causal_chain"} <= set(OPS)
     assert props["causal_direction"] == {"type": ["string", "null"], "enum": ["causes", "effects", None]}
@@ -280,7 +280,7 @@ def test_service_keyword_planner_end_to_end() -> None:
         )
     )
     j = r.as_json()
-    assert j["prompt_version"] == "nlqa-plan-1.2.0" and j["planner"] == "keyword_fallback"
+    assert j["prompt_version"] == "nlqa-plan-1.3.0" and j["planner"] == "keyword_fallback"
     assert [o["op"] for o in j["plan"]["operations"]] == ["entity_lookup", "why"]
     assert any(
         s["kind"] == "causal"

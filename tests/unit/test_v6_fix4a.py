@@ -139,7 +139,7 @@ def test_inheritance_modes_are_statements_not_claims(doid: ho.Parts) -> None:
     assert any(c.cause_id.startswith("ncbitaxon:") for c in doid.claims)  # pathogens stay causal (allow-list)
 
 
-def test_disease_driver_is_a_plain_link(doid: ho.Parts) -> None:
+def test_disease_driver_is_an_unmapped_statement(doid: ho.Parts) -> None:
     assert not [c for c in doid.claims if c.selector.get("relation") == "RO:0007001"]
     drv = [s for s in doid.statements if s.property_pid == "doid:has_disease_driver"]
     assert [s.object_qid for s in drv] == ["chebi:15377"]
@@ -204,7 +204,8 @@ def test_new_predicates_registered_and_families_valid() -> None:
     validate()
     reg = load_registry()
     assert reg.edge_family(cg.PID_NEGATIVE, "out") is None  # never a family hop
-    for pid in ("doid:inheritance_mode", "doid:has_disease_driver", "mondo:altered_state_of"):
+    assert reg.edge_family("doid:has_disease_driver", "out") is None  # neither causal nor traversed (M9)
+    for pid in ("doid:inheritance_mode", "mondo:altered_state_of"):
         ef = reg.edge_family(pid, "out")
         assert ef is not None and ef.family == "context", pid
 

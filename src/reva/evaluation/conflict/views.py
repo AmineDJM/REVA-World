@@ -61,9 +61,9 @@ def runs_from_frame(frame: pl.DataFrame) -> dict[str, ViewsRun]:
         if vr is None:
             gen_year, gen_month = run.split("_")[1:3]
             vr = ViewsRun(run, up.get("release_date"), (int(gen_year), int(gen_month)), var)
+            out[run] = vr
         if var in FATALITY_VARS:
             vr.variable = var
-            out[run] = vr
         v = float(Decimal(str(r["value"])))
         ps = r["period_start"]
         if var in PROB_VARS:
