@@ -75,7 +75,7 @@ from reva.kernel.errors import SourceResponseError
 
 # ----------------------------------------------------------------------------- OpenFlights
 OF_NAME = "atlas.openflights"
-OF_VERSION = "1.0.2"  # 1.0.2: module code changed (OurAirports 1.1.0); OpenFlights behaviour unchanged
+OF_VERSION = "1.0.3"  # 1.0.2: module code changed (OurAirports 1.1.0); OpenFlights behaviour unchanged
 OF_SOURCE_KEY = "openflights.data"
 OF_ATLAS_SOURCE = "openflights"
 OF_DATASET = "routes_2014"
@@ -98,7 +98,7 @@ OF_STALE = "provider warning: route data ceased being updated in June 2014; of h
 
 # ----------------------------------------------------------------------------- OurAirports
 OA_NAME = "atlas.ourairports"
-OA_VERSION = "1.1.0"  # 1.1.0 (V6INFRA): repository LICENSE fallback for the licence check; KG airports
+OA_VERSION = "1.1.1"  # 1.1.0 (V6INFRA): repository LICENSE fallback for the licence check; KG airports
 OA_SOURCE_KEY = "ourairports.data"
 OA_ATLAS_SOURCE = "ourairports"
 OA_DATASET = "airports"

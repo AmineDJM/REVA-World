@@ -61,7 +61,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.imf_portwatch"
-VERSION = "1.0.0"
+VERSION = "1.0.1"  # 1.0.1: digest changed with atlas_ghcnm (FIX4C); Natural Earth archived under its own spec
 SOURCE_KEY = "imf.portwatch"
 ATLAS_SOURCE = "portwatch"
 DS_CHOKE = "chokepoints_daily"

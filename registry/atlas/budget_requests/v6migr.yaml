@@ -1,0 +1,12 @@
+# Budget request from agent V6MIGR (human mobility: UNHCR asylum, Eurostat monthly asylum applicants, IOM Missing
+# Migrants, IDMC national figures). eurostat.dissemination and idmc.gidd already have budgets (shared, ample).
+agent: V6MIGR
+requests:
+  - source_key: unhcr.asylum
+    daily_requests: 10
+    expected_bytes_per_day: 10000000
+    reason: "2 ZIP downloads (asylum applications ~0.74 MB, decisions ~1.0 MB, every year) + 2 limit=1 JSON checks; retries"
+  - source_key: iom.missing_migrants
+    daily_requests: 8
+    expected_bytes_per_day: 20000000
+    reason: "HDX package_show + one 7.4 MB CSV (+ HDX 302 to S3); retries"

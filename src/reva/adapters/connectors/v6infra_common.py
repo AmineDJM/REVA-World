@@ -160,8 +160,16 @@ class Adm1Index:
 
 
 async def fetch_ne_admin1(run: Any) -> Adm1Index:
-    f = await ic.fetch_archived(run, NE_URL, name=NE_NAME, key="naturalearth:admin1_10m", media_types=NE_MEDIA,
-                                max_bytes=30_000_000)  # fmt: skip
+    """GET Natural Earth admin-1 through the run's (metered) client; archive it under the Natural Earth connector spec
+    (``naturalearth.admin1_10m``, public domain) so the artifact carries Natural Earth's rights whichever run fetched
+    it (same rule as :func:`atlas_ghcnm._fetch_ne`, AUDIT3 L2)."""
+    import dataclasses
+
+    raw = await run.get(NE_URL, key="naturalearth:admin1_10m", media_types=NE_MEDIA, max_bytes=30_000_000)
+    archiver = run if run.spec.name == gh.NE_NAME else dataclasses.replace(run, spec=gh.ne_spec())
+    sha = archiver.archive(raw)
+    meta = dict((getattr(raw, "response_metadata", None) or {}).get("headers") or {})
+    f = ic.Fetched(name=NE_NAME, url=NE_URL, body=raw.body, sha256=sha, retrieved_at=raw.retrieved_at, headers=meta)
     return Adm1Index.from_fetched(f, origin=run.origin)
 
 

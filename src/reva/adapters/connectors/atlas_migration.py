@@ -59,7 +59,6 @@ from __future__ import annotations
 
 import csv
 import hashlib
-import html
 import inspect
 import io
 import json
@@ -68,7 +67,7 @@ import sys
 import zipfile
 import zlib
 from collections import Counter, defaultdict
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Iterator, Mapping
 from dataclasses import dataclass, field
 from datetime import date
 from typing import Any
@@ -1149,5 +1148,4 @@ __all__ = [
     "build_idmc_national",
     "build_mmp",
     "build_unhcr_asylum",
-    "html",
 ]

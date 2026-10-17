@@ -1,4 +1,4 @@
-policy_version: "budgets-1.3.32"
+policy_version: "budgets-1.3.33"
 daily:
   http_requests_total: 20000
   http_bytes_total: 3221225472
@@ -155,6 +155,8 @@ per_source_daily_requests:
   imf.sdmx: 80
   # insee.bdm: requested by GAPHUNT (gaphunt.yaml)
   insee.bdm: 6
+  # iom.missing_migrants: requested by V6MIGR (v6migr.yaml)
+  iom.missing_migrants: 8
   # ipu.parline: requested by A-POL (a_pol.yaml)
   ipu.parline: 12
   # jrc.inform_risk: requested by A-GEO (a_geo.yaml)
@@ -271,6 +273,8 @@ per_source_daily_requests:
   unesco.uis: 30
   # unesco.whc: requested by A-CULTURE (a_culture.yaml), KGCULT (kgcult.yaml)
   unesco.whc: 4
+  # unhcr.asylum: requested by V6MIGR (v6migr.yaml)
+  unhcr.asylum: 10
   # unhcr.population: requested by A-UN (a_un.yaml)
   unhcr.population: 150
   # unichem.mapping: requested by V6DRUGS (v6drugs.yaml)

@@ -51,7 +51,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.nga_wpi"
-VERSION = "1.1.0"  # 1.1.0 (V6INFRA): KG layer (ports, UN/LOCODE, ADM1); Natural Earth admin-1 fetched
+VERSION = "1.1.1"  # 1.1.0 (V6INFRA): KG layer (ports, UN/LOCODE, ADM1); Natural Earth admin-1 fetched
 SOURCE_KEY = "nga.wpi"
 ATLAS_SOURCE = "nga"
 DATASET = "wpi"

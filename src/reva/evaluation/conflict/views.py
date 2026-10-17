@@ -32,6 +32,7 @@ class ViewsRun:
     variable: str
     monthly: dict[tuple[str, int, int], float] = field(default_factory=dict)  # (gw, year, month) -> fatalities
     refs: dict[tuple[str, int, int], dict[str, Any]] = field(default_factory=dict)
+    prob: dict[tuple[str, int, int], float] = field(default_factory=dict)  # P(>= 25 BRD in the country-month)
 
     def annual(self, gw: str, year: int) -> float | None:
         vals = [self.monthly.get((gw, year, m)) for m in range(1, 13)]
@@ -49,7 +50,7 @@ class ViewsRun:
 
 def runs_from_frame(frame: pl.DataFrame) -> dict[str, ViewsRun]:
     out: dict[str, ViewsRun] = {}
-    f = frame.filter(pl.col("indicator").str.split("|").list.get(1).is_in(list(FATALITY_VARS)))
+    f = frame.filter(pl.col("indicator").str.split("|").list.get(1).is_in([*FATALITY_VARS, *PROB_VARS]))
     for r in f.select(
         "indicator", "provider_geo", "period_start", "value", "flags", "raw_sha256", "selector"
     ).iter_rows(named=True):
@@ -60,11 +61,16 @@ def runs_from_frame(frame: pl.DataFrame) -> dict[str, ViewsRun]:
         if vr is None:
             gen_year, gen_month = run.split("_")[1:3]
             vr = ViewsRun(run, up.get("release_date"), (int(gen_year), int(gen_month)), var)
+        if var in FATALITY_VARS:
+            vr.variable = var
             out[run] = vr
         v = float(Decimal(str(r["value"])))
+        ps = r["period_start"]
+        if var in PROB_VARS:
+            vr.prob[(str(r["provider_geo"]), ps.year, ps.month)] = v
+            continue
         if FATALITY_VARS[var] == "ln1p":
             v = math.expm1(v)
-        ps = r["period_start"]
         key = (str(r["provider_geo"]), ps.year, ps.month)
         vr.monthly[key] = v
         vr.refs[key] = {"raw_sha256": r["raw_sha256"], "selector": r["selector"]}

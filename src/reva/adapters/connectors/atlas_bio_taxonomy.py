@@ -64,7 +64,7 @@ import yaml
 from reva.adapters.connectors import bio_common as bc
 from reva.atlas.sources import AtlasSourceSpec
 
-VERSION = "1.0.2"
+VERSION = "1.0.3"
 PARSER_VERSION = "atlas_bio_taxonomy/1"
 
 GBIF_NAME = "atlas.gbif_backbone"
@@ -73,6 +73,20 @@ COL_NAME = "atlas.col_checklist"
 COL_SOURCE_KEY = "col.checklistbank"
 WD_NAME = "atlas.bio_wikidata"
 WD_SOURCE_KEY = "wikidata.wdqs"
+# WDOPS (V6): the same bridge queries read from QLever (University of Freiburg; live-updated Wikidata dump) when WDQS
+# throttles the shared egress -- POST, larger VALUES chunks, rank filtered in Python (QLever answered rank FILTERs
+# inconsistently on 2026-10-17), budget key qlever.wikidata.
+QL_NAME = "atlas.bio_qlever"
+QL_SOURCE_KEY = "qlever.wikidata"
+QL_HOST = "qlever.dev"
+QL_URL = f"https://{QL_HOST}/api/wikidata"
+QL_CHUNK = 3000
+QL_PREFIXES = (
+    "PREFIX wd: <http://www.wikidata.org/entity/>\nPREFIX wdt: <http://www.wikidata.org/prop/direct/>\n"
+    "PREFIX p: <http://www.wikidata.org/prop/>\nPREFIX ps: <http://www.wikidata.org/prop/statement/>\n"
+    "PREFIX wikibase: <http://wikiba.se/ontology#>\n"
+)
+SPARQL_JSON = "application/sparql-results+json"
 ATLAS_SOURCE = "bio"
 GBIF_DATASET = "gbif_backbone"
 COL_DATASET = "col_checklist"
@@ -1019,12 +1033,13 @@ def wikidata_kg(
     loaded_gbif: set[str],
     loaded_ncbi: set[str],
     loaded_col: set[str],
+    rev_label: str = "wdqs",
 ) -> KgParts:
     """WDQS rows -> bridges and common names (see module doc); ambiguity rules as V4LINK's identity rules."""
     from reva.adapters.connectors.wikidata import qid_from_uri, statement_id_from_uri
     from reva.kg.model import KgStatement
 
-    rev = f"wdqs@{retrieved_at.strftime('%Y-%m-%dT%H:%M:%SZ')}"
+    rev = f"{rev_label}@{retrieved_at.strftime('%Y-%m-%dT%H:%M:%SZ')}"
     item_vals: dict[str, dict[str, set[str]]] = defaultdict(lambda: defaultdict(set))
     val_items: dict[tuple[str, str], set[str]] = defaultdict(set)
     gbif_st: dict[tuple[str, str], tuple[str, str, str]] = {}  # (item, key) -> (statement id, rank, raw)
@@ -1214,6 +1229,10 @@ async def ingest_wikidata(run: Any) -> dict[str, Any]:
     shas: list[str] = []
     retrieved: list[datetime] = []
     timeouts: list[str] = []
+    from reva.kernel.errors import SourceResponseError
+
+    is_ql = run.spec.name == QL_NAME
+    chunk = QL_CHUNK if is_ql else WD_CHUNK
     with tempfile.TemporaryDirectory(prefix="reva-v4bio-lock-") as tmp:
         lock = MachineLock(Path(tmp), min_interval=0.0) if run.origin != "live" else None
         client = WikidataClient(run.http, archive=Archive(run.store), lock=lock, max_retries=6)
@@ -1222,7 +1241,11 @@ async def ingest_wikidata(run: Any) -> dict[str, Any]:
             if len(queries) >= max_queries:
                 raise _Budget()
             try:
-                res = await client.sparql(q, meta={"purpose": purpose, "connector": WD_NAME})
+                res = await (
+                    qlever_sparql(run, q, purpose)
+                    if is_ql
+                    else client.sparql(q, meta={"purpose": purpose, "connector": WD_NAME})
+                )
             except QueryTimeout:  # this query only: the next ones still run (the run is then incomplete)
                 queries.append({"purpose": purpose, "error": "query_timeout"})
                 timeouts.append(purpose)
@@ -1250,29 +1273,39 @@ async def ingest_wikidata(run: Any) -> dict[str, Any]:
                 ("P685", "ncbi_rest", sorted(loaded_ncbi - prio_ncbi, key=lambda x: (len(x), x))),
             ]
             for prop, label, keys in plan:
-                for i in range(0, len(keys), WD_CHUNK):
-                    await ask(wd_values_query(prop, keys[i : i + WD_CHUNK]), f"{label}:{i}")
+                for i in range(0, len(keys), chunk):
+                    await ask(wd_values_query(prop, keys[i : i + chunk]), f"{label}:{i}")
         except _Budget:
             complete, stopped = False, f"max_queries={max_queries} reached"
-        except WikidataError as e:  # throttled / timed out: keep what was answered, never retract
+        except (WikidataError, SourceResponseError) as e:  # throttled / timed out: keep what answered, no retract
             complete, stopped = False, f"{type(e).__name__}: {str(e)[:200]}"
         if timeouts:
             complete = False
     if not retrieved:
         return {"skipped": True, "reason": "no query sent"}
     parts = wikidata_kg(
-        rows, retrieved_at=max(retrieved), loaded_gbif=loaded_gbif, loaded_ncbi=loaded_ncbi, loaded_col=loaded_col
+        rows,
+        retrieved_at=max(retrieved),
+        loaded_gbif=loaded_gbif,
+        loaded_ncbi=loaded_ncbi,
+        loaded_col=loaded_col,
+        rev_label="qlever" if is_ql else "wdqs",
     )
     kg = bc.load_kg(
         run.engine,
         run.store,
         entities=[],
         statements=parts.statements,
-        source_key=WD_SOURCE_KEY,
+        source_key=QL_SOURCE_KEY if is_ql else WD_SOURCE_KEY,
         raw_sha256s=sorted(set(shas)),
         retrieved_at=max(retrieved),
         origin=run.origin,
-        parameters={"connector": WD_NAME, "parser": PARSER_VERSION, "queries": len(queries), "complete": complete},
+        parameters={
+            "connector": run.spec.name,
+            "parser": PARSER_VERSION,
+            "queries": len(queries),
+            "complete": complete,
+        },
         prefixes=("bio:",),
         retract_prefix="bio_wd:" if complete else None,
     )
@@ -1283,8 +1316,52 @@ async def ingest_wikidata(run: Any) -> dict[str, Any]:
         "loaded": {"gbif": len(loaded_gbif), "ncbi": len(loaded_ncbi), "col": len(loaded_col)},
         "build": parts.report,
         "kg": kg,
-        "client": client.stats.as_dict(),
+        "client": {"qlever_requests": len(queries)} if is_ql else client.stats.as_dict(),
     }
+
+
+_RANK_FILTER = re.compile(r"\s*FILTER\(\?n?rk != wikibase:DeprecatedRank\)")
+_QL_STATEMENT = re.compile(r"(/statement/)q(\d+-)")
+
+
+@dataclass
+class _QlResult:
+    bindings: list[dict[str, Any]]
+    raw_sha256: str
+    retrieved_at: datetime
+
+
+async def qlever_sparql(run: Any, query: str, purpose: str) -> _QlResult:
+    """One bridge query on QLever (POST form; raw response archived by the run). The rank FILTER is removed from
+    the query and deprecated rows are dropped here; QLever's lower-case statement IRIs (``statement/q42-…``) are
+    normalised to the WDQS form (``statement/Q42-…``) so the statement ids are those of Wikidata."""
+    import json as _json
+
+    from reva.kernel.errors import SourceResponseError
+
+    q = QL_PREFIXES + _RANK_FILTER.sub("", query).strip()
+    acq = await run.post(
+        QL_URL,
+        key=f"qlever_{purpose}",
+        content=urlencode({"query": q}).encode(),
+        content_type="application/x-www-form-urlencoded",
+        media_types=(SPARQL_JSON, "application/json"),
+        headers={"Accept": SPARQL_JSON},
+    )
+    try:
+        doc = _json.loads(acq.body)
+        raw_bindings = list(doc["results"]["bindings"])
+    except (ValueError, KeyError, TypeError) as e:
+        raise SourceResponseError(f"QLever {purpose}: not SPARQL JSON results", retryable=False) from e
+    out: list[dict[str, Any]] = []
+    for b in raw_bindings:
+        if any(str((b.get(v) or {}).get("value", "")).endswith("DeprecatedRank") for v in ("rk", "nrk")):
+            continue
+        for v in ("st", "nst"):
+            if v in b and isinstance(b[v], dict):
+                b[v] = {**b[v], "value": _QL_STATEMENT.sub(r"\1Q\2", str(b[v].get("value", "")))}
+        out.append(b)
+    return _QlResult(out, run.archive(acq), acq.retrieved_at)
 
 
 class _Budget(Exception):
@@ -1404,6 +1481,32 @@ def atlas_source() -> list[AtlasSourceSpec]:
                 "common_name": "wdt:P1843 fr/en",
             },
             notes="KG only: identifier bridges and common names for loaded gbif:/ncbitaxon:/col: taxa.",
+        ),
+        AtlasSourceSpec(
+            name=QL_NAME,
+            version=VERSION,
+            source_key=QL_SOURCE_KEY,
+            budget_key=QL_SOURCE_KEY,
+            atlas_source=ATLAS_SOURCE,
+            provider=(
+                "Wikidata (community-edited) as indexed by QLever (University of Freiburg, qlever.dev, live-updated "
+                "dump); P846 GBIF key, P685 NCBI taxon id, P10585 COL id, P1843"
+            ),
+            licence="CC0-1.0 (https://www.wikidata.org/wiki/Wikidata:Licensing)",
+            allowed_hosts=(QL_HOST,),
+            datasets=(WD_DATASET,),
+            dataset_ids=("wikidata:P846", "wikidata:P685", "wikidata:P10585", "wikidata:P1843"),
+            cadence_seconds=30 * bc.DAY,
+            planned_requests=40,
+            max_response_bytes=MAX_WD_BYTES * 3,
+            min_interval_seconds=3.0,
+            parser_version=PARSER_VERSION,
+            code_digest=digest,
+            field_mappings={
+                "bridge": "one item holding P846 and P685 / P10585 (unique both ways)",
+                "common_name": "wdt:P1843 fr/en",
+            },
+            notes="Same bridges as atlas.bio_wikidata, read from QLever while WDQS throttles (WDOPS, V6).",
         ),
     ]
 

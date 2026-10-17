@@ -34,6 +34,9 @@ def _trimmed(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 async def _run(db: Any, spec: Any, name: str, **kw: Any) -> dict[str, Any]:
+    from reva.adapters.connectors import atlas_ghcnm as gh
+
+    ensure_registered(db.owner, db.store, gh.ne_spec())  # V6INFRA: WPI/OurAirports archive Natural Earth under it
     ensure_registered(db.owner, db.store, spec)
     out = await run_atlas_ingest(db.settings, db.worker, db.store, name, mode="fixture", **kw)
     assert out["status"] == "completed" and out["budget"] is None, out

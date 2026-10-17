@@ -1,0 +1,32 @@
+# V6 (agent V6MIGR): UNHCR Refugee Population Statistics API - asylum applications and decisions.
+# Connector: src/reva/adapters/connectors/atlas_migration.py (atlas.unhcr_asylum) -> atlas tables
+# unhcr.asylum_applications, unhcr.asylum_decisions. The population stocks (refugees, asylum-seekers, IDPs, stateless by
+# origin x asylum) are A-UN's unhcr.population (atlas_un.py) and are not fetched again.
+source_key: unhcr.asylum
+title: "UNHCR Refugee Population Statistics Database (API v1, asylum applications and asylum decisions)"
+provider_url: https://www.unhcr.org/refugee-statistics/
+lineage_family: unhcr
+rights:
+  licence: CC BY 4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: "UNHCR Refugee Data Finder, https://www.unhcr.org/refugee-statistics/"
+  review: >-
+    pending maintainer review (same statement as unhcr.population): UNHCR states CC BY 4.0 for the Refugee Data
+    Finder; the statement page is JavaScript-rendered and could not be read from the build container.
+metadata:
+  allowed_hosts: [api.unhcr.org]
+  api_docs: https://api.unhcr.org/docs/refugee-statistics.html
+  endpoints:
+    - "GET /population/v1/asylum-applications/?limit=1000000&coo_all=true&coa_all=true&download=true (ZIP: asylum-applications.csv + footnotes.csv, every year 2000-)"
+    - "GET /population/v1/asylum-decisions/?limit=1000000&coo_all=true&coa_all=true&download=true (ZIP: asylum-decisions.csv + footnotes.csv)"
+    - "GET /population/v1/<endpoint>/?limit=1&coo_all=true&coa_all=true (JSON: maxPages = record count, total = column sums; used to verify each download)"
+  authentication: none
+  cadence: end-year figures published each June (Global Trends); mid-year figures in November
+  value_encoding: >-
+    The JSON API renders a cell without a figure as the string "0"; the CSV download writes it as 0. For 2024 the
+    CSV 0 cells of asylum-decisions are exactly the JSON string-"0" cells (Recognized 3001, Complementary 4542,
+    Rejected 1907, Otherwise closed 1778, checked 2026-10-17); 0 cells are omitted, never stored as zero.
+    asylum-applications has no 0 cell.
+  editorial_status: "Government and UNHCR registration figures; claims lodged / decisions taken during the year"
+  upstream_lineages:
+    all: [national_governments, unhcr_registration]

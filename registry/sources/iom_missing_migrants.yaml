@@ -1,0 +1,36 @@
+# V6 (agent V6MIGR): IOM Missing Migrants Project incident records, via the Humanitarian Data Exchange (HDX).
+# Connector: src/reva/adapters/connectors/atlas_migration.py (atlas.iom_mmp) -> atlas table iom.mmp_monthly
+# (REVA sums / counts of incident records by country of incident or MMP region x month x cause of death).
+source_key: iom.missing_migrants
+title: "IOM Missing Migrants Project data (incident records, 2014-)"
+provider_url: https://missingmigrants.iom.int
+lineage_family: iom_mmp
+rights:
+  licence: "CC BY-IGO (HDX dataset record)"
+  licence_url: https://creativecommons.org/licenses/by/3.0/igo/
+  attribution: "IOM Missing Migrants Project, https://missingmigrants.iom.int (distributed on the Humanitarian Data Exchange)"
+  licence_evidence: >-
+    HDX package_show missing-migrants-project-data (read 2026-10-17): license_id cc-by-igo, license_title "Creative
+    Commons Attribution for Intergovernmental Organisations (CC BY-IGO)". The project's own site answers 403 to a
+    non-browser client (missingmigrants.iom.int/downloads), so its terms page was not read: maintainer review pending.
+  review_flag: licence read from the HDX record only
+metadata:
+  allowed_hosts: [data.humdata.org, s3.us-east-1.amazonaws.com]
+  files:
+    - https://data.humdata.org/api/3/action/package_show?id=missing-migrants-project-data
+    - resource iom-missing-migrants-project-data.csv named by that record (7.4 MB; HDX answers 302 to its S3 file store)
+  authentication: none
+  cadence: weekly on HDX (data_update_frequency 7)
+  codebook: >-
+    Codebook CSV of the HDX dataset iom-missing-migrants-project-data (Google Sheets publication, read 2026-10-17,
+    not archived by the connector: its download host is a per-request googleusercontent.com name). Quoted verbatim:
+    reported_date "Estimated date of death. In cases where the exact date of death is not known, this variable
+    indicates the date in which the body or bodies were found. [...] In some cases, official statistics are not
+    disaggregated by the incident, meaning that data is reported as a total number of deaths occurring during a
+    certain time period. In such cases the entry is marked as a “cumulative total,” and the latest date of the range
+    is recorded, with the full dates recorded in the comments."; total_dead_and_missing "The sum of the ‘number dead’
+    and ‘number missing’ variables."; cause_death "The determination of conditions resulting in the migrant's death
+    i.e. the circumstances of the event that produced the fatal injury."
+  editorial_status: >-
+    Compiled from coroners, border authorities, IOM offices, NGOs and media; source_quality 1-5 per record. Counts are
+    a minimum: deaths not reported to any source are absent.

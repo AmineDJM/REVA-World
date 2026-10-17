@@ -8,6 +8,7 @@ from typing import Any
 import pytest
 from sqlalchemy import text
 
+from reva.adapters.connectors import atlas_ghcnm as gh
 from reva.adapters.connectors import atlas_portwatch as pw
 from reva.adapters.connectors import atlas_unlocode as un
 from reva.atlas.ingest import run_atlas_ingest
@@ -24,6 +25,7 @@ def _trimmed(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 async def _run(db: Any, name: str) -> dict[str, Any]:
+    ensure_registered(db.owner, db.store, gh.ne_spec())  # Natural Earth bytes are archived under its own spec
     ensure_registered(db.owner, db.store, atlas_sources()[name].spec)
     out = await run_atlas_ingest(db.settings, db.worker, db.store, name, mode="fixture")
     assert out["status"] == "completed", out
