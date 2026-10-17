@@ -42,9 +42,11 @@ Causal axioms (docs/dev/v4_v4health.md)
 ---------------------------------------
 A relation is causal when RO places it under ``RO:0002410`` "causally related to" (e.g. ``RO:0014001`` disease has
 infectious agent, ``RO:0004003`` has material basis in germline mutation in, ``RO:0004019`` disease has basis in,
-``RO:0001022`` has allergic trigger), when the ontology defines it as causation (DOID's ``IDO:0000664`` "has
-material basis in": "Relating the disease to it's causation (disease and disorder)."), or when its label carries
-a causal marker (``health_obo_common.CAUSAL_MARKERS``). Such an axiom is **never** a KG statement: it becomes one
+``RO:0001022`` has allergic trigger) or when it is on the reviewed allow-list of relations the ontology defines as
+causation (``health_obo_common.DEFINED_AS_CAUSATION``: DOID's ``IDO:0000664`` "has material basis in": "Relating
+the disease to it's causation (disease and disorder)."). Labels are never read (FIX4A, AUDIT3 M9: ``RO:0007001``
+"has disease driver" is not under RO:0002410 and is a plain ``doid:has_disease_driver`` link). Such an axiom is
+**never** a KG statement: it becomes one
 T1 claim (expert-curated ontology axiom with a verbatim definition, the closest V3 tier -- a coded relation of a
 curated research resource) via ``reva.causal.load_dataset_claims`` -- cause = the filler (pathogen, gene,
 inheritance mode, ...), effect = the disease, except the two RO relations whose subject is the cause ("disease
@@ -52,6 +54,22 @@ causes disruption/dysfunction of"). Codebook = the relation definition quoted ve
 doid.json (or, explicitly marked, the nearest ancestor's when RO gives none). A causal relation with no definition
 anywhere is not loaded at all (counted in the run report). Claims are class-level ("a disease of this class has
 its material basis in an infection by this taxon"), never about a person or an outbreak.
+
+FIX4A (audit AUDIT3, docs/dev/review_v4_v5_audit.md; report docs/dev/v6_fix4a.md):
+
+* H1 -- RO relations whose filler is not itself the cause / effect but its *disruption*, *dysfunction* or
+  *alteration* (``RO:0004021`` disease has basis in disruption of, ``RO:0004020`` ... dysfunction of,
+  ``RO:0004030`` disease arises from alteration in structure; subject side ``RO:0004024`` disease causes disruption
+  of, ``RO:0004025`` disease causes dysfunction of) never make the filler (a normal process or structure) the
+  cause or effect. The endpoint is a REVA-made node ``reva_state:<state>:<filler>`` (kind ``reva_altered_state``,
+  label "disruption of GO:0003824" ..., described as REVA-made), linked to the filler by ``<ns>:altered_state_of``
+  (family ``context``); the claim selector keeps the verbatim source relation, its label and the filler.
+* M1 -- DOID ``IDO:0000664`` "has material basis in" with a ``GENO:`` filler names a mode of inheritance (autosomal
+  recessive ...), not a causal agent: KG statement ``doid:inheritance_mode`` (family ``context``), never a claim.
+* M9 -- causal classification by RO id / explicit allow-list only (see above).
+* Claims dropped by these rules are retracted append-only by the causal loader; the reason is
+  ``reclassified_by_reva`` when the raw file is byte-identical or the axiom is still in the new file
+  (``source_row_present``), ``removed_at_source`` when the axiom is verifiably gone.
 """
 
 from __future__ import annotations
@@ -85,8 +103,8 @@ from reva.adapters.connectors.health_obo_common import (
 )
 from reva.atlas.sources import AtlasSourceSpec
 
-VERSION = "1.0.0"
-PARSER_VERSION = "atlas_health_onto/1"
+VERSION = "1.1.0"  # 1.1.0 (FIX4A): altered-state nodes (H1), doid:inheritance_mode (M1), no label rule (M9)
+PARSER_VERSION = "atlas_health_onto/2"
 DAY = 86400
 GH_HOSTS = ("github.com", "release-assets.githubusercontent.com", "objects.githubusercontent.com")
 
@@ -150,7 +168,21 @@ DOID_RELS = {
     "RO:0002488": "doid:onset_during",
     "RO:0002220": "doid:adjacent_to",
     "so#has_origin": "doid:has_origin",
+    # FIX4A (M9): "has disease driver" is under RO:0007000 "has driver", not under RO:0002410 "causally related to"
+    "RO:0007001": "doid:has_disease_driver",
 }
+#: FIX4A (M1): DOID "has material basis in" with an inheritance-pattern filler -> doid:inheritance_mode (not causal)
+INHERITANCE_RELATION, INHERITANCE_PREFIX = "IDO:0000664", "GENO"
+#: FIX4A (H1): relation (RO id) -> (node key, en, fr) of the state of the filler the source names as cause / effect
+ALTERED_STATE: dict[str, tuple[str, str, str]] = {
+    "RO:0004021": ("disruption_of", "disruption of", "perturbation de"),
+    "RO:0004024": ("disruption_of", "disruption of", "perturbation de"),
+    "RO:0004020": ("dysfunction_of", "dysfunction of", "dysfonctionnement de"),
+    "RO:0004025": ("dysfunction_of", "dysfunction of", "dysfonctionnement de"),
+    "RO:0004030": ("alteration_in_structure_of", "alteration in the structure of", "altération de la structure de"),
+}
+STATE_PREFIX = "reva_state"
+STATE_KIND = "reva_altered_state"
 #: prefixes of DOID import-module classes the DOID loader creates as entities (others are owned elsewhere)
 DOID_ENTITY_PREFIXES = ("DOID", "NCBITaxon", "SYMP", "HP", "GENO", "SO", "TRANS", "FOODON", "DISDRIV")
 #: Mondo relation (shorthand id or RO CURIE) -> predicate, non-causal only
@@ -289,6 +321,7 @@ _KIND_FR = {
     "transmission_process": "processus de transmission",
     "food_material": "aliment",
     "disease_driver": "facteur déterminant de maladie",
+    STATE_KIND: "état altéré (nœud créé par REVA)",
 }
 
 
@@ -307,6 +340,10 @@ class _Claims:
         self.sources: dict[str, dict[str, Any]] = {}
         self.undefined: Counter[str] = Counter()
         self.by_relation: Counter[str] = Counter()
+        #: REVA-made altered-state nodes (H1): node id -> (filler CURIE, relation, relation label, en, fr)
+        self.nodes: dict[str, tuple[str, str, str, str, str]] = {}
+        #: every relation axiom (subject, relation, filler) of the file, causal or not (retraction evidence)
+        self.axioms: set[tuple[str, str, str]] = set()
 
     def add(self, subj: str, rel: str, filler: str, *, axiom: str, selector: Mapping[str, Any]) -> None:
         from reva.adapters.connectors.causdata_common import ClaimRecord
@@ -321,8 +358,18 @@ class _Claims:
             self.definitions[term] = d[0]
             self.sources[term] = d[1]
         relation, side = claim_relation(rel, ro)
-        cause, effect = (subj, filler) if side == "subject" else (filler, subj)
-        cid = f"{subj}|{term}|{filler}"
+        endpoint, extra = filler, {}
+        st = ALTERED_STATE.get(ro)
+        if st is not None:
+            endpoint = state_node(st[0], filler)
+            self.nodes.setdefault(endpoint, (filler, ro, self.ri.name(rel), st[1], st[2]))
+            extra = {
+                "reva_node": endpoint,
+                "reva_node_rule": f"the source relation names the {st[1].rsplit(' ', 1)[0]} of the filler, not the "
+                "filler itself; REVA-made node (FIX4A, audit AUDIT3 H1)",
+            }
+        cause, effect = (subj, endpoint) if side == "subject" else (endpoint, subj)
+        cid = f"{subj}|{term}|{endpoint}"
         prev = self.records.get(cid)
         if prev is not None:
             axioms = list(prev.selector.get("axioms", []))
@@ -341,6 +388,7 @@ class _Claims:
                 "relation_label": self.ri.name(rel),
                 "filler": filler,
                 "axioms": [axiom],
+                **extra,
                 **dict(selector),
             },
             raw_sha256=self.raw,
@@ -348,6 +396,40 @@ class _Claims:
             source_claim_id=cid,
         )
         self.by_relation[f"{term} {self.ri.name(rel)}"] += 1
+
+
+def state_node(key: str, filler: str) -> str:
+    """``reva_state:<key>:<filler kg id>`` (e.g. ``reva_state:disruption_of:go:0003824``): a REVA-made node."""
+    return f"{STATE_PREFIX}:{key}:{kg_id(filler)}"
+
+
+def add_state_nodes(b: _Builder, claims: _Claims, ns: str) -> None:
+    """H1: one entity per REVA-made altered-state node + its ``<ns>:altered_state_of`` link to the filler."""
+    from reva.kg.model import KgEntity
+
+    for node, (filler, ro, label, en, fr) in sorted(claims.nodes.items()):
+        b.ents[node] = KgEntity(
+            qid=node,
+            kind=STATE_KIND,
+            labels={"en": f"{en} {filler}", "fr": f"{fr} {filler}"},
+            descriptions={
+                "en": f"REVA-made node, not a class of {b.source_label}: the {en} {filler}, as named by the relation "
+                f"'{label}' ({ro}) of {b.source_label} disease axioms (the source states this {en.split(' ')[0]}, not "
+                f"{filler} itself, as cause or effect)"[:2000],
+                "fr": f"nœud créé par REVA, pas une classe de {b.source_label} : {fr} {filler}, nommé par la relation "
+                f"« {label} » ({ro}) des axiomes de maladie (la source désigne cet état, pas {filler} lui-même, comme "
+                "cause ou effet)"[:2000],
+            },
+            source_revision=b.revision,
+        )
+        b.statement(
+            node,
+            f"{ns}:altered_state_of",
+            f"altered_state_of:{node}",
+            {"file": b.file, "relation": ro, "relation_label": label, "filler": filler, "reva_made_node": True},
+            obj=filler,
+            quals={"reva_made_node": True, "source_relation": ro, "source_relation_label": label},
+        )
 
 
 def codebook(name: str, revision: str, ro_revision: str, claims: _Claims, url: str) -> dict[str, Any]:
@@ -592,6 +674,19 @@ def doid_kg(body: bytes, *, raw_sha256: str, ri: RelationIndex) -> tuple[Parts, 
         if subj not in created or prefix(subj) != "DOID":
             b.skipped["relation_on_imported_class"] += 1
             return
+        claims.axioms.add((subj, rel, o))
+        if rel == INHERITANCE_RELATION and prefix(o) == INHERITANCE_PREFIX:
+            # M1: a mode of inheritance, not a causal agent (the relation and its label are kept verbatim)
+            b.statement(
+                subj,
+                "doid:inheritance_mode",
+                f"inheritance_mode:{subj}:{o}",
+                sel,
+                obj=o,
+                axiom=kind,
+                quals={"source_relation": rel, "source_relation_label": ri.name(rel)},
+            )
+            return
         if ri.is_causal(rel):
             if rel in DOID_RELS:
                 raise drift(f"DOID relation {rel} is mapped as a plain link but is causal by the rule")
@@ -619,6 +714,7 @@ def doid_kg(body: bytes, *, raw_sha256: str, ri: RelationIndex) -> tuple[Parts, 
             axiom(s, "is_a", str(gen), "equivalent_class_genus", "doid.owl")
         for r in ld.get("restrictions") or []:
             axiom(s, str(r.get("propertyId")), str(r.get("fillerId")), "equivalent_class", "doid.owl")
+    add_state_nodes(b, claims, "doid")
     out = Parts(list(b.ents.values()), b.kg_statements(), list(claims.records.values()))
     out.report = {
         "revision": rev,
@@ -631,6 +727,7 @@ def doid_kg(body: bytes, *, raw_sha256: str, ri: RelationIndex) -> tuple[Parts, 
         "causal_by_relation": dict(sorted(claims.by_relation.items())),
         "causal_cause_prefixes": dict(Counter(c.cause_id.split(":")[0] for c in out.claims)),
         "causal_without_definition_not_loaded": dict(claims.undefined),
+        "reva_state_nodes": len(claims.nodes),
         "skipped": dict(sorted(b.skipped.items())),
     }
     out.codebook = {"claims": claims}
@@ -711,6 +808,7 @@ def mondo_kg(body: bytes, *, raw_sha256: str, ri: RelationIndex) -> tuple[Parts,
                     continue
                 kind = "intersection_of" if tag == "intersection_of" else "subclass_of_some"
                 sel = {"term": i, "tag": tag, "value": v}
+                claims.axioms.add((i, rel, tgt))
                 if ri.is_causal(rel):
                     if rel in MONDO_RELS or ri.resolve(rel) in MONDO_RELS:
                         raise drift(f"Mondo relation {rel} is mapped as a plain link but is causal by the rule")
@@ -734,6 +832,7 @@ def mondo_kg(body: bytes, *, raw_sha256: str, ri: RelationIndex) -> tuple[Parts,
                     axiom=kind,
                     quals={"relation": rel} if pid == "mondo:has_feature" else None,
                 )
+    add_state_nodes(b, claims, "mondo")
     out = Parts(list(b.ents.values()), b.kg_statements(), list(claims.records.values()))
     out.report = {
         "revision": rev,
@@ -746,6 +845,7 @@ def mondo_kg(body: bytes, *, raw_sha256: str, ri: RelationIndex) -> tuple[Parts,
         "causal_by_relation": dict(sorted(claims.by_relation.items())),
         "causal_cause_prefixes": dict(Counter(c.cause_id.split(":")[0] for c in out.claims)),
         "causal_without_definition_not_loaded": dict(claims.undefined),
+        "reva_state_nodes": len(claims.nodes),
         "skipped": dict(sorted(b.skipped.most_common(60))),
     }
     out.codebook = {"claims": claims}
@@ -825,8 +925,8 @@ def atlas_source() -> list[AtlasSourceSpec]:
             f"{RIGHTS['doid']['licence']} ({RIGHTS['doid']['licence_url']}); {RIGHTS['doid']['attribution']}",
             "diseases",
             "KG: DOID diseases, is_a, location (UBERON), symptoms (SYMP), phenotypes, onset, "
-            "transmission, ICD/OMIM/ORDO/MeSH xrefs; causal axioms (has material basis in: pathogens, inheritance, "
-            "...) -> T1 claims via the causal loader.",
+            "transmission, inheritance mode, disease drivers, ICD/OMIM/ORDO/MeSH xrefs; causal axioms (has material "
+            "basis in: pathogens, cell types, ...; RO 'causally related to') -> T1 claims via the causal loader.",
         ),
         _spec(
             MONDO_NAME,
@@ -934,7 +1034,20 @@ def deliver(
         origin=run.origin,
         claims=sorted(parts.claims, key=lambda c: c.source_claim_id),
     )
-    return deliver_claims(run, [d])
+    return deliver_claims(run, [d], source_row_present=row_present(claims))
+
+
+def row_present(claims: _Claims) -> Any:
+    """Retraction evidence: is the stored claim's axiom (subject, relation, filler) still in the delivered file?"""
+
+    def present(lt: Mapping[str, Any]) -> bool | None:
+        sel = lt.get("selector") or {}
+        key = (sel.get("subject"), sel.get("relation"), sel.get("filler"))
+        if not all(isinstance(k, str) for k in key):
+            return None
+        return key in claims.axioms
+
+    return present
 
 
 def chain_up(parts: Parts, start: str, pid: str, max_hops: int = 12) -> list[str]:

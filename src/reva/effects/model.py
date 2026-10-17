@@ -25,6 +25,7 @@ from sqlalchemy import Connection, Engine, text
 from sqlalchemy.exc import DBAPIError
 
 from reva.effects import vocab as v
+from reva.effects.consistency import side_problem
 from reva.effects.variables import Resolver, default_resolver
 from reva.kernel.errors import ValidationProblem
 
@@ -398,6 +399,23 @@ def validate_estimate(
     _txt(e.shock_unit, "invalid_shock_unit", 100)
     if e.measure == "response" and shock is None:
         raise Reject("response_needs_shock")
+    # unit / transform consistency with the named variable's own unit (FIX4B, audit M3)
+    for side_kind, side_id, side_tr, side_def, is_effect in (
+        (e.cause_kind, e.cause_id, e.cause_transform, e.cause_definition, False),
+        (e.effect_kind, e.effect_id, e.effect_transform, e.effect_definition, True),
+    ):
+        is_growth, gvar = res.growth_info(side_kind, side_id)
+        why = side_problem(
+            transform=side_tr,
+            is_growth=is_growth,
+            growth_variable=gvar,
+            definition=side_def,
+            measure=e.measure,
+            unit=e.unit,
+            is_effect=is_effect,
+        )
+        if why:
+            raise Reject(f"{'effect' if is_effect else 'cause'}_{why}")
     # point / sign
     if e.sign not in v.SIGNS:
         raise Reject("invalid_sign")

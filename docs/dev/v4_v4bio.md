@@ -80,11 +80,47 @@ names (fr/en, verbatim). No predicate is causal.
 
 LIVE_RESULTS_PLACEHOLDER
 
+## Live loads in the dev DB `reva` (2026-10-17, origin `live`)
+
+| Source (connector version) | Requests | Raw archived (distinct) | Entities | Statements | Notes |
+|---|---|---|---|---|---|
+| `atlas.hgnc` (1.0.0) | 1 | 17.0 MB | 45,277 genes | 424,384 | complete set 2026-10-16, md5 = ETag checked; 19,299 protein-coding, 10,304 ncRNA, 14,671 pseudogenes, 1,003 other; 20,377 `hgnc:encodes`; 36 locations name no chromosome (19 empty, 8 reserved, 6 unplaced, 3 not on reference assembly) |
+| `atlas.uniprot` (1.0.1) | 154 | 20.1 MB | 14,919 `ncbitaxon:` + 20,431 proteins | 113,787 | release 2026_03 (2026-09-02); 575,748 reviewed entries in 14,919 organisms (human 20,431, mouse 17,283, Arabidopsis 16,421, rat 8,233, yeast 6,733); 17,341 function texts; 20,382 `uniprot:encoded_by` |
+| `atlas.ensembl_genomes` (1.0.1) | 3 | 0.1 MB | 343 assemblies, 47 chromosomes, 99 new `ncbitaxon:` | 737 | release 116, 356 vertebrate species (13 without INSDC accession: not loaded); karyotypes human (25) and mouse (22) |
+| `atlas.ncbi_genomes` (1.0.1) | 5 | 7.7 MB | 1,922 assemblies (+ new taxa) | 16,530 | reference annotated genomes: 1,364 Vertebrata + 558 Viridiplantae; 7,748 gene-count statements; 1,094 RefSeq↔INSDC pairings |
+| `atlas.col_checklist` (1.0.2) | 9 | 4.3 MB | 649 (648 taxa + release) | 1,912 | COL26.10 (2026-10-14, doi:10.48580/dgzh4): 3 domains, 10 realms, 24 kingdoms, 146 phyla, 465 classes; 602 species counts (facet top 50,000: 237 small taxa without a count); 28 release metrics |
+| `atlas.gbif_backbone` (1.0.2) | 161 (+800 by 1.0.1, see below) | 78.8 MB | 58,785 taxa | 175,327 | 8 kingdoms, 257 phyla, 749 classes, 2,791 orders, 27,015 families, 21,100 Mammalia species + 6,740 genera, 170/178 scope species; 36,641 species counts from 101 facet partitions (4 truncated: root, Animalia, Arthropoda, Insecta); 6,144 taxa stated 0 (absent from an exhaustive partition), 920 without count (only under truncated partitions) |
+| `atlas.bio_wikidata` (1.0.2) | WD_REQ | WD_MB | — | WD_ST | WD_NOTE |
+| **Total** | | **WD_TOTAL MB** (≤ 150 MB bound) | **~180k** | **~750k** | rejected statements: 0 in every load |
+
+Examples (ids in the dev DB):
+
+* **Tree of life**: Puma concolor `gbif:2435099` → is_a → Puma `gbif:2435098` (3 accepted species) → is_a → Felidae
+  `gbif:9703` (205) → is_a → Carnivora `gbif:732` → is_a → Mammalia `gbif:359` (21,100 accepted species, fossil
+  and extant) → is_a → Chordata `gbif:44` → is_a → Animalia `gbif:1` (1,822,234).
+* **Gene → protein → organism**: TP53 `hgnc:11998` → produces (HGNC `uniprot_ids`) → Cellular tumor antigen p53
+  `uniprot:P04637` → produced_by (UniProt HGNC xref) → `hgnc:11998`; P04637 → context → Homo sapiens
+  `ncbitaxon:9606` (20,431 Swiss-Prot entries).
+* **Gene → chromosome → genome**: `hgnc:11998` → located_in → chromosome 17 `chromosome:9606:17` ← has_part ←
+  GRCh38.p14 `assembly:GCA_000001405.29` (Ensembl, length in bp as qualifier) ← NCBI pairing ←
+  `assembly:GCF_000001405.40` (annotation GCF_000001405.40-RS_2025_08 of 2025-08-01: 59,792 genes total, 20,076
+  protein-coding, 22,235 non-coding, 17,070 pseudogenes, 411 other).
+* **Refused scope entries** (the check working): 8 pathogen keys from GBIF's name match (e.g. 11286021 for
+  "Escherichia coli") are, in the backbone, GTDB cluster names ("Escherichia coli_E", "Acinetobacter baumannii_B"):
+  the scientific name differs from the scope entry, so they are not loaded (listed in the run report).
+
+GBIF budget note: connector 1.0.1 opened one facet partition per family whose count the parent partition did not
+list (thousands of families with no accepted species), consumed the whole 800-request budget and loaded nothing
+(its 458 archived responses are the same bytes 1.0.2 re-read). 1.0.2 opens partitions on kingdoms..orders only.
+Facet values of a partition's *ancestors* are partial counts (restricted to the partition): the run keeps the
+first value seen, which (breadth-first from the root) is always the full count, and lists the later partial
+values under `counts.conflicts` in the run report (they are not conflicts between sources).
+
 ## Hand-offs
 
 * **V4HEALTH** — gene–disease associations are yours, as `associated_with` (never causal): key genes as
   `hgnc:<n>` (numeric part of HGNC:<n>, 45,277 genes loaded), proteins as `uniprot:<acc>`, taxa as `ncbitaxon:<id>`
-  (14,9xx organisms with Swiss-Prot entries have entities) — the same prefixes as your ClinGen / Mondo loaders.
+  (14,919 organisms with Swiss-Prot entries have entities) — the same prefixes as your ClinGen / Mondo loaders.
   Pathogens of `registry/bio/taxon_scope.yaml` (group `pathogens`, 46 accepted backbone species) carry GBIF keys;
   their NCBI ids reach them only through `bio:same_taxon_via_wikidata` (Wikidata P685 + P846 on one item).
 * **V4ECO** — species distributions are yours: GBIF taxon keys of every loaded taxon are the `gbif:<key>` ids
@@ -92,9 +128,8 @@ LIVE_RESULTS_PLACEHOLDER
   model organisms, iconic / threatened). `gbif:accepted_species_count` gives the backbone's species count per group.
   IUCN threat statuses are not loaded here (IUCN Red List data on GBIF is CC BY-NC; your IUCN source decides).
 * **V4LINK** — identity rules already use `gbif:` (P846 legacy backbone), `ncbitaxon:` (P685), `hgnc:` (P354):
-  my entities match them. My own `bio:wikidata_item` / `bio:same_taxon_via_wikidata` cover the taxa your bounded
-  pack (>= 30 sitelinks) leaves out; if your pack supersedes them, retract by re-running `atlas.bio_wikidata`
-  with fewer queries is not needed — both can coexist (different predicates, same Wikidata statements).
+  my entities match them. `bio:wikidata_item` / `bio:same_taxon_via_wikidata` (mine) cover taxa your bounded pack
+  (>= 30 sitelinks) leaves out; both can coexist (different predicates reading the same Wikidata statements).
 
 ## What is missing, and why
 

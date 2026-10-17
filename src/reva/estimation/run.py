@@ -451,6 +451,37 @@ def archive_run(engine: Any, store: Any, doc: Mapping[str, Any]) -> str:
 
 
 EFFECT_TRANSFORM = {"cumsum": "percent_change", "logdiff": "percent_change", "diff": "pp_change", "level": "level"}
+#: The treatment is an onset dummy D(i,t) (1 in the onset year only); the response at h includes whatever the
+#: episode does afterwards, with later onsets inside the window controlled: a one-time impulse in the occurrence
+#: (docs/dev/v5_effect_interface.md vocabulary). FIX4B (audit L3): the first writes left it unset.
+SHOCK_PROFILE = "one_time_impulse"
+
+
+def effect_target(concept_id: str, lhs: str) -> tuple[str, str, str]:
+    """(effect_kind, effect_id, definition suffix) of a run's estimate.
+
+    A ``cumsum`` LHS (cumulative sum of growth rates from t to t+h, ≈ % change of the LEVEL relative to t-1) on a
+    growth-rate concept is a level response: it is written on the level variable whose curated ``growth_concepts``
+    list that concept (``registry/effects/variables.yaml``), never on the growth concept (audit AUDIT3 M3). No
+    curated level variable -> refused (no estimate is written rather than a mislabelled one)."""
+    if lhs != "cumsum":
+        return "atlas_concept", concept_id, ""
+    from reva.effects.variables import load_variables
+
+    levels = load_variables().level_of_growth_concept(concept_id)
+    if len(levels) != 1:
+        raise ValidationProblem(
+            "cumulative-growth LHS: no unique curated level variable for this growth concept "
+            "(registry/effects/variables.yaml growth_concepts); not written",
+            concept=concept_id,
+            candidates=levels,
+        )
+    return (
+        "variable",
+        levels[0],
+        f" -- written on the level variable {levels[0]} (its curated growth concept {concept_id} is the panel "
+        "outcome): a cumulative level response, not a growth rate",
+    )
 
 
 def effect_estimates(doc: Mapping[str, Any], *, headline_h: int | None = None) -> list[dict[str, Any]]:
@@ -473,6 +504,7 @@ def effect_estimates(doc: Mapping[str, Any], *, headline_h: int | None = None) -
     sign = "negative" if point < 0 else ("positive" if point > 0 else "zero")
     ev = doc["inputs"]["events"]
     sample = lp["sample"]
+    effect_kind, effect_id, level_note = effect_target(str(req["outcome"]).split(":", 1)[1], lhs)
     return [
         {
             "estimate_id": f"h{h}",
@@ -480,15 +512,17 @@ def effect_estimates(doc: Mapping[str, Any], *, headline_h: int | None = None) -
             "cause_id": tr["event_type"],
             "cause_definition": tr["definition"],
             "cause_transform": "occurrence",
-            "effect_kind": "atlas_concept",
-            "effect_id": str(req["outcome"]).split(":", 1)[1],
+            "effect_kind": effect_kind,
+            "effect_id": effect_id,
             "effect_definition": f"{out_s.get('label') or ''}: {out_s.get('definition') or ''} -- REVA LHS: "
-            + doc["interpretation"]["unit_note"],
+            + doc["interpretation"]["unit_note"]
+            + level_note,
             "effect_transform": EFFECT_TRANSFORM[lhs],
             "measure": "response",
             "unit": unit,
             "shock_size": 1,
             "shock_unit": "occurrence",
+            "shock_profile": SHOCK_PROFILE,
             "sign": sign,
             "point": point,
             "point_kind": "point",

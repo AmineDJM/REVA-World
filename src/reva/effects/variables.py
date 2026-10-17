@@ -28,6 +28,11 @@ class EffectVariable:
     unit: str
     atlas_concepts: tuple[str, ...]
     atlas_note: str | None = None
+    #: atlas concepts that are the (annual) growth rate of this level variable -- a curated identifier link,
+    #: not the same quantity (FIX4B, audit M3): a cumulative-growth response is written on the level variable.
+    growth_concepts: tuple[str, ...] = ()
+    #: the effect variable that is the growth rate of this level variable (curated id link, FIX4B)
+    growth_variable: str | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -49,6 +54,24 @@ class Variables:
     def by_atlas_concept(self, concept_id: str) -> list[str]:
         return sorted(v.id for v in self.items.values() if concept_id in v.atlas_concepts)
 
+    def level_of_growth_concept(self, concept_id: str) -> list[str]:
+        """Level variables whose curated ``growth_concepts`` list this growth-rate concept."""
+        return sorted(v.id for v in self.items.values() if concept_id in v.growth_concepts)
+
+    def growth_ids(self) -> dict[str, set[str]]:
+        """Ids that are growth rates, per kind (``variable`` / ``atlas_concept``), from the curated links."""
+        var: set[str] = set()
+        con: set[str] = set()
+        for v in self.items.values():
+            con.update(v.growth_concepts)
+            if v.growth_variable:
+                var.add(v.growth_variable)
+        for gid in list(var):
+            gv = self.items.get(gid)
+            if gv is not None:
+                con.update(gv.atlas_concepts)
+        return {"variable": var, "atlas_concept": con}
+
 
 def parse_variables(data: bytes, *, known_concepts: set[str] | None = None) -> Variables:
     doc = yaml.safe_load(data)
@@ -65,8 +88,12 @@ def parse_variables(data: bytes, *, known_concepts: set[str] | None = None) -> V
         if not str(v.get("definition") or "").strip() or not str(v.get("unit") or "").strip():
             raise ValidationProblem("variables.yaml: definition and unit are required", id=vid)
         concepts = tuple(v.get("atlas_concepts") or ())
+        growth = tuple(v.get("growth_concepts") or ())
+        gvar = v.get("growth_variable")
+        if gvar is not None and (not isinstance(gvar, str) or not VAR_ID_RE.match(gvar)):
+            raise ValidationProblem("variables.yaml: invalid growth_variable", id=vid)
         if known_concepts is not None:
-            bad = [c for c in concepts if c not in known_concepts]
+            bad = [c for c in (*concepts, *growth) if c not in known_concepts]
             if bad:
                 raise ValidationProblem("variables.yaml: unknown atlas concept", id=vid, concepts=bad)
         out[vid] = EffectVariable(
@@ -76,7 +103,12 @@ def parse_variables(data: bytes, *, known_concepts: set[str] | None = None) -> V
             str(v["unit"]).strip(),
             concepts,
             v.get("atlas_note"),
+            growth,
+            gvar,
         )
+    for vid, ev in out.items():
+        if ev.growth_variable and ev.growth_variable not in out:
+            raise ValidationProblem("variables.yaml: unknown growth_variable", id=vid, growth_variable=ev.growth_variable)
     return Variables(out, hashlib.sha256(data).hexdigest())
 
 
@@ -96,6 +128,12 @@ class Resolver:
     variables: Variables
     atlas: dict[str, dict[str, str]] | None  # concept id -> labels
     event_types: dict[str, dict[str, str]] | None  # type id -> labels
+
+    def growth_info(self, kind: str, id_: str) -> tuple[bool, str | None]:
+        """(is a growth rate, curated growth variable of this level variable) -- identifier links only."""
+        is_growth = id_ in self.variables.growth_ids().get(kind, set())
+        gvar = self.variables.items[id_].growth_variable if kind == "variable" and id_ in self.variables.items else None
+        return is_growth, gvar
 
     def known(self, kind: str, id_: str) -> bool:
         if kind == "variable":

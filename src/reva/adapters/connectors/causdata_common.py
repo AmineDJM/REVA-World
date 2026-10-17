@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import asdict, dataclass, field
 from datetime import date, datetime
 from functools import lru_cache
@@ -577,7 +577,9 @@ def causal_available(engine: Any) -> bool:
         return bool(conn.execute(text("SELECT to_regclass('kg.causal_claim') IS NOT NULL")).scalar_one())
 
 
-def _load_one(engine: Any, store: Any, d: ClaimDelivery) -> dict[str, Any]:
+def _load_one(
+    engine: Any, store: Any, d: ClaimDelivery, source_row_present: Callable[[Mapping[str, Any]], bool | None] | None = None
+) -> dict[str, Any]:
     codebook_cls, claim_cls = _causal_api("Codebook"), _causal_api("DatasetClaim")
     load_dataset_claims = _causal_api("load_dataset_claims")
     cb = codebook_cls(**d.codebook)
@@ -612,6 +614,7 @@ def _load_one(engine: Any, store: Any, d: ClaimDelivery) -> dict[str, Any]:
         origin=d.origin,
         claims=claims,
         complete=d.complete,
+        **({"source_row_present": source_row_present} if source_row_present is not None else {}),
     )
     return rep.as_dict() if hasattr(rep, "as_dict") else dict(rep)
 
@@ -620,8 +623,17 @@ def staging_name(d: ClaimDelivery) -> str:
     return f"{d.source_key}__{d.dataset}__{d.origin}.json"
 
 
-def deliver_claims(run: Any, deliveries: Sequence[ClaimDelivery]) -> dict[str, Any]:
-    """Load (or stage) claim deliveries; see the module doc. Returns a per-dataset report."""
+def deliver_claims(
+    run: Any,
+    deliveries: Sequence[ClaimDelivery],
+    *,
+    source_row_present: Callable[[Mapping[str, Any]], bool | None] | None = None,
+) -> dict[str, Any]:
+    """Load (or stage) claim deliveries; see the module doc. Returns a per-dataset report.
+
+    ``source_row_present`` (optional, loaded mode only): given a stored claim absent from the delivery, whether its
+    source row is still in the delivered files (``reva.causal.load_dataset_claims``: True = ``reclassified_by_reva``,
+    False = ``removed_at_source``); staged deliveries do not carry it (the reason is then derived from the raw)."""
     out: dict[str, Any] = {}
     staging = (getattr(run, "options", None) or {}).get("claims_staging")
     if causal_available(getattr(run, "engine", None)):
@@ -629,7 +641,7 @@ def deliver_claims(run: Any, deliveries: Sequence[ClaimDelivery]) -> dict[str, A
             out[d.dataset] = {
                 "status": "loaded",
                 "claims": len(d.claims),
-                "report": _load_one(run.engine, run.store, d),
+                "report": _load_one(run.engine, run.store, d, source_row_present),
             }
         return out
     for d in deliveries:

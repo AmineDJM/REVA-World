@@ -18,6 +18,8 @@ variables:
     definition: Real gross domestic product, level (a multiplier relates its change, in currency, to the change of the cause in the same currency).
     unit: constant-price currency
     atlas_concepts: []
+    growth_variable: output.real_gdp_growth
+    growth_concepts: [wb.ny.gdp.mktp.kd.zg]
   - id: labour.unemployment_gap
     labels: {en: Unemployment gap, fr: Écart de chômage}
     definition: Unemployment rate minus its long-run (trend or natural) level, in percentage points.
@@ -109,6 +111,8 @@ variables:
     definition: Real gross domestic product per person; its growth rate is the annual percent change.
     unit: constant-price currency per person
     atlas_concepts: []
+    growth_variable: output.real_gdp_per_capita_growth
+    growth_concepts: [wb.ny.gdp.pcap.kd.zg]
   - id: output.world_industrial_production
     labels: {en: World industrial production, fr: Production industrielle mondiale}
     definition: Index of industrial production of a broad group of economies used as a measure of world economic activity (e.g. OECD plus six major other countries).
@@ -293,3 +297,19 @@ variables:
     definition: Twelve-month (or annual) percent change of a consumer or retail price index as measured by the cited study (e.g. CPI, HICP, RPIX); changes are in percentage points.
     unit: percent
     atlas_concepts: []
+  # FIX4B (audit AUDIT3 M3/M5): growth-rate variables of the two GDP level variables. `growth_variable` /
+  # `growth_concepts` on a level variable are curated identifier links (the growth rate OF that level, not the
+  # same quantity); reva.effects.consistency refuses a level response on a growth id and a growth_rate transform
+  # on a level variable that has a growth variable.
+  - id: output.real_gdp_growth
+    labels: {en: Real GDP growth rate, fr: Taux de croissance du PIB réel}
+    definition: Annual (or per-period) percent change of real gross domestic product; changes of it are in percentage points.
+    unit: percent per year
+    atlas_concepts: [wb.ny.gdp.mktp.kd.zg]
+    atlas_note: "Curated by agent FIX4B: WDI NY.GDP.MKTP.KD.ZG (GDP growth, annual %, constant 2015 USD) measures the annual growth rate of real GDP; a source's own GDP series (PWT, national accounts, IMF) may differ."
+  - id: output.real_gdp_per_capita_growth
+    labels: {en: Real GDP per capita growth rate, fr: Taux de croissance du PIB réel par habitant}
+    definition: Annual percent change of real gross domestic product per person; changes of it are in percentage points.
+    unit: percent per year
+    atlas_concepts: [wb.ny.gdp.pcap.kd.zg]
+    atlas_note: "Curated by agent FIX4B: WDI NY.GDP.PCAP.KD.ZG (GDP per capita growth, annual %, constant 2015 USD) measures the annual growth rate of real GDP per capita; a source's own series (PWT, national accounts) may differ."

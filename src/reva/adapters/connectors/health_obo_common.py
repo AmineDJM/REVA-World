@@ -12,10 +12,13 @@ What lives here
 * :class:`RelationIndex` -- the Relation Ontology (``ro.obo``, archived by each run) plus the ontology's own
   relation stanzas: labels, verbatim definitions, ``is_a`` closure. :meth:`RelationIndex.is_causal` is the
   **causal decision rule** (docs/dev/v4_v4health.md, "Causal axioms"): a relation is causal when RO classifies it
-  under ``RO:0002410`` "causally related to" (or the ontology defines it as causation, e.g. DOID's
-  ``IDO:0000664`` "has material basis in" -- "Relating the disease to it's causation"), or when its own label
-  carries a causal marker. A causal relation never becomes a KG link: it is delivered to the causal loader as an
-  attributed T1 claim whose codebook definition is quoted verbatim from the archived file.
+  under ``RO:0002410`` "causally related to", or when it is on the explicit, reviewed allow-list
+  :data:`DEFINED_AS_CAUSATION` (a relation the ontology itself defines as causation, e.g. DOID's ``IDO:0000664``
+  "has material basis in" -- "Relating the disease to it's causation"; the defining phrase is checked verbatim in
+  the archived file). A relation's label is never read (FIX4A, audit AUDIT3 M9: ``RO:0007001`` "has disease
+  driver" was causal only because of the word "driver"). A causal relation never becomes a KG link: it is
+  delivered to the causal loader as an attributed T1 claim whose codebook definition is quoted verbatim from the
+  archived file.
 * :func:`load_predicates` / :func:`load_kg` -- ``registry/kg/predicates_health.yaml`` and a bounded, retracting
   KG loader (same contract as the language layer's).
 """
@@ -42,24 +45,13 @@ PREDICATES_FILE = REPO_ROOT / "registry" / "kg" / "predicates_health.yaml"
 RO_URL = "https://raw.githubusercontent.com/oborel/obo-relations/master/ro.obo"
 RO_HOST = "raw.githubusercontent.com"
 CAUSAL_ROOT = "RO:0002410"  # "causally related to"
-#: Label markers of a causal relation (a superset of V4CORE's never_map markers): a relation whose label carries
-#: one is never loaded as a plain KG link, even when RO does not place it under "causally related to".
-CAUSAL_MARKERS = (
-    "cause",
-    "causal",
-    "causation",
-    "effect",
-    "material basis",
-    "basis in",
-    "risk factor",
-    "induce",
-    "leads to",
-    "predispos",
-    "trigger",
-    "driver",
-    "susceptib",
-    "arises from",
-)
+#: Relations outside RO's "causally related to" branch that the ontology *defines* as causation (FIX4A, audit
+#: AUDIT3 M9: an explicit, reviewed id list -- never a label word). Value = the phrase of the relation's verbatim
+#: definition that says so; :meth:`RelationIndex.is_causal` refuses the id (drift) when the archived definition no
+#: longer contains it. Adding an id is an owner decision (docs/dev/v6_fix4a.md).
+DEFINED_AS_CAUSATION: dict[str, str] = {
+    "IDO:0000664": "Relating the disease to it’s causation",  # DOID "has material basis in" (doid.json)
+}
 #: Causal relations whose SUBJECT (the disease) is the cause ("disease causes disruption of <process>").
 SUBJECT_IS_CAUSE = frozenset({"RO:0004024", "RO:0004025"})
 #: Causal relations read as "contributing factor" (a susceptibility factor), the others as "has_cause".
@@ -335,11 +327,19 @@ class RelationIndex:
         return rid
 
     def is_causal(self, rid: str) -> bool:
+        """RO hierarchy (``RO:0002410`` "causally related to" in the archived ro.obo) or the explicit
+        :data:`DEFINED_AS_CAUSATION` allow-list. Labels are never read."""
         if CAUSAL_ROOT in self.closure(rid) or self.resolve(rid) == CAUSAL_ROOT:
             return True
-        # label markers only (a definition's wording is not read: RO's hierarchy is the classification)
-        low = " ".join((rid.replace("_", " "), self.name(rid))).lower()
-        return any(m in low for m in CAUSAL_MARKERS)
+        for key in (rid, self.resolve(rid)):
+            phrase = DEFINED_AS_CAUSATION.get(key)
+            if phrase is None:
+                continue
+            r = self.relations.get(key)
+            if r is None or not r.definition or _apostrophes(phrase) not in _apostrophes(r.definition):
+                raise drift(f"{key}: definition no longer contains {phrase!r}; review DEFINED_AS_CAUSATION")
+            return True
+        return False
 
     def definition(self, rid: str) -> tuple[str, dict[str, Any]] | None:
         """Codebook text for a causal relation: its own verbatim definition, else (explicitly marked) the verbatim
@@ -377,6 +377,10 @@ class RelationIndex:
                 src,
             )
         return None
+
+
+def _apostrophes(t: str) -> str:
+    return t.replace("\u2019", "'")
 
 
 def claim_relation(rid: str, ro: str) -> tuple[str, str]:
@@ -507,8 +511,8 @@ def kg_available(engine: Any) -> bool:
 
 
 __all__ = [
-    "CAUSAL_MARKERS",
     "CAUSAL_ROOT",
+    "DEFINED_AS_CAUSATION",
     "KIND_BY_PREFIX",
     "RO_URL",
     "HealthSourceError",
