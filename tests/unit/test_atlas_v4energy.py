@@ -31,13 +31,15 @@ SHA = "a" * 64
 
 def _fixture(conn: str, url_part: str) -> bytes:
     man = json.loads((FIX / conn / "manifest.json").read_text())
-    hits = [e for e in man if url_part in e["url"]]
+    hits = [e for e in man if url_part in e["url"] or e["file"].endswith(url_part)]
     assert len(hits) == 1, url_part
     return (FIX / conn / hits[0]["file"]).read_bytes()
 
 
 # ---------------------------------------------------------------------------------------------- common
-@pytest.mark.parametrize("name", ["atlas.wb_pinksheet", "atlas.eia_steo", "atlas.wri_gppd"])
+@pytest.mark.parametrize(
+    "name", ["atlas.wb_pinksheet", "atlas.eia_steo", "atlas.wri_gppd", "atlas.usgs_myb_facilities"]
+)
 def test_specs_are_discovered_and_bounded(name: str) -> None:
     found, errors = discover()
     assert not [e for e in errors if name.split(".")[1] in json.dumps(e)]
@@ -46,7 +48,9 @@ def test_specs_are_discovered_and_bounded(name: str) -> None:
     assert spec.planned_requests <= 3
 
 
-@pytest.mark.parametrize("conn", ["atlas.wb_pinksheet", "atlas.eia_steo", "atlas.wri_gppd"])
+@pytest.mark.parametrize(
+    "conn", ["atlas.wb_pinksheet", "atlas.eia_steo", "atlas.wri_gppd", "atlas.usgs_myb_facilities"]
+)
 def test_fixture_manifests_match_their_bytes(conn: str) -> None:
     man = json.loads((FIX / conn / "manifest.json").read_text())
     for e in man:
@@ -196,3 +200,46 @@ def test_v4energy_relation_mappings_are_valid() -> None:
     for m in doc["mappings"]:
         if ":" in m["property"]:
             assert m["property"] in preds
+
+
+# ---------------------------------------------------------------------------------------------- USGS MYB facilities
+def test_usgs_facilities_metadata_codes_are_read_from_the_archive() -> None:
+    from reva.adapters.connectors import atlas_usgs_facilities as U
+
+    meta = _fixture("atlas.usgs_myb_facilities", ".xml")
+    codes = U.capacity_code_meanings(meta)
+    assert codes["E"] == "Reported value is estimated"
+    assert U.not_known_is_declared(meta)
+    assert not U.not_known_is_declared(meta.replace(b"Value is not known", b"Value is zero"))
+
+
+def test_usgs_facilities_kg_owners_with_shares_and_missing_never_zero() -> None:
+    from reva.adapters.connectors import atlas_usgs_facilities as U
+    from reva.kg.model import _normalise_entity, _normalise_statement
+
+    entries, info = U.parse_csv(_fixture("atlas.usgs_myb_facilities", ".csv"))
+    assert info["entries"] == len(entries) > 20
+    codes = U.capacity_code_meanings(_fixture("atlas.usgs_myb_facilities", ".xml"))
+    parts = U.build_kg(entries, raw_sha256=SHA, capacity_codes=codes, country_qids={"CHL": "Q298"})
+    props = {p.pid: p.value_kind for p in U.load_predicates()}
+    for i, s in enumerate(parts.statements):
+        _normalise_statement(i, s, U.SOURCE_KEY, {SHA}, props)
+    for i, e in enumerate(parts.entities):
+        _normalise_entity(i, e)
+    assert {e.kind for e in parts.entities} == {"facility", "commodity"}
+    li = U.commodity_qid("Lithium")
+    chl_li = {
+        s.subject_qid for s in parts.statements if s.property_pid == "usgs_myb:produces" and s.object_qid == li
+    } & {s.subject_qid for s in parts.statements if s.property_pid == "usgs_myb:country" and s.object_qid == "Q298"}
+    assert chl_li
+    caps = [s for s in parts.statements if s.property_pid == "usgs_myb:annual_capacity"]
+    assert caps and all(s.value["amount"] != "-999" for s in caps)
+    assert parts.counters.get("capacity_not_known", 0) >= 1
+    shared = [s for s in caps if s.qualifiers.get("capacity_code") == "C,E"]
+    assert shared and shared[0].qualifiers["shared_capacity_with"]
+    owners = [s for s in parts.statements if s.property_pid == "usgs_myb:equity_owner_name"]
+    assert owners and all(s.value["type"] == "string" for s in owners)
+    assert any(s.qualifiers.get("share_percent") for s in owners)
+    assert all((q := s.qualifiers.get("share_percent")) is None or q[0]["amount"] != "-999" for s in owners)
+    hti = [s for s in parts.statements if s.property_pid == "usgs_myb:country" and s.object_qid == "iso3:HTI"]
+    assert hti  # evidenced name alias (registry/atlas/geo_aliases/v4energy.yaml)

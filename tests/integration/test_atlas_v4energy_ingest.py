@@ -82,3 +82,21 @@ def test_gppd_fixture_ingest_loads_kg_idempotently(db: Any) -> None:
     with db.owner.connect() as c:
         n2 = c.execute(text("SELECT count(*) FROM kg.statement WHERE source_key = 'wri.gppd'")).scalar_one()
     assert n2 == n
+
+
+def test_usgs_facilities_fixture_ingest_loads_kg(db: Any) -> None:
+    from reva.adapters.connectors import atlas_usgs_facilities
+
+    ensure_registered(db.owner, db.store, atlas_usgs_facilities.atlas_source())
+    out = _run(db, "atlas.usgs_myb_facilities")
+    assert out["status"] == "completed" and out["error"] is None, out
+    with db.owner.connect() as c:
+        n = c.execute(
+            text("SELECT count(*) FROM kg.statement_current WHERE property_pid LIKE 'usgs_myb:%'")
+        ).scalar_one()
+        kinds = dict(
+            c.execute(
+                text("SELECT kind, count(*) FROM kg.entity_current WHERE qid LIKE 'usgs_myb:%' GROUP BY kind")
+            ).all()
+        )
+    assert n > 100 and set(kinds) == {"facility", "commodity"}

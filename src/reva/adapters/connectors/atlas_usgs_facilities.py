@@ -419,7 +419,13 @@ def build_kg(
             for k in (1, 2):
                 src = e.g(f"Data Source {k}")
                 if src:
-                    st(f"entry:{key}:data_source:{k}", q, "usgs_myb:data_source", value=s(src), qualifiers={"selector": esel})
+                    st(
+                        f"entry:{key}:data_source:{k}",
+                        q,
+                        "usgs_myb:data_source",
+                        value=s(src),
+                        qualifiers={"selector": esel},
+                    )
     return KgParts(ents, sts, dict(c))
 
 
