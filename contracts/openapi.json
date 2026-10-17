@@ -12904,6 +12904,21 @@
             "title": "Cells",
             "type": "array"
           },
+          "current_version": {
+            "title": "Current Version",
+            "type": "string"
+          },
+          "headline_families": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "description": "Families where reva.ensemble is the headline forecast (an ensemble_better verdict), with versions",
+            "title": "Headline Families",
+            "type": "object"
+          },
           "holm_family_size": {
             "title": "Holm Family Size",
             "type": "integer"
@@ -12928,27 +12943,32 @@
             "title": "Rule",
             "type": "string"
           },
-          "weights_by_family": {
+          "weights_by_version": {
             "additionalProperties": {
               "additionalProperties": {
-                "type": "integer"
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
               },
               "type": "object"
             },
-            "description": "Ensemble forecasts per family by weight status (equal_weights_insufficient_history, online_weights, abstained)",
-            "title": "Weights By Family",
+            "description": "Ensemble forecasts per method version and family by weight status (equal_weights_insufficient_history, online_weights, abstained)",
+            "title": "Weights By Version",
             "type": "object"
           }
         },
         "required": [
           "label",
           "model",
+          "current_version",
           "rule",
           "alpha",
           "holm_family_size",
           "n_ensemble_forecasts",
           "n_ensemble_scored",
-          "weights_by_family",
+          "weights_by_version",
+          "headline_families",
           "cells"
         ],
         "title": "EnsembleBoard",
@@ -12970,6 +12990,18 @@
             "description": "Eligible competitor the ensemble does worst against",
             "title": "Best Single"
           },
+          "claim_fr": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Wording of a win: 'la combinaison REVA bat <forecaster> seul'; else null",
+            "title": "Claim Fr"
+          },
           "competitors": {
             "description": "Ensemble vs each forecaster it combined, common questions",
             "items": {
@@ -12978,6 +13010,11 @@
             },
             "title": "Competitors",
             "type": "array"
+          },
+          "ensemble_version": {
+            "description": "reva.ensemble method version (1.0.0 per forecaster, 2.0.0 per source)",
+            "title": "Ensemble Version",
+            "type": "string"
           },
           "family": {
             "title": "Family",
@@ -13048,6 +13085,7 @@
           }
         },
         "required": [
+          "ensemble_version",
           "family",
           "type",
           "metric",
@@ -13060,7 +13098,8 @@
           "status",
           "p_holm",
           "holm_family_size",
-          "verdict"
+          "verdict",
+          "claim_fr"
         ],
         "title": "EnsembleCell",
         "type": "object"

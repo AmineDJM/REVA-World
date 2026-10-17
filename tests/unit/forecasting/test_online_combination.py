@@ -61,3 +61,27 @@ def test_combination_rules() -> None:
     assert med == pytest.approx(loc)  # the combined median is the combined point
     assert OC.combine_probability({"x": 0.2, "y": 0.8}, {"x": 0.75, "y": 0.25}) == pytest.approx(0.35)
     assert OC.restrict({}, ["a", "b"]) == {"a": 0.5, "b": 0.5}
+
+
+def test_one_weight_per_information_source_split_equally_inside() -> None:
+    """Method 2 (reva.ensemble@2): forecasters built around the same official point share one source weight."""
+    weo = {"weo": "imf.weo.point", "conformal": "imf.weo.point", "bias": "imf.weo.point", "fan": "imf.weo.point"}
+    comps = ["weo", "conformal", "bias", "fan", "ar", "persistence"]
+    rule = OC.WeightRule(min_resolved=20, by_source=True)
+    assert rule.doc()["method"] == OC.METHOD_BY_SOURCE and "by_source" not in rule.doc()
+    eq = OC.grouped_weights(comps, weo, [], rule)
+    assert eq["status"] == OC.EQUAL  # equal-weights mode applies per source
+    assert eq["source_weights"] == pytest.approx({"imf.weo.point": 1 / 3, "ar": 1 / 3, "persistence": 1 / 3})
+    assert eq["weights"]["weo"] == pytest.approx(1 / 12) and eq["weights"]["ar"] == pytest.approx(1 / 3)
+    # one question where the WEO point is absent (e.g. the shape role): the group's weight goes to its present members
+    one = OC.restrict_grouped(eq["source_weights"], eq["sources"], ["conformal", "bias", "fan", "ar"])
+    assert one["ar"] == pytest.approx(0.5) and one["fan"] == pytest.approx(1 / 6)
+    assert sum(one.values()) == pytest.approx(1.0)
+    # per-source losses = mean of the members' losses; online weights then favour the better source
+    hist = rows(60, {"weo": 1.0, "conformal": 1.0, "bias": 1.0, "fan": 1.0, "ar": 3.0, "persistence": 3.0})
+    on = OC.grouped_weights(comps, weo, hist, rule)
+    assert on["status"] == OC.ONLINE and on["source_weights"]["imf.weo.point"] > on["source_weights"]["ar"]
+    assert on["weights"]["weo"] == pytest.approx(on["source_weights"]["imf.weo.point"] / 4)
+    assert OC.source_rows([OC.LossRow("q", "weo", 1.0), OC.LossRow("q", "fan", 3.0)], weo) == [
+        OC.LossRow("q", "imf.weo.point", 2.0)
+    ]

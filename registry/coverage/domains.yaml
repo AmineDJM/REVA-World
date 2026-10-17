@@ -1,0 +1,208 @@
+# REVA V8 coverage domains (agent V8COUVERTURE). The rows of the coverage matrix ("what REVA has loaded per
+# domain x place x time"). A domain is a reading grid over what is already stored, never a claim about the world:
+# a domain with no loaded source is "not covered", it does not mean the phenomenon is absent.
+#
+# How an atlas table gets its domain (first match wins, see reva.v8.coverage.domains):
+#   1. `tables`: an exact atlas dataset key ("atlas.<source>.<dataset>") listed under a domain;
+#   2. `sources`: the table's atlas source key ("ucdp_ged") listed under a domain;
+#   3. the majority theme (registry/atlas/themes.yaml) of the catalog concepts whose source order cites the table,
+#      mapped through `themes` below (ties: domain order of this file);
+#   4. otherwise `other` ("Non classé"), reported as such.
+# A KG entity kind gets the domain whose `kg_kinds` lists it (exact kind, or a prefix ending in "*"); else `other`.
+# Every theme of themes.yaml must belong to exactly one domain (tests/unit/v8/test_v8_coverage_registry.py).
+schema: reva-v8-coverage-domains/1
+domains:
+  - id: population
+    fr: Population et démographie
+    en: Population and demography
+    themes: [population]
+    sources: [un_wpp, un_wup, hyde, cbs, insee, statsjersey, spc]
+    kg_kinds: [survey_wave]
+  - id: macro
+    fr: Macroéconomie et travail
+    en: Macroeconomy and labour
+    themes: [economy, labour]
+    sources: [maddison, vintage_weo, vintage_us, vintage_ea, vintage_oecd, wid, ilostat, gapminder]
+    kg_kinds: [occupation, isic_code, crisis_trigger, crisis_outcome, crisis_response]
+  - id: prices
+    fr: Prix et matières premières
+    en: Prices and commodities
+    themes: [prices]
+    sources: [wb_cmo, fao_ffpi]
+    kg_kinds: [commodity]
+  - id: finance
+    fr: Finance, monnaie et budgets publics
+    en: Finance, money and public budgets
+    themes: [finance]
+    sources: [bis, ecb, boe, nyfed, ust, kfrench, cbcal, jst, laeven_valencia, reinhart_rogoff, esrb]
+    kg_kinds: [fund]
+  - id: trade
+    fr: Commerce et chaînes de valeur
+    en: Trade and value chains
+    themes: [trade]
+    sources: [baci, unctad]
+    kg_kinds: [hs_code, sitc_code, cpc_code]
+  - id: industry
+    fr: Industrie et entreprises
+    en: Industry and companies
+    themes: [industry, companies]
+    sources: [gleif]
+    kg_kinds: [legal_entity, sole_proprietor, facility, government_entity]
+  - id: energy
+    fr: Énergie
+    en: Energy
+    themes: [energy]
+    sources: [eia, eia_steo, vintage_steo, eia_wpsr]
+    kg_kinds: [energy_source]
+  - id: chemistry
+    fr: Chimie et matériaux
+    en: Chemistry and materials
+    themes: [chemistry, materials]
+    sources: [chebi, codata, pubchem, usgs]
+    kg_kinds: [chemical_element, isotope, compound, chemical_class, chemical_role, physical_constant, mineral, food_material]
+  - id: agriculture
+    fr: Agriculture, pêche et alimentation
+    en: Agriculture, fisheries and food
+    themes: []
+    sources: [fao, fishstat, usda, ifpri, usda_psd, usda_wasde, fao_tm]
+    kg_kinds: []
+  - id: climate
+    fr: Climat et météo
+    en: Weather and climate
+    themes: [climate]
+    sources: [cckp, cckp_ts, climind, ghcnm, attribution_cb]
+    kg_kinds: [weather_station, climate_trend, climate_index, climate_driver, extreme_event]
+  - id: environment
+    fr: Environnement et écologie
+    en: Environment and ecology
+    themes: [environment, ecology]
+    sources: [globi, gbif_occ, ecoregions]
+    kg_kinds: [ecoregion, biome, biogeographic_realm]
+  - id: hazards
+    fr: Catastrophes et risques naturels
+    en: Disasters and natural hazards
+    themes: []
+    sources: [ncei_hazards, inform]
+    kg_kinds: [earthquake, tsunami, volcanic_eruption, volcano, disaster_event]
+  - id: biology
+    fr: Biologie (espèces, gènes, protéines)
+    en: Biology (species, genes, proteins)
+    themes: [biology]
+    sources: [hgnc, uniprot, ensembl, ncbi, col, gbif]
+    kg_kinds: [taxon, gene, protein, genome_assembly, chromosome, sequence_feature, cell_type]
+  - id: health
+    fr: Santé et maladies
+    en: Health and diseases
+    themes: [health, health_body]
+    sources: [who, cdc, ecdc]
+    kg_kinds: [disease, disease_or_phenotype, phenotype, symptom, anatomical_structure, icd11_category, mesh_descriptor,
+               transmission_process, genetic_inheritance_pattern, disease_driver, condition, reva_altered_state]
+  - id: drugs
+    fr: Médicaments
+    en: Medicines
+    themes: []
+    sources: [openfda, chembl, ctgov, who_eml, unichem]
+    kg_kinds: [drug, drug_substance, drug_target, eml_section, essential_medicines_list]
+  - id: society
+    fr: Société, esprit et comportement
+    en: Society, mind and behaviour
+    themes: [society, behaviour]
+    sources: [hofstede, whr, undp, sscp, hief, cdpd]
+    kg_kinds: []
+  - id: education
+    fr: Éducation et science
+    en: Education and science
+    themes: [education, science]
+    sources: [uis, wipo, nobel]
+    kg_kinds: [research_topic, research_subfield, research_field, research_domain]
+  - id: politics
+    fr: Politique, institutions et droit
+    en: Politics, institutions and law
+    themes: [politics, law]
+    sources: [vdem, bmr, lied, ipu, parlgov, constitute, ccp, untc, unga, ohchr, eusanct, eusanctionsmap, ofac, ties,
+              ti, archigos, wbl, ssa, nelda, whogov, oxcgrt]
+    kg_kinds: [un_roll_call, treaty, treaty_participant, sanction_episode, sanction_regime, sanction_program,
+               polity_relation, international_organisation, organization]
+  - id: conflict
+    fr: Conflits et sécurité
+    en: Conflict and security
+    themes: []
+    sources: [ucdp, ucdp_ged, cow, icb, navco, mmp, mec, views, unpk, gdelt]
+    kg_kinds: [war, war_outcome, armed_conflict, armed_conflict_episode, armed_group, non_state_conflict,
+               one_sided_violence, militarized_incident, militarized_interstate_dispute, dispute_outcome,
+               foreign_policy_crisis, international_crisis, protracted_conflict, peace_agreement, peace_process,
+               conflict_termination, campaign_outcome, un_peace_operation, coded_outcome]
+  - id: migration
+    fr: Migrations et déplacements
+    en: Migration and displacement
+    themes: []
+    sources: [unhcr, idmc, iom, un_ims, eurostat_asylum]
+    kg_kinds: [disaster_displacement]
+  - id: infrastructure
+    fr: Infrastructures et transports
+    en: Infrastructure and transport
+    themes: []
+    sources: [ourairports, openflights, nga, unlocode, imf_portwatch, wikidata, gcat]
+    kg_kinds: [airport]
+  - id: digital
+    fr: Numérique
+    en: Digital
+    themes: []
+    sources: [keepiton, cfr_cyber, itu]
+    kg_kinds: []
+  - id: culture
+    fr: Culture, langues et religions
+    en: Culture, languages and religions
+    themes: [culture]
+    sources: [glottolog, wrp, unesco_ich, unesco_whc, olympics, musicbrainz, openlibrary]
+    kg_kinds: [language, dialect, family, heritage_site, intangible_heritage_element, heritage_list, olympic_team]
+  - id: history
+    fr: Histoire (séries longues, États historiques)
+    en: History (long series, historical states)
+    themes: [history]
+    sources: [clio, coldat, icow, cowtc, cshapes]
+    kg_kinds: [historical_state, polity, territory, state_code, international_system, person]
+  - id: geography
+    fr: Géographie et territoires
+    en: Geography and territories
+    themes: [geography]
+    sources: [geonames, naturalearth, factbook]
+    kg_kinds: [country, region_adm1, nuts_region, oecd_region, place_name, country_code]
+
+# Rows the grid cannot place: shown as "Non classé" with their count, never dropped.
+other: {id: other, fr: Non classé, en: Unclassified}
+
+# Columns: UN M49 regions/sub-regions as published in registry/entities/country_crosswalk.json (m49_region,
+# m49_subregion). Entities without an M49 region there get a REVA placement, labelled as such in the API/UI.
+regions:
+  Africa: {fr: Afrique}
+  Americas: {fr: Amériques}
+  Asia: {fr: Asie}
+  Europe: {fr: Europe}
+  Oceania: {fr: Océanie}
+  Antarctica: {fr: Antarctique}
+subregions:
+  Northern Africa: {fr: Afrique du Nord}
+  Sub-Saharan Africa: {fr: Afrique subsaharienne}
+  Latin America and the Caribbean: {fr: Amérique latine et Caraïbes}
+  Northern America: {fr: Amérique du Nord}
+  Central Asia: {fr: Asie centrale}
+  Eastern Asia: {fr: Asie de l’Est}
+  South-eastern Asia: {fr: Asie du Sud-Est}
+  Southern Asia: {fr: Asie du Sud}
+  Western Asia: {fr: Asie de l’Ouest}
+  Eastern Europe: {fr: Europe de l’Est}
+  Northern Europe: {fr: Europe du Nord}
+  Southern Europe: {fr: Europe du Sud}
+  Western Europe: {fr: Europe de l’Ouest}
+  Australia and New Zealand: {fr: Australie et Nouvelle-Zélande}
+  Melanesia: {fr: Mélanésie}
+  Micronesia: {fr: Micronésie}
+  Polynesia: {fr: Polynésie}
+  Antarctica: {fr: Antarctique}
+region_overrides:
+  # REVA placement (not M49): the crosswalk has no m49_region for these four entities.
+  ATA: {region: Antarctica, subregion: Antarctica, basis: "M49 lists Antarctica (010) without a region"}
+  CHI: {region: Europe, subregion: Northern Europe, basis: "M49 830 Channel Islands is listed under Northern Europe"}
+  TWN: {region: Asia, subregion: Eastern Asia, basis: "REVA placement: not listed separately by M49"}
+  XKX: {region: Europe, subregion: Southern Europe, basis: "REVA placement: not listed by M49 (World Bank code XKX)"}

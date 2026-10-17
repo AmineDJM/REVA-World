@@ -199,11 +199,12 @@ def question(conn: Any, store: Any, question_id: str) -> dict[str, Any] | None:
         if q is None:
             continue
         oc = outcomes(conn, store, None, b["batch_sha256"]).get(question_id)
-        scores: dict[str, dict[str, Any]] = {}
+        # keyed by (model, model_version): reva.ensemble 1.0.0 and 2.0.0 both forecast the same question (V7)
+        scores: dict[tuple[str, Any], dict[str, Any]] = {}
         for r in _score_rows(conn, None, b["batch_sha256"]):
             for s in r["metrics"].get("scores", []):
                 if s["question_id"] == question_id:
-                    scores[s["model"]] = s
+                    scores[(s["model"], s.get("model_version"))] = s
         fcs = [f for f in m["forecasts"] if f["question_id"] == question_id]
         for b2 in batches(conn, None):  # forecasts of supplementary batches (V6 PRED-MODELS) on the same question
             if b2["batch_sha256"] == b["batch_sha256"]:
@@ -211,14 +212,14 @@ def question(conn: Any, store: Any, question_id: str) -> dict[str, Any] | None:
             m2 = CACHE.get(store, b2["batch_sha256"])
             if m2.get("supplement_of") != b["batch_sha256"]:
                 continue
-            sc2 = {s["model"]: s for r in _score_rows(conn, None, b2["batch_sha256"])
+            sc2 = {(s["model"], s.get("model_version")): s for r in _score_rows(conn, None, b2["batch_sha256"])
                    for s in r["metrics"].get("scores", []) if s["question_id"] == question_id}  # fmt: skip
             scores.update(sc2)
             fcs += [{**f, "supplement_batch_sha256": b2["batch_sha256"]} for f in m2["forecasts"]
                     if f["question_id"] == question_id]  # fmt: skip
         return {
             "question": q,
-            "forecasts": [{**f, "score": scores.get(f["model"])} for f in fcs],
+            "forecasts": [{**f, "score": scores.get((f["model"], f.get("model_version")))} for f in fcs],
             "outcome": oc,
             "status": (oc or {}).get("status", "pending"),
             "seal": {

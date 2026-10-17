@@ -515,13 +515,22 @@ function EnsembleBlock() {
             Prévisions d’ensemble scellées : {eb.data.data.n_ensemble_forecasts} · notées : {eb.data.data.n_ensemble_scored} · tests dans la famille de
             Holm : {eb.data.data.holm_family_size}.
           </p>
-          {Object.keys(eb.data.data.weights_by_family).length > 0 && (
+          <p>
+            Méthode en cours : v{eb.data.data.current_version} (un poids par source d’information : les prévisions construites autour du même point
+            officiel, p. ex. le WEO du FMI et ses intervalles calibrés, partagent un seul poids).{' '}
+            {Object.keys(eb.data.data.headline_families).length === 0
+              ? 'Aucune famille où l’ensemble est la prévision de référence pour l’instant.'
+              : `Prévision de référence dans : ${Object.keys(eb.data.data.headline_families).join(', ')}.`}
+          </p>
+          {Object.keys(eb.data.data.weights_by_version).length > 0 && (
             <ul>
-              {Object.entries(eb.data.data.weights_by_family).map(([fam, st]) => (
-                <li key={fam}>
-                  {fam} : {Object.entries(st).map(([k, n]) => `${n} ${WEIGHT_FR[k] ?? k}`).join(', ')}
-                </li>
-              ))}
+              {Object.entries(eb.data.data.weights_by_version).flatMap(([ver, fams]) =>
+                Object.entries(fams).map(([fam, st]) => (
+                  <li key={`${ver}|${fam}`}>
+                    v{ver} · {fam} : {Object.entries(st).map(([k, n]) => `${n} ${WEIGHT_FR[k] ?? k}`).join(', ')}
+                  </li>
+                )),
+              )}
             </ul>
           )}
           {eb.data.data.cells.length === 0 ? (
@@ -532,6 +541,7 @@ function EnsembleBlock() {
             <table className="v3-table">
               <thead>
                 <tr>
+                  <th>Version</th>
                   <th>Famille</th>
                   <th>Type</th>
                   <th>Mesure</th>
@@ -544,7 +554,8 @@ function EnsembleBlock() {
               </thead>
               <tbody>
                 {eb.data.data.cells.map((c) => (
-                  <tr key={`${c.family}|${c.type}|${c.metric}`}>
+                  <tr key={`${c.ensemble_version}|${c.family}|${c.type}|${c.metric}`}>
+                    <td>v{c.ensemble_version}</td>
                     <td>{c.family}</td>
                     <td>{TYPE_FR[c.type] ?? c.type}</td>
                     <td>{METRIC_FR[c.metric] ?? c.metric}</td>
@@ -552,7 +563,7 @@ function EnsembleBlock() {
                     <td>{c.best_single ? modelFr(c.best_single.model) : 'n. a.'}</td>
                     <td>{fr(c.best_single?.ratio ?? null)}</td>
                     <td>{fr(c.p_holm, 4)}</td>
-                    <td>{VERDICT_FR[c.verdict] ?? c.verdict}</td>
+                    <td title={c.claim_fr ?? undefined}>{c.claim_fr ?? VERDICT_FR[c.verdict] ?? c.verdict}</td>
                   </tr>
                 ))}
               </tbody>

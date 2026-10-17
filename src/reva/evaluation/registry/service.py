@@ -655,11 +655,13 @@ def _record_resolution(
         counts: dict[str, int] = defaultdict(int)
         for o in res["outcomes"]:
             counts[o["status"]] += 1
-        for mk, (ver, _d) in sorted(all_models().items()):
+        declared = _declared_versions(conn, manifest)
+        for mk, (cur, _d) in sorted(all_models().items()):
             mine = [s for s in res["scores"] if s["model"] == mk]
+            ver, mv_id = declared.get(mk, (cur, mv[mk]))
             _insert_eval(
                 conn,
-                mv[mk],
+                mv_id,
                 ctx,
                 sha,
                 "operational_as_known",
@@ -687,6 +689,24 @@ def _record_resolution(
                 act.id,
             )
     return sha, dict(counts)
+
+
+def _declared_versions(conn: Any, manifest: Mapping[str, Any]) -> dict[str, tuple[str, str]]:
+    """Models a sealed batch declares at a version other than the current one (e.g. a ``reva.ensemble`` 1.0.0
+    batch resolved after 2.0.0 was registered): their score rows are linked to the declared version (V7)."""
+    models = all_models()
+    want = {
+        str(m["model_key"]): str(m["version"])
+        for m in manifest.get("models") or []
+        if m.get("model_key") in models and str(m.get("version")) != models[str(m["model_key"])][0]
+    }
+    if not want:
+        return {}
+    rows = conn.execute(
+        text("SELECT model_key, version, id::text AS id FROM model.version WHERE model_key = ANY(:k)"),
+        {"k": sorted(want)},
+    ).mappings()
+    return {r["model_key"]: (r["version"], r["id"]) for r in rows if want.get(r["model_key"]) == r["version"]}
 
 
 def _series_for(

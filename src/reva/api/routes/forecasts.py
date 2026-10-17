@@ -230,6 +230,7 @@ class LeaderboardResponse(s.Envelope):
 
 
 class EnsembleCell(s.ApiModel):
+    ensemble_version: str = Field(description="reva.ensemble method version (1.0.0 per forecaster, 2.0.0 per source)")
     family: str
     type: str
     metric: str = Field(description="Loss compared (lower is better): crps, abs_error, interval_score or brier")
@@ -246,19 +247,24 @@ class EnsembleCell(s.ApiModel):
         description="awaiting_resolutions, no_comparable_competitor, not_testable, no_significant_difference, "
         "ensemble_better or best_single_better"
     )
+    claim_fr: str | None = Field(description="Wording of a win: 'la combinaison REVA bat <forecaster> seul'; else null")
 
 
 class EnsembleBoard(s.ApiModel):
     label: str
     model: str
+    current_version: str
     rule: str
     alpha: float
     holm_family_size: int
     n_ensemble_forecasts: int
     n_ensemble_scored: int
-    weights_by_family: dict[str, dict[str, int]] = Field(
-        description="Ensemble forecasts per family by weight status (equal_weights_insufficient_history, "
-        "online_weights, abstained)"
+    weights_by_version: dict[str, dict[str, dict[str, int]]] = Field(
+        description="Ensemble forecasts per method version and family by weight status "
+        "(equal_weights_insufficient_history, online_weights, abstained)"
+    )
+    headline_families: dict[str, list[str]] = Field(
+        description="Families where reva.ensemble is the headline forecast (an ensemble_better verdict), with versions"
     )
     cells: list[EnsembleCell]
 

@@ -6231,6 +6231,15 @@ export interface components {
             alpha: number;
             /** Cells */
             cells: components["schemas"]["EnsembleCell"][];
+            /** Current Version */
+            current_version: string;
+            /**
+             * Headline Families
+             * @description Families where reva.ensemble is the headline forecast (an ensemble_better verdict), with versions
+             */
+            headline_families: {
+                [key: string]: string[];
+            };
             /** Holm Family Size */
             holm_family_size: number;
             /** Label */
@@ -6244,12 +6253,14 @@ export interface components {
             /** Rule */
             rule: string;
             /**
-             * Weights By Family
-             * @description Ensemble forecasts per family by weight status (equal_weights_insufficient_history, online_weights, abstained)
+             * Weights By Version
+             * @description Ensemble forecasts per method version and family by weight status (equal_weights_insufficient_history, online_weights, abstained)
              */
-            weights_by_family: {
+            weights_by_version: {
                 [key: string]: {
-                    [key: string]: number;
+                    [key: string]: {
+                        [key: string]: number;
+                    };
                 };
             };
         };
@@ -6263,12 +6274,22 @@ export interface components {
                 [key: string]: unknown;
             } | null;
             /**
+             * Claim Fr
+             * @description Wording of a win: 'la combinaison REVA bat <forecaster> seul'; else null
+             */
+            claim_fr: string | null;
+            /**
              * Competitors
              * @description Ensemble vs each forecaster it combined, common questions
              */
             competitors: {
                 [key: string]: unknown;
             }[];
+            /**
+             * Ensemble Version
+             * @description reva.ensemble method version (1.0.0 per forecaster, 2.0.0 per source)
+             */
+            ensemble_version: string;
             /** Family */
             family: string;
             /** Holm Family Size */

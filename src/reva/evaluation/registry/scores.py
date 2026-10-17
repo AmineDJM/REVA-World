@@ -75,6 +75,8 @@ def score_forecast(question: Mapping[str, Any], forecast: Mapping[str, Any], out
         "log_score": num(ls) if ls is not None else None,
         "pit": num(pit) if pit is not None else None,
     }
+    if forecast.get("model_version"):  # e.g. reva.ensemble 2.0.0 next to sealed 1.0.0 records (V7)
+        out["model_version"] = forecast["model_version"]
     if question["type"] == "interval":
         iv = forecast.get("interval")
         if iv:

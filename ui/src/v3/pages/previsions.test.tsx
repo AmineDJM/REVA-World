@@ -103,11 +103,12 @@ const ROUTES = {
   'GET /v1/forecasts/backtests': { body: env([]) },
   'GET /v1/forecasts/ensemble': {
     body: env({
-      label: 'REVA ENSEMBLE', model: 'reva.ensemble', rule: 'r', alpha: 0.05, holm_family_size: 0, n_ensemble_forecasts: 434, n_ensemble_scored: 0,
-      weights_by_family: { 'weo.cpi_inflation': { equal_weights_insufficient_history: 434 } },
+      label: 'REVA ENSEMBLE', model: 'reva.ensemble', current_version: '2.0.0', rule: 'r', alpha: 0.05, holm_family_size: 0, n_ensemble_forecasts: 434, n_ensemble_scored: 0,
+      weights_by_version: { '2.0.0': { 'weo.cpi_inflation': { equal_weights_insufficient_history: 434 } } },
+      headline_families: {},
       cells: [
-        { family: 'weo.cpi_inflation', type: 'quantity', metric: 'crps', n_ensemble_issued: 434, n_ensemble_scored: 0, min_pairs: 20, competitors: [],
-          best_single: null, test: null, status: 'awaiting_resolutions', p_holm: null, holm_family_size: 0, verdict: 'awaiting_resolutions' },
+        { ensemble_version: '2.0.0', family: 'weo.cpi_inflation', type: 'quantity', metric: 'crps', n_ensemble_issued: 434, n_ensemble_scored: 0, min_pairs: 20, competitors: [],
+          best_single: null, test: null, status: 'awaiting_resolutions', p_holm: null, holm_family_size: 0, verdict: 'awaiting_resolutions', claim_fr: null },
       ],
     }),
   },
@@ -141,6 +142,7 @@ describe('Prévisions', () => {
     const ens = await screen.findByTestId('previsions-ensemble');
     expect(ens).toHaveTextContent('poids égaux (historique insuffisant)');
     expect(ens).toHaveTextContent('en attente de résolutions');
+    expect(ens).toHaveTextContent('un poids par source d’information');
     const fam = await screen.findByTestId('previsions-families');
     expect(fam).toHaveTextContent('source à créer');
     const qs = await screen.findByTestId('previsions-questions');

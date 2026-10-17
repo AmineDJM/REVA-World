@@ -78,3 +78,24 @@ def test_stack_weight_uses_past_outcomes_only() -> None:
     w = B.stack_weight(recs, lambda _g, _i: 30.0, "logloss")
     assert w["w"] == 1.0
     assert B.stack_weight(recs, lambda _g, _i: None, "logloss")["n"] == 0
+
+
+def test_seal_family_and_question_parse_with_registry_rules() -> None:
+    from datetime import date
+
+    from reva.evaluation.conflict import beat_seal as S
+    from reva.evaluation.registry.absence import absence_rule_of
+    from reva.evaluation.registry.service import _family_of
+
+    for key in S.FAMILIES:
+        doc = S.family_doc(key, ["SDN", "COL"])
+        fam = _family_of(doc)
+        assert fam.frequency == "M" and absence_rule_of(doc) == "zero_within_coverage"
+    o = B.midx(2026, 8)
+    q = S.question("ucdp.sb_conflict25_cm", "SDN", "gw:625", o + 3, o, 120.0, "2026-Q4", {"x": 1}, date(2026, 10, 17))
+    assert q["reference_period"] == "2026-11" and q["timing"]["kind"] == "forecast"
+    assert q["resolution"]["absence_rule"] == "zero_within_coverage" and q["threshold"] == "24"
+    assert "Risk estimate" in q["text_en"]
+    r = S.record(q, B.CAND, B.Fc(1.0, 0.4, np.array([0.0, 1.0, 2.0])), o, {})
+    assert r["prob_above"] == "0.4" and r["point"] is None
+    assert S.record(q, B.VIEWS, None, o, {})["status"] == "abstained"

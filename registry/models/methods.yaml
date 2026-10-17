@@ -347,6 +347,7 @@ models:
   # and the attributed IMF WEO reference forecast. Candidates: they are what the registry judges, not judged models.
   - model_key: forecast.registry_persistence
     version: "1.0.0"
+    information_source: forecast.registry_persistence
     kind: forecast
     approval_status: candidate
     description: >-
@@ -358,6 +359,7 @@ models:
     assumptions: [random-walk point; zero-mean h-step errors; history = final consecutive run only]
   - model_key: forecast.registry_seasonal_naive
     version: "1.0.0"
+    information_source: forecast.registry_seasonal_naive
     kind: forecast
     approval_status: candidate
     description: >-
@@ -369,6 +371,7 @@ models:
     assumptions: [same-season persistence; zero-mean errors]
   - model_key: forecast.registry_ar
     version: "1.0.0"
+    information_source: forecast.registry_ar
     kind: forecast
     approval_status: candidate
     description: >-
@@ -381,6 +384,7 @@ models:
     assumptions: [linear Gaussian AR on levels; parameters estimated within the window only]
   - model_key: forecast.registry_hist_quantile
     version: "1.0.0"
+    information_source: forecast.registry_hist_quantile
     kind: forecast
     approval_status: candidate
     description: >-
@@ -392,6 +396,7 @@ models:
     assumptions: [past h-step changes are exchangeable with the next one]
   - model_key: forecast.reference_imf_weo
     version: "1.0.0"
+    information_source: imf.weo.point
     kind: forecast
     approval_status: candidate
     description: >-
@@ -407,6 +412,7 @@ models:
   # (reva.evaluation.finance_backtest) shows them significantly better than every benchmark (DM-HLN, Holm).
   - model_key: fin.rw_histvol
     version: "1.0.0"
+    information_source: fin.rw_histvol
     kind: forecast
     approval_status: candidate
     description: >-
@@ -419,6 +425,7 @@ models:
     assumptions: [martingale point; zero-mean independent daily changes; volatility of the last 250 published days]
   - model_key: fin.fx_forward_cip
     version: "1.0.0"
+    information_source: fin.fx_forward_cip
     kind: forecast
     approval_status: candidate
     description: >-
@@ -431,6 +438,7 @@ models:
     assumptions: [uncovered interest parity; policy rates stand in for money-market rates of the horizon]
   - model_key: fin.ust_eh_forward
     version: "1.0.0"
+    information_source: fin.ust_eh_forward
     kind: forecast
     approval_status: candidate
     description: >-
@@ -443,6 +451,7 @@ models:
     assumptions: [no term premium; par yields approximately zero-coupon yields]
   - model_key: fin.meeting_base_rate
     version: "1.0.0"
+    information_source: fin.meeting_base_rate
     kind: forecast
     approval_status: candidate
     description: >-
@@ -454,6 +463,7 @@ models:
     assumptions: [stationary frequency of moves over the last 25 years]
   - model_key: fin.meeting_momentum
     version: "1.0.0"
+    information_source: fin.meeting_momentum
     kind: forecast
     approval_status: candidate
     description: >-
@@ -465,6 +475,7 @@ models:
     assumptions: [rate cycles persist (first-order Markov in the direction of the last move)]
   - model_key: fin.garch11
     version: "1.0.0"
+    information_source: fin.garch11
     kind: forecast
     approval_status: candidate
     description: >-
@@ -476,6 +487,7 @@ models:
     assumptions: [GARCH(1,1) conditional variance; Gaussian quasi-likelihood; martingale point]
   - model_key: fin.ns_dl
     version: "1.0.0"
+    information_source: fin.ns_dl
     kind: forecast
     approval_status: candidate
     description: >-
@@ -488,6 +500,7 @@ models:
     assumptions: [three-factor Nelson-Siegel curve; independent AR(1) factors]
   - model_key: fin.ppp_reversion
     version: "1.0.0"
+    information_source: fin.ppp_reversion
     kind: forecast
     approval_status: candidate
     description: >-
@@ -499,6 +512,7 @@ models:
     assumptions: [relative PPP with slow mean reversion; CPI published with its lag]
   - model_key: fin.taylor_logit
     version: "1.0.0"
+    information_source: fin.taylor_logit
     kind: forecast
     approval_status: candidate
     description: >-
@@ -594,6 +608,7 @@ models:
   # registry; the KG candidate is issued only on as-of back-test winner (family, horizon) pairs.
   - model_key: forecast.conflict_persistence
     version: "1.0.0"
+    information_source: forecast.conflict_persistence
     kind: forecast
     approval_status: candidate
     description: >-
@@ -606,6 +621,7 @@ models:
     assumptions: [no-change point; intensity-bin log-changes exchangeable across countries and years]
   - model_key: forecast.conflict_base_rate
     version: "1.0.0"
+    information_source: forecast.conflict_base_rate
     kind: forecast
     approval_status: candidate
     description: >-
@@ -617,6 +633,7 @@ models:
     assumptions: [stationary country-specific risk]
   - model_key: forecast.conflict_history_logit
     version: "1.0.0"
+    information_source: forecast.conflict_history_logit
     kind: forecast
     approval_status: candidate
     description: >-
@@ -629,6 +646,7 @@ models:
     assumptions: [pooled coefficients across countries; ridge lambda 1 on standardised features]
   - model_key: forecast.conflict_kg_logit
     version: "1.0.0"
+    information_source: forecast.conflict_kg_logit
     kind: forecast
     approval_status: candidate
     description: >-
@@ -642,6 +660,7 @@ models:
     assumptions: [pooled coefficients; missing covariates mean-imputed with missing indicators; CShapes borders of 2019 carried forward]
   - model_key: forecast.reference_views
     version: "1.0.0"
+    information_source: views.point
     kind: forecast
     approval_status: candidate
     description: >-
@@ -657,6 +676,7 @@ models:
   # only on (series, horizon) pairs where they significantly beat the random walk (registry/forecasts/energy_winners.yaml).
   - model_key: forecast.energy_rw
     version: "1.0.0"
+    information_source: forecast.energy_rw
     kind: forecast
     approval_status: candidate
     description: >-
@@ -669,6 +689,7 @@ models:
     assumptions: [no-change point; zero-mean (log) changes; history as published in the STEO issue in force]
   - model_key: forecast.reference_eia_steo
     version: "1.0.0"
+    information_source: eia.steo.point
     kind: forecast
     approval_status: candidate
     description: >-
@@ -680,6 +701,7 @@ models:
     assumptions: [EIA projection as published; no distribution]
   - model_key: forecast.energy_inventory
     version: "1.0.0"
+    information_source: forecast.energy_inventory
     kind: forecast
     approval_status: candidate
     description: >-
@@ -691,6 +713,7 @@ models:
     assumptions: [linear association used for prediction, not a causal claim; residual sd as spread]
   - model_key: forecast.energy_ardl
     version: "1.0.0"
+    information_source: forecast.energy_ardl
     kind: forecast
     approval_status: candidate
     description: >-
@@ -702,6 +725,7 @@ models:
     assumptions: [associations used for prediction, not causal claims; as-of history only]
   - model_key: forecast.energy_drift
     version: "1.0.0"
+    information_source: forecast.energy_drift
     kind: forecast
     approval_status: candidate
     description: Energy candidate (quantities) - random walk with the mean monthly change of the last 24 months as drift.
@@ -711,6 +735,7 @@ models:
     assumptions: [linear drift; random-walk spread]
   - model_key: forecast.energy_seasonal
     version: "1.0.0"
+    information_source: forecast.energy_seasonal
     kind: forecast
     approval_status: candidate
     description: >-
@@ -722,6 +747,7 @@ models:
     assumptions: [stable seasonal changes; random-walk spread]
   - model_key: forecast.energy_ar_diff
     version: "1.0.0"
+    information_source: forecast.energy_ar_diff
     kind: forecast
     approval_status: candidate
     description: Energy candidate (quantities) - AR(p) on monthly changes (p <= 3 by AIC, last 120 months), iterated; psi-weight variance.
@@ -731,6 +757,7 @@ models:
     assumptions: [stationary changes; non-stationary fit abstains]
   - model_key: forecast.energy_combo_steo_rw
     version: "1.0.0"
+    information_source: eia.steo.point
     kind: forecast
     approval_status: candidate
     description: >-
@@ -742,6 +769,7 @@ models:
     assumptions: [fixed equal weights chosen before the backtest]
   - model_key: forecast.energy_combo_models
     version: "1.0.0"
+    information_source: forecast.energy_combo_models
     kind: forecast
     approval_status: candidate
     description: Energy candidate - equal-weight average of the REVA energy models available for the series (and the random walk).
@@ -821,6 +849,7 @@ models:
     assumptions: [past and future normalised errors exchangeable (fails under regime change)]
   - model_key: forecast.weo_bias_corrected
     version: "1.0.0"
+    information_source: imf.weo.point
     kind: forecast
     approval_status: candidate
     description: >-
@@ -835,6 +864,7 @@ models:
     assumptions: [past and future normalised errors exchangeable (fails under regime change)]
   - model_key: forecast.weo_conformal
     version: "1.0.0"
+    information_source: imf.weo.point
     kind: forecast
     approval_status: candidate
     description: >-
@@ -849,6 +879,7 @@ models:
     assumptions: [past and future normalised errors exchangeable (fails under regime change)]
   - model_key: forecast.weo_error_fan
     version: "1.0.0"
+    information_source: imf.weo.point
     kind: forecast
     approval_status: candidate
     description: >-
@@ -954,6 +985,7 @@ models:
   # --- V7 BEAT-ENSEMBLE: online combination of every forecaster sealed on a registry question
   - model_key: reva.ensemble
     version: "1.0.0"
+    information_source: reva.ensemble
     kind: forecast
     approval_status: candidate
     description: >-
@@ -969,8 +1001,26 @@ models:
     assumptions: [past relative performance of a component in a family informative about its next one; components' sealed forecasts available at issue]
   # V7 BEAT-ENERGY (src/reva/evaluation/beat_energy.py, beat_energy_seal.py; registry/forecasts/beat_energy/protocol.yaml):
   # issued only for the pre-registered Holm winners (W1 h0 Brent/WTI timeliness nowcasts) with their benchmarks.
+  - model_key: reva.ensemble
+    version: "2.0.0"
+    information_source: reva.ensemble
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      REVA ensemble, method 2 (lead decision 2026-10-17): as 1.0.0, but forecasters built around the same official
+      point share ONE weight per information source (field information_source of each model in this file; e.g. the
+      IMF WEO projection, weo_conformal, weo_bias_corrected and the weo_error_fan benchmark = imf.weo.point), split
+      equally among the members present; Hedge on per-source relative losses (mean of the members' losses), from
+      RESOLVED PROSPECTIVE registry scores only; equal weights per source, labelled, until 20 resolved questions per
+      family/type/role. Sealed next to the 1.0.0 batches (never edited). A win reads "la combinaison REVA bat
+      <forecaster> seul".
+    input_ports: [{name: component_forecasts, kind: point_or_predictive}, {name: resolved_scores, kind: published_outcomes}, {name: information_sources, kind: registry_declaration}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}, {name: probability}]
+    applicability: {min_components: 1, min_resolved_for_online_weights: 20}
+    assumptions: [forecasters built around the same official point carry one information source; past relative performance of a source in a family informative about its next one]
   - model_key: forecast.beat_energy_daily_nowcast
     version: "1.0.0"
+    information_source: forecast.beat_energy_daily_nowcast
     kind: forecast
     approval_status: candidate
     description: >-
@@ -983,6 +1033,7 @@ models:
     assumptions: [daily spot prices not revised; no-change for the rest of the month]
   - model_key: forecast.beat_energy_combo_steo_daily
     version: "1.0.0"
+    information_source: eia.steo.point
     kind: forecast
     approval_status: candidate
     description: >-
@@ -995,6 +1046,7 @@ models:
     assumptions: [past relative accuracy informative about the next]
   - model_key: forecast.beat_energy_daily_nowcast_ln
     version: "1.0.0"
+    information_source: forecast.beat_energy_daily_nowcast_ln
     kind: forecast
     approval_status: candidate
     description: >-
@@ -1006,6 +1058,7 @@ models:
     assumptions: [log errors centred, exchangeable over past issues]
   - model_key: forecast.eia_steo_fair_ln
     version: "1.0.0"
+    information_source: eia.steo.point
     kind: forecast
     approval_status: candidate
     description: >-
@@ -1019,6 +1072,7 @@ models:
   # country-month conflict-RISK estimates, sealed (W3) only for families admitted by the pre-registered W1 backtest.
   - model_key: forecast.cm_hurdle
     version: "1.0.0"
+    information_source: forecast.cm_hurdle
     kind: forecast
     approval_status: candidate
     description: >-
@@ -1034,6 +1088,7 @@ models:
     assumptions: [pooled coefficients across countries; ridge lambda 1 on standardised features; homoscedastic log-normal positive part]
   - model_key: forecast.cm_stack_views
     version: "1.0.0"
+    information_source: views.point
     kind: forecast
     approval_status: candidate
     description: >-
@@ -1044,3 +1099,19 @@ models:
     output_ports: [{name: point_forecast}, {name: probability}]
     applicability: {frequencies: [M], question_types: [quantity, binary]}
     assumptions: [past relative accuracy informative about the next]
+  - model_key: forecast.bm_stack
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      BEAT-MACRO combination - USES THE OFFICIAL FORECAST AS AN INPUT: official point (IMF WEO / ECB SPF in force on the
+      same date) + lambda x (REVA nowcast - official), lambda from past errors of the same bucket (variable x origin
+      month, last 10 past origins, outcomes published by the origin), clipped to [0, 1] and shrunk toward 1/2; density =
+      point + past normalised errors (empirical). Confirmed on the pre-registered holdout only for G7 current-year
+      unemployment (AE x0.63 vs the WEO in force, Holm p 0.0044, family 7; interval under-covers: 0.56 at 80 %).
+      A win reads "REVA's combination of the WEO with REVA's nowcast beats the WEO alone on the same date".
+      Code: src/reva/evaluation/beat_macro/combine.py; protocol registry/forecasts/beat_macro/protocol.yaml.
+    input_ports: [{name: official_forecast, kind: point}, {name: reva_nowcast, kind: point}, {name: past_errors, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}]
+    applicability: {frequencies: [A], question_types: [quantity], min_past_origins: 3}
+    assumptions: [past relative accuracy of nowcast vs official informative about the next, normalised errors exchangeable within a bucket]

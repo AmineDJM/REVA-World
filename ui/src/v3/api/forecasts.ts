@@ -135,6 +135,7 @@ export const Calibration = z.looseObject({
 
 const EnsembleCompetitor = z.looseObject({ model: z.string(), n_common: z.number(), ratio: NumOrNull });
 export const EnsembleCell = z.looseObject({
+  ensemble_version: z.string(),
   family: z.string(),
   type: z.string(),
   metric: z.string(),
@@ -148,17 +149,20 @@ export const EnsembleCell = z.looseObject({
   p_holm: NumOrNull,
   holm_family_size: z.number(),
   verdict: z.string(),
+  claim_fr: z.string().nullable(),
 });
 export type EnsembleCell = z.output<typeof EnsembleCell>;
 export const EnsembleBoard = z.looseObject({
   label: z.string(),
   model: z.string(),
+  current_version: z.string(),
   rule: z.string(),
   alpha: z.number(),
   holm_family_size: z.number(),
   n_ensemble_forecasts: z.number(),
   n_ensemble_scored: z.number(),
-  weights_by_family: z.record(z.string(), z.record(z.string(), z.number())),
+  weights_by_version: z.record(z.string(), z.record(z.string(), z.record(z.string(), z.number()))),
+  headline_families: z.record(z.string(), z.array(z.string())),
   cells: z.array(EnsembleCell),
 });
 

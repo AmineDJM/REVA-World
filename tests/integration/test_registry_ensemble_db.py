@@ -146,7 +146,16 @@ def last_month(env: Env) -> int:
     return P.index_of("M", P.cycle_anchor(P.cycle_of(env.today))) - 6
 
 
-def test_01_ensemble_is_sealed_with_labelled_equal_weights(env: Env, monkeypatch: pytest.MonkeyPatch) -> None:
+def _version_of(env: Env, sha: str) -> tuple[str, dict[str, Any]]:
+    with env.worker.connect() as c:
+        row = c.execute(
+            text("SELECT v.model_key || '@' || v.version, e.task_scope FROM model.evaluation e JOIN model.version v "
+                 "ON v.id = e.model_version_id WHERE e.evaluation_manifest_sha256 = :s"), {"s": sha}
+        ).one()  # fmt: skip
+    return str(row[0]), dict(row[1])
+
+
+def test_01_v1_and_v2_ensembles_are_sealed_side_by_side(env: Env, monkeypatch: pytest.MonkeyPatch) -> None:
     register(env, history(last_month(env)))
     out = svc.issue_cycle(env.worker, env.store, origin="test_fixture", families=[FAM])
     assert out["status"] == "issued" and out["n_questions"] == 12
@@ -154,24 +163,31 @@ def test_01_ensemble_is_sealed_with_labelled_equal_weights(env: Env, monkeypatch
         m.setattr(E, "SAME_WINDOW_DAYS", -1)
         late = E.issue_ensemble(env.worker, env.store, origin="test_fixture")
     assert late["status"] == "nothing_to_issue" and late["originals_outside_same_window"] == 1
-    ens = E.issue_ensemble(env.worker, env.store, origin="test_fixture")
-    assert ens["status"] == "issued" and ens["ensembles"][0]["questions"] == 12 and ens["ensembles"][0]["issued"] == 12
-    assert set(ens["ensembles"][0]["weight_tasks"]) == {OC.EQUAL}
+    v1 = E.issue_ensemble(env.worker, env.store, origin="test_fixture", version=E.V1)  # as sealed before 2.0.0
+    v2 = E.issue_ensemble(env.worker, env.store, origin="test_fixture")  # the job's default: current method
+    for ens in (v1, v2):
+        assert (
+            ens["status"] == "issued" and ens["ensembles"][0]["questions"] == 12 and ens["ensembles"][0]["issued"] == 12
+        )
+        assert set(ens["ensembles"][0]["weight_tasks"]) == {OC.EQUAL}
+    assert v2["version"] == E.ENSEMBLE_VERSION == "2.0.0"
     assert E.issue_ensemble(env.worker, env.store, origin="test_fixture")["status"] == "nothing_to_issue"
-    sup = load_frozen_manifest(env.store, ens["ensembles"][0]["batch_sha256"])
     orig = {**load_frozen_manifest(env.store, out["batch_sha256"]), "_sha256": out["batch_sha256"]}
-    assert sup["supplement_of"] == out["batch_sha256"] and sup["data"] == orig["data"]
     comps = E.components_of(out["batch_sha256"], [orig])
-    assert E.rebuild_forecasts(sup, comps) == sup["forecasts"] and E.recheck_weights(sup)
-    with env.worker.connect() as c:
-        row = c.execute(
-            text("SELECT v.model_key, e.task_scope FROM model.evaluation e JOIN model.version v ON v.id = "
-                 "e.model_version_id WHERE e.evaluation_manifest_sha256 = :s"), {"s": ens["ensembles"][0]["batch_sha256"]}
-        ).one()  # fmt: skip
-    assert row[0] == E.ENSEMBLE_KEY and row[1]["ensemble"] is True and len(row[1]["question_ids"]) == 12
+    for ens, ver in ((v1, "1.0.0"), (v2, "2.0.0")):
+        sha = ens["ensembles"][0]["batch_sha256"]
+        sup = load_frozen_manifest(env.store, sha)
+        assert sup["supplement_of"] == out["batch_sha256"] and sup["data"] == orig["data"]
+        assert sup["models"][0]["version"] == ver
+        assert E.rebuild_forecasts(sup, comps) == sup["forecasts"] and E.recheck_weights(sup)
+        mv, scope = _version_of(env, sha)
+        assert mv == f"{E.ENSEMBLE_KEY}@{ver}" and scope["ensemble"] is True and len(scope["question_ids"]) == 12
+    sup2 = load_frozen_manifest(env.store, v2["ensembles"][0]["batch_sha256"])
+    assert all(t["rule"]["method"] == OC.METHOD_BY_SOURCE and "source_weights" in t
+               for t in sup2["ensemble"]["tasks"].values())  # fmt: skip
 
 
-def test_02_resolution_scores_the_ensemble_and_weights_use_only_resolved_scores(
+def test_02_resolution_scores_both_versions_and_weights_use_only_resolved_scores(
     env: Env, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setattr(svc, "period_ended", lambda q, today: True)
@@ -185,35 +201,48 @@ def test_02_resolution_scores_the_ensemble_and_weights_use_only_resolved_scores(
     v2 = register(env, data)
     assert v2["created"], v2
     out = svc.resolve_due(env.worker, env.store, origin="test_fixture")
-    assert sorted(b["status"] for b in out["batches"]) == ["scored", "scored"], out
+    assert sorted(b["status"] for b in out["batches"]) == ["scored"] * 3, out
     with env.worker.connect() as c:
         now = c.execute(text("SELECT clock_timestamp()")).scalar_one()
         scores = E._score_records(c, "test_fixture", now)
         bs = c.execute(text("SELECT DISTINCT evaluation_manifest_sha256 FROM model.evaluation "
                             "WHERE metrics->>'kind' = 'registry_issue' AND task_scope->>'ensemble' IS NULL")).scalar_one()  # fmt: skip
-    assert sum(1 for s in scores if s["model"] == E.ENSEMBLE_KEY) == 12
+        linked = c.execute(
+            text("SELECT v.version, e.metrics->>'model', jsonb_array_length(e.metrics->'scores') FROM model.evaluation e "
+                 "JOIN model.version v ON v.id = e.model_version_id WHERE e.metrics->>'kind' = 'registry_score' "
+                 "AND v.model_key = :k AND jsonb_array_length(e.metrics->'scores') > 0 ORDER BY 1"), {"k": E.ENSEMBLE_KEY}
+        ).all()  # fmt: skip
+    # each version's scores are recorded under its own model version (a 1.0.0 batch resolved after 2.0.0 exists)
+    assert [tuple(r) for r in linked] == [("1.0.0", "reva.ensemble@1.0.0", 12), ("2.0.0", "reva.ensemble@2.0.0", 12)]
+    ens = [s for s in scores if s["model"] == E.ENSEMBLE_KEY]
+    assert sorted(str(s.get("model_version")) for s in ens) == ["2.0.0"] * 12 + ["None"] * 12
     orig = {**load_frozen_manifest(env.store, bs), "_sha256": bs}
     b = E.build_ensemble_batch(orig, E.components_of(bs, [orig]), scores, issued_at=now, already=set(),
-                               rule=OC.WeightRule(min_resolved=2))  # fmt: skip
+                               rule=OC.WeightRule(min_resolved=2, by_source=True))  # fmt: skip
     assert b is not None
     t = b["ensemble"]["tasks"][f"{FAM}|interval|location"]
     assert t["status"] == OC.ONLINE and t["n_resolved_questions"] == 8
     assert E.ENSEMBLE_KEY not in {r[1] for r in t["history"]}  # its own scores never set its weights
-    assert len({float(w) for w in t["weights"].values()}) > 1
+    assert len({float(w) for w in t["source_weights"].values()}) > 1
 
 
 def test_03_api_scoreboard_fills_only_from_resolved_ensemble_scores(env: Env) -> None:
     board = get(env, "/v1/forecasts/ensemble", origin="test_fixture")["data"]
-    assert board["model"] == E.ENSEMBLE_KEY and board["n_ensemble_forecasts"] == 12 and board["n_ensemble_scored"] == 12
-    assert board["weights_by_family"] == {FAM: {OC.EQUAL: 12}}
+    assert board["model"] == E.ENSEMBLE_KEY and board["current_version"] == "2.0.0"
+    assert board["n_ensemble_forecasts"] == 24 and board["n_ensemble_scored"] == 24
+    assert board["weights_by_version"] == {"1.0.0": {FAM: {OC.EQUAL: 12}}, "2.0.0": {FAM: {OC.EQUAL: 12}}}
     assert {c["status"] for c in board["cells"]} == {"awaiting_resolutions"} and board["holm_family_size"] == 0
-    assert {(c["type"], c["metric"]) for c in board["cells"]} == {
-        ("interval", "interval_score"), ("interval", "abs_error"), ("binary", "brier")}  # fmt: skip
+    assert board["headline_families"] == {} and all(c["claim_fr"] is None for c in board["cells"])
+    assert {(c["ensemble_version"], c["type"], c["metric"]) for c in board["cells"]} == {
+        (v, t, m) for v in ("1.0.0", "2.0.0")
+        for t, m in (("interval", "interval_score"), ("interval", "abs_error"), ("binary", "brier"))}  # fmt: skip
+    assert all(c["n_ensemble_scored"] in (8, 4) for c in board["cells"])
     lb = get(env, "/v1/forecasts/leaderboard", origin="test_fixture")["data"]
     row = next(m for m in lb["models"] if m["model"] == E.ENSEMBLE_KEY)
-    assert row["kind"] == "reva_ensemble" and row["n_scored"] == 12 and row["n_issued"] == 12
+    assert row["kind"] == "reva_ensemble" and row["n_scored"] == 24 and row["n_issued"] == 24  # both versions
     assert lb["questions"]["resolved"] == 12 and lb["questions"].get("pending", 0) == 0  # supplements not re-counted
     qs = get(env, "/v1/forecasts/questions", origin="test_fixture", status="resolved")["data"]["questions"]
     d = get(env, f"/v1/forecasts/questions/{qs[0]['question_id']}")["data"]
-    e = next(f for f in d["forecasts"] if f["model"] == E.ENSEMBLE_KEY)
-    assert e["score"] is not None and e["ensemble"]["weight_status"]
+    es = [f for f in d["forecasts"] if f["model"] == E.ENSEMBLE_KEY]
+    assert len(es) == 2 and all(f["score"] is not None for f in es)
+    assert {f["score"].get("model_version") for f in es} == {None, "2.0.0"}

@@ -161,3 +161,44 @@ def test_scoreboard_cells_compare_with_the_best_component_only_on_common_questio
     assert ae["best_single"]["model"] == "a" and {c["model"] for c in ae["competitors"]} == {"a", "b", "w"}
     few = {k: v for k, v in list(ens.items())[:5]}
     assert {c["status"] for c in E._cells(few, scores)} == {"awaiting_resolutions"}
+
+
+def with_weo_wrappers() -> dict[str, Any]:
+    m = original()
+    qid = q(1)["question_id"]
+    for mk in ("forecast.weo_conformal", "forecast.weo_error_fan"):
+        m["forecasts"].append(fc(qid, mk, "2.6", {"family": "normal", "mu": "2.6", "sigma": "1.5"}))
+    return m
+
+
+def test_v2_groups_forecasters_built_around_the_same_official_point() -> None:
+    src = E.information_sources()
+    weo_group = ("forecast.reference_imf_weo", "forecast.weo_conformal", "forecast.weo_bias_corrected",
+                 "forecast.weo_error_fan")  # fmt: skip
+    assert {src[k] for k in weo_group} == {"imf.weo.point"}
+    from reva.evaluation.registry.forecasts import all_models
+
+    assert set(all_models()) <= set(src)  # every registry forecaster declares its information source
+    m = with_weo_wrappers()
+    b = E.build_ensemble_batch(m, comps(m), [], issued_at=T0, already=set())
+    assert b is not None and b["models"][0]["version"] == E.ENSEMBLE_VERSION == "2.0.0"
+    loc = b["ensemble"]["tasks"][f"{FAM}|quantity|location"]
+    assert loc["rule"]["method"] == OC.METHOD_BY_SOURCE and loc["status"] == OC.EQUAL
+    assert loc["source_weights"] == {"forecast.registry_ar": "0.3333333333", "forecast.registry_persistence":
+                                     "0.3333333333", "imf.weo.point": "0.3333333333"}  # fmt: skip
+    f1 = b["forecasts"][0]
+    assert f1["model_version"] == "2.0.0" and f1["ensemble"]["method"] == OC.METHOD_BY_SOURCE
+    w = {k: float(v) for k, v in f1["ensemble"]["weights"]["location"].items()}
+    assert w["forecast.registry_ar"] == pytest.approx(1 / 3) and w["forecast.reference_imf_weo"] == pytest.approx(1 / 9)
+    sh = {k: float(v) for k, v in f1["ensemble"]["weights"]["shape"].items()}  # WEO point-only: 2 members left
+    assert sh["forecast.weo_conformal"] == pytest.approx(1 / 6) and sh["forecast.registry_ar"] == pytest.approx(1 / 3)
+    assert f1["ensemble"]["sources"]["forecast.weo_error_fan"] == "imf.weo.point"
+    assert E.rebuild_forecasts(b, comps(m)) == b["forecasts"] and E.recheck_weights(b)
+    assert S.score_forecast(q(1), f1, "2.5")["model_version"] == "2.0.0"
+    # v1 (per forecaster, sealed before) stays reproducible and unstamped
+    b1 = E.build_ensemble_batch(m, comps(m), [], issued_at=T0, already=set(), version=E.V1)
+    assert b1 is not None and "model_version" not in b1["forecasts"][0]
+    assert float(b1["forecasts"][0]["ensemble"]["weights"]["location"]["forecast.reference_imf_weo"]) == pytest.approx(
+        0.2
+    )
+    assert E.rebuild_forecasts(b1, comps(m)) == b1["forecasts"] and E.recheck_weights(b1)
