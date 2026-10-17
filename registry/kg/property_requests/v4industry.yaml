@@ -1,6 +1,6 @@
 # Property requests from V4INDUSTRY (companies, ownership, facilities). WDHARVEST's merge
 # (`python -m reva.kg.harvest merge-property-requests`) checks every id and datatype against Wikidata and takes the
-# en/fr labels from the property entity itself. Used by registry/kg/queries/economy/v4_*.yaml (seed specs keep every
+# en/fr labels from the property entity itself. Used by registry/kg/queries/industry/v4_*.yaml (seed specs keep every
 # allow-listed property, so once merged these claims are kept on the next (re-)harvest).
 - property: P1278
   why: >-

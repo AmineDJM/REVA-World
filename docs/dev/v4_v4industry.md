@@ -33,7 +33,7 @@ withdrew it when V4LINK's broader one landed (my UNSD fixture excerpts remain in
 | GLEIF Global LEI Index API (`gleif.api`, new) | `https://api.gleif.org/api/v1` | **CC0 1.0** (GLEIF LEI data terms) | pagination totals of filtered `lei-records` (page size 1); `/countries`; `/entity-legal-forms` (18 pages); `sort=-ultimateChildCount` top 200; `ultimate-children` / `direct-children` totals; `filter[lei]=<200 LEIs>&include=direct-parent,ultimate-parent` + parent pages | ~3.3 kB per count; ELF list 1.7 MB; ~1-2 MB per page of 200 records; ≈ 45-60 MB for a full run (~2,300 requests at 1.1 s) |
 | Wikidata WDQS (`wikidata.wdqs`, existing) | `query.wikidata.org/sparql` | CC0 | one query: every non-deprecated P1278 (LEI) statement + item sitelinks | 33.7 MB JSON (53,523 rows), archived gzip (~4 MB) |
 | OECD TiVA 2025 (`oecd.sdmx`, existing key) | `https://sdmx.oecd.org/sti-public/rest` (TiVA flows are external references of `/public`) | OECD CC BY 4.0 default (dataset statement not verified: `licence_status` flag, as BaTIS) | CL_TIVA_MEASURE (26 kB), OECD CL_ACTIVITY_ISIC4 (0.9 MB), available constraint (16 kB), 7 x MAINLV (2010-2022), 2 x FDVA | ≈ 50 MB per run (FDVA all-activities 2010-2022 ≈ 10.6 MB; by-section 2022 ≈ 17 MB) |
-| Wikidata harvest specs (WDHARVEST executor) | `registry/kg/queries/economy/v4_*.yaml` | CC0 | 3,104 LEI-bearing items with >= 20 sitelinks; 3,567 factories with coordinates + owner/operator/product | ~65 + ~75 `wbgetentities` calls (+ label snapshots of objects) |
+| Wikidata harvest specs (WDHARVEST executor) | `registry/kg/queries/industry/v4_*.yaml` | CC0 | 3,104 LEI-bearing items with >= 20 sitelinks; 3,567 factories with coordinates + owner/operator/product | ~65 + ~75 `wbgetentities` calls (+ label snapshots of objects) |
 
 Not used (owner decisions, below): SEC EDGAR company facts, Open Supply Hub, UNIDO INDSTAT.
 
@@ -92,7 +92,7 @@ produces / produced_by / owns / located_in mappings of the Wikidata company and 
 
 ### Wikidata specs and property requests
 
-* `registry/kg/queries/economy/v4_companies_lei.yaml` (seed, 3,104 items, `expand_hops: 1`) and
+* `registry/kg/queries/industry/v4_companies_lei.yaml` (seed, 3,104 items, `expand_hops: 1`) and
   `v4_factories.yaml` (seed, ~3,567 factories with P625 and P127/P137/P1056; facility layer: factory -> owned_by /
   operator -> company, factory -> produces -> product, factory -> located_in). Validated (`harvest validate`).
 * `registry/kg/property_requests/v4industry.yaml`: P1278 (LEI), P5531 (SEC CIK), P2139 revenue, P2403 total
@@ -160,7 +160,7 @@ flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.oecd_tiva
 # 4. Wikidata companies + factories (throwaway harvest DB, then governed import into reva)
 uv run python -m reva.kg.harvest merge-property-requests                     # P1278, P5531, P2139, P2403, P2295, P2226
 uv run python -m reva.kg.harvest run --db reva_kg_v4industry \
-    registry/kg/queries/economy/v4_companies_lei.yaml registry/kg/queries/economy/v4_factories.yaml
+    registry/kg/queries/industry/v4_companies_lei.yaml registry/kg/queries/industry/v4_factories.yaml
 flock /tmp/reva-devdb.lock uv run python -m reva.kg.import_harvest --from-db reva_kg_v4industry
 dropdb reva_kg_v4industry                                                     # throwaway
 ```
