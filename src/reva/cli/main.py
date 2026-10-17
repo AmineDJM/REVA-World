@@ -767,6 +767,12 @@ def forecasts_resolve_cmd(origin: str = typer.Option("live", help="live or test_
     _out(_forecast_job({"action": "resolve", "origin": origin}))
 
 
+@forecasts_app.command("ensemble")
+def forecasts_ensemble_cmd(origin: str = typer.Option("live", help="live or test_fixture")) -> None:
+    """Seal the REVA ensemble on recently sealed open questions (also run by `reva forecasts issue`)."""
+    _out(_forecast_job({"action": "ensemble", "origin": origin}))
+
+
 @forecasts_app.command("backtest")
 def forecasts_backtest_cmd(
     origin: str = typer.Option("live", help="live or test_fixture"),

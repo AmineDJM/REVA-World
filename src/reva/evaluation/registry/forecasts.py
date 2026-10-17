@@ -155,6 +155,13 @@ def pred_models() -> dict[str, tuple[str, str]]:
     return registry_models()
 
 
+def ensemble_models() -> dict[str, tuple[str, str]]:
+    """The REVA ensemble (V7 BEAT-ENSEMBLE, :mod:`reva.evaluation.registry.ensemble`)."""
+    from reva.evaluation.registry.ensemble import model_entry
+
+    return model_entry()
+
+
 def all_models() -> dict[str, tuple[str, str]]:
     return {
         **BASELINES,
@@ -163,6 +170,7 @@ def all_models() -> dict[str, tuple[str, str]]:
         **conflict_models(),
         **energy_models(),
         **pred_models(),
+        **ensemble_models(),
     }
 
 
@@ -174,6 +182,7 @@ __all__ = [
     "abstention",
     "all_models",
     "conflict_models",
+    "ensemble_models",
     "finance_models",
     "forecast_baseline",
     "forecast_reference",

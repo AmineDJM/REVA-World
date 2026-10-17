@@ -129,6 +129,9 @@ class Batch(s.ApiModel):
     n_questions: int | None
     by_type: dict[str, int]
     label: str | None
+    supplement_of: str | None = Field(
+        None, description="Original batch of a supplementary batch (registered models, REVA ensemble); else null"
+    )
     models: list[BatchModel]
 
 
@@ -195,7 +198,7 @@ class LeaderboardRow(s.ApiModel):
     model: str
     version: str
     description: str
-    kind: Literal["baseline", "external_reference"]
+    kind: Literal["baseline", "external_reference", "reva_ensemble"]
     n_issued: int
     n_abstained: int
     n_scored: int
@@ -224,6 +227,44 @@ class Leaderboard(s.ApiModel):
 
 class LeaderboardResponse(s.Envelope):
     data: Leaderboard
+
+
+class EnsembleCell(s.ApiModel):
+    family: str
+    type: str
+    metric: str = Field(description="Loss compared (lower is better): crps, abs_error, interval_score or brier")
+    n_ensemble_issued: int
+    n_ensemble_scored: int
+    min_pairs: int
+    competitors: list[dict[str, Any]] = Field(description="Ensemble vs each forecaster it combined, common questions")
+    best_single: dict[str, Any] | None = Field(description="Eligible competitor the ensemble does worst against")
+    test: dict[str, Any] | None = Field(description="DM test (two-way clustered), null until enough resolutions")
+    status: Literal["awaiting_resolutions", "no_comparable_competitor", "tested"]
+    p_holm: float | None
+    holm_family_size: int
+    verdict: str = Field(
+        description="awaiting_resolutions, no_comparable_competitor, not_testable, no_significant_difference, "
+        "ensemble_better or best_single_better"
+    )
+
+
+class EnsembleBoard(s.ApiModel):
+    label: str
+    model: str
+    rule: str
+    alpha: float
+    holm_family_size: int
+    n_ensemble_forecasts: int
+    n_ensemble_scored: int
+    weights_by_family: dict[str, dict[str, int]] = Field(
+        description="Ensemble forecasts per family by weight status (equal_weights_insufficient_history, "
+        "online_weights, abstained)"
+    )
+    cells: list[EnsembleCell]
+
+
+class EnsembleResponse(s.Envelope):
+    data: EnsembleBoard
 
 
 class Calibration(s.ApiModel):
@@ -333,6 +374,20 @@ def get_leaderboard(
         lb = R.leaderboard(conn, _store(request), o, family)
         origins = [b["origin"] for b in R.batches(conn, o)]
     return LeaderboardResponse(data=Leaderboard(**lb), **_env(t, origins, len(lb["models"]), modality="evaluation"))
+
+
+@router.get("/ensemble", response_model=EnsembleResponse)
+def get_ensemble(request: Request, origin: OriginParam | None = ORIGIN_QUERY) -> EnsembleResponse:
+    """REVA ensemble vs the best single forecaster it combined, per family, from resolved prospective scores only
+    (fills in as questions resolve; nothing is backfilled). DM tests, Holm across every tested cell."""
+    from reva.evaluation.registry.ensemble import scoreboard
+
+    t = Timer()
+    o = _origin(request, origin)
+    with read_conn(request) as conn:
+        board = scoreboard(conn, _store(request), o)
+        origins = [b["origin"] for b in R.batches(conn, o)]
+    return EnsembleResponse(data=EnsembleBoard(**board), **_env(t, origins, len(board["cells"]), modality="evaluation"))
 
 
 @router.get("/calibration", response_model=CalibrationResponse)

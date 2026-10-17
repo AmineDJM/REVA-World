@@ -1074,7 +1074,8 @@ def run_backtest(
 
 
 def handle_forecast_registry(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
-    """Worker job ``forecast_registry``: payload ``{"action": "issue"|"resolve"|"backtest", "origin"}``.
+    """Worker job ``forecast_registry``: payload ``{"action": "issue"|"resolve"|"ensemble"|"backtest", "origin"}``
+    (``issue`` also seals the REVA ensemble, V7).
 
     Scheduled: ``issue`` weekly (a no-op within a cycle unless a new table landed: questions are issued once per
     quarterly cycle), ``resolve`` daily."""
@@ -1092,12 +1093,20 @@ def handle_forecast_registry(payload: dict[str, Any], ctx: Any) -> dict[str, Any
             from reva.evaluation.pred_models.issue import issue_supplements
 
             res["pred_models"] = issue_supplements(ctx.worker_engine, ctx.store, origin=origin)
+        # V7 BEAT-ENSEMBLE: the REVA ensemble on every recently sealed open question, after all its components
+        from reva.evaluation.registry.ensemble import issue_ensemble
+
+        res["ensemble"] = issue_ensemble(ctx.worker_engine, ctx.store, origin=origin)
         return res
     if action == "resolve":
         return resolve_due(ctx.worker_engine, ctx.store, origin=origin)
+    if action == "ensemble":
+        from reva.evaluation.registry.ensemble import issue_ensemble
+
+        return issue_ensemble(ctx.worker_engine, ctx.store, origin=origin)
     if action == "backtest":
         years = int(payload.get("years", 8))
         if not 1 <= years <= 30:
             raise ValidationProblem("years must be in 1..30")
         return run_backtest(ctx.worker_engine, ctx.store, origin=origin, families=fams, years=years)
-    raise ValidationProblem("action must be issue, resolve or backtest", action=str(action)[:32])
+    raise ValidationProblem("action must be issue, resolve, ensemble or backtest", action=str(action)[:32])

@@ -96,10 +96,23 @@ column is not even loaded). 60 codes Natural Earth gives to several polygons (AF
 PE-LIM, 19 PH codes ...) and placeholder codes are not used. Geometry decides; when the code's country differs from GED's
 country the event is still placed and counted in `flags.events_ged_country_differs`.
 
-Final GED: placed 360,986; placed with GED country different 14,674 (Gaza/West Bank under Israel ~10,850; pre-2011
+Final GED (connector 1.0.0, as loaded): **all placed events 376,082** = status `placed` 360,986 + placed with GED country different 14,674 + placed with historical GED state 422 (corrected by FIX6, AUDIT4 L6: "placed 360,986" counted only status `placed`); placed with GED country different 14,674 (Gaza/West Bank under Israel ~10,850; pre-2011
 Sudan events in today's South Sudan; border points at 1:10m); placed with historical GED state 422; not placed: where_prec
 5/6/7 18,645 / 5,309 / 266, ambiguous or placeholder code 15,112 (8,597 in Bosnia: BA-BIH), outside polygons 2,554
 (coast / generalisation). Candidate: 11,618 + 656 + 2 placed of 13,659.
+
+**FIX6 (connector 1.0.1, AUDIT4 M1/M2; code and tests done, live re-ingest queued: disk < 5 GB).** The placement rule
+is now: the polygon's country must be GED's own country, except a reviewed territory list
+(`registry/conflict/territory_exceptions.yaml`, curator decision pending owner review: ISR→PSE, SDN→SSD before
+2011-07-09, IDN→TLS before 2002-05-20, ETH→ERI before 1993-05-24, ZAF→NAM before 1990-03-21); other cross-border hits
+are `not_placed:border_generalisation` (polygon kept in `flags.adm1_polygon`). Recomputed offline on the archived
+GED 26.1 bytes: placed 360,989 + territory exceptions 12,023 (ISR→PSE 10,846, SDN→SSD 771, IDN→TLS 290, ETH→ERI 65,
+ZAF→NAM 51) + historical 419 = 373,431; border generalisation 2,651 (SYR→TUR 577, CAF→COD 215, COD→RWA 202, …);
+`adm1_month` 698,205 → 688,050 rows; country-month cells flag their events placed in another territory
+(`events_placed_in_other_territory`, deaths, `other_territory_iso3`; 607 cells, 329 of them Israel's). KG:
+215 `ucdpged:events_in_adm1` edges are retracted on re-ingest (`reclassified_by_reva`, raw unchanged), 141 get new
+counts, all 6,797 remaining cite the Natural Earth polygons as a second reference (public domain). See
+`docs/dev/v6_fix6.md`.
 
 ## 4. Military expenditure / arms (SIPRI via WDI)
 

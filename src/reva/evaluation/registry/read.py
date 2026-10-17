@@ -83,6 +83,7 @@ def batches(conn: Any, origin: str | None) -> list[dict[str, Any]]:
                 "n_questions": m.get("n_questions"),
                 "by_type": m.get("by_type") or {},
                 "label": m.get("label"),
+                "supplement_of": ts.get("supplement_of"),
                 "models": [],
             },
         )
@@ -264,7 +265,9 @@ def leaderboard(conn: Any, store: Any, origin: str | None, family: str | None = 
                 "model": mk,
                 "version": ver,
                 "description": desc,
-                "kind": "external_reference" if mk.startswith("forecast.reference_") else "baseline",
+                "kind": "external_reference"
+                if mk.startswith("forecast.reference_")
+                else ("reva_ensemble" if mk == "reva.ensemble" else "baseline"),
                 "n_issued": issued.get(mk, 0),
                 "n_abstained": abstained.get(mk, 0),
                 **aggregate(sc),
@@ -277,7 +280,7 @@ def leaderboard(conn: Any, store: Any, origin: str | None, family: str | None = 
     counts: dict[str, int] = defaultdict(int)
     for o in outcomes(conn, store, origin).values():
         counts[o["status"]] += 1
-    n_q = sum(int(b["n_questions"] or 0) for b in batches(conn, origin))
+    n_q = sum(int(b["n_questions"] or 0) for b in batches(conn, origin) if not b.get("supplement_of"))
     counts["pending"] = n_q - sum(counts.values())
     return {"label": LABEL, "baseline_for_skill": BASELINE_KEY, "questions": dict(counts), "models": rows}
 

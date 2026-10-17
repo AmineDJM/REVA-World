@@ -951,3 +951,19 @@ models:
     output_ports: [{name: point_forecast}, {name: predictive_empirical}]
     applicability: {min_past_errors: 15}
     assumptions: [past and future normalised errors exchangeable (fails under regime change)]
+  # --- V7 BEAT-ENSEMBLE: online combination of every forecaster sealed on a registry question
+  - model_key: reva.ensemble
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      REVA ensemble: online combination of every forecaster sealed on the question (REVA baselines/models and the
+      attributed official forecasts) with weights from RESOLVED PROSPECTIVE registry scores only (Hedge on relative
+      losses shrunk towards equal; equal weights, labelled, until 20 resolved questions per family/type/role;
+      back-tests never set weights). Weighted-mean point, quantile averaging of deviations, linear pool of
+      probabilities (src/reva/models/forecasting/online_combination.py, src/reva/evaluation/registry/ensemble.py).
+      A win reads "REVA's combination beats <forecaster> alone", never "REVA beats <forecaster>".
+    input_ports: [{name: component_forecasts, kind: point_or_predictive}, {name: resolved_scores, kind: published_outcomes}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}, {name: probability}]
+    applicability: {min_components: 1, min_resolved_for_online_weights: 20}
+    assumptions: [past relative performance of a component in a family informative about its next one; components' sealed forecasts available at issue]

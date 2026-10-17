@@ -22,6 +22,7 @@ registered:
   fair_benchmark: "benchmark.imf_weo_errfan (backtests) / forecast.weo_error_fan (registry): N(WEO point, RMS of the country's own past WEO errors known at the origin)"
   development_vs_fair_benchmark: {crps_ratio: 0.985, p_better: 0.033, holm_rejected: false, n_origins: 13, purged_overlap: {crps_ratio: 0.988, p_better: 0.095}}
   issuance: {status: probation, rule: "keeps issuing only if it beats forecast.weo_error_fan on the next prospective evaluation (CRPS, one-sided country-clustered DM p < 0.05, >= 30 resolved common questions; issue.fair_gate); decisions appended to issuance_decisions.yaml"}
+  outcome_vintage_mismatch: {audit: "AUDIT4 L4 (FIX6, appended)", validated_on: "first WEO vintage available on/after 1 October of the following year (realtime.weo_cases, = weo_backtest)", resolves_on: "registry family weo.gdp_growth: first WEO vintage in which the year is an actual (April of the following year)", measured_difference: "WEO real GDP growth, years 2015-2024, April vs October next-year vintage: 71-138 of 142-193 countries differ by > 0.05 pp per year, mean absolute difference 0.27-1.29 pp (2021: 1.29), p90 0.67-2.0 pp", consequence: "holdout coverage and CRPS were measured against October values; the registered intervals will be scored against April values, which differ - holdout calibration is NOT evidence of calibration on the resolving vintage; prospective coverage on resolved registry questions is the real test (the holdout is spent and is not re-opened)"}
 - task: weo
   variable: real_gdp_growth
   horizon: h0
@@ -38,6 +39,7 @@ registered:
   fair_benchmark: "benchmark.imf_weo_errfan (backtests) / forecast.weo_error_fan (registry): N(WEO point, RMS of the country's own past WEO errors known at the origin)"
   development_vs_fair_benchmark: {crps_ratio: 0.992, p_better: 0.18, holm_rejected: false, n_origins: 13, purged_overlap: {crps_ratio: 0.996, p_better: 0.33}}
   issuance: {status: probation, rule: "keeps issuing only if it beats forecast.weo_error_fan on the next prospective evaluation (CRPS, one-sided country-clustered DM p < 0.05, >= 30 resolved common questions; issue.fair_gate); decisions appended to issuance_decisions.yaml"}
+  outcome_vintage_mismatch: {audit: "AUDIT4 L4 (FIX6, appended)", validated_on: "first WEO vintage available on/after 1 October of the following year (realtime.weo_cases, = weo_backtest)", resolves_on: "registry family weo.gdp_growth: first WEO vintage in which the year is an actual (April of the following year)", measured_difference: "WEO real GDP growth, years 2015-2024, April vs October next-year vintage: 71-138 of 142-193 countries differ by > 0.05 pp per year, mean absolute difference 0.27-1.29 pp (2021: 1.29), p90 0.67-2.0 pp", consequence: "holdout coverage and CRPS were measured against October values; the registered intervals will be scored against April values, which differ - holdout calibration is NOT evidence of calibration on the resolving vintage; prospective coverage on resolved registry questions is the real test (the holdout is spent and is not re-opened)"}
 - task: us
   variable: real_gdp_growth
   horizon: spf2

@@ -9,10 +9,13 @@ bytes at load time (`transcribed_double_checked`). Nothing was read off a chart;
 ## Result
 
 * **225 new current estimates loaded live** (dev DB, `atlas.effects_lit@1.1.1`, loads 21–38), **0 refused** by the text
-  check or the validator; 302 current published + REVA-run estimates in all (77 before).
+  check or the validator; ~~302~~ **301** current published + REVA-run estimates in all (296 + 5; 77 before; corrected
+  by FIX6, AUDIT4 L6).
 * 18 new curated publications (`registry/effects/literature/*.yaml`), all `maintainer_review_pending`; 44 estimates
   are `evidence: secondary` (another study's number as printed in a survey/comparison table, labelled as such).
-* Every estimate states `shock_profile`. 32 new effect variables (`registry/effects/variables.yaml`), 4 curated atlas
+* Every estimate carries a `shock_profile` field; ~~it is stated~~ **20 current rows say `unspecified`** (the 12 new
+  Ramey survey multipliers and 8 V5 Ortega–Osbat rows: the source does not state the profile; FIX6, AUDIT4 L6), the
+  281 others state one. 32 new effect variables (`registry/effects/variables.yaml`), 4 curated atlas
   links (below).
 * Raw archive: 18 PDFs, ~24 MB new (OP 113 deduplicated); metered run: 28 requests, 42.6 MB (budget `budgets-1.3.33`).
 * Re-run of the 5 reference decisions appended to `docs/dev/v5_pred_engine.md` §7c: the OPEC+ and ECB decisions now
