@@ -171,7 +171,7 @@ def series_meta(q: AtlasQuery, idx: SeriesIndex, sid: int) -> dict[str, Any]:
     src, ds, ind = q.series_of[sid]
     measure, dims = parse_indicator(ind)
     skey = f"{src}.{ds}.{ind}"
-    spans = q._rows(  # noqa: SLF001 - the atlas query layer's own read path (thread-safe cursor)
+    spans = q._rows(
         f"""SELECT {SPAN_SQL} AS span, (x.year IS NOT NULL) AS att, count(*) AS n
             FROM cells_s x WHERE x.sid = ? AND x.has_value GROUP BY 1, 2""",
         [sid],
@@ -184,17 +184,15 @@ def series_meta(q: AtlasQuery, idx: SeriesIndex, sid: int) -> dict[str, Any]:
             counts[r["span"]] += int(r["n"])
         elif r["span"] == "day" and not r["att"]:
             counts["day"] += int(r["n"])
-    units = q._rows(  # noqa: SLF001
+    units = q._rows(
         """SELECT x.unit, count(*) AS n, count(x.value) AS n_num, count(x.value_text) AS n_text,
                   min(TRY_CAST(x.value AS DOUBLE)) AS vmin, max(TRY_CAST(x.value AS DOUBLE)) AS vmax,
                   count(DISTINCT x.iso3) AS n_iso, count(DISTINCT x.provider_geo) AS n_geo
            FROM cells_s x WHERE x.sid = ? AND x.has_value GROUP BY 1 ORDER BY 2 DESC""",
         [sid],
     )
-    geo_rows = q._rows(  # noqa: SLF001
-        "SELECT DISTINCT x.iso3, x.provider_geo FROM cells_s x WHERE x.sid = ? AND x.has_value", [sid]
-    )
-    shas = q._rows("SELECT DISTINCT x.table_sha FROM cells_s x WHERE x.sid = ? LIMIT 20", [sid])  # noqa: SLF001
+    geo_rows = q._rows("SELECT DISTINCT x.iso3, x.provider_geo FROM cells_s x WHERE x.sid = ? AND x.has_value", [sid])
+    shas = q._rows("SELECT DISTINCT x.table_sha FROM cells_s x WHERE x.sid = ? LIMIT 20", [sid])
     countries = sorted({r["iso3"] for r in geo_rows if r["iso3"]})
     subnational = sorted({r["provider_geo"] for r in geo_rows if r["iso3"] and SUBNATIONAL_RE.match(r["provider_geo"])})
     aggregates = sorted({r["provider_geo"] for r in geo_rows if not r["iso3"]})
@@ -261,7 +259,7 @@ def periods(q: AtlasQuery, sid: int, precision: str) -> list[dict[str, Any]]:
     src, ds, _ = q.series_of[sid]
     p_sql = _proj_sql(q, src, ds)
     if precision == "year":
-        rows = q._rows(  # noqa: SLF001
+        rows = q._rows(
             f"""SELECT x.year AS y, CAST(min(x.period_start) AS VARCHAR) AS ps,
                        count(*) FILTER (WHERE x.has_value AND NOT {p_sql}) AS obs,
                        count(*) FILTER (WHERE x.has_value AND {p_sql}) AS proj
@@ -276,7 +274,7 @@ def periods(q: AtlasQuery, sid: int, precision: str) -> list[dict[str, Any]]:
         ]
     elif precision in PRECISIONS:
         cond = f"{SPAN_SQL} = ?" + (" AND x.year IS NULL" if precision == "day" else "")
-        rows = q._rows(  # noqa: SLF001
+        rows = q._rows(
             f"""SELECT strftime(x.period_start, '%Y-%m-%d') AS ps,
                        count(*) FILTER (WHERE x.has_value AND NOT {p_sql}) AS obs,
                        count(*) FILTER (WHERE x.has_value AND {p_sql}) AS proj
@@ -289,7 +287,9 @@ def periods(q: AtlasQuery, sid: int, precision: str) -> list[dict[str, Any]]:
             if not (r["obs"] or r["proj"]):
                 continue
             code = period_code(precision, r["ps"])
-            out.append({"code": code, "label": period_label_fr(precision, code), "obs": int(r["obs"]), "proj": int(r["proj"])})
+            out.append(
+                {"code": code, "label": period_label_fr(precision, code), "obs": int(r["obs"]), "proj": int(r["proj"])}
+            )
     else:
         raise ValidationProblem("unknown precision", precision=precision[:20])
     _cache_put(_PERIODS, key, out)
@@ -301,7 +301,7 @@ def periods(q: AtlasQuery, sid: int, precision: str) -> list[dict[str, Any]]:
 
 def _cell(q: AtlasQuery, r: dict[str, Any]) -> dict[str, Any]:
     """The atlas query layer's cell (provenance, rights, projection rule) plus the row's country key."""
-    return {**q._cell(r), "iso3": r.get("iso3")}  # noqa: SLF001 - the query layer's own cell builder
+    return {**q._cell(r), "iso3": r.get("iso3")}
 
 
 class _Lic:
@@ -326,7 +326,8 @@ _FLAG_KEEP = ("estimate_kind", "missing", "note", "status", "label_year", "qa", 
 
 
 def _point(cell: dict[str, Any], precision: str, lic: _Lic) -> dict[str, Any]:
-    flags = cell.get("flags") if isinstance(cell.get("flags"), dict) else {}
+    raw_flags = cell.get("flags")
+    flags: dict[str, Any] = raw_flags if isinstance(raw_flags, dict) else {}
     has = cell.get("value") is not None or cell.get("value_text") is not None
     miss = None
     if not has:
@@ -369,7 +370,10 @@ def _choose(rows: list[dict[str, Any]], key: str) -> dict[str, dict[str, Any]]:
         k = r[key]
         cur = out.get(k)
         rank = (r["provider_geo"] == r.get("iso3"), r["value"] is not None or r["value_text"] is not None)
-        if cur is None or rank > (cur["provider_geo"] == cur.get("iso3"), cur["value"] is not None or cur["value_text"] is not None):
+        if cur is None or rank > (
+            cur["provider_geo"] == cur.get("iso3"),
+            cur["value"] is not None or cur["value_text"] is not None,
+        ):
             out[k] = r
     return out
 
@@ -419,9 +423,7 @@ def map_slice(
     if sel is None:
         raise ValidationProblem("period does not fit the precision", period=period[:20], precision=prec)
     where, params = _period_where(sel)
-    rows = q._rows(  # noqa: SLF001
-        f"SELECT {CELL_SELECT} FROM cells_s x WHERE x.sid = ? AND {where}", [sid, *params]
-    )
+    rows = q._rows(f"SELECT {CELL_SELECT} FROM cells_s x WHERE x.sid = ? AND {where}", [sid, *params])
     lic = _Lic()
     values: list[dict[str, Any]] = []
     hidden: set[str] = set()
@@ -449,7 +451,7 @@ def map_slice(
         series_countries = set(meta["countries"])
         other: set[str] = set()
         if prec == "year" and sel.year is not None and meta["precisions"].keys() - {"year"}:
-            orows = q._rows(  # noqa: SLF001
+            orows = q._rows(
                 """SELECT DISTINCT x.iso3 FROM cells_s x WHERE x.sid = ? AND x.iso3 IS NOT NULL AND x.has_value
                      AND x.year IS NULL AND x.period_start < make_date(?, 1, 1) AND x.period_end > make_date(?, 1, 1)""",
                 [sid, sel.year + 1, sel.year],
@@ -491,23 +493,27 @@ def map_slice(
     }
     out["licences"] = lic.items
     labels = place_labels()
-    out["names"] = {k: labels[k] for k in {*(v["iso3"] for v in values), *(m["geo"] for m in out["missing"])} if k in labels}
+    out["names"] = {
+        k: labels[k] for k in {*(v["iso3"] for v in values), *(m["geo"] for m in out["missing"])} if k in labels
+    }
     return out
 
 
 # --------------------------------------------------------------------------- one place, every period
 
 
-def place_series(q: AtlasQuery, idx: SeriesIndex, sid: int, geo: str, *, precision: str | None = None) -> dict[str, Any]:
+def place_series(
+    q: AtlasQuery, idx: SeriesIndex, sid: int, geo: str, *, precision: str | None = None
+) -> dict[str, Any]:
     meta = series_meta(q, idx, sid)
     prec = precision or meta["default_precision"] or "year"
     by_iso = re.fullmatch(r"[A-Z]{3}", geo) is not None
     if by_iso:
-        rows = q._rows(  # noqa: SLF001
+        rows = q._rows(
             f"SELECT {CELL_SELECT} FROM cells x WHERE x.iso3 = ? AND x.sid = ? ORDER BY x.period_start", [geo, sid]
         )
     else:
-        rows = q._rows(  # noqa: SLF001
+        rows = q._rows(
             f"SELECT {CELL_SELECT} FROM cells_s x WHERE x.sid = ? AND x.provider_geo = ? ORDER BY x.period_start",
             [sid, geo],
         )
@@ -575,7 +581,7 @@ def multi_series(
     lic = _Lic()
     isos = [g for g in geos if re.fullmatch(r"[A-Z]{3}", g)]
     rows = (
-        q._rows(  # noqa: SLF001
+        q._rows(
             f"""SELECT {CELL_SELECT} FROM cells_s x
                 WHERE x.sid IN ({",".join(str(int(s)) for s in sids)}) AND x.iso3 IN ({",".join("?" for _ in isos)})
                 ORDER BY x.iso3, x.sid, x.period_start""",

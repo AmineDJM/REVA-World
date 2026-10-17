@@ -91,7 +91,15 @@ class SeriesIndex:
                 self.concepts_of.setdefault(s.key, []).append(c.id)
             label = " ".join(v for v in (c.labels.get("fr"), c.labels.get("en")) if v)
             text = " ".join(
-                [label, c.id, c.unit, c.theme or "", c.domain, c.subdomain or "", " ".join(s.key for s in c.source_order)]
+                [
+                    label,
+                    c.id,
+                    c.unit,
+                    c.theme or "",
+                    c.domain,
+                    c.subdomain or "",
+                    " ".join(s.key for s in c.source_order),
+                ]
             )
             self.concepts.append(ConceptHit(c, fold(label), fold(text + " " + c.definition[:300])))
         self.catalog = catalog
@@ -144,12 +152,12 @@ class SeriesIndex:
         tables: list[Table] = []
         measures: list[Measure] = []
         if toks and not theme:
-            for t in self.tables.values():
-                ft = fold(t.key)
+            for tb in self.tables.values():
+                ft = fold(tb.key)
                 if all(tok in ft for tok in toks):
-                    tables.append(t)
-            for t in self.tables.values():
-                for m in t.measures.values():
+                    tables.append(tb)
+            for tb in self.tables.values():
+                for m in tb.measures.values():
                     if all(tok in m.folded for tok in toks):
                         measures.append(m)
                         if len(measures) >= limit * 4:

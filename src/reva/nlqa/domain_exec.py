@@ -331,10 +331,23 @@ class DomainOps:
             approx = _approximate(op, r, ev, consulted)
             if approx is not None:
                 return approx
-        res = port.cross(
-            ra.entity.qid, a["families"] or None, rb.entity.qid, a["other_families"], limit=min(a["limit"], MAX_CROSS)
-        )
+        lim = min(a["limit"], MAX_CROSS)
+        res = port.cross(ra.entity.qid, a["families"] or None, rb.entity.qid, a["other_families"], limit=lim)
         data: dict[str, Any] = {"a": ra.entity, "b": rb.entity, "families": a["families"], "other": a["other_families"]}
+        if not res.rows:
+            # V8ASK: the first side's equally matching records, then the records carrying one of its labels
+            # (« charbon » → Wikidata Q24489, labelled "coal" in English → GPPD "Coal"); the answer names it
+            cands: list[tuple[Any, dict[str, str] | None]] = []
+            if ra.match in ("label_exact", "alias_exact") or ra.match in STRICT_BRIDGE_MATCHES:
+                cands += [(alt, None) for alt in ra.alternatives[:MAX_IDENTITY_HOPS]]
+            cands += [(o, {"lang": lg, "label": lb}) for o, lg, lb in _label_bridges(self.b, ra)]
+            for other, bridge in cands:
+                more = port.cross(other.qid, a["families"] or None, rb.entity.qid, a["other_families"], limit=lim)
+                if more.rows:
+                    res = more
+                    data.update(a=other, chosen=ra.entity, answered_by=other, bridge=bridge, match=ra.match)
+                    data["answered_by_eid"] = ev.entity(other, query=ra.text, match=ra.match or "")
+                    break
         if not res.rows:
             data["absence"] = ev.absence(
                 "kg_cross", consulted, a=ra.entity.qid, b=rb.entity.qid, b_families=",".join(a["other_families"])

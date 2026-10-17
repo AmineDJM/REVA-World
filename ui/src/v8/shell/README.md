@@ -177,6 +177,26 @@ Drag or keyboard (←/→, Shift for bigger steps) on the separator; stacks belo
 `frDecimal("57082396439.6", 1)` → `57 082 396 439,6` (exact, no float); `frValue(value, unit)` picks digits by unit;
 `frNumber(0.1234)`, `frCompact(2.9e12)` → `2,9 T`; `missingReasonFr('not_reported')`.
 
+## Feature modules: keep `index.ts` tiny
+
+The shell imports every `features/<id>/index.ts(x)` **eagerly** (that is how the nav and the palette know the
+features), so everything an index imports statically lands in the console's first-load chunk. Keep it to metadata:
+
+- `element: lazy(() => import('./MyPage'))` — never a static page import;
+- in `search` / `commands`, load clients lazily: `const { getX } = await import('./api')` (zod, v3 clients, react-table
+  then stay out of the frame);
+- no top-level side effects, no CSS imports in index.
+
+Budgets are checked by `node scripts/v8-bundle-report.mjs` after a build (`--strict` fails on a breach).
+
+## Routing
+
+`path: 'monde'` is mounted as `/v8/monde/*` — nested `<Routes>` and `useParams` work inside your page. A path with
+params (`fiche/:kind/:id`) gets `/v8/fiche/:kind/:id/*`, and when it declares `navPath: 'fiche'`, `/v8/fiche` renders
+the same element too. `path: ''` is the `/v8` index (Accueil). A feature that throws is caught by the shell (the
+frame stays, the failure is named). The shell scrolls to top on path changes and prefetches a feature's chunk on
+nav hover/focus, palette selection and at landing.
+
 ## Shell services available to features
 
 - **Palette**: export `commands` (`PaletteCommand[]`) and `search` (`PaletteProvider`) on your `feature`; the shell

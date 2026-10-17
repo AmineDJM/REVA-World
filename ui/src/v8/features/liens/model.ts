@@ -150,8 +150,8 @@ export interface GraphModel {
   edges: Map<string, GEdge>;
 }
 
-const STEP = 210;
-const ROW = 92;
+const STEP = 170;
+const ROW = 74;
 
 function edgeKey(h: Hop): string {
   return `${h.from}→${h.to}:${h.kind}:${h.property?.pid ?? h.relation?.fr ?? ''}`;
@@ -246,4 +246,21 @@ export function toRights(l: Hop['licence']): import('../../../v3/lib/licence').R
     licence_url: l.licence_url,
     required_notice: l.required_notice,
   };
+}
+
+/** Server warnings in French; the honesty note (path ≠ cause, claims ≠ causation) and truncation are shown elsewhere. */
+export function warningsFr(ws: { code: string; message: string }[], d: PathsData): string[] {
+  const out: string[] = [];
+  for (const w of ws) {
+    let t: string | null;
+    if (w.code === 'path_not_causal' || w.code === 'claims_not_causation' || w.code === 'truncated') t = null;
+    else if (w.code === 'community_edited') t = 'Certains liens viennent de Wikidata : contributions communautaires, non vérifiées par REVA.';
+    else if (w.code === 'licence_restricted') {
+      const ls = [...new Set(d.paths.flatMap((p) => p.restricted_licences))];
+      t = `Licences restrictives à respecter pour réutiliser ces liens : ${ls.join(' ; ') || w.message}.`;
+    } else if (w.code === 'fixture_data') t = 'Contient des données de test (test_fixture), pas des données publiées.';
+    else t = w.message;
+    if (t && !out.includes(t)) out.push(t);
+  }
+  return out;
 }

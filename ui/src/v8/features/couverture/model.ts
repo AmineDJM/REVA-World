@@ -31,7 +31,7 @@ export function isMetric(v: string): v is Metric {
 }
 
 /** True when the cell stores at least one atlas row (KG-only cells are drawn differently). */
-export function hasRows(c: Cell | undefined): c is Cell {
+export function hasRows(c: Cell | undefined): boolean {
   return !!c && (c.rows ?? 0) > 0;
 }
 

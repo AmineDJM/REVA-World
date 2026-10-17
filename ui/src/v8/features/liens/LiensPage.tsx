@@ -4,7 +4,7 @@ import { ApiError } from '../../../api/problem';
 import { EmptyState, ErrorState, KeyHint, Skeleton } from '../../shell/ui';
 import { fetchFamilies, fetchNeighbourhood, fetchPaths, type EgoData, type FamilyInfo, type NodeRef, type PathsData } from './api';
 import { EXAMPLES } from './examples';
-import { HOP_CHOICES, answerSentence, buildGraph, parseState, plural, stateQuery, type LiensState } from './model';
+import { HOP_CHOICES, answerSentence, buildGraph, parseState, plural, stateQuery, warningsFr, type LiensState } from './model';
 import { NodePicker, type PickedNode } from './NodePicker';
 import { EgoList, NodeCard, PathCard } from './parts';
 import './liens.css';
@@ -60,7 +60,7 @@ export default function LiensPage() {
     setExpansions([]);
     fetchPaths({ from: st.from, to: st.to, families: st.families, causal: st.causal, hops: st.hops }, ctrl.signal)
       .then((r) => {
-        setPaths({ status: 'ok', data: r.data, warnings: r.warnings.filter((w) => !['path_not_causal', 'claims_not_causation'].includes(w.code)).map((w) => w.message) });
+        setPaths({ status: 'ok', data: r.data, warnings: warningsFr(r.warnings, r.data) });
         setLabels((l) => ({ ...l, [st.from]: r.data.from.label, [st.to]: r.data.to.label }));
       })
       .catch((e: unknown) => {
@@ -221,7 +221,7 @@ export default function LiensPage() {
             </button>
           ))}
         </div>
-        <p className="lien-honesty" data-testid="lien-honesty">
+        <div className="lien-honesty" data-testid="lien-honesty">
           <strong>Un chemin est un ensemble de liens documentés, pas une preuve causale.</strong> Les maillons causaux sont des affirmations de leurs sources (palier T1–T4, note A–E) ; les estimations sont celles de leurs auteurs.
           {note && (
             <details>
@@ -229,7 +229,7 @@ export default function LiensPage() {
               {note}
             </details>
           )}
-        </p>
+        </div>
       </section>
 
       {!st.from && !st.to && (

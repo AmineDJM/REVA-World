@@ -132,7 +132,7 @@ def test_rtdsm_monthly_vintages_and_month_end_rule() -> None:
     fl = _flags(df)
     assert {f["vintage"] for f in fl} == {"2010M01", "2010M02"}  # 2009M12 is before FIRST_VINTAGE
     assert all(f["available_at"] in ("2010-02-01T00:00:00Z", "2010-03-01T00:00:00Z") for f in fl)
-    assert df["period_start"].min() >= date(1990, 1, 1)
+    assert min(df["period_start"].to_list()) >= date(1990, 1, 1)
 
 
 def test_release_values_bounds_and_cells_select_as_of() -> None:

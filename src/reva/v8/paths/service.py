@@ -50,6 +50,7 @@ class IndexHolder:
         self._current_key: str | None = None
         self._registries: ix.Registries | None = None
         self._reg_at = 0.0
+        self._warm_started = False
 
     # ------------------------------------------------------------------------------------------ state
     def status(self) -> dict[str, Any]:
@@ -111,7 +112,12 @@ class IndexHolder:
                 self._cond.wait_for(lambda: self._idx is not None or not self._building, timeout=wait_s)
             if self._idx is None:
                 raise IndexBuilding(self._error or "the path index is being built")
-            return self._idx
+            idx = self._idx
+            start_warm = not self._warm_started
+            self._warm_started = True
+        if start_warm:
+            threading.Thread(target=_warm_renderers, name="v8-paths-warm", daemon=True).start()
+        return idx
 
     def _from_cache(self, key: str) -> ix.PathIndex | None:
         d = cache_dir()
@@ -157,6 +163,17 @@ class IndexHolder:
                     self._cond.notify_all()
 
         threading.Thread(target=run, name="v8-paths-index", daemon=True).start()
+
+
+def _warm_renderers() -> None:
+    """Load the registries the renderer reads (effect labels need the atlas catalog: ~10 s cold) once, in the
+    background, so that the first visitor does not pay for them."""
+    try:
+        from reva.v8.paths import render
+
+        render.warm()
+    except Exception:  # pragma: no cover - warming is an optimisation only
+        log.warning("v8 paths: renderer warm-up failed", exc_info=True)
 
 
 HOLDER = IndexHolder()

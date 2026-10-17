@@ -86,6 +86,12 @@ function dotTile(ink: string) {
   return { width: size, height: size, data };
 }
 
+/** Inhabited world (Antarctica mostly outside): the map opens and re-fits on this box. */
+const WORLD: [[number, number], [number, number]] = [
+  [-168, -56],
+  [192, 80],
+];
+
 const STYLE: StyleSpecification = { version: 8, sources: {}, layers: [{ id: 'bg', type: 'background', paint: { 'background-color': '#eef1f5' } }] };
 
 /**
@@ -134,8 +140,8 @@ export default function MondeMap({ collection, fills, selected, highlight = null
       map = new MapLibreMap({
         container: el.current,
         style: STYLE,
-        center: [12, 22],
-        zoom: 0.75,
+        bounds: WORLD,
+        fitBoundsOptions: { padding: 6 },
         minZoom: 0,
         maxZoom: 6,
         renderWorldCopies: false,
@@ -152,6 +158,8 @@ export default function MondeMap({ collection, fills, selected, highlight = null
     mapRef.current = map;
     map.on('error', (e) => setFailed(e.error?.message ?? 'erreur de carte'));
     map.on('load', () => {
+      map.resize();
+      map.fitBounds(WORLD, { padding: 6, animate: false });
       map.addSource('c', { type: 'geojson', data: latest.current as never });
       map.addLayer({ id: 'fill', type: 'fill', source: 'c', filter: ['in', ['get', 'state'], ['literal', ['value', 'proj']]], paint: { 'fill-color': ['get', 'color'] as never } });
       map.addLayer({ id: 'outside', type: 'fill', source: 'c', filter: ['==', ['get', 'state'], 'outside'], paint: { 'fill-color': '#dde1e6' } });
@@ -174,7 +182,18 @@ export default function MondeMap({ collection, fills, selected, highlight = null
       const iso = at(e)?.properties?.iso3;
       if (iso) select.current(String(iso));
     });
-    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => map.resize()) : null;
+    let moved = false;
+    map.on('dragstart', () => (moved = true));
+    map.on('zoomstart', (e) => {
+      if ((e as { originalEvent?: unknown }).originalEvent) moved = true;
+    });
+    const ro =
+      typeof ResizeObserver !== 'undefined'
+        ? new ResizeObserver(() => {
+            map.resize();
+            if (!moved) map.fitBounds(WORLD, { padding: 6, animate: false });
+          })
+        : null;
     ro?.observe(el.current);
     return () => {
       ro?.disconnect();

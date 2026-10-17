@@ -1,0 +1,110 @@
+# BEAT-NOWCAST pre-registration (V7, agent BEAT-NOWCAST). Committed BEFORE the holdout (targets 2022-2025) was built
+# or scored. Binding rules: docs/roadmap/v7_beat_official.md; standard: docs/dev/review_v6_predictions.md.
+# Do not edit after commit: the CLI refuses to run when the code digest below differs from the code; the development
+# stage writes hypotheses.yaml (mechanical rule below); holdout_ledger.yaml records the single opening.
+schema: reva-beat-nowcast-protocol/1
+written_at: '2026-10-17T23:30:00+00:00'
+agent: BEAT-NOWCAST
+goal: >-
+  Beat the Federal Reserve Banks' official nowcasts of US current-quarter real GDP growth (Atlanta Fed GDPNow, New
+  York Fed Staff Nowcast) and of monthly CPI inflation (Cleveland Fed inflation nowcasting), judged on the same
+  publication dates with the same (or less) information, on proper scores, with one Holm family.
+
+disclosure_before_registration:
+  - >-
+    The development stage (targets 2014-2021) was run while building and debugging the code (results printed in the
+    session; the official run after this commit writes development.json). Model specifications were not changed in
+    response to development scores; only bugs were fixed.
+  - >-
+    While inspecting the GDPNow workbook layout, the first rows of its 'TrackRecord' sheet were displayed: GDPNow's
+    final pre-release nowcast errors for 2025Q2-2026Q2 (three of them are holdout quarters: 2025Q2-2025Q4) and the
+    sheet's whole-record average errors. No REVA candidate, combination or holdout score was ever computed for a
+    holdout target before this commit.
+  - >-
+    No euro-area official nowcast with a published update history was found (the ECB publishes none; Eurostat's flash
+    estimate is the release itself): no euro-area cell.
+  - >-
+    FRED/ALFRED (incl. the St. Louis Fed Economic News Index and ALFRED vintages of BLS/BEA series) is reachable but its
+    Terms of Use prohibit using FRED content "in connection with the development or training of any software program
+    or system or machine learning": not used (owner decision). REVA's real-time monthly inputs therefore come from the
+    Philadelphia Fed RTDSM monthly vintages, available only from the 1st of the month after each vintage month
+    (a handicap of up to a month per release against the official nowcasters).
+
+comparison_rule: >-
+  Unit: one official nowcast of target period P published on day d, strictly before the truth's release day. REVA
+  cutoff C = d 00:00 UTC: pure REVA inputs (RTDSM monthly vintages, EIA gasoline spot prices usable 8 days after the
+  price day, CPI history, GDP first releases for estimation, past errors for combinations) must have available_at <= C.
+  Official cutoff C + 1 day: the official nowcast of day d and, for stack_all, the other official nowcast of P
+  published on/before d. Every case's inputs pass LeakageGuard (available_then) at the right cutoff.
+
+cells:
+  gdp_gdpnow: {official: "Atlanta Fed GDPNow (every update; 2011Q4-2014Q2 archive rows were made before the public launch, flagged)",
+               variable: real GDP growth, q/q SAAR, truth: first release}
+  gdp_nyfed: {official: "New York Fed Staff Nowcast (2016 model: real time 2016Q1-2021Q3; reintroduced model: real time from 2023-09-08)",
+              variable: real GDP growth, q/q SAAR, truth: first release}
+  cpi_clev: {official: Cleveland Fed CPI m/m nowcast (daily), variable: CPI-U m/m % SA, truth: first release}
+  core_clev: {official: Cleveland Fed core CPI m/m nowcast (daily), variable: core CPI-U m/m % SA, truth: first release}
+
+truth:
+  primary_gdp: >-
+    BEA advance (first/initial) estimate = Philadelphia Fed 'First' release value (routput_first_second_third.xlsx);
+    known from the day after BEA's publication date recorded in the GDPNow archives (else the 4th-month bound).
+  secondary_gdp: BEA third estimate (Philadelphia Fed 'Third'); descriptive only, not tested.
+  primary_cpi: >-
+    first-release month-over-month CPI / core CPI as recorded by the Cleveland Fed in its nowcast file on the BLS
+    release day (an official nowcast is compared only if published before that day). No secondary CPI truth.
+
+windows:
+  burn_in: "GDP targets 2011Q3-2013Q4, CPI 2013-07..2013-12: feed past-error pools, never scored"
+  development: "targets 2014Q1-2021Q4 (GDP), 2014-01..2021-12 (CPI)"
+  holdout: "targets 2022Q1-2025Q4 (GDP), 2022-01..2025-12 (CPI): untouched until hypotheses.yaml is committed; opened once"
+  prospective: >-
+    after the holdout opening: sealed records for GDP 2026Q4 and 2027Q1 and CPI 2026-10..2027-03 (CLI 'seal';
+    registry/forecasts/beat_nowcast/sealed/), re-sealed on later official publication days; only holdout-confirmed
+    scopes may be claimed when they resolve.
+
+candidates:
+  forecast.nc_bridge: pure REVA; GDP bridge OLS on 5 RTDSM monthly indicators (payrolls, IP, aggregate hours, housing starts, real PCE), AR(1) ragged-edge fill, estimation from 1993Q1 on first releases known at C excluding 2020Q2-Q3
+  forecast.nc_dfm: pure REVA; V6 one-factor DFM (reva.models.forecasting.dfm, unchanged) on the same panel
+  forecast.nc_cpi_bridge: "pure REVA; headline: OLS on mean of last 12 known m/m and NY Harbor gasoline spot log change; core: OLS on means of last 12 and last 3 known core m/m"
+  forecast.nc_stack_reva: "USES THE OFFICIAL NOWCAST: O + lambda (R - O), R = mean of pure REVA points; lambda = clipped LS on past errors of the same phase bucket (last 12 quarters / 24 months), shrunk to 0.5 (prior 4 quarters / 6 months)"
+  forecast.nc_stack_all: "GDP only; USES BOTH OFFICIAL NOWCASTS: same with R = mean of REVA points and the other official nowcast published by d"
+  forecast.nc_biascorr: "USES THE OFFICIAL NOWCAST: O + shrunk mean past official error of the bucket (n/(n+n0))"
+  buckets: "GDP: month of d relative to the target quarter's first month (m-1, m0, m1, m2, m3+); CPI: m0 (within the month), m1 (after)"
+  densities: "point + the candidate's own past errors in the bucket and window (>= 4 quarters & 8 errors GDP; >= 6 months & 12 errors CPI), else point only"
+
+benchmarks:
+  point: the official nowcast of day d (AE)
+  density_fair: "N(official point, RMS of the official's own past errors in the bucket and window) (QA-PRED X1 fair fan) (CRPS)"
+
+scores_and_tests:
+  losses: {points: AE (primary), densities: CRPS; RMSE, coverage, by-bucket ratios, third-release MAE descriptive}
+  inference: >-
+    loss differential averaged over all publication days of a target period (target = unit); Diebold-Mariano with
+    HLN correction, one-sided (candidate better), horizon argument 2; >= 6 targets.
+  development_selection: >-
+    per (cell, loss): among development tests on the selection sample (GDP: targets 2014-2021 without 2020Q2-2020Q3,
+    whose single-quarter losses are ~30x typical; CPI: all) with relative loss < 1, the best combination candidate
+    (uses the official nowcast) and the best pure-REVA candidate -> at most 2 hypotheses per (cell, loss), written to
+    hypotheses.yaml with this protocol's sha256 and the code sha256, committed before the holdout is opened.
+  holdout_family: ONE Holm (alpha 0.05) over all hypotheses jointly; family size printed with every result.
+  confirmation: Holm-rejected AND relative < 1 AND, for densities, holdout 80% interval coverage within [0.70, 0.90].
+  holdout_opened_once: holdout_ledger.yaml refuses a second opening of the same hypotheses; code digest must match.
+
+wording_rules:
+  - A confirmed stack/bias scope is "REVA's combination of <official nowcast> with REVA's model(s) beats <official>
+    alone on the same dates" - never "REVA beats the Fed" without saying it uses the official nowcast.
+  - stack_all uses both official nowcasts: its win is a combination of official nowcasts (plus REVA's), stated so.
+  - Wins AND losses are reported exactly with n targets, n publication days, family size and coverage.
+
+licences: >-
+  Atlanta Fed and Cleveland Fed content: non-commercial reproduction with attribution; New York Fed: licence to use,
+  copy and distribute (no endorsement); Philadelphia Fed: no stated licence (internal evaluation only); EIA spot prices:
+  Refinitiv data republished by EIA (licence review flag). Official values in sealed records carry attribution.
+
+code_files: [src/reva/evaluation/beat_nowcast/__init__.py, src/reva/evaluation/beat_nowcast/data.py,
+             src/reva/evaluation/beat_nowcast/models.py, src/reva/evaluation/beat_nowcast/cases.py,
+             src/reva/evaluation/beat_nowcast/service.py, src/reva/models/forecasting/dfm.py,
+             src/reva/evaluation/pred_models/gate.py, src/reva/adapters/connectors/atlas_fed_nowcasts.py,
+             src/reva/cli/beat_nowcast.py]
+code_sha256: PLACEHOLDER

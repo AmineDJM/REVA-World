@@ -60,6 +60,11 @@ export function PlacePanel({ sel, geo, name, precision, onClose }: { sel: Select
             height={64}
             label={`Série ${d.meta.series} pour ${name}, ${pts.length} périodes`}
           />
+          {pts.length > 1 && (
+            <p className="v8m-panel-range v8-subtle v8-num">
+              {pts[0]!.p} – {pts[pts.length - 1]!.p} · {pts.filter((p) => p.v !== null || p.t !== null).length} valeurs
+            </p>
+          )}
           {firstProj && (
             <p className="v8m-panel-note">
               <Badge kind="projection" /> à partir de {firstProj.p} (tirets) — jamais mêlé aux observations.

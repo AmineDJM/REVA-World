@@ -23,7 +23,7 @@ export const FORECASTER_KEYWORDS: Record<string, string[]> = {
   imf_weo: ['fmi', 'imf', 'weo', 'fonds monétaire'],
   us_spf: ['spf', 'philadelphie', 'philadelphia', 'fed'],
   ecb_spf: ['bce', 'ecb', 'spf bce'],
-  eia_steo: ['eia', 'steo', 'énergie', 'pétrole', 'brent', 'wti'],
+  eia_steo: ['eia', 'steo', 'pétrole', 'brent', 'wti'],
   cdc_flusight: ['cdc', 'flusight', 'grippe'],
   cdc_covidhub: ['cdc', 'covid', 'covidhub'],
   views: ['views', 'conflit', 'uppsala'],
@@ -69,7 +69,7 @@ export function fmtRange(lo: number | null | undefined, hi: number | null | unde
 export function fmtP(p: number | null | undefined): string | null {
   if (p === null || p === undefined || !Number.isFinite(p)) return null;
   if (p >= 0.001) return p.toLocaleString('fr-FR', { maximumSignificantDigits: 2 });
-  const [m, e] = p.toExponential(1).split('e');
+  const [m = '', e = ''] = p.toExponential(1).split('e');
   return `${m.replace('.', ',')}e${e}`;
 }
 

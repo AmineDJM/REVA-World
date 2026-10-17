@@ -1,0 +1,184 @@
+/* Dossier (V8DOSSIER): a reading document — serif text, footnote chips, inline charts; tokens only. */
+.dos-page {
+  --dos-serif: 'Source Serif 4', 'Source Serif Pro', 'Iowan Old Style', 'Charter', Georgia, 'Times New Roman', serif;
+  --dos-paper: var(--v8-surface, #fff);
+  min-width: 0;
+}
+
+/* ---------------------------------------------------------------- picker */
+.dos-picker { max-width: 880px; }
+.dos-search { position: relative; margin: var(--v8-space-4, 12px) 0; }
+.dos-search-input { width: 100%; font-size: var(--v8-text-md, 15px); padding: 10px 40px 10px 12px; }
+.dos-key {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  font: 11px var(--v8-font-mono, monospace); color: var(--v8-fg-subtle, #858b96);
+  border: 1px solid var(--v8-border, #e2e4e8); border-radius: 4px; padding: 0 5px;
+}
+.dos-kinds { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--v8-space-5, 16px); }
+.dos-kind-btn {
+  font: inherit; font-size: var(--v8-text-sm, 12.5px); cursor: pointer;
+  border: 1px solid var(--v8-border, #e2e4e8); background: var(--v8-surface, #fff); color: var(--v8-fg-muted, #565d6a);
+  border-radius: var(--v8-radius-pill, 999px); padding: 3px 12px;
+}
+.dos-kind-btn.is-on { background: var(--v8-accent-soft, #e9edfd); color: var(--v8-accent, #3653d3); border-color: var(--v8-accent, #3653d3); }
+.dos-hits-title { font-size: var(--v8-text-sm, 12.5px); text-transform: uppercase; letter-spacing: .06em; color: var(--v8-fg-subtle, #858b96); margin: var(--v8-space-5, 16px) 0 var(--v8-space-3, 8px); }
+.dos-hits { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 10px; }
+.dos-hit {
+  display: flex; flex-direction: column; gap: 2px; height: 100%; text-decoration: none; color: inherit;
+  border: 1px solid var(--v8-border, #e2e4e8); background: var(--v8-surface, #fff); border-radius: var(--v8-radius-lg, 10px);
+  padding: 12px 14px; transition: border-color var(--v8-dur-fast, 90ms), box-shadow var(--v8-dur-fast, 90ms);
+}
+.dos-hits li.is-active .dos-hit, .dos-hit:hover, .dos-hit:focus-visible { border-color: var(--v8-accent, #3653d3); box-shadow: var(--v8-shadow-sm, 0 1px 2px rgba(0,0,0,.06)); }
+.dos-hit-kind { font-size: var(--v8-text-2xs, 10.5px); text-transform: uppercase; letter-spacing: .07em; color: var(--v8-accent, #3653d3); font-weight: 600; }
+.dos-hit-label { font-family: var(--dos-serif); font-size: 18px; line-height: 1.25; font-weight: 600; }
+.dos-hit-sub { font-size: var(--v8-text-xs, 11.5px); color: var(--v8-fg-muted, #565d6a); }
+
+/* ---------------------------------------------------------------- layout */
+.dos-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--v8-space-6, 24px); }
+@media (min-width: 1040px) {
+  .dos-layout { grid-template-columns: 230px minmax(0, 1fr); }
+  .dos-side { position: sticky; top: calc(var(--v8-topbar-h, 48px) + 12px); align-self: start; max-height: calc(100vh - var(--v8-topbar-h, 48px) - 24px); overflow: auto; }
+}
+.dos-side { font-size: var(--v8-text-sm, 12.5px); min-width: 0; }
+.dos-back { display: inline-block; margin-bottom: var(--v8-space-4, 12px); color: var(--v8-fg-muted, #565d6a); text-decoration: none; }
+.dos-back:hover { color: var(--v8-accent, #3653d3); }
+.dos-toc summary { cursor: pointer; font-weight: 600; color: var(--v8-fg, #15171c); margin-bottom: 6px; }
+.dos-toc ol { margin: 0 0 var(--v8-space-5, 16px); padding-left: 1.3em; }
+.dos-toc li { margin: 3px 0; }
+.dos-toc a { color: var(--v8-fg-muted, #565d6a); text-decoration: none; }
+.dos-toc a:hover { color: var(--v8-accent, #3653d3); }
+.dos-toc-miss {
+  display: inline-block; margin-left: 6px; min-width: 16px; padding: 0 4px; border-radius: 8px; font-size: 10px; text-align: center;
+  color: var(--v8-missing, #7a5a1c); background: var(--v8-missing-hatch), var(--v8-missing-bg, #faf5ea);
+}
+.dos-exports { display: flex; flex-wrap: wrap; gap: 6px; margin: var(--v8-space-3, 8px) 0; }
+.dos-side-meta { color: var(--v8-fg-subtle, #858b96); font-size: var(--v8-text-2xs, 10.5px); line-height: 1.5; overflow-wrap: anywhere; }
+.dos-main { min-width: 0; }
+.dos-loading { max-width: 760px; display: grid; gap: 12px; }
+
+/* ---------------------------------------------------------------- the document */
+.dos-doc {
+  max-width: 780px; background: var(--dos-paper); color: var(--v8-fg, #15171c);
+  border: 1px solid var(--v8-border, #e2e4e8); border-radius: var(--v8-radius-lg, 10px);
+  padding: clamp(18px, 4vw, 52px) clamp(16px, 5vw, 60px);
+  font-family: var(--dos-serif); font-size: 17px; line-height: 1.65;
+}
+.dos-kicker { font-family: var(--v8-font-sans, system-ui); font-size: var(--v8-text-xs, 11.5px); text-transform: uppercase; letter-spacing: .08em; color: var(--v8-accent, #3653d3); font-weight: 600; }
+.dos-kicker a { color: inherit; text-transform: none; letter-spacing: 0; font-weight: 500; }
+.dos-title { font-family: var(--dos-serif); font-size: clamp(28px, 4.2vw, 40px); line-height: 1.12; margin: 6px 0 4px; letter-spacing: -.01em; }
+.dos-subtitle { margin: 0; color: var(--v8-fg-muted, #565d6a); font-style: italic; }
+.dos-meta { font-family: var(--v8-font-sans, system-ui); font-size: var(--v8-text-xs, 11.5px); color: var(--v8-fg-subtle, #858b96); border-top: 1px solid var(--v8-border, #e2e4e8); padding-top: 8px; margin: 12px 0 6px; }
+.dos-legend-line { display: flex; flex-wrap: wrap; gap: 6px 12px; font-family: var(--v8-font-sans, system-ui); font-size: var(--v8-text-2xs, 10.5px); margin: 0 0 var(--v8-space-6, 24px); }
+.dos-legend-line .dos-v { font-weight: 600; }
+
+.dos-essentiel { background: var(--v8-surface-2, #f1f2f4); border-left: 3px solid var(--v8-accent, #3653d3); padding: 12px 18px; margin: 0 0 var(--v8-space-6, 24px); border-radius: 0 var(--v8-radius, 6px) var(--v8-radius, 6px) 0; }
+.dos-essentiel h2 { font-family: var(--v8-font-sans, system-ui); font-size: var(--v8-text-xs, 11.5px); text-transform: uppercase; letter-spacing: .08em; margin: 0 0 4px; border: 0; padding: 0; }
+.dos-essentiel ul { margin: 0; padding-left: 1.1em; }
+.dos-essentiel li { margin: 4px 0; }
+
+.dos-section { margin-top: var(--v8-space-7, 32px); scroll-margin-top: calc(var(--v8-topbar-h, 48px) + 12px); }
+.dos-section h2 { font-family: var(--dos-serif); font-size: 23px; line-height: 1.25; margin: 0 0 6px; padding-top: 10px; border-top: 2px solid var(--v8-fg, #15171c); }
+.dos-lede { color: var(--v8-fg-muted, #565d6a); font-style: italic; margin: 0 0 10px; font-size: 16px; }
+.dos-p { margin: 0 0 12px; hyphens: auto; }
+.dos-list-title { font-family: var(--v8-font-sans, system-ui); font-size: var(--v8-text-sm, 12.5px); font-weight: 600; margin: 14px 0 4px; color: var(--v8-fg-muted, #565d6a); }
+.dos-list ul { margin: 0 0 10px; padding-left: 1.2em; }
+.dos-list li { margin: 3px 0; }
+.dos-more { color: var(--v8-fg-subtle, #858b96); font-style: italic; list-style: none; margin-left: -1.2em; font-size: 15px; }
+
+/* values: honesty kinds */
+.dos-v-wrap { white-space: normal; }
+.dos-v { font-weight: 600; font-variant-numeric: tabular-nums; }
+.dos-v-label, .dos-v-claim { font-weight: inherit; }
+.dos-v-estimate { color: var(--v8-estimate, #0b7a70); }
+.dos-v-projection, .dos-v-forecast { color: var(--v8-projection, #7c3fc4); text-decoration: underline dashed 1px; text-underline-offset: 3px; }
+.dos-v-scenario { color: var(--v8-scenario, #b35400); text-decoration: underline dashed 1px; text-underline-offset: 3px; }
+.dos-v-derived { text-decoration: underline dotted 1px; text-underline-offset: 3px; }
+.dos-v-link { color: inherit; text-decoration: underline solid 1px color-mix(in srgb, var(--v8-accent, #3653d3) 45%, transparent); text-underline-offset: 3px; }
+.dos-v-link:hover { color: var(--v8-accent, #3653d3); }
+.dos-miss {
+  font-family: var(--v8-font-sans, system-ui); font-size: .82em; font-style: italic; color: var(--v8-missing, #7a5a1c);
+  background: var(--v8-missing-hatch), var(--v8-missing-bg, #faf5ea); padding: 0 5px; border-radius: 3px;
+}
+.dos-miss-inline { color: var(--v8-missing, #7a5a1c); }
+.dos-missing-block {
+  font-family: var(--v8-font-sans, system-ui); font-size: var(--v8-text-sm, 12.5px); line-height: 1.5; color: var(--v8-missing, #7a5a1c);
+  background: var(--v8-missing-hatch), var(--v8-missing-bg, #faf5ea); border: 1px dashed color-mix(in srgb, var(--v8-missing, #7a5a1c) 40%, transparent);
+  padding: 7px 10px; border-radius: var(--v8-radius, 6px); margin: 8px 0;
+}
+
+/* footnote chips */
+.dos-fn { position: relative; display: inline-block; vertical-align: super; line-height: 0; margin-left: 1px; }
+.dos-fn-chip {
+  font: 600 9.5px/1 var(--v8-font-sans, system-ui); cursor: pointer; padding: 2px 3px; min-width: 14px;
+  border: 0; border-radius: 3px; background: var(--v8-accent-soft, #e9edfd); color: var(--v8-accent, #3653d3);
+}
+.dos-fn-chip.dos-fn-nc { background: var(--v8-licence-bg, #fdeee6); color: var(--v8-licence, #9a3412); }
+.dos-fn-chip.dos-fn-lic { box-shadow: inset 0 -1.5px 0 var(--v8-licence, #9a3412); }
+.dos-fn-chip:focus-visible { outline: 2px solid var(--v8-focus, #3653d3); outline-offset: 1px; }
+.dos-fn-pop {
+  display: none; position: absolute; z-index: var(--v8-z-popover, 40); left: 50%; transform: translateX(-50%); top: 14px;
+  width: min(360px, 86vw); padding: 10px 12px; text-align: left; white-space: normal;
+  font: 12px/1.45 var(--v8-font-sans, system-ui); color: var(--v8-fg, #15171c);
+  background: var(--v8-surface, #fff); border: 1px solid var(--v8-border-strong, #c8ccd3); border-radius: var(--v8-radius, 6px); box-shadow: var(--v8-shadow-lg, 0 8px 24px rgba(0,0,0,.16));
+}
+.dos-fn:hover .dos-fn-pop, .dos-fn-chip:focus-visible + .dos-fn-pop, .dos-fn-pinned .dos-fn-pop { display: block; }
+.dos-fn-row { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 6px; margin: 2px 0; }
+.dos-fn-k { color: var(--v8-fg-subtle, #858b96); }
+.dos-fn-v { overflow-wrap: anywhere; }
+.dos-fn-all { display: inline-block; margin-top: 6px; font-size: 11px; color: var(--v8-accent, #3653d3); }
+
+/* tables */
+.dos-table-box { overflow-x: auto; margin: 8px 0 16px; }
+.dos-table { border-collapse: collapse; width: 100%; font-family: var(--v8-font-sans, system-ui); font-size: var(--v8-text-sm, 12.5px); line-height: 1.45; }
+.dos-table caption { text-align: left; font-family: var(--dos-serif); font-style: italic; color: var(--v8-fg-muted, #565d6a); font-size: 14px; padding-bottom: 4px; }
+.dos-table th { text-align: left; font-weight: 600; border-bottom: 1.5px solid var(--v8-fg, #15171c); padding: 5px 8px; white-space: nowrap; }
+.dos-table td { border-bottom: 1px solid var(--v8-border, #e2e4e8); padding: 5px 8px; vertical-align: top; }
+.dos-table .dos-num { text-align: right; font-variant-numeric: tabular-nums; }
+.dos-note { font-size: 14px; color: var(--v8-fg-muted, #565d6a); font-style: italic; }
+
+/* charts */
+.dos-chart { margin: 12px 0 20px; }
+.dos-chart-box { position: relative; }
+.dos-chart svg { display: block; width: 100%; height: auto; }
+.dos-grid { stroke: var(--v8-border, #e2e4e8); stroke-width: 1; }
+.dos-tick { font: 10px var(--v8-font-sans, system-ui); fill: var(--v8-fg-subtle, #858b96); }
+.dos-cross { stroke: var(--v8-fg-subtle, #858b96); stroke-dasharray: 2 3; }
+.dos-chart-tip {
+  position: absolute; top: 4px; transform: translateX(-50%); pointer-events: none; z-index: 2;
+  display: flex; flex-direction: column; gap: 1px; padding: 6px 8px; min-width: 120px; max-width: 280px;
+  font: 11.5px/1.35 var(--v8-font-sans, system-ui); background: var(--v8-surface, #fff); border: 1px solid var(--v8-border-strong, #c8ccd3);
+  border-radius: var(--v8-radius-sm, 4px); box-shadow: var(--v8-shadow, 0 2px 8px rgba(0,0,0,.1));
+}
+.dos-chart-tip i, .dos-legend-item i { display: inline-block; width: 10px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 3px; }
+.dos-legend-item i.dos-dashed { background-image: linear-gradient(90deg, transparent 50%, var(--v8-surface, #fff) 50%) !important; background-size: 4px 3px; }
+.dos-chart figcaption { font: 12.5px/1.5 var(--v8-font-sans, system-ui); color: var(--v8-fg, #15171c); margin-top: 4px; }
+.dos-legend { display: inline-flex; flex-wrap: wrap; gap: 4px 12px; margin-left: 8px; }
+.dos-legend-item { white-space: nowrap; }
+.dos-kind { margin-left: 4px; font-size: 10.5px; padding: 0 5px; border-radius: 8px; }
+.dos-kind-projection, .dos-kind-forecast { color: var(--v8-projection, #7c3fc4); background: var(--v8-projection-bg, #f2eafb); }
+.dos-kind-scenario { color: var(--v8-scenario, #b35400); background: var(--v8-scenario-bg, #fdf0e1); }
+.dos-kind-estimate { color: var(--v8-estimate, #0b7a70); background: var(--v8-estimate-bg, #e2f4f1); }
+.dos-kind-derived { color: var(--v8-fg-muted, #565d6a); background: var(--v8-surface-2, #f1f2f4); }
+.dos-muted { color: var(--v8-fg-muted, #565d6a); }
+
+/* closing sections */
+.dos-notcovered ul { padding-left: 1.1em; }
+.dos-notcovered li { margin: 4px 0; font-size: 15.5px; }
+.dos-rules { font-size: 15px; color: var(--v8-fg-muted, #565d6a); padding-left: 1.1em; }
+.dos-lic-warn { font-family: var(--v8-font-sans, system-ui); font-size: var(--v8-text-sm, 12.5px); color: var(--v8-licence, #9a3412); background: var(--v8-licence-bg, #fdeee6); padding: 6px 10px; border-radius: var(--v8-radius, 6px); }
+.dos-sources ol { font-family: var(--v8-font-sans, system-ui); font-size: var(--v8-text-xs, 11.5px); line-height: 1.5; color: var(--v8-fg-muted, #565d6a); padding-left: 2.2em; }
+.dos-sources li { margin: 3px 0; overflow-wrap: anywhere; scroll-margin-top: calc(var(--v8-topbar-h, 48px) + 12px); }
+.dos-sources li:target { background: var(--v8-accent-soft, #e9edfd); }
+
+@media (max-width: 640px) {
+  .dos-doc { font-size: 16px; border-radius: 0; border-left: 0; border-right: 0; }
+  .dos-section h2 { font-size: 20px; }
+  .dos-toc:not([open]) { margin-bottom: 8px; }
+}
+
+@media print {
+  .dos-side, .dos-fn-pop, .dos-legend-line { display: none !important; }
+  .dos-layout { display: block; }
+  .dos-doc { border: 0; padding: 0; max-width: none; }
+  .dos-fn-chip { background: none; padding: 0; }
+}

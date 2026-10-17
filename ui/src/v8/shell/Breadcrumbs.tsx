@@ -4,6 +4,13 @@ import { featureForPath, type DiscoveredFeature } from './discovery';
 
 export const TITLE_SUFFIX = 'REVA V8';
 
+let shellTitle: string | null = null;
+/** The shell's default title for a route; a feature naming its page (document.title = 'France · Fiche') overrides it. */
+export function setShellTitle(t: string): void {
+  shellTitle = t;
+  document.title = t;
+}
+
 export interface Crumb {
   label: string;
   to: string | null;
@@ -45,6 +52,7 @@ export function useTitleLabel(): string | null {
     mo.observe(el, { childList: true, characterData: true, subtree: true });
     return () => mo.disconnect();
   }, []);
+  if (t === shellTitle) return null;
   const first = t.split(' · ')[0]?.trim() ?? '';
   return first && first !== TITLE_SUFFIX && first !== 'REVA World' ? first : null;
 }

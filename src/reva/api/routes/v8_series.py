@@ -21,6 +21,7 @@ from reva.api.routes.atlas import ORIGIN_Q, SNAPSHOT_Q, _catalog, _headlines, _l
 from reva.atlas.query import AtlasQuery
 from reva.kernel.errors import ValidationProblem
 from reva.v8.series import service as svc
+from reva.v8.series.core import fold, parse_indicator
 from reva.v8.series.index import SeriesIndex, index_for
 from reva.v8.series.vintages import has_vintages, vintages_for
 
@@ -182,10 +183,9 @@ def catalog(
     for h in res["concepts"]:
         c = h.concept
         prim = idx.primary_series(c)
-        meas, dims = (None, ())
+        meas: str | None = None
+        dims: tuple[tuple[str, str], ...] = ()
         if prim:
-            from reva.v8.series.core import parse_indicator
-
             meas, dims = parse_indicator(prim[2])
         hits.append(
             CatalogHit(
@@ -215,8 +215,9 @@ def catalog(
             CatalogHit(
                 kind="measure",
                 id=f"{m.table}:{m.measure}",
-                label=(concept.labels.get("fr") or concept.labels.get("en")) if concept else m.measure,
-                sublabel=f"{m.table} · {m.measure}" + (f" · {len(m.variants)} variantes" if len(m.variants) > 1 else ""),
+                label=((concept.labels.get("fr") or concept.labels.get("en")) if concept else None) or m.measure,
+                sublabel=f"{m.table} · {m.measure}"
+                + (f" · {len(m.variants)} variantes" if len(m.variants) > 1 else ""),
                 table=m.table,
                 measure=m.measure,
                 filters=[{"key": k, "value": val} for k, val in v.dims],
@@ -251,8 +252,6 @@ def table(
     t = idx.tables.get(table)
     if t is None:
         raise ValidationProblem("table not in this atlas snapshot", table=table)
-    from reva.v8.series.core import fold
-
     needle = fold(q)
     ms = [m for m in t.measures.values() if not needle or needle in m.folded]
     ms.sort(key=lambda m: m.measure)
@@ -287,7 +286,7 @@ def measure(
     m = idx.measure(table, measure)
     if m is None:
         raise ValidationProblem("unknown table/measure in this snapshot", table=table, measure=measure[:120])
-    sid, src, ds, ind = svc.resolve(idx, table=table, measure=measure, filters=_filters(f))
+    _sid, src, ds, ind = svc.resolve(idx, table=table, measure=measure, filters=_filters(f))
     _cache(response)
     return MeasureResponse(
         table=table,
@@ -330,7 +329,11 @@ def map_slice(
             )
         )
     return MapResponse(
-        data=data, snapshot=_snap(aq), notes=[NOTE], warnings=warnings, took_ms=round((time.perf_counter() - t0) * 1000, 1)
+        data=data,
+        snapshot=_snap(aq),
+        notes=[NOTE],
+        warnings=warnings,
+        took_ms=round((time.perf_counter() - t0) * 1000, 1),
     )
 
 
@@ -415,8 +418,6 @@ def vintages(
     t0 = time.perf_counter()
     aq, idx = _ctx(request, origin, snapshot)
     _sid, src, ds, ind = svc.resolve(idx, series=series)
-    from reva.v8.series.core import parse_indicator
-
     meas, _dims = parse_indicator(ind)
     isos = [p.strip().upper() for x in g for p in x.split(",") if len(p.strip()) == 3]
     with read_conn(request) as conn:
@@ -425,7 +426,9 @@ def vintages(
     return VintagesResponse(
         data=data,
         snapshot=_snap(aq),
-        notes=["Millésimes tels que publiés par le fournisseur ; les projections d’un millésime restent des projections."],
+        notes=[
+            "Millésimes tels que publiés par le fournisseur ; les projections d’un millésime restent des projections."
+        ],
         took_ms=round((time.perf_counter() - t0) * 1000, 1),
     )
 

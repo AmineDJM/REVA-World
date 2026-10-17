@@ -257,6 +257,7 @@ def _timeseries_from_cells(cells: Sequence[Mapping[str, Any]]) -> dict[str, Any]
         "series": [
             {
                 "label": c0.get("concept_id"),
+                "concept": c0.get("concept_id"),
                 "unit": c0.get("unit"),
                 "iso3": c0.get("iso3") or None,
                 "source": f"{c0['citation'].get('source')}/{c0['citation'].get('dataset')}",

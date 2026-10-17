@@ -130,7 +130,7 @@ def country_series(q: Any, iso3: str) -> dict[str, Any]:
                 "last": str(c.get("year_max")),
                 "source_breaks": len(c.get("source_breaks") or []),
                 "sources_used": list(c.get("sources_used") or []),
-                "link": {"table": table, "params": {"concept": c["concept_id"], "headline": "1", "geo": iso3}}
+                "link": {"table": table, "params": {"indicator": str(ab.get("indicator")), "sel": iso3}}
                 if table
                 else None,
                 "out_of_snapshot": False,
@@ -251,7 +251,7 @@ def anchor_series(q: Any, recorded: Mapping[str, Any], spec: Mapping[str, Any], 
                 continue
             ser = concept.source_order[0]
             table, provider_geo, indicators = f"{ser.source}.{ser.dataset}", None, [ser.indicator]
-            card["link"] = {"table": table, "params": {"concept": s["catalog"]}}
+            card["link"] = {"table": table, "params": {"indicator": ser.indicator}}
         else:
             table, provider_geo, indicators = s["table"], s.get("provider_geo"), [s["indicator"]]
             card["link"] = {

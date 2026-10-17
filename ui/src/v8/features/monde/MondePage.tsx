@@ -1,9 +1,8 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router';
 import { getLocations } from '../../../api/client';
 import { memo as memoOnce, warningsFr } from '../../../v3/api/common';
 import { LicenceList } from '../../../v3/components/Licence';
-import { v8Links } from '../../contract';
 import { Badge, EmptyState, ErrorState, MissingValue, Skeleton, SourceChip, VirtualTable, frValue, toNumber, type ColumnDef } from '../../shell/ui';
 import { getMap, type MapData, type MapResponse, type Point, type Rights, type Selector } from './api';
 import { FilterBar, IndicatorPicker } from './IndicatorPicker';
@@ -488,7 +487,10 @@ function Legend({ d, rows, mode }: { d: MapData; rows: { color: string; label: s
           </li>
         )}
       </ul>
-      <p className="v8m-legend-mode v8-muted">Classes : {mode} des valeurs observées de la période. La couleur ne porte que la classe ; la valeur exacte est au survol et dans le classement.</p>
+      <p className="v8m-legend-mode v8-muted">
+        Classes : {mode} des valeurs {(d.counts.observed ?? 0) > 0 ? 'observées' : 'projetées'} de la période{(d.counts.observed ?? 0) > 0 && (d.counts.projection ?? 0) > 0 ? ' (les projections sont placées dans ces classes sans les définir)' : ''}. La couleur ne porte que la
+        classe ; la valeur exacte est au survol et dans le classement.
+      </p>
       {byReason.size > 0 && (
         <ul className="v8m-legend-miss">
           {[...byReason.entries()]
@@ -595,11 +597,6 @@ function Ranking({ d, nameOf, sel, onSel, level }: { d: MapData; nameOf: (iso: s
         isRowActive={(r) => r.geo === sel}
         empty={<EmptyState title="Aucune valeur pour cette période" compact />}
       />
-      {sel && level === 'adm0' && (
-        <p className="v8m-rank-foot">
-          <Link to={v8Links.entity('country', sel)}>Fiche {nameOf(sel)} →</Link>
-        </p>
-      )}
     </section>
   );
 }

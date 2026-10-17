@@ -176,7 +176,16 @@ class DomainComposer:
             )
         for fam, label, count, items, lower in d.get("fam_groups") or []:
             reading = items[0][0].reading.get(self.lang) or items[0][0].reading.get("en") or label.get(self.lang, fam)
-            subject = items[0][0].statement.subject_label(self.lang) if not items[0][0].inverse else None
+            n0 = items[0][0]
+            st0 = n0.statement
+            if n0.inverse:
+                subject = None
+            elif st0.subject_qid == n0.neighbour.qid and st0.object_qid:
+                # the statement was read against its direction (water ← « part of » — hydrogen): its object is the
+                # subject of the reading (V8ASK fix: the neighbour was named as the subject)
+                subject = st0.object_label(self.lang)
+            else:
+                subject = st0.subject_label(self.lang)
             who = self.entity(e) if subject is None else subject
             caveat = NON_CAUSAL_NOTE.get(fam)
             tail = f" — {caveat[0] if self.fr() else caveat[1]}" if caveat else ""
@@ -256,6 +265,22 @@ class DomainComposer:
     def op_kg_cross(self, res: Any) -> None:
         d, op = res.data, res.op
         a, b = d["a"], d["b"]
+        if d.get("answered_by") is not None:
+            ch, br = d["chosen"], d.get("bridge")
+            text = (
+                bridge_sentence(self.lang, ch, a, br["lang"], br["label"], "relation")
+                if br
+                else same_rule_sentence(self.lang, ch, a, d.get("match"), "relation")
+                or self._t(
+                    f"Rien de chargé sur {self.entity(ch)} ({ch.qid}) pour cette relation ; réponse lue sur "
+                    f"{self.entity(a)} ({a.qid}), autre fiche au même libellé dans l'index du graphe (fiches non "
+                    f"fusionnées).",
+                    f"Nothing loaded on {self.entity(ch)} ({ch.qid}) for this relation; answer read on "
+                    f"{self.entity(a)} ({a.qid}), another record with the same label in the graph index (records "
+                    f"not merged).",
+                )
+            )
+            self.add(text, [d.get("answered_by_eid") or ""], "identification", op.id)
         rows = d["cross_rows"]
         items = []
         for row, _ea, _eb in rows[:MAX_LISTED]:

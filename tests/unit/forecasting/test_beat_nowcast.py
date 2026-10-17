@@ -26,7 +26,9 @@ def _cells(rows: list[dict[str, object]]) -> pl.DataFrame:
     return pl.DataFrame([{**base, **r} for r in rows], schema=CELL_SCHEMA)
 
 
-def _vcell(var: str, vint: str, ps: date, value: float, av: datetime, family: str = "philfed_rtdsm_monthly") -> dict[str, object]:
+def _vcell(
+    var: str, vint: str, ps: date, value: float, av: datetime, family: str = "philfed_rtdsm_monthly"
+) -> dict[str, object]:
     return {"dataset_key": "atlas.fed_nowcasts.rtdsm_monthly", "family": family, "variable": "x", "provider_variable": var,
             "indicator": f"{var}|v={vint}", "provider_geo": "USA", "iso3": "USA", "period_start": ps,
             "period_end": ps + timedelta(days=28), "vintage": vint, "available_at": av,
@@ -85,7 +87,7 @@ def test_daily_series_lag() -> None:
     mm = s.month_mean(D.mi_of(date(2020, 1, 1)), cut)
     assert mm is not None and mm[1] == 12
     ref = s.ref(cut)
-    assert ref is not None and ref.source_available_at <= cut
+    assert ref is not None and ref.source_available_at is not None and ref.source_available_at <= cut
 
 
 def _case(task: str, target: date, pub: date, y: float | None, off: float, bridge: float, known: date) -> Case:

@@ -268,12 +268,26 @@ def _status(cnt: Counter[str], weak_only: bool) -> str:
     return "en_attente"
 
 
+_SHA_CACHE: dict[tuple[str, float, int], str | None] = {}
+
+
+def _sha_cached(root: Path, rel: str) -> str | None:
+    p = root / rel
+    try:
+        st = p.stat()
+    except OSError:
+        return None
+    key = (str(p), st.st_mtime, st.st_size)
+    if key not in _SHA_CACHE:
+        _SHA_CACHE[key] = hashlib.sha256(p.read_bytes()).hexdigest()
+    return _SHA_CACHE[key]
+
+
 def stale_sources(doc: Mapping[str, Any], root: Path = REPO) -> list[dict[str, Any]]:
     """Source files whose bytes changed since the build (the rows may no longer match: rebuild)."""
-    f = _Files(root)
     out = []
     for s in doc.get("sources", []):
-        now = f.sha(s["file"])
+        now = _sha_cached(root, s["file"])
         if now != s["sha256"]:
             out.append({"file": s["file"], "built_sha256": s["sha256"], "current_sha256": now})
     return out

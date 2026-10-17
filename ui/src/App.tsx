@@ -24,9 +24,12 @@ const RunsPage = lazy(() => import('./pages/RunsPage'));
 const RunPage = lazy(() => import('./pages/RunPage'));
 const V3App = lazy(() => import('./v3/V3App'));
 // V8 console: its own frame (no V1 header), own chunk; features are discovered under src/v8/features/.
-const V8Root = lazy(() => import('./v8/shell/V8Root'));
+const loadV8 = () => import('./v8/shell/V8Root');
+const V8Root = lazy(loadV8);
 
 const isV8 = (pathname: string) => pathname === '/v8' || pathname.startsWith('/v8/');
+// Landing on /v8: fetch the console chunk in parallel with the session check (no waterfall).
+if (typeof window !== 'undefined' && isV8(window.location.pathname)) void loadV8().catch(() => undefined);
 
 const NAV = [
   { to: '/world', label: 'World' },

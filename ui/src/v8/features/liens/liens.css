@@ -557,3 +557,8 @@
   gap: 4px;
   margin: 0 0 8px;
 }
+.lien-nodecard-actions a.v8-btn-primary,
+.lien-nodecard-actions a.v8-btn-primary:hover {
+  color: var(--v8-fg-on-accent, #fff);
+  text-decoration: none;
+}

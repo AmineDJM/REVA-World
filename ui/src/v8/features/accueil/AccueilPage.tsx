@@ -6,13 +6,23 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { v8Links } from '../../contract';
-import { Badge, EmptyState, ErrorState, KeyHint, Panel, Skeleton, SourceChip, frCompact, useUrlParam } from '../../shell/ui';
+import { Badge, EmptyState, ErrorState, KeyHint, Panel, Skeleton, SourceChip, useUrlParam } from '../../shell/ui';
 import { classifyV3Error } from '../../../v3/api/common';
 import { useApi } from '../../../lib/useApi';
 import { listBoardsForPin, onPinned } from '../tableaux/pin';
 import { getCalendar, getChanges, getCoverage, getDecisions, type ChangeItem, type DecisionItem } from './api';
-import { asWindow, countsFr, dateFr, daysUntil, groupByDay, KIND_ORDER, kindFr, relDays, sinceFor, timeFr, verdictOf, WINDOW_FR, WINDOWS, type WindowKey } from './model';
+import { asWindow, countsFr, DEFAULT_FEED_KINDS, dateFr, daysUntil, groupByDay, KIND_ORDER, kindFr, relDays, sinceFor, timeFr, verdictOf, WINDOW_FR, WINDOWS, type WindowKey } from './model';
 import './accueil.css';
+
+/** 93 495 663 → "93,5 M" (one decimal below 100 units, so the glance strip keeps the order of magnitude AND the digit). */
+export function compactFr(n: number): string {
+  const a = Math.abs(n);
+  const f = (v: number, u: string) => `${v.toLocaleString('fr-FR', { maximumFractionDigits: v < 100 ? 1 : 0 })} ${u}`;
+  if (a >= 1e9) return f(n / 1e9, 'Md');
+  if (a >= 1e6) return f(n / 1e6, 'M');
+  if (a >= 1e4) return f(n / 1e3, 'k');
+  return n.toLocaleString('fr-FR');
+}
 
 function isTyping(t: EventTarget | null): boolean {
   const el = t as HTMLElement | null;
@@ -106,8 +116,8 @@ function Glance() {
   const covWhy = cov.status === 'error' ? `${classifyV3Error(cov.error).title} : agrégats de couverture (/v1/v8/coverage)` : undefined;
   return (
     <section className="v8a-glance" aria-label="Couverture en bref">
-      {tile('Atlas', m ? frCompact(m.atlas_rows) : null, m ? `${m.atlas_tables.toLocaleString('fr-FR')} tables · ${m.places} lieux` : 'tables · lignes', cov.status, '/v8/couverture', covWhy)}
-      {tile('Graphe', m ? (m.kg_computed ? frCompact(m.kg_statements) : null) : null, m ? `${frCompact(m.kg_entities)} entités · déclarations` : 'entités · déclarations', cov.status, '/v8/couverture', covWhy ?? (m && !m.kg_computed ? 'non calculé' : undefined))}
+      {tile('Atlas', m ? compactFr(m.atlas_rows) : null, m ? `${m.atlas_tables.toLocaleString('fr-FR')} tables · ${m.places} lieux` : 'tables · lignes', cov.status, '/v8/couverture', covWhy)}
+      {tile('Graphe', m ? (m.kg_computed ? compactFr(m.kg_statements) : null) : null, m ? `${compactFr(m.kg_entities)} entités · déclarations` : 'entités · déclarations', cov.status, '/v8/couverture', covWhy ?? (m && !m.kg_computed ? 'non calculé' : undefined))}
       {tile(
         'Prévisions scellées',
         totals ? totals.questions.toLocaleString('fr-FR') : null,
@@ -196,7 +206,8 @@ function Changes() {
   const w: WindowKey = asWindow(win);
   const since = useMemo(() => sinceFor(w), [w]);
   const [extra, setExtra] = useState<{ items: ChangeItem[]; cursor: string | null } | null>(null);
-  const st = useApi((s) => getChanges({ since, limit: 100, ...(kind ? { kinds: kind } : {}) }, s), [since, kind]);
+  const kindsParam = kind || DEFAULT_FEED_KINDS.join(',');
+  const st = useApi((s) => getChanges({ since, limit: 100, kinds: kindsParam }, s), [since, kindsParam]);
   useEffect(() => setExtra(null), [since, kind]);
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -217,13 +228,18 @@ function Changes() {
   const data = st.status === 'ok' ? st.data : null;
   const items = data ? [...data.items, ...(extra?.items ?? [])] : [];
   const cursor = extra ? extra.cursor : (data?.next_cursor ?? null);
-  const counts = data?.counts ?? {};
+  // counts per kind come from the unfiltered request (a filtered request only counts its own kind)
+  const fullCounts = useRef<{ since: string; counts: Record<string, number> } | null>(null);
+  if (data && !kind) fullCounts.current = { since, counts: data.counts };
+  const counts = (fullCounts.current?.since === since ? fullCounts.current.counts : null) ?? data?.counts ?? {};
   const kinds = KIND_ORDER.filter((k) => (counts[k] ?? 0) > 0 || k === kind).concat(Object.keys(counts).filter((k) => !KIND_ORDER.includes(k) && (counts[k] ?? 0) > 0));
-  const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  const total = Object.entries(counts)
+    .filter(([k]) => k !== 'owner_decision')
+    .reduce((a, [, b]) => a + b, 0);
 
   const loadMore = async () => {
     if (!cursor) return;
-    const r = await getChanges({ since, limit: 100, cursor, ...(kind ? { kinds: kind } : {}) });
+    const r = await getChanges({ since, limit: 100, cursor, kinds: kindsParam });
     setExtra((x) => ({ items: [...(x?.items ?? []), ...r.items], cursor: r.next_cursor }));
   };
 
@@ -247,6 +263,7 @@ function Changes() {
         <div className="v8a-chips" role="group" aria-label="Filtrer par type">
           <button type="button" className={`v8a-chip${kind === '' ? ' is-on' : ''}`} aria-pressed={kind === ''} onClick={() => setKind('', { replace: false })}>
             Tout <span className="v8-num">{total.toLocaleString('fr-FR')}</span>
+            {(counts.owner_decision ?? 0) > 0 && <span className="v8-sr-only"> (hors décisions du propriétaire, listées à part)</span>}
           </button>
           {kinds.map((k) => (
             <button key={k} type="button" className={`v8a-chip v8a-chip-${k}${kind === k ? ' is-on' : ''}`} aria-pressed={kind === k} onClick={() => setKind(kind === k ? '' : k, { replace: false })}>

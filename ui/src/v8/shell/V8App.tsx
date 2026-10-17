@@ -1,7 +1,7 @@
 import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router';
 import type { PaletteProvider } from '../contract';
-import { Breadcrumbs, TITLE_SUFFIX } from './Breadcrumbs';
+import { Breadcrumbs, setShellTitle, TITLE_SUFFIX } from './Breadcrumbs';
 import { FeatureBoundary } from './Boundary';
 import { featureForPath, navFeatures, type DiscoveredFeature } from './discovery';
 import { HealthIndicator } from './Health';
@@ -85,7 +85,7 @@ export function V8App({ features, problems = [], username, onLogout, defaultProv
   // Default title per route (layout effect: a feature's own useEffect title wins).
   const current = featureForPath(features, pathname);
   useLayoutEffect(() => {
-    document.title = current ? `${current.title} · ${TITLE_SUFFIX}` : `Console · ${TITLE_SUFFIX}`;
+    setShellTitle(current ? `${current.title} · ${TITLE_SUFFIX}` : `Console · ${TITLE_SUFFIX}`);
   }, [pathname, current]);
   useEffect(() => {
     window.scrollTo?.(0, 0);

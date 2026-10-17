@@ -32,7 +32,7 @@ export async function fallbackSearch(q: string, signal: AbortSignal): Promise<Pa
       out.push({
         id: `kg:${h.qid}`,
         label: entityLabel(h),
-        sublabel: [KIND_FR[kind] ?? kind, h.qid].join(' · '),
+        sublabel: [KIND_FR[kind] ?? kind, h.qid, h.origin === 'test_fixture' ? 'donnée de test' : null].filter(Boolean).join(' · '),
         href: v8Links.entity(kind, h.qid),
         group: kind === 'country' || kind === 'region' ? 'Pays & régions' : 'Entités',
       });

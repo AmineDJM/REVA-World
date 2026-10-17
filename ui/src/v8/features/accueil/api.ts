@@ -18,19 +18,21 @@ const Int = z.number().int();
  * One request shared by the panels that need the same read during one page view (the glance strip and the
  * panels): the promise is reused for `ttlMs`; a failure is not kept. Callers' abort signals do not cancel it.
  */
-export function shared<T>(fn: () => Promise<T>, ttlMs = 15_000): () => Promise<T> {
+export function shared<T>(fn: () => Promise<T>, ttlMs = 15_000): (() => Promise<T>) & { reset: () => void } {
   let p: Promise<T> | null = null;
   let at = 0;
-  return () => {
+  const get = () => {
     if (!p || Date.now() - at > ttlMs) {
       at = Date.now();
-      p = fn();
-      p.catch(() => {
-        p = null;
+      const mine = fn();
+      p = mine;
+      mine.catch(() => {
+        if (p === mine) p = null;
       });
     }
     return p;
   };
+  return Object.assign(get, { reset: () => void (p = null) });
 }
 
 export const ChangeItem = z.looseObject({
@@ -54,12 +56,14 @@ export const ChangesData = z.looseObject({
   until: z.string().nullish(),
   items: z.array(ChangeItem),
   counts: z.record(z.string(), Int).nullish().transform((v) => v ?? {}),
+  kind_labels: z.record(z.string(), z.string()).nullish(),
+  next_cursor: z.string().nullish(),
 });
-export type ChangesData = z.output<typeof ChangesData> & { next_cursor: string | null };
+export type ChangesData = Omit<z.output<typeof ChangesData>, 'next_cursor'> & { next_cursor: string | null };
 
 export async function getChanges(q: { since?: string; kinds?: string; limit?: number; cursor?: string }, signal?: AbortSignal): Promise<ChangesData> {
   const r = await v3get('/v1/v8/changes', envelopeOf(ChangesData), { ...q }, signal);
-  return { ...r.data, next_cursor: r.next_cursor ?? null };
+  return { ...r.data, next_cursor: r.data.next_cursor ?? r.next_cursor ?? null };
 }
 
 // ------------------------------------------------------------------ calendar

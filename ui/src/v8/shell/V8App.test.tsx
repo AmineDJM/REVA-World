@@ -99,3 +99,24 @@ describe('V8App shell', () => {
     expect(await screen.findByText('Données prêtes')).toBeInTheDocument();
   });
 });
+
+describe('breadcrumb page label', () => {
+  it('uses the feature title of the page, never the shell default', async () => {
+    globalThis.fetch = vi.fn(async () => new Response('{}', { status: 200 })) as typeof fetch;
+    render(
+      <MemoryRouter initialEntries={['/v8/nexiste/pas/FRA']}>
+        <Routes>
+          <Route path="/v8/*" element={<V8App features={features} defaultProvider={null} />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    const crumbs = screen.getByRole('navigation', { name: 'Fil d’Ariane' });
+    expect(crumbs).toHaveTextContent('FRA');
+    expect(crumbs.querySelector('[aria-current=page]')).toHaveTextContent('FRA');
+    await act(async () => {
+      document.title = 'France · Fiche';
+      await new Promise((r) => setTimeout(r, 10));
+    });
+    expect(crumbs.querySelector('[aria-current=page]')).toHaveTextContent('France');
+  });
+});

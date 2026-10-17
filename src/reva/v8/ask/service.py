@@ -142,10 +142,32 @@ class AskService:
         )
         ans = r.as_json()
         out = B.build(ans, q, series_reader=self.reader)
+        self._label(out, ans.get("language") or "fr")
         out["latency_ms"] = round((time.perf_counter() - t0) * 1000, 1)
         out["cached"] = False
         self.cache.put(key, out)
         return out
+
+    def _label(self, out: dict[str, Any], lang: str) -> None:
+        """Catalog labels for the concept ids shown (headline, bars, series), so the page never shows a bare id."""
+
+        def lab(cid: Any) -> str | None:
+            c = self.catalog.concepts.get(str(cid)) if cid else None
+            return c.label(lang) if c is not None else None
+
+        h = out.get("headline") or {}
+        if h.get("concept"):
+            h["concept_label"] = lab(h["concept"])
+        v = out.get("viz") or {}
+        for r in v.get("rows") or []:
+            if isinstance(r, dict) and r.get("concept"):
+                r["label"] = lab(r["concept"]) or r.get("label")
+        for sr in v.get("series") or []:
+            if isinstance(sr, dict) and sr.get("concept"):
+                sr["label"] = lab(sr["concept"]) or sr.get("label")
+        for t in out.get("targets") or []:
+            if t.get("kind") in ("monde", "comparer") and t.get("label"):
+                t["label"] = lab(t["label"]) or t["label"]
 
     def brainstorm(self, target: str) -> dict[str, Any]:
         return Brainstormer(self.backends, self.catalog).run(target)

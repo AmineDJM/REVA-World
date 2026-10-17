@@ -24,32 +24,33 @@ function inline(text: string, key: string): ReactNode[] {
 }
 
 export function renderMarkdown(md: string): ReactNode[] {
-  const lines = md.replace(/\r/g, '').split('\n');
+  const src = md.replace(/\r/g, '').split('\n');
+  const lines = { length: src.length, at: (j: number): string => src[j] ?? '' };
   const out: ReactNode[] = [];
   let i = 0;
   let k = 0;
   while (i < lines.length) {
-    const line = lines[i];
+    const line = lines.at(i);
     if (line.startsWith('```')) {
       const buf: string[] = [];
       i++;
-      while (i < lines.length && !lines[i].startsWith('```')) buf.push(lines[i++]);
+      while (i < lines.length && !lines.at(i).startsWith('```')) buf.push(lines.at(i++));
       i++;
       out.push(<pre key={k++} className="sc-doc-pre">{buf.join('\n')}</pre>);
       continue;
     }
     const h = /^(#{1,4})\s+(.*)$/.exec(line);
     if (h) {
-      const level = Math.min(4, h[1].length + 1);
+      const level = Math.min(4, (h[1] ?? '#').length + 1);
       const Tag = `h${level}` as 'h2' | 'h3' | 'h4' | 'h5';
-      out.push(<Tag key={k++}>{inline(h[2], `h${k}`)}</Tag>);
+      out.push(<Tag key={k++}>{inline(h[2] ?? '', `h${k}`)}</Tag>);
       i++;
       continue;
     }
     if (line.trim().startsWith('|')) {
       const rows: string[][] = [];
-      while (i < lines.length && lines[i].trim().startsWith('|')) {
-        const cells = lines[i].trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
+      while (i < lines.length && lines.at(i).trim().startsWith('|')) {
+        const cells = lines.at(i).trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
         if (!cells.every((c) => /^:?-{2,}:?$/.test(c))) rows.push(cells);
         i++;
       }
@@ -74,10 +75,10 @@ export function renderMarkdown(md: string): ReactNode[] {
     }
     if (/^\s*([*-]|\d+\.)\s+/.test(line)) {
       const items: string[] = [];
-      while (i < lines.length && /^\s*([*-]|\d+\.)\s+/.test(lines[i])) {
-        let item = lines[i].replace(/^\s*([*-]|\d+\.)\s+/, '');
+      while (i < lines.length && /^\s*([*-]|\d+\.)\s+/.test(lines.at(i))) {
+        let item = lines.at(i).replace(/^\s*([*-]|\d+\.)\s+/, '');
         i++;
-        while (i < lines.length && /^\s{2,}\S/.test(lines[i]) && !/^\s*([*-]|\d+\.)\s+/.test(lines[i])) item += ` ${lines[i++].trim()}`;
+        while (i < lines.length && /^\s{2,}\S/.test(lines.at(i)) && !/^\s*([*-]|\d+\.)\s+/.test(lines.at(i))) item += ` ${lines.at(i++).trim()}`;
         items.push(item);
       }
       out.push(<ul key={k++}>{items.map((it, j) => <li key={j}>{inline(it, `li${k}-${j}`)}</li>)}</ul>);
@@ -88,7 +89,7 @@ export function renderMarkdown(md: string): ReactNode[] {
       continue;
     }
     const para: string[] = [];
-    while (i < lines.length && lines[i].trim() !== '' && !/^(#{1,4}\s|```|\s*\||\s*([*-]|\d+\.)\s)/.test(lines[i])) para.push(lines[i++]);
+    while (i < lines.length && lines.at(i).trim() !== '' && !/^(#{1,4}\s|```|\s*\||\s*([*-]|\d+\.)\s)/.test(lines.at(i))) para.push(lines.at(i++));
     if (para.length === 0) {
       i++;
       continue;

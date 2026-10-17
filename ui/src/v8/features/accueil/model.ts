@@ -33,12 +33,18 @@ const COUNT_FR: Record<string, [string, string]> = {
   forecasts: ['prévision', 'prévisions'],
   resolved: ['résolue', 'résolues'],
   void: ['annulée', 'annulées'],
+  revisions: ['révision', 'révisions'],
+  loads: ['lot', 'lots'],
+  retractions: ['retrait', 'retraits'],
+  graded: ['notée', 'notées'],
+  models: ['modèle', 'modèles'],
+  forecasters_scored: ['prévisionniste noté', 'prévisionnistes notés'],
 };
 
-/** "30 187 lignes · 1 table" — integers only, French grouping; unknown keys keep their name. */
+/** "30 187 lignes · 1 table" — integers only, French grouping, zeros omitted; unknown keys keep their name. */
 export function countsFr(counts: Record<string, number>): string {
   return Object.entries(counts)
-    .filter(([, n]) => Number.isFinite(n))
+    .filter(([, n]) => Number.isFinite(n) && n !== 0)
     .map(([k, n]) => {
       const w = COUNT_FR[k];
       return `${n.toLocaleString('fr-FR')} ${w ? (Math.abs(n) > 1 ? w[1] : w[0]) : k}`;
@@ -111,7 +117,11 @@ export function relDays(n: number): string {
   return n > 0 ? `dans ${n} j` : `il y a ${-n} j`;
 }
 
-/** The judged status of a resolved question as the change feed states it (never computed here). */
+/**
+ * The judged status of a resolved question as the change feed states it (never computed here): void questions say
+ * why; a resolution without a sealed official forecaster says there is no comparison; with one, the comparison is
+ * on the scoreboard (one question is not a verdict).
+ */
 export function verdictOf(it: ChangeItem): { text: string; kind: 'win' | 'loss' | 'neutral' | 'missing' } | null {
   if (it.kind !== 'question_resolved') return null;
   const d = it.detail;
@@ -121,9 +131,17 @@ export function verdictOf(it: ChangeItem): { text: string; kind: 'win' | 'loss' 
     const kind = /ne bat pas|perd|loses|worse/.test(lv) ? 'loss' : /bat|beats|better|gagne/.test(lv) ? 'win' : 'neutral';
     return { text: v, kind };
   }
+  if (d.status === 'void') return { text: `annulée${it.summary ? ` : ${it.summary.replace(/_/g, ' ')}` : ''}`, kind: 'missing' };
   if (d.official === 'absent') return { text: 'aucun prévisionniste officiel scellé : pas de comparaison', kind: 'missing' };
+  if (d.official && typeof d.official === 'object') {
+    const names = Object.keys(d.official as Record<string, unknown>);
+    if (names.length) return { text: `comparée à ${names.join(', ')} — une question n’est pas un verdict`, kind: 'neutral' };
+  }
   return null;
 }
+
+/** Kinds shown by default in the feed: owner decisions have their own panel. */
+export const DEFAULT_FEED_KINDS = KIND_ORDER.filter((k) => k !== 'owner_decision');
 
 /** Day-key of a date in YYYY-MM-DD (local), for the calendar grouping. */
 export function isoDay(d: Date): string {

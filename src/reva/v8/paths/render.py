@@ -68,10 +68,17 @@ def _resolver() -> Any:
     return default_resolver()
 
 
-def _iso3_of_qid() -> dict[str, str]:
-    from reva.kg.query import country_qid_registry
+def warm() -> None:
+    """Load the registries rendering reads (effect variable / atlas concept labels, relation families, causal
+    vocabulary and grading rules)."""
+    from reva.causal import grading as gr
+    from reva.causal.vocab import vocabulary
+    from reva.kg.family_query import registry
 
-    return {q: iso for iso, q in country_qid_registry().items()}
+    _resolver()
+    registry()
+    vocabulary()
+    gr.load_rules()
 
 
 # ---------------------------------------------------------------------------------------------- nodes

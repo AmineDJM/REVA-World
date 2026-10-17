@@ -263,7 +263,9 @@ def transform_rules(
     elif _PER_CAPITA.search(f"{context} {unit or ''}"):
         out["percap"] = TransformRule(False, "déjà rapporté à la population (ou à une surface) : pas de second calcul")
     elif kind != "extensive":
-        out["percap"] = TransformRule(False, f"unité « {unit or '?'} » non additive ou inconnue : pas de calcul par habitant")
+        out["percap"] = TransformRule(
+            False, f"unité « {unit or '?'} » non additive ou inconnue : pas de calcul par habitant"
+        )
     else:
         out["percap"] = TransformRule(True)
     return out
@@ -273,20 +275,24 @@ def transform_rules(
 
 
 def scale_hint(values: list[float]) -> str:
-    """``log`` (strictly positive and spanning > 3 orders of magnitude), ``diverging`` (both signs), ``linear``
-    (few values or near-uniform spread) or ``quantile`` (skewed). The UI may override it."""
+    """``diverging`` (both signs), ``log`` (strictly positive, right-skewed and spanning >= 2 orders of magnitude),
+    ``linear`` (few distinct values, or a near-symmetric spread) or ``quantile`` (other skewed distributions).
+    The UI may override it."""
     v = sorted(values)
     if not v:
         return "quantile"
     lo, hi = v[0], v[-1]
     if lo < 0 < hi:
         return "diverging"
-    if lo > 0 and hi / lo > 1000:
-        return "log"
     n = len(v)
     if n < 8 or len(set(v)) <= 6:
         return "linear"
+    spread = hi - lo
+    if spread <= 0:
+        return "linear"
     mean = sum(v) / n
     med = v[n // 2]
-    spread = hi - lo
-    return "linear" if spread > 0 and abs(mean - med) / spread < 0.08 else "quantile"
+    skew = (mean - med) / spread
+    if lo > 0 and hi / lo >= 100 and skew > 0.03:
+        return "log"
+    return "linear" if abs(skew) < 0.02 else "quantile"

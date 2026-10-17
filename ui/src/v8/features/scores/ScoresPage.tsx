@@ -261,7 +261,7 @@ function CalendarPanel({ items, live, onOpenTrack, onOpenDoc, today }: { items: 
           </ol>
           {overdue.length > 0 && (
             <p className="sc-footnote">
-              {overdue.reduce((a, d) => a + d.n, 0).toLocaleString('fr-FR')} questions ont une date attendue passée sans résolution encore (p. ex. {overdue[0].fams[0]}, attendue le {dayLabel(overdue[0].date)}) :
+              {overdue.reduce((a, d) => a + d.n, 0).toLocaleString('fr-FR')} questions ont une date attendue passée sans résolution encore (p. ex. {overdue[0]?.fams[0]}, attendue le {dayLabel(overdue[0]?.date ?? '')}) :
               en attente de la publication de la source.
             </p>
           )}
@@ -616,7 +616,7 @@ export default function ScoresPage() {
 }
 
 function Drawer({ cell, p, onClose, onOpenDoc, onOpenTrack }: { cell: string; p: Page; onClose: () => void; onOpenDoc: (p: string) => void; onOpenTrack: (id: string) => void }) {
-  const [targetId] = cell.split('~');
+  const targetId = cell.split('~')[0] ?? cell;
   const target = p.matrix.flatMap((d) => d.targets).find((t) => t.target === targetId);
   const c = target ? (Object.values(target.cells).find((x) => x.key === cell) ?? (target.naive?.key === cell ? target.naive : null)) : null;
   if (c?.status === 'no_track') return <NoTrackDrawer cellKey={cell} p={p} onClose={onClose} onOpenDoc={onOpenDoc} />;
@@ -626,7 +626,7 @@ function Drawer({ cell, p, onClose, onOpenDoc, onOpenTrack }: { cell: string; p:
 function ForecasterFocus({ p, f }: { p: Page; f: string }) {
   if (!f) return null;
   const fc = p.forecasters.find((x) => x.id === f);
-  const cells = p.matrix.flatMap((d) => d.targets.map((t) => t.cells[f])).filter(Boolean);
+  const cells = p.matrix.flatMap((d) => d.targets.map((t) => t.cells[f])).filter((x): x is NonNullable<typeof x> => Boolean(x));
   const c = cells.reduce<Counts>(
     (a, x) => ({ bat: a.bat + (x.counts?.bat ?? 0), ne_bat_pas: a.ne_bat_pas + (x.counts?.ne_bat_pas ?? 0), egalite: a.egalite + (x.counts?.egalite ?? 0), en_attente: a.en_attente + (x.counts?.en_attente ?? 0) }),
     { bat: 0, ne_bat_pas: 0, egalite: 0, en_attente: 0 },

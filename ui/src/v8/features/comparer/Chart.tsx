@@ -148,7 +148,7 @@ export function CompareChart({ places, xRange, annual, unit, label, syncKey, hei
     <div className="v8c-chart">
       <ul className="v8c-legend" aria-label="Légende">
         {places.map((pl) => {
-          const at = valueAt(pl.points, cursorX) ?? [...pl.points].reverse().find((q) => q.y !== null) ?? null;
+          const at = valueAt(pl.points, cursorX) ?? [...pl.points].reverse().find((q) => q.y !== null && !q.proj) ?? [...pl.points].reverse().find((q) => q.y !== null) ?? null;
           return (
             <li key={pl.iso3}>
               <span className="v8c-sw" style={{ background: pl.color }} aria-hidden="true" />

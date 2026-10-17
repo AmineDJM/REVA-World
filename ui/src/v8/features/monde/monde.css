@@ -451,8 +451,8 @@
   width: 100%;
 }
 .v8m-map {
-  position: absolute;
-  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 .v8m-map-fail {
   padding: var(--v8-space-5, 16px);
@@ -745,4 +745,8 @@
   .v8m-picker {
     max-width: none;
   }
+}
+.v8m-panel-range {
+  margin: -4px 0 0;
+  font-size: var(--v8-text-2xs, 10.5px);
 }
