@@ -1,0 +1,26 @@
+# V4 (agent V4ECON): FAO Food Price Index, World Food Situation page + monthly CSV.
+# Connector src/reva/adapters/connectors/atlas_fao_ffpi.py (atlas table fao_ffpi.ffpi_m).
+source_key: fao.ffpi
+title: FAO Food Price Index (FFPI) and commodity sub-indices, monthly nominal (2014-2016=100)
+provider_url: https://www.fao.org/worldfoodsituation/foodpricesindex/en/
+lineage_family: fao
+rights:
+  licence: "FAO website terms (non-commercial use with acknowledgement); not a CC BY 4.0 FAO corporate statistical database"
+  licence_url: https://www.fao.org/contact-us/terms/en/
+  licence_restriction: non_commercial
+  attribution: "FAO. FAO Food Price Index. https://www.fao.org/worldfoodsituation/foodpricesindex/en/"
+  terms_quote: >-
+    All other content on the FAO website (except where otherwise indicated), may be copied, printed and downloaded
+    for private study, research and teaching purposes, and for use in non-commercial products or services,
+    provided that appropriate acknowledgement of FAO as the source and copyright holder is given and that FAO's
+    endorsement of users' views, products or services is not stated or implied in any way.
+  licence_checked: "2026-10-17"
+  review: "owner decision: commercial reuse needs FAO permission (or confirmation that the FFPI falls under the CC BY 4.0 database terms)"
+metadata:
+  allowed_hosts: [www.fao.org]
+  files:
+    - https://www.fao.org/worldfoodsituation/foodpricesindex/en/
+    - https://www.fao.org/media/docs/worldfoodsituationlibraries/wfs-library/food_price_indices_data.csv
+  authentication: none
+  cadence: "monthly release (first Friday of the month, FAO release calendar on the page)"
+  editorial_status: "FAO index of international export prices of food commodity groups; revisions of recent months happen at each release"

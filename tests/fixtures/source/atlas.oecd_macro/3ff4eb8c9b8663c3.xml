@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--NSI Web Service v10.11.8.0-->
+<message:Structure xmlns:message="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" xmlns:structure="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure" xmlns:common="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common">
+  <message:Header>
+    <message:ID>IDREF7679</message:ID>
+    <message:Test>false</message:Test>
+    <message:Prepared>2026-10-17T15:47:10.5125524+02:00</message:Prepared>
+    <message:Sender id="Unknown" />
+    <message:Receiver id="Unknown" />
+  </message:Header>
+  <message:Structures>
+    <structure:Codelists>
+      <structure:Codelist isPartial="true" id="CL_REGIONAL" agencyID="OECD" version="2.8" isFinal="true">
+        <common:Name xml:lang="en">Extended codelist for reference areas and geocoding</common:Name>
+        <common:Name xml:lang="fr">Liste de codes étendue pour les zones de référence</common:Name>
+        <structure:Code id="FRA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>CTRY</common:AnnotationTitle>
+              <common:AnnotationType>COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>TL2024+TL2021</common:AnnotationTitle>
+              <common:AnnotationType>FAMILY_LABEL</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">4950</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">9470</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">France</common:Name>
+          <common:Name xml:lang="fr">France</common:Name>
+        </structure:Code>
+        <structure:Code id="FR1">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>TL2</common:AnnotationTitle>
+              <common:AnnotationType>COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>TL2024+TL2021</common:AnnotationTitle>
+              <common:AnnotationType>FAMILY_LABEL</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">4955</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">9475</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Île-de-France</common:Name>
+          <common:Name xml:lang="fr">Île-de-France</common:Name>
+          <structure:Parent>
+            <Ref id="FRA" />
+          </structure:Parent>
+        </structure:Code>
+        <structure:Code id="FR10">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>NOG</common:AnnotationTitle>
+              <common:AnnotationType>COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>TL2024+TL2021</common:AnnotationTitle>
+              <common:AnnotationType>FAMILY_LABEL</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">4960</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">9480</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Île-de-France</common:Name>
+          <common:Name xml:lang="fr">Île-de-France</common:Name>
+          <structure:Parent>
+            <Ref id="FR1" />
+          </structure:Parent>
+        </structure:Code>
+        <structure:Code id="FR101">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>TL3</common:AnnotationTitle>
+              <common:AnnotationType>COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>TL2024+TL2021</common:AnnotationTitle>
+              <common:AnnotationType>FAMILY_LABEL</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">4965</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">9485</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Paris</common:Name>
+          <common:Name xml:lang="fr">Paris</common:Name>
+          <structure:Parent>
+            <Ref id="FR1" />
+          </structure:Parent>
+        </structure:Code>
+        <structure:Code id="FRL">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>TL2</common:AnnotationTitle>
+              <common:AnnotationType>COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>TL2024+TL2021</common:AnnotationTitle>
+              <common:AnnotationType>FAMILY_LABEL</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">5550</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">10070</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Provence-Alpes-Côte d’Azur</common:Name>
+          <common:Name xml:lang="fr">Provence-Alpes-Côte d’Azur</common:Name>
+          <structure:Parent>
+            <Ref id="FRA" />
+          </structure:Parent>
+        </structure:Code>
+        <structure:Code id="FRL04">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>TL3</common:AnnotationTitle>
+              <common:AnnotationType>COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>TL2024+TL2021</common:AnnotationTitle>
+              <common:AnnotationType>FAMILY_LABEL</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">5575</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">10095</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Bouches-du-Rhône</common:Name>
+          <common:Name xml:lang="fr">Bouches-du-Rhône</common:Name>
+          <structure:Parent>
+            <Ref id="FRL" />
+          </structure:Parent>
+        </structure:Code>
+        <structure:Code id="JPN">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>CTRY</common:AnnotationTitle>
+              <common:AnnotationType>COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>TL2024+TL2021</common:AnnotationTitle>
+              <common:AnnotationType>FAMILY_LABEL</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10090</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">11780</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Japan</common:Name>
+          <common:Name xml:lang="fr">Japon</common:Name>
+          <common:Description xml:lang="en">全国</common:Description>
+        </structure:Code>
+        <structure:Code id="JPD">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>TL2</common:AnnotationTitle>
+              <common:AnnotationType>COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>TL2024+TL2021</common:AnnotationTitle>
+              <common:AnnotationType>FAMILY_LABEL</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10170</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">11860</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Southern-Kanto</common:Name>
+          <common:Name xml:lang="fr">Sud-Kanto</common:Name>
+          <common:Description xml:lang="en">南関東</common:Description>
+          <structure:Parent>
+            <Ref id="JPN" />
+          </structure:Parent>
+        </structure:Code>
+        <structure:Code id="JPD13">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>TL3</common:AnnotationTitle>
+              <common:AnnotationType>COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>TL2024+TL2021</common:AnnotationTitle>
+              <common:AnnotationType>FAMILY_LABEL</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10185</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">11875</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Tokyo</common:Name>
+          <common:Name xml:lang="fr">Tokyo</common:Name>
+          <common:Description xml:lang="en">東京都</common:Description>
+          <structure:Parent>
+            <Ref id="JPD" />
+          </structure:Parent>
+        </structure:Code>
+        <structure:Code id="MEX">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>CTRY</common:AnnotationTitle>
+              <common:AnnotationType>COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>TL2024+TL2021</common:AnnotationTitle>
+              <common:AnnotationType>FAMILY_LABEL</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10750</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">12290</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Mexico</common:Name>
+          <common:Name xml:lang="fr">Mexique</common:Name>
+          <common:Description xml:lang="en">Mexico</common:Description>
+        </structure:Code>
+        <structure:Code id="ME09">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>TL2</common:AnnotationTitle>
+              <common:AnnotationType>COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>TL2024+TL2021</common:AnnotationTitle>
+              <common:AnnotationType>FAMILY_LABEL</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">11065</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">12605</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">México D.C.</common:Name>
+          <common:Name xml:lang="fr">México D.C.</common:Name>
+          <common:Description xml:lang="en">México Distrito Federal</common:Description>
+          <structure:Parent>
+            <Ref id="MEX" />
+          </structure:Parent>
+        </structure:Code>
+        <structure:Code id="USA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>CTRY</common:AnnotationTitle>
+              <common:AnnotationType>COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>TL2024+TL2021</common:AnnotationTitle>
+              <common:AnnotationType>FAMILY_LABEL</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">17010</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">8030</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">United States</common:Name>
+          <common:Name xml:lang="fr">États-Unis</common:Name>
+        </structure:Code>
+        <structure:Code id="US06">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>TL2</common:AnnotationTitle>
+              <common:AnnotationType>COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>TL2024+TL2021</common:AnnotationTitle>
+              <common:AnnotationType>FAMILY_LABEL</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">17080</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">8100</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">California</common:Name>
+          <common:Name xml:lang="fr">Californie</common:Name>
+          <structure:Parent>
+            <Ref id="USA" />
+          </structure:Parent>
+        </structure:Code>
+      </structure:Codelist>
+    </structure:Codelists>
+  </message:Structures>
+</message:Structure>

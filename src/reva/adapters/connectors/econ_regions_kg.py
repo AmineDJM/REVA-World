@@ -217,7 +217,9 @@ def build(
             )
         )
 
-        def st(pid: str, *, obj: str | None = None, value: Mapping[str, Any] | None = None, **q: Any) -> None:
+        def st(
+            pid: str, *, obj: str | None = None, value: Mapping[str, Any] | None = None, r: Region = r, **q: Any
+        ) -> None:
             ident = obj or (value or {}).get("value", "")
             sid = hashlib.sha256(f"{r.qid}|{pid}|{ident}".encode()).hexdigest()[:24]
             sts.append(

@@ -1,0 +1,27 @@
+[
+ {
+  "request_fingerprint": "bc2d4b95c510d863bd4cfb7e908f375aff5835d2301c0ec28cf77f7fb152e792",
+  "url": "https://www.fao.org/worldfoodsituation/foodpricesindex/en/",
+  "file": "bc2d4b95c510d863.html",
+  "sha256": "e7d798475ca08a865765dd8d39f5e8382751b290380cdf2110895e8f9e4f6231",
+  "status": 200,
+  "headers": {
+   "content-type": "text/html; charset=utf-8"
+  },
+  "retrieved_at": "2026-10-17T13:47:00.246067+00:00",
+  "licence": "FAO website terms: copy/download for private study, research and teaching, and for use in non-commercial products or services, with acknowledgement of FAO as source and copyright holder (non-commercial)"
+ },
+ {
+  "request_fingerprint": "58ae79d0b33beb8f3ad2d3880f105c20343a0f8fbde2351e4228900e0f704f7f",
+  "url": "https://www.fao.org/media/docs/worldfoodsituationlibraries/wfs-library/food_price_indices_data.csv",
+  "file": "58ae79d0b33beb8f.csv",
+  "sha256": "1e7b4cab727d65ad85ac056a1f4ec21285c3294aebdacb08f01e10be490a4098",
+  "status": 200,
+  "headers": {
+   "content-type": "text/csv",
+   "etag": "\"0x8DF2088AA9D4197\""
+  },
+  "retrieved_at": "2026-10-17T13:47:01.982001+00:00",
+  "licence": "FAO website terms: copy/download for private study, research and teaching, and for use in non-commercial products or services, with acknowledgement of FAO as source and copyright holder (non-commercial)"
+ }
+]

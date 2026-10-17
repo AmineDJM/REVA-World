@@ -1,0 +1,14 @@
+[
+ {
+  "request_fingerprint": "250833d656dac6033708a46f5308522d75a9d22013d6bb4c93fa2fab380af3ef",
+  "url": "https://api.worldbank.org/v2/sources/90/country/FRA;IND;NGA;USA;WLD/series/all/classification/PX.WL;PPPGlob/time/YR2021;YR2017?format=json&per_page=50000",
+  "file": "250833d656dac603.json",
+  "sha256": "383908f9bddd5565056094c5cce41bea2e5c13be44d747f91eed0ef07d7865a4",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json;charset=utf-8"
+  },
+  "retrieved_at": "2026-10-17T13:46:58.282523+00:00",
+  "licence": "CC-BY-4.0 (World Bank datasets, https://datacatalog.worldbank.org/public-licenses#cc-by)"
+ }
+]

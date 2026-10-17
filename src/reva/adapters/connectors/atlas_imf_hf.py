@@ -481,9 +481,7 @@ def parse_flow(fl: HfFlow, body: bytes, sha: str, label: str) -> tuple[pl.DataFr
             cols["unit"].append(unit)
             cols["flags"].append(fc.canon(flags))
             cols["raw_sha256"].append(sha)
-            cols["selector"].append(
-                fc.canon({"file": label, "flow": msg.flow_ref, "series": skey, "time_period": tp})
-            )
+            cols["selector"].append(fc.canon({"file": label, "flow": msg.flow_ref, "series": skey, "time_period": tp}))
     if not cols["indicator"]:
         raise ImfHfError(f"IMF {fl.flow}: no cell with a value")
     rep.cells = len(cols["indicator"])

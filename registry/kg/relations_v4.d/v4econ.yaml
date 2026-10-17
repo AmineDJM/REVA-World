@@ -1,0 +1,22 @@
+# V4ECON mappings: statistical regions (Eurostat NUTS, OECD TL2/TL3) loaded by
+# src/reva/adapters/connectors/econ_regions_kg.py from atlas.eurostat_macro and atlas.oecd_macro.
+version: 1
+agent: V4ECON
+note: >-
+  Region edges read from identifiers the providers publish: NUTS parent = the code with its last character
+  removed (NUTS coding rule, Regulation (EC) No 1059/2003), kept only when the parent code is in the same Eurostat
+  response; OECD parent = the CL_REGIONAL codelist Parent chain; country = NUTS two-letter country prefix
+  (Eurostat country codes) or the OECD COUNTRY attribute. nuts:<code> and oecdreg:<code> are distinct entities even
+  when the code is equal (no published equivalence). measured_by points to an atlas table entity
+  (atlas:<source>.<dataset>, kind data_series); values are read from the atlas.
+mappings:
+  - {property: "nuts:part_of", family: part_of, subtype: nuts_parent_region, source: eurostat,
+     subject_kinds: [nuts_region], object_kinds: [nuts_region]}
+  - {property: "nuts:in_country", family: located_in, subtype: nuts_country, source: eurostat,
+     subject_kinds: [nuts_region], object_kinds: [country]}
+  - {property: "oecdreg:part_of", family: part_of, subtype: oecd_cl_regional_parent, source: oecd,
+     subject_kinds: [oecd_region], object_kinds: [oecd_region]}
+  - {property: "oecdreg:in_country", family: located_in, subtype: oecd_region_country, source: oecd,
+     subject_kinds: [oecd_region], object_kinds: [country]}
+  - {property: "econ:measured_by", family: measured_by, subtype: atlas_table, source: v4econ,
+     subject_kinds: [nuts_region, oecd_region], object_kinds: [data_series]}

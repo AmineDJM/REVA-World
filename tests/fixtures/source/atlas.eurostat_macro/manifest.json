@@ -1,0 +1,98 @@
+[
+ {
+  "request_fingerprint": "80954ad811a45751ce214135c9c90c83134b6a1ab52b511671e9987b85117bf6",
+  "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?coicop18=TOTAL&unit=I25&unit=RCH_M&unit=RCH_A&format=JSON&lang=EN&geo=DE&geo=EL&geo=FR&geo=EU27_2020&sinceTimePeriod=2024",
+  "file": "80954ad811a45751.json",
+  "sha256": "57d86d009c70052c88a26d58798dedcce41376771bd6c25633f21f8fad91f7aa",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T13:46:37.032278+00:00",
+  "licence": "Eurostat reuse policy (Commission Decision 2011/833/EU; CC BY 4.0), acknowledgement required"
+ },
+ {
+  "request_fingerprint": "a10f98c8c03cb5dc07477ac8a02919729273501b59063271e2ed139c141c325f",
+  "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_m?sex=T&age=TOTAL&unit=PC_ACT&format=JSON&lang=EN&geo=DE&geo=EL&geo=FR&geo=EU27_2020&sinceTimePeriod=2024",
+  "file": "a10f98c8c03cb5dc.json",
+  "sha256": "9e9bfaf9191db6ed3d1c5df15de747ac44deb7ca75b273c6182176d8cfa4faff",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T13:46:39.032585+00:00",
+  "licence": "Eurostat reuse policy (Commission Decision 2011/833/EU; CC BY 4.0), acknowledgement required"
+ },
+ {
+  "request_fingerprint": "c9f2478131676c3d0ff636d204bb9ceafe1afb596fdeeb3479ba7f37e942bf0f",
+  "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/namq_10_gdp?na_item=B1GQ&unit=CP_MEUR&unit=CLV_PCH_PRE&unit=CLV_PCH_SM&format=JSON&lang=EN&geo=DE&geo=EL&geo=FR&geo=EU27_2020&sinceTimePeriod=2024",
+  "file": "c9f2478131676c3d.json",
+  "sha256": "22a0e688ec0f5f4582c13bb8890fed151d090363be7ad8d435bde2d574b510cc",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T13:46:41.177563+00:00",
+  "licence": "Eurostat reuse policy (Commission Decision 2011/833/EU; CC BY 4.0), acknowledgement required"
+ },
+ {
+  "request_fingerprint": "db0046dbaec0b757e3018681a68e040b55a6a3e157b022a798b8412b5cf35244",
+  "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10q_ggdebt?sector=S13&na_item=GD&unit=MIO_EUR&unit=PC_GDP&format=JSON&lang=EN&geo=DE&geo=EL&geo=FR&geo=EU27_2020&sinceTimePeriod=2024",
+  "file": "db0046dbaec0b757.json",
+  "sha256": "ba3f8c9a8778bac36fb79f4abe6c585258cb2e95cbc31bb8642d80f0b9efa9b4",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T13:46:43.170099+00:00",
+  "licence": "Eurostat reuse policy (Commission Decision 2011/833/EU; CC BY 4.0), acknowledgement required"
+ },
+ {
+  "request_fingerprint": "e523d1c95b67ae8510d120dba769c3af7e602400a606afbc8a01420d82bf4c05",
+  "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/sts_inpr_m?nace_r2=B-D&indic_bt=PRD&unit=I21&s_adj=SCA&s_adj=NSA&format=JSON&lang=EN&geo=DE&geo=EL&geo=FR&geo=EU27_2020&sinceTimePeriod=2024",
+  "file": "e523d1c95b67ae85.json",
+  "sha256": "90e3e7eabac5b2e1bd08b7a226964849d9e567d4e1118cdb20bf838b60c3f712",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T13:46:45.508889+00:00",
+  "licence": "Eurostat reuse policy (Commission Decision 2011/833/EU; CC BY 4.0), acknowledgement required"
+ },
+ {
+  "request_fingerprint": "8d9960de061585df3d2381f7808a2340927aa2e2cc040725418a14a4a31f84dd",
+  "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nama_10r_3gdp?unit=MIO_EUR&unit=EUR_HAB&unit=PPS_EU27_2020_HAB&format=JSON&lang=EN&geo=FR&geo=FR1&geo=FR10&geo=FR101&geo=FRY&geo=FRY1&geo=FRY10&geo=EL&geo=EL3&geo=EL30&geo=EL303&geo=EU27_2020&sinceTimePeriod=2021",
+  "file": "8d9960de061585df.json",
+  "sha256": "20bec2acb479923141befe816b2f9d3efbf8a3b4337bbae722564a6a84b44f3b",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T13:46:49.294032+00:00",
+  "licence": "Eurostat reuse policy (Commission Decision 2011/833/EU; CC BY 4.0), acknowledgement required"
+ },
+ {
+  "request_fingerprint": "4baee9eb835e06965c85dfc8d2fe9332a9c83f92bce2501f71b24f9ca6f26e57",
+  "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/lfst_r_lfu3rt?sex=T&age=Y15-74&isced11=TOTAL&unit=PC&format=JSON&lang=EN&geo=FR&geo=FR1&geo=FR10&geo=FR101&geo=FRY&geo=FRY1&geo=FRY10&geo=EL&geo=EL3&geo=EL30&geo=EL303&geo=EU27_2020&sinceTimePeriod=2022",
+  "file": "4baee9eb835e0696.json",
+  "sha256": "ccf5bf93cd5a288fc9d0f86de7eeaa4f680e77da4b59c700704663b4b6afd6f7",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T13:46:51.829238+00:00",
+  "licence": "Eurostat reuse policy (Commission Decision 2011/833/EU; CC BY 4.0), acknowledgement required"
+ },
+ {
+  "request_fingerprint": "d009e2579b508241b484221063b02fd386ef35d6a7fe8587fdc8d8462de6974b",
+  "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_r_pjanaggr3?sex=T&age=TOTAL&unit=NR&format=JSON&lang=EN&geo=FR&geo=FR1&geo=FR10&geo=FR101&geo=FRY&geo=FRY1&geo=FRY10&geo=EL&geo=EL3&geo=EL30&geo=EL303&geo=EU27_2020&sinceTimePeriod=2023",
+  "file": "d009e2579b508241.json",
+  "sha256": "d186916dc8a0a7c8998d13bce67a4403bde9b32e15af91ee49e36a7dccac9887",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-17T13:46:55.936515+00:00",
+  "licence": "Eurostat reuse policy (Commission Decision 2011/833/EU; CC BY 4.0), acknowledgement required"
+ }
+]

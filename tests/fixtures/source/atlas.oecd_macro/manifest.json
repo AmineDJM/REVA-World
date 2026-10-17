@@ -1,0 +1,62 @@
+[
+ {
+  "request_fingerprint": "3ff4eb8c9b8663c3a6b1376f5837709ebab8f1224c4a185212e32ae846cff4ad",
+  "url": "https://sdmx.oecd.org/public/rest/codelist/OECD/CL_REGIONAL/latest/FRA+FR1+FR10+FR101+FRL+FRL04+USA+US06+JPN+JPD+JPD13+MEX+ME09",
+  "file": "3ff4eb8c9b8663c3.xml",
+  "sha256": "28525b18361be60ffc674fba364a2715fb5d5825abd15e8ed21e9074bb4d8cfd",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.sdmx.structure+xml; version=2.1; charset=utf-8"
+  },
+  "retrieved_at": "2026-10-17T13:47:10.313517+00:00",
+  "licence": "OECD Terms and Conditions (Data Explorer: '© OECD Terms & conditions'); CC BY 4.0 is the OECD default since 2024-07-01 (open-by-default policy); no dataset-level licence in the SDMX metadata"
+ },
+ {
+  "request_fingerprint": "002c4f861ebdcf4d869c5600ee303a4d272b06a9eea9d193cb7ee1d429c369e8",
+  "url": "https://sdmx.oecd.org/public/rest/data/OECD.SDD.STES,DSD_KEI@DF_KEI,/FRA+USA+JPN+EA20.M+Q.UNEMP+IR3TIB+IRLT+CA_GDP+B1GQ_Q.....?format=csvfile&startPeriod=2025",
+  "file": "002c4f861ebdcf4d.csv",
+  "sha256": "7d1de7da23ae54d68f9e75bdaf225448eff63403b6fd5284b0257e4b2f8a8894",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.sdmx.data+csv; charset=utf-8"
+  },
+  "retrieved_at": "2026-10-17T13:47:13.227365+00:00",
+  "licence": "OECD Terms and Conditions (Data Explorer: '© OECD Terms & conditions'); CC BY 4.0 is the OECD default since 2024-07-01 (open-by-default policy); no dataset-level licence in the SDMX metadata"
+ },
+ {
+  "request_fingerprint": "80a9a3e13b5bae146a44538ac4d73002e5597b9fed9e07d48461537fa33dcf5d",
+  "url": "https://sdmx.oecd.org/public/rest/data/OECD.CFE.EDS,DSD_REG_ECO@DF_GDP,/A.TL2+TL3+CTRY.FRA+FR1+FR10+FR101+FRL+FRL04+USA+US06+JPN+JPD+JPD13+MEX+ME09._Z.GDP._T.V.USD_PPP_PS+XDC?format=csvfile&startPeriod=2022",
+  "file": "80a9a3e13b5bae14.csv",
+  "sha256": "3f8cf6430cec922980f81c1964753ded5e69b8579b4c84e9e4d161ca9af6d01c",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.sdmx.data+csv; charset=utf-8"
+  },
+  "retrieved_at": "2026-10-17T13:47:15.798160+00:00",
+  "licence": "OECD Terms and Conditions (Data Explorer: '© OECD Terms & conditions'); CC BY 4.0 is the OECD default since 2024-07-01 (open-by-default policy); no dataset-level licence in the SDMX metadata"
+ },
+ {
+  "request_fingerprint": "999cab5d0b8105e300803a53ac031f90df39cad3540f71039a8df4330954f304",
+  "url": "https://sdmx.oecd.org/public/rest/data/OECD.CFE.EDS,DSD_REG_LAB@DF_RATES,/A.TL2+TL3+CTRY.FRA+FR1+FR10+FR101+FRL+FRL04+USA+US06+JPN+JPD+JPD13+MEX+ME09._Z.UNE_RATE.Y15T64._T.PT_LF_SUB?format=csvfile&startPeriod=2022",
+  "file": "999cab5d0b8105e3.csv",
+  "sha256": "ee52904ab4ff3cc9c8f2372eaf9c8b53bce637f9211b0acaa57703c62937256f",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.sdmx.data+csv; charset=utf-8"
+  },
+  "retrieved_at": "2026-10-17T13:47:18.245431+00:00",
+  "licence": "OECD Terms and Conditions (Data Explorer: '© OECD Terms & conditions'); CC BY 4.0 is the OECD default since 2024-07-01 (open-by-default policy); no dataset-level licence in the SDMX metadata"
+ },
+ {
+  "request_fingerprint": "5bc8342eb7b5eea70adf7a5f6e5ba90272c648027047b926665d37eed58787f7",
+  "url": "https://sdmx.oecd.org/public/rest/data/OECD.CFE.EDS,DSD_REG_DEMO@DF_POP_BROAD,/A.TL2+TL3+CTRY.FRA+FR1+FR10+FR101+FRL+FRL04+USA+US06+JPN+JPD+JPD13+MEX+ME09._Z.POP._T._T.PS?format=csvfile&startPeriod=2022",
+  "file": "5bc8342eb7b5eea7.csv",
+  "sha256": "04d64b7b7ae4c34114ce80224c0fa7ef08fdeafe50da170455e0092dad9295dc",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.sdmx.data+csv; charset=utf-8"
+  },
+  "retrieved_at": "2026-10-17T13:47:20.779911+00:00",
+  "licence": "OECD Terms and Conditions (Data Explorer: '© OECD Terms & conditions'); CC BY 4.0 is the OECD default since 2024-07-01 (open-by-default policy); no dataset-level licence in the SDMX metadata"
+ }
+]

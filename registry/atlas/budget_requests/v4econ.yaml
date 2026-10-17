@@ -1,0 +1,37 @@
+# Budget request from agent V4ECON (macro monthly/quarterly, NUTS/OECD regions, ICP prices, FAO FFPI).
+# Merged by `python -m reva.atlas.budget_merge`. The merge keeps the largest request per source (never the sum):
+# where V4ECON shares a key, the figure is the current limit plus V4ECON's own runs (one retry).
+agent: V4ECON
+requests:
+  - source_key: imf.sdmx
+    # atlas.imf_hf: 8 SDMX-ML requests per run (CPI ~12 MB, QNEA ~7, LS ~4.4, PI ~5.7, ER ~11, MFS_IR ~4, BOP ~6,
+    # QGFS ~1.1; ~51 MB measured 2026-10-17).
+    daily_requests: 76
+    expected_bytes_per_day: 520000000
+    reason: "existing 60 (A-IMF) + V4ECON 8 per run, one retry"
+  - source_key: oecd.sdmx
+    # atlas.oecd_macro: CL_REGIONAL codelist (5.6 MB) + 4 code-only SDMX-CSV (KEI ~9 MB, regional GDP ~15 MB,
+    # unemployment ~4.5 MB, population ~10 MB).
+    daily_requests: 92
+    expected_bytes_per_day: 100000000
+    reason: "existing 82 (A-FISCAL/A-ILO/A-SOCIETY/A-TRADE/V4MIND) + V4ECON 5 per run, one retry"
+  - source_key: eurostat.dissemination
+    # atlas.eurostat_macro: 8 JSON-stat requests (~5 MB in all).
+    daily_requests: 116
+    expected_bytes_per_day: 20000000
+    reason: "existing 100 + V4ECON 8 per run, one retry"
+  - source_key: worldbank.atlas
+    # atlas.wb_icp: one ICP 2021 API v2 request (~12 MB).
+    daily_requests: 42
+    expected_bytes_per_day: 30000000
+    reason: "existing 40 (A-WB) + V4ECON 1 per run, one retry"
+  - source_key: fao.ffpi
+    # atlas.fao_ffpi: page (64 kB) + CSV (48 kB).
+    daily_requests: 4
+    expected_bytes_per_day: 500000
+    reason: "2 requests per run, one retry"
+daily_totals_increase:
+  http_requests_total: "+50"
+  http_bytes_total: "+0"
+notes: >-
+  Disk: raw ~110 MB per full run of every V4ECON source; Parquet ~40 MB.
