@@ -254,11 +254,11 @@ columns) is the same documented curator assignment as AUDIT3 §5 row 3.
 
 | ID | Status | By | Where |
 |---|---|---|---|
-| M1 | open | — | |
-| M2 | open | — | |
-| L1 | open | — | |
-| L2 | open (= AUDIT3 L2) | — | |
-| L3 | open | — | |
-| L4 | open | — | |
-| L5 | open | — | |
-| L6 | open | — | |
+| M1 | fixed in code; live re-ingest queued (disk < 5 GB) | FIX6 | `atlas_ucdp_ged.py` 1.0.1 border rule + `registry/conflict/territory_exceptions.yaml` (owner review); offline: 2,651 events unplaced, 215 KG edges to retract (`reclassified_by_reva`), 141 recounted; `v6_fix6.md` §1 |
+| M2 | fixed in code; re-ingest queued | FIX6 | country-month `events_placed_in_other_territory` / deaths / `other_territory_iso3` (329 ISR cells), catalog note on ISR concepts; `v6_fix6.md` §2 |
+| L1 | fixed in code; re-ingest queued | FIX6 | `left_censored: true` on 79 `ucdpged:first_event_date`; `v6_fix6.md` §3 |
+| L2 | fixed (read side live; refs on re-ingest) | FIX6 (with FIX4C) | families API `rights.inputs` = Natural Earth public domain for the 7,012 statements; `extra_refs` + adm1 `geometry_licence`; `v6_fix6.md` §4 |
+| L3 | fixed | FIX6 (text), FIX7 (one Holm family of 260) | `v6_pred_energy.md` §3/§4; `v6_fix6.md` §5 |
+| L4 | flagged (holdout not re-opened); owner decision | FIX6 | `registered_models.yaml` `outcome_vintage_mismatch` (MAD 0.27–1.29 pp April vs October), `v6_pred_models.md` §6; `v6_fix6.md` §6 |
+| L5 | fixed, live | FIX6 | curation `retired:` → retraction detail; existing retractions 1–2 annotated (artifact `24926bfc…`, activity `e41da24a…`); `v6_fix6.md` §7 |
+| L6 | fixed | FIX6 | `v6_effects_more.md` (301; 20 `unspecified`), `v6_conflict.md` (376,082 placed), `v6_pred_energy.md`; `v6_fix6.md` §8 |
