@@ -168,7 +168,7 @@ def energy_forecasts(q: Mapping[str, Any], fam: Any, ctx: Mapping[str, Any]) -> 
         return [abstention(q, k, f"series {code} not in the STEO issue in force") for k in (RW_KEY, STEO_KEY)]
     last = max(own)
     hist = sorted((i, v) for i, v in info[code].items() if i <= last)
-    detail = (
+    detail: tuple[tuple[str, str], ...] = (
         ("steo_issue", str(ctx["issue"])),
         ("steo_release_date", str(ctx.get("release_date"))),
         ("information_set", "STEO issue in force (vintage accessor, as_known at issue)"),
