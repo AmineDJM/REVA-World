@@ -39,3 +39,29 @@ def test_artifact_rights_kept_for_the_source_that_recorded_them() -> None:
     # no statement licence: the artifact's (possibly more restrictive) rights stay
     r2 = fq._rights({"source_key": "naturalearth.admin1_10m", "raw_sha256": NE_SHA, "refs": []}, _by_sha(NOAA_RIGHTS))
     assert r2 is not None and r2["licence"].startswith("US Government work")
+
+
+def test_fishstat_not_significant_cells_are_flagged() -> None:
+    """AUDIT3 L4: FAO 'N' cells are published as 0 but are 'not a real zero' (< 0.5 unit each)."""
+    import json
+    from collections import Counter
+    from decimal import Decimal
+
+    from reva.adapters.connectors import atlas_fishstat as f
+
+    mixed = f.Cell(total=Decimal("12"), n_values=3, symbols=Counter({"N": 2}))
+    all_n = f.Cell(total=Decimal("0"), n_values=2, symbols=Counter({"N": 2}))
+    plain = f.Cell(total=Decimal("5"), n_values=1)
+    rows = f.atlas_rows(
+        {("FRA", "capture.mg_pisces.tonnes", 2020): mixed, ("ISL", "capture.mg_pisces.tonnes", 2020): all_n,
+         ("NOR", "capture.mg_pisces.tonnes", 2020): plain},
+        raw_sha256="f" * 64,
+    )  # fmt: skip
+    by = {r["provider_geo"]: (r["value"], json.loads(r["flags"])) for r in rows}
+    v, fl = by["FRA"]
+    assert v == "12" and fl["includes_not_significant"] and fl["not_significant_cells"] == 2
+    assert fl["understated_by_less_than"] == "1" and "all_cells_not_significant" not in fl
+    assert fl["not_significant_definition"].startswith("Not significant (<0.5)")
+    v, fl = by["ISL"]
+    assert v == "0" and fl["all_cells_not_significant"] is True
+    assert "includes_not_significant" not in by["NOR"][1]

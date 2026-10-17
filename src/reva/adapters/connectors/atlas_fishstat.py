@@ -49,7 +49,10 @@ from reva.adapters.connectors.eco_common import canon
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.fishstat"
-CONNECTOR_VERSION = "1.0.1"  # 1.0.0 was registered from an in-flight snapshot with different code
+# 1.0.1: 1.0.0 was registered from an in-flight snapshot with different code.
+# 1.0.2 (FIX4C, AUDIT3 L4): sums containing FAO "N" (not significant, < 0.5) cells are flagged; the N definition is
+#        checked against the release's CL_FI_SYMBOL_SDMX.csv when the release carries it.
+CONNECTOR_VERSION = "1.0.2"
 PARSER_VERSION = "atlas-fishstat-1"
 SOURCE_KEY = "fao.fishstat"
 ATLAS_SOURCE = "fishstat"
@@ -66,6 +69,9 @@ RIGHTS: dict[str, str] = {
     "attribution": f"FAO. FishStat Data, Global production by production source (release {RELEASE}). Licence: CC-BY-4.0.",
 }
 MISSING_SYMBOLS = {"L": "not_available", "M": "not_applicable", "O": "not_reported", "Q": "confidential"}
+#: FAO's own words for status "N" (``CL_FI_SYMBOL_SDMX.csv`` of release 2026.1.0, columns Name_En / Description_En).
+NOT_SIGNIFICANT_NAME = "Not significant (<0.5)"
+NOT_SIGNIFICANT_DESCRIPTION = 'Used to indicate a value which is not a "real" zero (e.g. a result of 0.0004 rounded to zero).'
 NOTABLE_SYMBOLS = ("E", "I", "X", "P", "N", "B", "F", "G", "S", "U", "V")
 SOURCE_SLUG = {
     "CAPTURE": "capture",
@@ -138,6 +144,11 @@ def parse_release(body: bytes) -> Release:
     unknown_src = sorted({r["Code"] for r in src} - set(SOURCE_SLUG))
     if unknown_src:
         raise FishstatError(f"unknown production source codes {unknown_src}")
+    if "CL_FI_SYMBOL_SDMX.csv" in zf.namelist():  # absent from the trimmed test excerpt only
+        sym = _member(zf, "CL_FI_SYMBOL_SDMX.csv")
+        n_rows = [ln for ln in sym.splitlines() if ln.rstrip().endswith('"N"')]
+        if not n_rows or NOT_SIGNIFICANT_NAME not in n_rows[0] or "not a \"\"real\"\" zero" not in n_rows[0]:
+            raise FishstatError("CL_FI_SYMBOL_SDMX.csv no longer defines N as 'Not significant (<0.5)'")
     qty = _rows(_member(zf, "Global_production_quantity.csv"), QTY_COLUMNS, "production quantities")
     return Release(
         countries={r["UN_Code"]: r["ISO3_Code"].strip() for r in cty},
@@ -234,6 +245,14 @@ def atlas_rows(cells: Mapping[tuple[str, str, int], Cell], *, raw_sha256: str) -
         }
         if c.symbols:
             flags["fao_symbols"] = dict(sorted(c.symbols.items()))
+        n_ns = c.symbols.get("N", 0)
+        if n_ns:  # AUDIT3 L4: published 0s that FAO says are not real zeros
+            flags["includes_not_significant"] = True
+            flags["not_significant_cells"] = n_ns
+            flags["not_significant_definition"] = f"{NOT_SIGNIFICANT_NAME}: {NOT_SIGNIFICANT_DESCRIPTION}"
+            flags["understated_by_less_than"] = _decimal_text(Decimal(n_ns) * Decimal("0.5"))
+            if n_ns == c.n_values:
+                flags["all_cells_not_significant"] = True  # the 0 is "below 0.5 per cell", not zero production
         value: str | None = _decimal_text(c.total)
         if c.missing:
             flags["missing_cells"] = dict(sorted(c.missing.items()))
