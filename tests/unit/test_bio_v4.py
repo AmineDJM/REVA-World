@@ -39,8 +39,9 @@ def test_predicates_and_family_mappings_are_consistent() -> None:
         assert preds[pid]["value_kind"] == "item"
         assert preds[pid].get("family") == fam, pid
     reg = families.load_registry()
-    assert reg.mapping("hgnc:encodes") is not None and reg.mapping("hgnc:encodes").family == "produces"
-    assert reg.mapping("gbif:parent").family == "is_a"
+    enc, par = reg.mapping("hgnc:encodes"), reg.mapping("gbif:parent")
+    assert enc is not None and enc.family == "produces"
+    assert par is not None and par.family == "is_a"
     # identity bridges stay unmapped; nothing causal
     assert reg.mapping("bio:same_taxon_via_wikidata") is None
     assert not any(w in p for p in preds for w in ("cause", "causal", "effect"))
@@ -107,7 +108,9 @@ def test_scope_record_check_refuses_anything_but_the_stated_accepted_species() -
     assert tx.check_scope_record(rec, sp) is None
     u = tx.usage_from_gbif_species(rec, raw="c" * 64)
     assert u.parent_id == "2436435" and u.classification[-2] == ("2436435", "Homo", "genus")
-    assert tx.check_scope_record(rec, tx.ScopeSpecies(2436436, "Homo neanderthalensis", "x")) == "canonical_name_differs"
+    assert (
+        tx.check_scope_record(rec, tx.ScopeSpecies(2436436, "Homo neanderthalensis", "x")) == "canonical_name_differs"
+    )
     assert tx.check_scope_record({**rec, "taxonomicStatus": "SYNONYM"}, sp) == "status_SYNONYM"
 
 
@@ -115,14 +118,16 @@ class _FacetHttp:
     """Fake run: partitions answer facets from a dict; truncation simulated with a small FACET_LIMIT."""
 
     def __init__(self, answers: Mapping[str | None, list[tuple[str, int]]], totals: Mapping[str | None, int]):
-        self.answers, self.totals, self.calls = answers, totals, []
+        self.answers, self.totals = answers, totals
+        self.calls: list[str | None] = []
 
     async def get(self, url: str, *, key: str, max_bytes: int) -> Any:
         part = key.split(":", 2)[2]
         p = None if part == "root" else part
         self.calls.append(p)
-        body = json.dumps({"count": self.totals[p], "facets": [{"counts": [
-            {"name": k, "count": c} for k, c in self.answers[p]]}]}).encode()
+        body = json.dumps(
+            {"count": self.totals[p], "facets": [{"counts": [{"name": k, "count": c} for k, c in self.answers[p]]}]}
+        ).encode()
         return type("R", (), {"body": body, "retrieved_at": datetime(2026, 10, 17, tzinfo=UTC)})()
 
     def archive(self, raw: Any) -> str:
@@ -152,8 +157,9 @@ async def test_facet_partitions_recurse_only_where_truncated(monkeypatch: pytest
 
 def test_gbif_kg_records() -> None:
     us = _usages()
-    meta = tx.parse_backbone_meta(_fx("atlas.gbif_backbone", "gbif_dataset.json"),
-                                  _fx("atlas.gbif_backbone", "clb_dataset.json"))
+    meta = tx.parse_backbone_meta(
+        _fx("atlas.gbif_backbone", "gbif_dataset.json"), _fx("atlas.gbif_backbone", "clb_dataset.json")
+    )
     vals, _t = tx.parse_facet(_fx("atlas.gbif_backbone", "gbif_facet_root.json"))
     counts = tx.FacetCounts({k: (c, "facet_value", "root", "e" * 64) for k, c in vals}, [], [], [])
     parts = tx.gbif_kg(us, counts, meta=meta, scope_groups={"9703": "test"})
@@ -193,13 +199,17 @@ def test_col_release_metrics_and_counts() -> None:
     par = _by(parts.statements, "col:parent", f"col:{mam}")[0]
     assert us[par.object_qid.split(":", 1)[1]].name == "Chordata"
     assert "Tetrapoda (megaclass)" in par.qualifiers["intermediate_ranks_skipped"]
-    n = {s.qualifiers["variant"]: int(s.value["amount"]) for s in _by(parts.statements, "col:species_count", f"col:{mam}")}
+    n = {
+        s.qualifiers["variant"]: int(s.value["amount"])
+        for s in _by(parts.statements, "col:species_count", f"col:{mam}")
+    }
     assert n["extant"] < n["all"]
     metrics = _by(parts.statements, "col:release_metric", f"col:release.{rel.key}")
     assert any(s.qualifiers.get("metric") == "taxonCount" for s in metrics)
     with pytest.raises(tx.TaxonomyError):
-        tx.parse_col_release(json.dumps({**json.loads(_fx("atlas.col_checklist", "col_release.json")),
-                                         "license": "cc by-nc"}).encode())
+        tx.parse_col_release(
+            json.dumps({**json.loads(_fx("atlas.col_checklist", "col_release.json")), "license": "cc by-nc"}).encode()
+        )
 
 
 # ------------------------------------------------------------------------------------------------ Wikidata
@@ -224,8 +234,13 @@ def test_wikidata_bridges_need_unique_values_both_ways() -> None:
         (_b(item="Q2", st="Q2-X", gbif="222", ncbi="5"), "s1"),  # NCBI 5 on two items: ambiguous
         (_b(item="Q3", st="Q3-X", gbif="333", col="4QHKG"), "s1"),
     ]
-    parts = tx.wikidata_kg(rows, retrieved_at=datetime(2026, 10, 17, tzinfo=UTC),
-                           loaded_gbif={"2435099", "111", "222", "333"}, loaded_ncbi=set(), loaded_col=set())
+    parts = tx.wikidata_kg(
+        rows,
+        retrieved_at=datetime(2026, 10, 17, tzinfo=UTC),
+        loaded_gbif={"2435099", "111", "222", "333"},
+        loaded_ncbi=set(),
+        loaded_col=set(),
+    )
     same = {(s.subject_qid, s.object_qid) for s in _by(parts.statements, "bio:same_taxon_via_wikidata")}
     assert ("ncbitaxon:9696", "gbif:2435099") in same and ("col:4QHKG", "gbif:333") in same
     assert not any(o in ("gbif:111", "gbif:222") for _s, o in same)
@@ -262,13 +277,16 @@ def test_uniprot_release_counts_and_human_entries() -> None:
     assert rel.name >= "2026_03" and len(rel.date) == 10
     counts = mo.organism_counts(_fx("atlas.uniprot", "organisms.tsv"))
     assert counts == {"9606": 12, "10090": 5, "83333": 3}
-    taxa = {r["Taxon Id"]: (r, "t" * 64) for r in mo.tsv_rows(_fx("atlas.uniprot", "taxonomy_0.tsv"),
-                                                                ["Taxon Id"], "tax")}
+    taxa = {
+        r["Taxon Id"]: (r, "t" * 64) for r in mo.tsv_rows(_fx("atlas.uniprot", "taxonomy_0.tsv"), ["Taxon Id"], "tax")
+    }
     rows = mo.tsv_rows(_fx("atlas.uniprot", "human.tsv"), ["Entry", "HGNC"], "human")
     parts = mo.uniprot_kg(counts, "o" * 64, taxa, [(r, i + 2) for i, r in enumerate(rows)], "h" * 64, rel)
     ent = {e.qid: e for e in parts.entities}
     assert ent["ncbitaxon:9606"].labels["en"] == "Homo sapiens"
-    assert ent["uniprot:P04637"].kind == "protein" and ent["uniprot:P04637"].labels["en"] == "Cellular tumor antigen p53"
+    assert (
+        ent["uniprot:P04637"].kind == "protein" and ent["uniprot:P04637"].labels["en"] == "Cellular tumor antigen p53"
+    )
     enc = _by(parts.statements, "uniprot:encoded_by", "uniprot:P04637")[0]
     assert enc.object_qid == "hgnc:11998"
     ln = _by(parts.statements, "uniprot:sequence_length", "uniprot:P04637")[0]
@@ -283,8 +301,9 @@ def test_uniprot_release_counts_and_human_entries() -> None:
 # ------------------------------------------------------------------------------------------------ Ensembl / NCBI
 def test_ensembl_assemblies_and_karyotype() -> None:
     sp = json.loads(_fx("atlas.ensembl_genomes", "info_species.json"))["species"]
-    kar = {n: (json.loads(_fx("atlas.ensembl_genomes", f"info_assembly_{n}.json")), "k" * 64)
-           for n in mo.KARYOTYPE_SPECIES}
+    kar = {
+        n: (json.loads(_fx("atlas.ensembl_genomes", f"info_assembly_{n}.json")), "k" * 64) for n in mo.KARYOTYPE_SPECIES
+    }
     parts = mo.ensembl_kg(sp, "s" * 64, kar, release="115", known_taxa={"9606"})
     asm = _by(parts.statements, "ensembl:assembly_of")
     human = next(s for s in asm if s.object_qid == "ncbitaxon:9606")
@@ -304,16 +323,25 @@ def test_ncbi_gene_counts_and_pairing() -> None:
     parts = mo.ncbi_kg(reps, known_taxa=set(), retrieved_day="2026-10-17")
     pair = _by(parts.statements, "ncbi:paired_assembly", "assembly:GCF_000001405.40")[0]
     assert pair.object_qid == "assembly:GCA_000001405.29"
-    gc = {s.qualifiers["category"]: int(s.value["amount"])
-          for s in _by(parts.statements, "ncbi:annotated_gene_count", "assembly:GCF_000001405.40")}
+    gc = {
+        s.qualifiers["category"]: int(s.value["amount"])
+        for s in _by(parts.statements, "ncbi:annotated_gene_count", "assembly:GCF_000001405.40")
+    }
     assert gc["protein_coding"] > 19_000 and gc["total"] >= gc["protein_coding"]
     assert all(s.value["unit"] == "genes" for s in _by(parts.statements, "ncbi:annotated_gene_count"))
 
 
 def test_atlas_specs() -> None:
     specs = {s.name: s for s in [*tx.atlas_source(), *mo.atlas_source()]}
-    assert set(specs) == {"atlas.gbif_backbone", "atlas.col_checklist", "atlas.bio_wikidata", "atlas.hgnc",
-                          "atlas.uniprot", "atlas.ensembl_genomes", "atlas.ncbi_genomes"}
+    assert set(specs) == {
+        "atlas.gbif_backbone",
+        "atlas.col_checklist",
+        "atlas.bio_wikidata",
+        "atlas.hgnc",
+        "atlas.uniprot",
+        "atlas.ensembl_genomes",
+        "atlas.ncbi_genomes",
+    }
     for s in specs.values():
         assert s.code_digest.startswith("sha256:") and s.planned_requests >= 1
         man = json.loads((FIX / s.name / "manifest.json").read_text())

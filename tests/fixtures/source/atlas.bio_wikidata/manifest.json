@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "18ec1743a567f4f6f768ba60efe9e58b01be13cda3620b71a5a9e32eda5cbcae",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fst+%3Fgbif+%3Frk+%3Fncbi+%3Fcol+%3Fcn+WHERE+%7B%0A++%3Fitem+p%3AP846+%3Fst+.+%3Fst+ps%3AP846+%3Fgbif+%3B+wikibase%3Arank+%3Frk+.+FILTER%28%3Frk+%21%3D+wikibase%3ADeprecatedRank%29%0A++%3Fitem+wdt%3AP105+wd%3AQ36732+.%0A++OPTIONAL+%7B+%3Fitem+wdt%3AP685+%3Fncbi+%7D%0A++OPTIONAL+%7B+%3Fitem+wdt%3AP10585+%3Fcol+%7D%0A++OPTIONAL+%7B+%3Fitem+wdt%3AP1843+%3Fcn+.+FILTER%28LANG%28%3Fcn%29+%3D+%22fr%22+%7C%7C+LANG%28%3Fcn%29+%3D+%22en%22%29+%7D%0A%7D&format=json",
+    "file": "wdqs_kingdom.json",
+    "sha256": "416a28f94410d623728a0440990ecb0bc834d32860b9cabea6b02ba13c538151",
+    "status": 200,
+    "headers": {
+      "content-type": "application/sparql-results+json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC0 1.0 (Wikidata)",
+    "fixture_note": "trimmed: WDQS results of the kingdom and phylum per-rank queries reduced to the rows of the fixture taxa (GBIF keys of the atlas.gbif_backbone fixture); the class/order/family queries were refused by WDQS (HTTP 429, '1 req / min during active wdqs outage') on 2026-10-17, so the integration test stops after 2 queries (max_queries=2)"
+  },
+  {
+    "request_fingerprint": "5c1891dd4e2bc0ae33db28eb27d5d199c495645e0501f6496f99c333d6eaff0b",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fst+%3Fgbif+%3Frk+%3Fncbi+%3Fcol+%3Fcn+WHERE+%7B%0A++%3Fitem+p%3AP846+%3Fst+.+%3Fst+ps%3AP846+%3Fgbif+%3B+wikibase%3Arank+%3Frk+.+FILTER%28%3Frk+%21%3D+wikibase%3ADeprecatedRank%29%0A++%3Fitem+wdt%3AP105+wd%3AQ38348+.%0A++OPTIONAL+%7B+%3Fitem+wdt%3AP685+%3Fncbi+%7D%0A++OPTIONAL+%7B+%3Fitem+wdt%3AP10585+%3Fcol+%7D%0A++OPTIONAL+%7B+%3Fitem+wdt%3AP1843+%3Fcn+.+FILTER%28LANG%28%3Fcn%29+%3D+%22fr%22+%7C%7C+LANG%28%3Fcn%29+%3D+%22en%22%29+%7D%0A%7D&format=json",
+    "file": "wdqs_phylum.json",
+    "sha256": "f881d6b144271e4324683c34991d8b6d0c6471ef98a47cb4a2cec7f8f2977e35",
+    "status": 200,
+    "headers": {
+      "content-type": "application/sparql-results+json"
+    },
+    "retrieved_at": "2026-10-17T14:00:00+00:00",
+    "licence": "CC0 1.0 (Wikidata)",
+    "fixture_note": "trimmed: WDQS results of the kingdom and phylum per-rank queries reduced to the rows of the fixture taxa (GBIF keys of the atlas.gbif_backbone fixture); the class/order/family queries were refused by WDQS (HTTP 429, '1 req / min during active wdqs outage') on 2026-10-17, so the integration test stops after 2 queries (max_queries=2)"
+  }
+]

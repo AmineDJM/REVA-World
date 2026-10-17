@@ -6,6 +6,7 @@ the links: Puma concolor -> is_a -> Puma -> Felidae -> Carnivora -> Mammalia; TP
 
 from __future__ import annotations
 
+from itertools import pairwise
 from typing import Any
 
 import pytest
@@ -19,10 +20,17 @@ from reva.kg import query as kq
 pytestmark = pytest.mark.db
 OPTIONS: dict[str, dict[str, Any]] = {
     "atlas.gbif_backbone": {"groups": ["9703"], "scope_keys": ["2436436", "5290052"]},
-    "atlas.bio_wikidata": {"max_queries": 5},
+    "atlas.bio_wikidata": {"max_queries": 2},
 }
-ORDER = ("atlas.gbif_backbone", "atlas.col_checklist", "atlas.hgnc", "atlas.uniprot", "atlas.ensembl_genomes",
-         "atlas.ncbi_genomes", "atlas.bio_wikidata")
+ORDER = (
+    "atlas.gbif_backbone",
+    "atlas.col_checklist",
+    "atlas.hgnc",
+    "atlas.uniprot",
+    "atlas.ensembl_genomes",
+    "atlas.ncbi_genomes",
+    "atlas.bio_wikidata",
+)
 
 
 async def _run(db: Any, name: str) -> dict[str, Any]:
@@ -54,7 +62,7 @@ async def test_bio_layer_fixture_ingest_links_and_idempotence(db: Any) -> None:
     with db.owner.connect() as c:
         # tree of life: species -> genus -> family -> order -> class (is_a family)
         chain = ["gbif:2435099", "gbif:2435098", "gbif:9703", "gbif:732", "gbif:359"]
-        for a, b in zip(chain, chain[1:], strict=False):
+        for a, b in pairwise(chain):
             row = _one(c, a, "gbif:parent")
             assert row.object_qid == b and row.source_key == "gbif.backbone"
             assert row.raw_sha256 in row.raw_sha256s and row.source_revision.startswith("backbone 2023-08-28")
@@ -79,19 +87,38 @@ async def test_bio_layer_fixture_ingest_links_and_idempotence(db: Any) -> None:
         kinds = dict(
             c.execute(
                 text("""SELECT qid, kind FROM kg.entity_current WHERE qid = ANY(:q)"""),
-                {"q": ["hgnc:11998", "uniprot:P04637", "chromosome:9606:17", "assembly:GCA_000001405.29",
-                       "gbif:359", "ncbitaxon:9606"]},
+                {
+                    "q": [
+                        "hgnc:11998",
+                        "uniprot:P04637",
+                        "chromosome:9606:17",
+                        "assembly:GCA_000001405.29",
+                        "gbif:359",
+                        "ncbitaxon:9606",
+                    ]
+                },
             ).all()
         )
-        assert kinds == {"hgnc:11998": "gene", "uniprot:P04637": "protein", "chromosome:9606:17": "chromosome",
-                         "assembly:GCA_000001405.29": "genome_assembly", "gbif:359": "taxon",
-                         "ncbitaxon:9606": "taxon"}
+        assert kinds == {
+            "hgnc:11998": "gene",
+            "uniprot:P04637": "protein",
+            "chromosome:9606:17": "chromosome",
+            "assembly:GCA_000001405.29": "genome_assembly",
+            "gbif:359": "taxon",
+            "ncbitaxon:9606": "taxon",
+        }
         path = kq.paths(c, "hgnc:11998", "assembly:GCA_000001405.29", max_hops=2)
         assert [h["property"]["pid"] for h in path["paths"][0]["hops"]] == [
-            "hgnc:located_on_chromosome", "ensembl:has_chromosome"]
+            "hgnc:located_on_chromosome",
+            "ensembl:has_chromosome",
+        ]
         # COL: counts and the release metrics
-        assert c.execute(text("SELECT count(*) FROM kg.statement_current WHERE property_pid = 'col:species_count'")
-                         ).scalar_one() >= 9
+        assert (
+            c.execute(
+                text("SELECT count(*) FROM kg.statement_current WHERE property_pid = 'col:species_count'")
+            ).scalar_one()
+            >= 9
+        )
         # Wikidata bridges are community-edited statements under wikidata.wdqs
         wd = c.execute(
             text("""SELECT count(*) FROM kg.statement_current

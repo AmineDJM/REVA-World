@@ -61,7 +61,7 @@ import yaml
 from reva.adapters.connectors import bio_common as bc
 from reva.atlas.sources import AtlasSourceSpec
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 PARSER_VERSION = "atlas_bio_taxonomy/1"
 
 GBIF_NAME = "atlas.gbif_backbone"
