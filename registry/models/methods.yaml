@@ -1015,3 +1015,32 @@ models:
     output_ports: [{name: point_forecast}, {name: predictive_empirical}]
     applicability: {frequencies: [M], question_types: [quantity], min_past_errors: 8}
     assumptions: [log errors centred, exchangeable over past issues]
+  # V7 BEAT-CONFLICT (src/reva/evaluation/conflict/beat.py, beat_seal.py; registry/forecasts/beat_conflict/protocol.yaml):
+  # country-month conflict-RISK estimates, sealed (W3) only for families admitted by the pre-registered W1 backtest.
+  - model_key: forecast.cm_hurdle
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Country-month conflict-risk candidate: per step 1-12, ridge logistic P(state-based deaths >= 25), ridge logistic
+      P(>= 1) and ridge log-normal for log1p(deaths) | >= 1, refitted each December on the 120 previous months; features
+      (months <= origin only): GED state-based / non-state / one-sided deaths and events, recency, trend, spatial spread
+      (distinct ADM1 units and PRIO-GRID cells with events), CShapes neighbours' deaths, IMF CPI and FX shocks (2-month
+      lag). Admitted on a FINAL-VINTAGE backtest (W1), not real-time skill. Associations, not causal claims; never a
+      prediction of a specific attack, actor or person.
+    input_ports: [{name: country_month_deaths, kind: atlas_ucdp_ged_month}, {name: borders, kind: kg_cshapes}, {name: macro_shocks, kind: atlas_imf_monthly}]
+    output_ports: [{name: point_forecast}, {name: predictive_empirical}, {name: probability}]
+    applicability: {frequencies: [M], question_types: [quantity, binary], steps: [1, 12]}
+    assumptions: [pooled coefficients across countries; ridge lambda 1 on standardised features; homoscedastic log-normal positive part]
+  - model_key: forecast.cm_stack_views
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Combination with VIEWS: linear pool w * VIEWS + (1 - w) * forecast.cm_hurdle for P(>= 25) and on the log1p scale
+      for the point; w on a 0.05 grid from past pairs with known outcomes only. A win reads "REVA's combination with
+      VIEWS beats VIEWS alone".
+    input_ports: [{name: views_forecast, kind: atlas_views_cm_sb}, {name: reva_forecast, kind: point_or_predictive}]
+    output_ports: [{name: point_forecast}, {name: probability}]
+    applicability: {frequencies: [M], question_types: [quantity, binary]}
+    assumptions: [past relative accuracy informative about the next]

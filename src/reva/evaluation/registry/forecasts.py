@@ -162,6 +162,14 @@ def ensemble_models() -> dict[str, tuple[str, str]]:
     return model_entry()
 
 
+def beat_conflict_models() -> dict[str, tuple[str, str]]:
+    """V7 BEAT-CONFLICT country-month models sealed in W3 (``reva.evaluation.conflict.beat_seal``); the benchmarks
+    persistence and VIEWS reuse the V6 conflict model keys."""
+    from reva.evaluation.conflict.beat_seal import MODELS
+
+    return {k: v for k, v in MODELS.items() if k in ("forecast.cm_hurdle", "forecast.cm_stack_views")}
+
+
 def all_models() -> dict[str, tuple[str, str]]:
     return {
         **BASELINES,
@@ -171,6 +179,7 @@ def all_models() -> dict[str, tuple[str, str]]:
         **energy_models(),
         **pred_models(),
         **ensemble_models(),
+        **beat_conflict_models(),
     }
 
 

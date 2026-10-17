@@ -63,6 +63,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     ap.add_argument("--out", required=True, help="full JSON (records included)")
     ap.add_argument("--summary", help="slim JSON without records (committed next to the report)")
     ap.add_argument("--seal", action="store_true", help="seal the protocol's winners (run under flock)")
+    ap.add_argument("--w3", action="store_true", help="evaluate W3 (needs atlas.eia_wpsr; w3_addendum.yaml)")
     a = ap.parse_args(argv)
     pinned = check_protocol(Path.cwd())
     eng = make_engine("api", get_settings())
@@ -74,6 +75,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
     with eng.connect() as conn:
         res = load_and_run(conn, get_store(), origin=a.origin)
+    if a.w3:
+        res = run_w3(eng, get_store(), res, origin=a.origin)
     res["protocol_check"] = pinned
     reloc = pinned.get("code_relocation")
     if reloc and res["digest"] != reloc["preregistered_run_digest"]:
@@ -137,6 +140,64 @@ def load_and_run(conn: Any, store: Any, *, origin: str = "live") -> dict[str, An
         "run_at": now.isoformat(),
     }
     return res
+
+
+def run_w3(engine: Any, store: Any, base: dict[str, Any], *, origin: str = "live") -> dict[str, Any]:
+    """W3 on the pinned WPSR table; the protocol's Holm family recomputed with W3's evaluated p-values."""
+    from datetime import UTC, datetime
+
+    import polars as pl  # noqa: F401
+    from sqlalchemy import text
+
+    from reva.adapters.connectors.atlas_vintage_steo import PAGE_URL, parse_archive_page
+    from reva.atlas.tables import read_atlas_table
+    from reva.evaluation import beat_energy_w3 as w3
+    from reva.evaluation.energy_backtests import VINTAGE_TABLE, origins_from_cells, outcomes_from_frame
+    from reva.evaluation.registry.data import latest_version
+    from reva.evaluation.vintages import load_vintage_cells
+
+    proto = yaml.safe_load(Path(be.PROTOCOL_PATH).with_name("w3_addendum.yaml").read_text(encoding="utf-8"))
+    code = Path("src/reva/evaluation/beat_energy_w3.py").read_bytes()
+    if hashlib.sha256(code).hexdigest() != proto["code_sha256"]:
+        raise SystemExit("beat_energy_w3.py differs from the code pinned in w3_addendum.yaml: refusing")
+    now = datetime.now(UTC)
+    with engine.connect() as conn:
+        page = conn.execute(
+            text(
+                "SELECT raw_sha256 FROM evidence.acquisition WHERE origin = :o AND "
+                "response_metadata->>'final_url' = :u ORDER BY retrieved_at DESC LIMIT 1"
+            ),
+            {"o": origin, "u": PAGE_URL},
+        ).scalar_one()
+        cells = load_vintage_cells(conn, store, origin=origin, dataset_keys=[VINTAGE_TABLE])
+        wpin = latest_version(conn, "atlas.eia.wpsr_w", origin=origin, cutoff=now)
+        opin = latest_version(conn, "atlas.eia_steo.steo_observed", origin=origin, cutoff=now)
+    if wpin is None or opin is None:
+        raise SystemExit("atlas.eia.wpsr_w / steo_observed not registered")
+    issues, _ = parse_archive_page(store.get("raw", page))
+    release_of = {f"{i.year:04d}-{i.month:02d}": i.release for i in issues if i.release is not None}
+    origins = origins_from_cells(cells, codes=tuple(w3.WPSR_SERIES))
+    outcomes = outcomes_from_frame(read_atlas_table(store, opin["artifact_sha256"]), codes=tuple(w3.WPSR_SERIES))
+    weekly = w3.weekly_from_frame(read_atlas_table(store, wpin["artifact_sha256"]))
+    recs = w3.w3_records(origins, release_of, weekly, outcomes)
+    tests = w3.w3_tests(recs)
+    fam = w3.merged_family(base["tests"], tests)
+    return {
+        "label": "v7_beat_energy_w3",
+        "base_digest": base["digest"],
+        "w3_tests": tests,
+        "family_size": fam["family_size"],
+        "tests": fam["tests"],
+        "wins": fam["wins"],
+        "n_w3_records": len(recs),
+        "digest": be.digest({"base": base["digest"], "w3": tests}),
+        "inputs": {
+            "wpsr_table": {k: wpin[k] for k in ("dataset_key", "artifact_sha256", "recorded_at")},
+            "outcome_table": {k: opin[k] for k in ("dataset_key", "artifact_sha256", "recorded_at")},
+            "run_at": now.isoformat(),
+        },
+        "records": recs,
+    }
 
 
 def seal(engine: Any, store: Any, *, origin: str = "live", actor: str = "agent:beat-energy") -> dict[str, Any]:
