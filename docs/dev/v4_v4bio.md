@@ -79,3 +79,68 @@ counts, Ensembl assembly name/genebuild/golden path, NCBI gene counts/assembly n
 names (fr/en, verbatim). No predicate is causal.
 
 LIVE_RESULTS_PLACEHOLDER
+
+## Hand-offs
+
+* **V4HEALTH** — gene–disease associations are yours, as `associated_with` (never causal): key genes as
+  `hgnc:<n>` (numeric part of HGNC:<n>, 45,277 genes loaded), proteins as `uniprot:<acc>`, taxa as `ncbitaxon:<id>`
+  (14,9xx organisms with Swiss-Prot entries have entities) — the same prefixes as your ClinGen / Mondo loaders.
+  Pathogens of `registry/bio/taxon_scope.yaml` (group `pathogens`, 46 accepted backbone species) carry GBIF keys;
+  their NCBI ids reach them only through `bio:same_taxon_via_wikidata` (Wikidata P685 + P846 on one item).
+* **V4ECO** — species distributions are yours: GBIF taxon keys of every loaded taxon are the `gbif:<key>` ids
+  (kingdom..family, all accepted Mammalia species and genera, the 178 scope species: crops, livestock, pathogens,
+  model organisms, iconic / threatened). `gbif:accepted_species_count` gives the backbone's species count per group.
+  IUCN threat statuses are not loaded here (IUCN Red List data on GBIF is CC BY-NC; your IUCN source decides).
+* **V4LINK** — identity rules already use `gbif:` (P846 legacy backbone), `ncbitaxon:` (P685), `hgnc:` (P354):
+  my entities match them. My own `bio:wikidata_item` / `bio:same_taxon_via_wikidata` cover the taxa your bounded
+  pack (>= 30 sitelinks) leaves out; if your pack supersedes them, retract by re-running `atlas.bio_wikidata`
+  with fewer queries is not needed — both can coexist (different predicates, same Wikidata statements).
+
+## What is missing, and why
+
+* **Species lists beyond Mammalia** (Aves 14,641, Amphibia 9,815, reptiles ~14,200, fishes) are declared in
+  `registry/bio/taxon_scope.yaml` with `load: false`: the raw archive is bounded at 150 MB on this machine
+  (ChecklistBank returns ~1.5 kB per species: Aves alone ~22 MB). Command below.
+* **Extant vs fossil**: the GBIF backbone (2023-08-28) mixes fossil and extant species (Mammalia: 21,100 accepted
+  species, of which GBIF flags 6,323 extant and 12,917 extinct, the rest unflagged); counts are stated with that
+  definition. COL counts are given both ways (all / `extinct=false`).
+* **Genus/species counts under truncated facet partitions**: GBIF lists at most 50,000 facet values per query;
+  families under a truncated order partition with few species get no count statement (listed in the run report,
+  `counts.missing_sample`), never a zero.
+* **Gene counts from Ensembl**: not published by the REST API (BioMart retired) -> NCBI annotation reports.
+* **Wikidata bridges are partial**: WDQS answered `429 Aggressively rate-limiting to 1 req / min - this rule was
+  created during active wdqs outage` on 2026-10-17 (shared egress); the run keeps what was answered and never
+  retracts on an incomplete run (`complete: false`).
+* **Common names**: only Wikidata P1843 (fr/en). GBIF's own vernacular names are per source checklist and cost one
+  request per taxon (not fetched); COL vernacular names (190k) would need the ColDP export (login required).
+* **Threat status / IUCN**: not loaded (V4ECO; NC licence).
+* **Withdrawn HGNC symbols, non-human genes**: only the human approved complete set (HGNC scope).
+
+## Owner decisions
+
+* **GBIF 2026 backbone**: GBIF announced a COL-XR-based backbone (Wikidata P14607, alphanumeric ids, 2,701 items
+  on 2026-10-17) while api.gbif.org still serves the 2023-08-28 integer-key backbone. When GBIF switches its API,
+  decide whether `gbif:` keys stay the legacy keys (and a `gbif2026:` scheme is added, V4LINK's inactive rule) or
+  are re-keyed.
+* **Raw archive budget**: loading all vertebrate species needs ~+80 MB (see command below).
+* **Budget**: `gbif.backbone` was raised to 1,200 requests/day after the 1.0.1 run spent 800 requests opening a
+  facet partition per family (fixed in 1.0.2). The 78.5 MB that run archived are the same pages the 1.0.2 run reads
+  (content-addressed, not stored twice).
+
+## Commands (resume / bigger machine)
+
+```bash
+df -h /                                                   # >= 5 GB free first
+flock /tmp/reva-devdb.lock uv run reva seed              # registers atlas_bio_* connector versions
+for s in atlas.hgnc atlas.uniprot atlas.ensembl_genomes atlas.ncbi_genomes atlas.col_checklist \
+         atlas.gbif_backbone atlas.bio_wikidata; do
+  flock /tmp/reva-devdb.lock uv run reva atlas ingest $s
+done
+# all vertebrate species (bigger machine, ~+80 MB raw): a partial run never retracts
+flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.gbif_backbone --option groups=212,131,11592253,11418114,11493978,11569602,121,204
+# more Wikidata bridges when WDQS is healthy (budget wikidata.wdqs 1,500/day)
+flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.bio_wikidata --option max_queries=400
+# offline checks
+uv run pytest tests/unit/test_bio_v4.py tests/integration/test_bio_v4_ingest.py
+uv run python -m reva.kg.families check
+```
