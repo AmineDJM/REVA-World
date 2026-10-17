@@ -40,7 +40,8 @@ Live loads in the dev DB `reva` (origin `live`, 2026-10-17):
 |---|---|
 | `atlas.ecoregions` | KG load 444: **869 entities** (847 `resolve_eco:*` ecoregions, 14 `resolve_biome:*`, 8 `resolve_realm:*`), **2,538 statements** (in_biome 846, in_realm 846, nature_needs_half 846), 0 rejected; 2 requests, 121,980 bytes |
 | `atlas.fishstat` | atlas table `fishstat.production`: **136,317 rows** (country x production source x Yearbook / Major group x measure x year, 1950-2024) from 1,159,616 FAO cells; unmapped (kept): ANT, CSK, EAZ, SCG, SUN, YUG (former entities with FAO ISO3) and un:230 Ethiopia PDR, un:736 Sudan [former], un:896 Other NEI; 78 sums flagged lower_bound (suppressed `Q` cells), 8 all-missing sums Missing; 1 request, 6,382,577 bytes |
-| `atlas.globi`, `atlas.gbif_occ` | GLOBI_GBIF |
+| `atlas.globi` | KG: **23,091 taxon entities** (partners, fill-missing), **39,230 statements**: eats 11,849, preys_on 8,545, has_host 8,232, parasite_of 3,333, visits_flowers_of 2,728, pollinates 2,477, pathogen_of 1,774, vector_of 151, resolved_within 141; 0 rejected. 44,255 GloBI rows read; 3,747 without a usable id and 1,203 of unmapped types (visits 616, hasArbuscularMycorrhizalHost 392, hasVector 180, ...) dropped and counted; 9 of 90 queries truncated at 2,000 rows (cattle as target, house sparrow, cod, honey bee, buff-tailed bumblebee, monarch as source, maize, potato, apple as target); 90 requests, 3,686,225 bytes |
+| `atlas.gbif_occ` | **not loaded live**: it got the DB lock at 15:36 UTC when free disk had fallen to 4.9 GB (other agents' loads), below the 5 GB rule, and was stopped before fetching; code, fixtures and tests are complete (fixture replay loads all 4 tables + KG). Run the command below when >= 5 GB are free (~267 requests, ~5 MB raw) |
 | `atlas.un_sdg` (RLI), `atlas.owid` (LPI), `atlas.fao` QCL (9 items) | code + fixtures + tests done; not re-ingested live (each re-fetches the whole existing source: run the commands below) |
 
 Fixture replays (tests, origin `test_fixture`): GBIF excerpt 4 tables (1,006 + 496 + 494 + 293 rows; 2 groups, 1 year,
@@ -78,6 +79,9 @@ Fixture replays (tests, origin `test_fixture`): GBIF excerpt 4 tables (1,006 + 4
   taurus) and `ncbi:59532` (Kobus megaceros); Apis mellifera (`eol:1045608` --resolved_within--> `gbif:1341976`)
   --interacts_with (globi:pollinates)--> `ncbi:237863` Passiflora ligularis; `eol:13677906` Crithidia mellificae
   --interacts_with (globi:parasite_of)--> `eol:1045608` Apis mellifera.
+* **Live GloBI example**: `col:QLXL` (Canis lupus as GloBI indexes it) --is_a (globi:resolved_within)--> `gbif:5219173`
+  (wolf, GBIF); `col:QLXL` --eats--> `eol:328663` Sus scrofa (246 interaction records), `col:QSF4` Capreolus pygargus
+  (202), `eol:311906` Ovis aries (174), `eol:328649` Cervus elaphus (174).
 * **Where it lives / how threatened** (GBIF, fixture replay): `gbif:5219404` Panthera leo --located_in
   (gbif_occ:recorded_in, >= 10 records)--> Kenya (Q114), ...; `gbif:iucn_red_list_category` = VU (IUCN taxon
   15951); `gbif:5219404` --measured_by--> `atlas:gbif_occ.taxon_country` (indicator `occurrences.gbif_5219404`).
