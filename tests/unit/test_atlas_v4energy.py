@@ -242,7 +242,13 @@ def test_usgs_facilities_kg_owners_with_shares_and_missing_never_zero() -> None:
     assert any(s.qualifiers.get("share_percent") for s in owners)
     assert all((q := s.qualifiers.get("share_percent")) is None or q[0]["amount"] != "-999" for s in owners)
     hti = [s for s in parts.statements if s.property_pid == "usgs_myb:country" and s.object_qid == "iso3:HTI"]
-    assert hti  # evidenced name alias (registry/atlas/geo_aliases/v4energy.yaml)
+    assert hti and hti[0].subject_qid.startswith("usgs_myb:HTI")  # Facility ID prefix, not the name alias
+    # AUDIT3 section 5: every country statement comes from the GENC trigraph of the USGS Facility ID
+    cs = [s for s in parts.statements if s.property_pid == "usgs_myb:country"]
+    assert all(s.qualifiers["genc_trigraph"] == s.subject_qid.removeprefix("usgs_myb:")[:3] for s in cs)
+    assert all(s.statement_id.endswith(":country_by_id") for s in cs)
+    assert parts.counters.get("country_name_crosscheck_differs", 0) == 0
+    assert parts.counters.get("country_unmapped_id_prefix", 0) == 0
 
 
 def test_steo_long_state_lists_fit_the_atlas_bound() -> None:

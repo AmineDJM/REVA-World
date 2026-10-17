@@ -1,0 +1,64 @@
+# Curator decisions that map by a NAME or a LABEL rather than by an identifier the source publishes
+# (inventory: docs/dev/review_v4_v5_audit.md section 5, AUDIT3; consolidated by FIX4C, 2026-10-17).
+#
+# REVA's rule is "never map by name similarity; only by identifiers the sources publish". None of the entries below is
+# a similarity or fuzzy match: each is an exact string, a listed alias with its evidence, or a curator's assignment.
+# They are kept because no identifier exists in the source bytes, and each one is listed here for MAINTAINER REVIEW.
+# `status`: pending_maintainer_review | resolved_by_identifier (no longer name-based; kept for the record).
+# Read-only documentation: no loader reads this file (the mappings themselves live where `where` says).
+version: 1
+decisions:
+  - id: usgs_facility_country
+    where: src/reva/adapters/connectors/atlas_usgs_facilities.py (scheme usgs_name, registry/atlas/geo_aliases/a_resources.yaml + v4energy.yaml)
+    maps: USGS country short names ('Country (Short Form) or Locality') -> ISO3 -> Wikidata QID (usgs_myb:country)
+    size: 12,027 facility statements
+    status: resolved_by_identifier
+    resolution: >-
+      FIX4C (atlas.usgs_myb_facilities 1.0.2): the country is the GENC trigraph that prefixes the USGS Facility ID
+      ("GENC country code combined with an internally assigned number", USGS metadata), mapped as ISO 3166-1 alpha-3;
+      the name is kept verbatim as qualifier usgs_country and only cross-checked (0 differences, AUDIT3 population
+      check 12,027/12,027). The usgs_name alias scheme is still used by the A-RESOURCES atlas tables, whose rows carry
+      no identifier (MCS / MYB production tables): those remain curator aliases.
+  - id: hofstede_country_labels
+    where: registry/atlas/geo_aliases/v4mind.yaml (scheme hofstede), table hofstede.dimensions (V4MIND)
+    maps: Hofstede's own 3-letter codes are NOT ISO 3166 (CHI = China, SAL = El Salvador ...); aliases are built from
+      Hofstede's `country` column (exact crosswalk label or a listed name match with its reason)
+    size: 101 aliases, 666 cells
+    status: pending_maintainer_review
+    review_points:
+      - '"Great Britain" -> GBR (United Kingdom entity): one national score published under that name.'
+      - Regions / sub-national groups / former states left unmapped on purpose (AFE, AFW, ARA, BEF, BEN, CAF, GEE, SAW, SWF, SWG).
+  - id: effect_estimate_scope_countries
+    where: registry/effects/literature/*.yaml (scope.countries); owner decision 2 of PRED-EFFECT
+    maps: country names / column heads printed in a publication -> curator-assigned ISO3
+    size: 72 published estimates
+    status: pending_maintainer_review
+    review_points:
+      - The printed name is kept in scope.sample_note next to the ISO3 the curator assigned.
+      - A publication prints no ISO code; the assignment is the curator's reading, reviewable per file.
+  - id: country_qids_chi_xkx
+    where: registry/entities/country_qids.json (V3 WDHARVEST; used by every V4 country edge)
+    maps: CHI (Channel Islands) -> Q42314 and XKX (Kosovo) -> Q1246 resolved by English Wikipedia sitelink title
+    size: 2 of 249 countries (the other 247 by Wikidata P298 = ISO 3166-1 alpha-3)
+    status: pending_maintainer_review
+    review_points:
+      - CHI and XKX are not ISO 3166-1 codes held by a Wikidata item via P298 (CHI is a UN M49/WB code, XKX a
+        user-assigned code), so no identifier join exists; method enwiki_sitelink is recorded per entry in the file.
+  - id: health_obo_causal_markers
+    where: src/reva/adapters/connectors/health_obo_common.py (CAUSAL_MARKERS)
+    maps: causal status of an ontology relation from words in its label
+    size: 61 DOID claims (RO:0007001 has disease driver)
+    status: pending_maintainer_review
+    review_points: [AUDIT3 M9 -- owned by V4HEALTH / FIX4A (classification by RO hierarchy or an id allow-list).]
+  - id: eml_anchor_by_label
+    where: registry/kg/queries/health/wikidata/essential_medicines.yaml
+    maps: the WHO Model List of Essential Medicines anchor item selected by its exact English label
+    size: 0 (spec not harvested)
+    status: pending_maintainer_review
+    review_points: [Pin the anchor QID in the spec before the first harvest (owner V4HEALTH / FIX4A).]
+  - id: carbonbrief_event_and_resolve_realm_ids
+    where: src/reva/adapters/connectors/atlas_attribution.py (ids_by_name, cbattr:extreme:<sha256(Name)>), resolve_realm:<REALM>
+    maps: event / realm identity from the source's own name string (within one source, not a cross-source merge)
+    size: 948 + 8 entities
+    status: pending_maintainer_review
+    review_points: [AUDIT3 L8 -- the grouping rule should be stated in the entity description.]

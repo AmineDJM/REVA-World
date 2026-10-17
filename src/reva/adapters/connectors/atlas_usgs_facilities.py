@@ -19,8 +19,8 @@ KG (``source_key`` ``usgs.sciencebase``; predicates ``usgs_myb:*`` in ``registry
   aliases). The id is USGS's ("GENC country code combined with an internally assigned number").
 * entity ``usgs_myb:commodity:<code>`` (kind ``commodity``) per "Level 2 (Commodity)" value (code = the value
   lower-cased, non-alphanumerics -> ``_``); label verbatim; not mapped to any other vocabulary (no identifier).
-* facility statements: ``usgs_myb:country`` (country QID via the A-RESOURCES ``usgs_name`` scheme, else
-  ``iso3:<ISO3>``), ``usgs_myb:feature_type``, ``usgs_myb:adm1_name`` (a *name* as listed in the NGA GNS, with
+* facility statements: ``usgs_myb:country`` (country QID of the GENC trigraph that prefixes the USGS Facility ID,
+  else ``iso3:<ISO3>``; the country-name column is kept verbatim as ``usgs_country``), ``usgs_myb:feature_type``, ``usgs_myb:adm1_name`` (a *name* as listed in the NGA GNS, with
   the division type — never linked to a region entity: no code is published), ``usgs_myb:location``,
   ``usgs_myb:operator_name``.
 * entry statements (``Global Entry`` key in the statement id): ``usgs_myb:produces`` -> commodity (qualifiers: the
@@ -56,7 +56,9 @@ from reva.atlas.tables import country_iso3
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.usgs_myb_facilities"
-CONNECTOR_VERSION = "1.0.1"
+# 1.0.2 (FIX4C, AUDIT3 section 5): usgs_myb:country from the Facility ID's GENC trigraph, not from the country name.
+CONNECTOR_VERSION = "1.0.2"
+FACILITY_ID_RE = re.compile(r"^([A-Z]{3})[0-9]+$")
 PARSER_VERSION = "atlas_usgs_facilities/1"
 SOURCE_KEY = "usgs.sciencebase"
 SOURCE = "usgs_myb_fac"
@@ -323,19 +325,31 @@ def build_kg(
         sel = {"file": RELEASE.data_file, "row": first.row}
         base = f"fac:{fid}"
         country = first.g("Country (Short Form) or Locality")
-        iso = country_iso3(country, GEO_SCHEME) if country else None
+        # AUDIT3 section 5: the country is the trigraph USGS puts in its own Facility ID ("GENC country code combined
+        # with an internally assigned number"), an identifier -- not the country *name* column. The name-based
+        # answer is only a cross-check (counted when it differs, never used).
+        m = FACILITY_ID_RE.match(fid)
+        iso = country_iso3(m.group(1), "iso3") if m else None
         if iso:
             cq = country_qids.get(iso)
             c["country_qid" if cq else "country_iso3_node"] += 1
+            by_name = country_iso3(country, GEO_SCHEME) if country else None
+            if by_name != iso:
+                c["country_name_crosscheck_differs"] += 1
             st(
-                f"{base}:country",
+                f"{base}:country_by_id",
                 q,
                 "usgs_myb:country",
                 obj=cq or f"iso3:{iso}",
-                qualifiers={"selector": sel, "usgs_country": country},
+                qualifiers={
+                    "selector": sel,
+                    "usgs_country": country,
+                    "genc_trigraph": m.group(1) if m else None,
+                    "basis": "USGS Facility ID prefix (GENC trigraph) -> ISO 3166-1 alpha-3",
+                },
             )
         else:
-            c["country_unmapped"] += 1
+            c["country_unmapped_id_prefix"] += 1
         for k, ft in enumerate(ftypes):
             st(f"{base}:feature_type:{k}", q, "usgs_myb:feature_type", value=s(ft), qualifiers={"selector": sel})
         adm = first.g("First-Level Administrative Division Name")
