@@ -1,0 +1,47 @@
+[
+ {
+  "request_fingerprint": "1df8b145d702b0af7f23aa94257f3d5c852040059050a6cbecd357102e777b7b",
+  "url": "https://www.cfr.org/cyber-operations/",
+  "file": "tracker.html",
+  "sha256": "3da76039030ef32cab7377c5db3af3fa2f39109480396f6f3b0014f57e15189d",
+  "status": 200,
+  "headers": {
+   "content-type": "text/html; charset=UTF-8"
+  },
+  "retrieved_at": "2026-10-17T21:00:00+00:00",
+  "licence": "CFR Terms of Use (all rights reserved)",
+  "live_sha256": "bdac6d64242c880e26e6c51afdb0ba7aef3c1d98468d401f2abcebe8236b9b74",
+  "live_bytes": 1121660,
+  "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (visible text of the page)"
+ },
+ {
+  "request_fingerprint": "7203029ed1d97f0e64c6f81112d29dab266646511919cfa961aa39aeed50b73d",
+  "url": "https://www.cfr.org/terms-use",
+  "file": "terms.html",
+  "sha256": "595381143aee6e83159243dbabd1ecc2a2814b7bf7afdf6e6822723eddfaf1f1",
+  "status": 200,
+  "headers": {
+   "content-type": "text/html; charset=UTF-8"
+  },
+  "retrieved_at": "2026-10-17T21:00:00+00:00",
+  "licence": "CFR Terms of Use (all rights reserved)",
+  "live_sha256": "bb77ada8d881823ddb0bd559da96a7d6b4676a69b6491b0d09654662a2c1ebec",
+  "live_bytes": 309790,
+  "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (visible text of the page)"
+ },
+ {
+  "request_fingerprint": "170ff6e50a9209892ef2889c72398fe8cbb7706dccac12f432f2587f4eda8aa9",
+  "url": "https://static.cfr.org/cyber-operations/data/cyber-operations-incidents.csv",
+  "file": "incidents.csv",
+  "sha256": "e905c619d2ee6a98679dfa9600f2341d38e2d5965686a137c7b189ca6a3f3ffe",
+  "status": 200,
+  "headers": {
+   "content-type": "text/csv"
+  },
+  "retrieved_at": "2026-10-17T21:00:00+00:00",
+  "licence": "CFR Terms of Use (non-commercial, no redistribution)",
+  "live_sha256": "0a6117f51583c0213d9b451a916f2e997b54dc3839a355fd1f1f58a1f39dac73",
+  "live_bytes": 558289,
+  "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped)"
+ }
+]

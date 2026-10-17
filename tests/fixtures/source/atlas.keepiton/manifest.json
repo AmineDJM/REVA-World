@@ -1,0 +1,62 @@
+[
+ {
+  "request_fingerprint": "a0a3e6e631db7d5c6e1ba131792f50624a0f7674fe41dfdba312d6ac6d33695f",
+  "url": "https://www.accessnow.org/guide/shutdown-tracker-optimization-project/",
+  "file": "methodology.html",
+  "sha256": "b128145de436d3a10652342fd1a67f3e81df298e0f99348fece8e46082c7d882",
+  "status": 200,
+  "headers": {
+   "content-type": "text/html; charset=UTF-8"
+  },
+  "retrieved_at": "2026-10-17T21:00:00+00:00",
+  "licence": "Access Now website (Terms of Use)",
+  "live_sha256": "5b7d203b47f662eea25f957dbfe6e8a356d4711fcb677c9ff885a8fb9768084a",
+  "live_bytes": 385863,
+  "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (visible text of the page)"
+ },
+ {
+  "request_fingerprint": "f7558c689cb3fd783c657311b7a48b0b6397516975858427b91ddc717e99c378",
+  "url": "https://www.accessnow.org/trademarks-copyright-and-media-usage/",
+  "file": "media_usage.html",
+  "sha256": "eeb1aa9fadacaa6ac8d6b71be49ba9e6418b19fe29c5ff267ad141414fae99de",
+  "status": 200,
+  "headers": {
+   "content-type": "text/html; charset=UTF-8"
+  },
+  "retrieved_at": "2026-10-17T21:00:00+00:00",
+  "licence": "Access Now website (Terms of Use)",
+  "live_sha256": "3e1614126f44f97faa0a055fa4656aaa9cdf4f34526bd9ee3b76a3556d32be5d",
+  "live_bytes": 364069,
+  "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (visible text of the page)"
+ },
+ {
+  "request_fingerprint": "8b61fbb76ce0aa5b337633c906165b4a817f50a47427a758077b765b2b221776",
+  "url": "https://docs.google.com/spreadsheets/d/1DvPAuHNLp5BXGb0nnZDGNoiIwEeu2ogdXEIDvT4Hyfk/gviz/tq?tqx=out:json&gid=1484157943&tq=limit%200",
+  "file": "gviz_header.js",
+  "sha256": "1d159eabd95355152415b1ca94a3295bd84cf0dada77c75afbcd9cc51b3e01f6",
+  "status": 200,
+  "headers": {
+   "content-type": "application/javascript; charset=utf-8"
+  },
+  "retrieved_at": "2026-10-17T21:00:00+00:00",
+  "licence": "Access Now STOP (no dataset licence)",
+  "live_sha256": "1d159eabd95355152415b1ca94a3295bd84cf0dada77c75afbcd9cc51b3e01f6",
+  "live_bytes": 2676,
+  "excerpt": "whole file"
+ },
+ {
+  "request_fingerprint": "8c7619e35ef1364ab07710d89aebde0058fc6e5cca15f99f7e67d8ffd598c78a",
+  "url": "https://docs.google.com/spreadsheets/d/1DvPAuHNLp5BXGb0nnZDGNoiIwEeu2ogdXEIDvT4Hyfk/gviz/tq?tqx=out:csv&gid=1484157943",
+  "file": "stop_combined.csv",
+  "sha256": "87966b158557b2cbf8f24e999c83b66d7a4c94ccecebe70095c133e57d56de44",
+  "status": 200,
+  "headers": {
+   "content-type": "text/csv; charset=utf-8"
+  },
+  "retrieved_at": "2026-10-17T21:00:00+00:00",
+  "licence": "Access Now STOP (no dataset licence; restricted)",
+  "live_sha256": "d69480b3af8a32e578afbe52bba0ad7a349a277a80fc45bc53c7ae0876d42ef8",
+  "live_bytes": 2163985,
+  "excerpt": "subset of the real provider bytes downloaded 2026-10-17 (rows/records kept verbatim; most rows dropped; re-quoted CSV)"
+ }
+]
