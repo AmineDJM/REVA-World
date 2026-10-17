@@ -1,0 +1,27 @@
+# V4 (agent V4MIND): Hofstede cultural dimensions, dimension data matrix (country scores).
+# Connector: src/reva/adapters/connectors/atlas_mind_hofstede.py (atlas.hofstede -> atlas table hofstede.dimensions_2015).
+source_key: hofstede.dimensions
+title: Hofstede dimension data matrix (six dimensions of national culture, version 2015 12 08)
+provider_url: https://geerthofstede.com/research-and-vsm/dimension-data-matrix/
+lineage_family: hofstede_ibm_surveys
+rights:
+  licence: "Research use without permission; commercial use requires contacting the authors (no open licence)"
+  licence_url: https://geerthofstede.com/research-and-vsm/dimension-data-matrix/
+  licence_status: research_use_only
+  redistribution: not_granted
+  licence_evidence: >-
+    Page text (read 2026-10-17): "Researchers can use them without asking for permission. Those who are considering
+    commercial use should contact us." Checked on every run (registration refused if the sentence changes).
+  attribution: >-
+    Hofstede, G., Hofstede, G.J. & Minkov, M. (2010). Cultures and Organizations: Software of the Mind, 3rd ed.
+    Data: geerthofstede.com dimension data matrix, version 2015 12 08.
+metadata:
+  allowed_hosts: [geerthofstede.com]
+  files:
+    - https://geerthofstede.com/research-and-vsm/dimension-data-matrix/
+    - https://geerthofstede.com/wp-content/uploads/2016/08/6-dimensions-for-website-2015-08-16.csv
+  authentication: none
+  editorial_status: >-
+    Scores of national cultures from IBM employee surveys (~1967-1973) and later replications; no measurement year
+    per value. Owner decision: keep for research use only, or drop (docs/dev/v4_v4mind.md).
+  cadence: static (version 2015 12 08)

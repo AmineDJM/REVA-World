@@ -12,6 +12,18 @@
     "licence": "per file: NOAA/NASA/EPA US Government works; HadCRUT5 OGL v3; Berkeley Earth CC BY-NC 4.0; NSIDC G02135 cite"
   },
   {
+    "request_fingerprint": "d8915ebff9446cb9c7b830f1d3422f10786cec27845d3eb026c31ec4299a5c65",
+    "url": "https://data.giss.nasa.gov/gistemp/tabledata_v4/GLB.Ts+dSST.csv",
+    "file": "d8915ebff9446cb9.csv",
+    "sha256": "4c64eda288bce32b8d76926278f346ecea1e53506df8ee72a3d5accb0657c416",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T13:40:53.239443+00:00",
+    "licence": "per file: NOAA/NASA/EPA US Government works; HadCRUT5 OGL v3; Berkeley Earth CC BY-NC 4.0; NSIDC G02135 cite"
+  },
+  {
     "request_fingerprint": "9df90234ede908af0652e4e0e370ba7f93c99e6b7a7a829e4a48a0b58274086a",
     "url": "https://gml.noaa.gov/webdata/ccgg/trends/ch4/ch4_mm_gl.csv",
     "file": "9df90234ede908af.csv",
@@ -300,6 +312,54 @@
     "licence": "per file: NOAA/NASA/EPA US Government works; HadCRUT5 OGL v3; Berkeley Earth CC BY-NC 4.0; NSIDC G02135 cite"
   },
   {
+    "request_fingerprint": "2f0926629ab768cae84d40a96426cc451e0ad4b4ce2825da06f22b66a5f80e8b",
+    "url": "https://noaadata.apps.nsidc.org/NOAA/G02135/south/monthly/data/S_09_extent_v4.0.csv",
+    "file": "2f0926629ab768ca.txt",
+    "sha256": "32e94df4721daf475d675490ce81d49d5e99f47e43cad2660c064ab56ba4f01a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-17T13:40:43.334095+00:00",
+    "licence": "per file: NOAA/NASA/EPA US Government works; HadCRUT5 OGL v3; Berkeley Earth CC BY-NC 4.0; NSIDC G02135 cite"
+  },
+  {
+    "request_fingerprint": "bd4ce7c7a013f39d34cbdcb27d1ca64c30deb52639da1d21ac9d9637fd5fbfcc",
+    "url": "https://noaadata.apps.nsidc.org/NOAA/G02135/south/monthly/data/S_10_extent_v4.0.csv",
+    "file": "bd4ce7c7a013f39d.txt",
+    "sha256": "c2c343b117cb1e04c8f08821ee9982c124312d3cce59c86e90f0a75b6ee8af4e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-17T13:40:43.631607+00:00",
+    "licence": "per file: NOAA/NASA/EPA US Government works; HadCRUT5 OGL v3; Berkeley Earth CC BY-NC 4.0; NSIDC G02135 cite"
+  },
+  {
+    "request_fingerprint": "d7895eb62b26a9323683891dbc3c29affeb2929e64d4d77efe92977c700fabda",
+    "url": "https://noaadata.apps.nsidc.org/NOAA/G02135/south/monthly/data/S_11_extent_v4.0.csv",
+    "file": "d7895eb62b26a932.txt",
+    "sha256": "1ad02149c0e754021fb136324550bcb171390805e34ea0501b8136874f1f4e5a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-17T13:40:43.894799+00:00",
+    "licence": "per file: NOAA/NASA/EPA US Government works; HadCRUT5 OGL v3; Berkeley Earth CC BY-NC 4.0; NSIDC G02135 cite"
+  },
+  {
+    "request_fingerprint": "24ca2856e68b4b76781a8f81623488e1091033e34c8e7b7bc13c8a4cd3566b19",
+    "url": "https://noaadata.apps.nsidc.org/NOAA/G02135/south/monthly/data/S_12_extent_v4.0.csv",
+    "file": "24ca2856e68b4b76.txt",
+    "sha256": "dafcb0df80ac1fb828ae66bb40f28b10539ace084b0a9fb2e19cef145abe1dc2",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-17T13:40:44.885793+00:00",
+    "licence": "per file: NOAA/NASA/EPA US Government works; HadCRUT5 OGL v3; Berkeley Earth CC BY-NC 4.0; NSIDC G02135 cite"
+  },
+  {
     "request_fingerprint": "2e78af8f7afa5e699e93fe22cc7d8b004d9ef2494bbc93b27c8b0297a036c32e",
     "url": "https://psl.noaa.gov/data/correlation/oni.data",
     "file": "2e78af8f7afa5e69.txt",
@@ -324,6 +384,18 @@
     "licence": "per file: NOAA/NASA/EPA US Government works; HadCRUT5 OGL v3; Berkeley Earth CC BY-NC 4.0; NSIDC G02135 cite"
   },
   {
+    "request_fingerprint": "d0cd5feb10c5a3b0c36d02196d6b9b4738a23ef4099df96a95b7047af6eb4759",
+    "url": "https://www.epa.gov/system/files/other-files/2024-06/sea-level_fig-1.csv",
+    "file": "d0cd5feb10c5a3b0.csv",
+    "sha256": "3a075b69dc33734707c0e7bc2ee32e4ad49a8a906678912a8d23f0bb32d2a3be",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T13:40:46.060222+00:00",
+    "licence": "per file: NOAA/NASA/EPA US Government works; HadCRUT5 OGL v3; Berkeley Earth CC BY-NC 4.0; NSIDC G02135 cite"
+  },
+  {
     "request_fingerprint": "d5dca054d28643796e9a6ab801aa316e4ea814a91ec5efdba16e8c3e8f61ea34",
     "url": "https://www.metoffice.gov.uk/hadobs/hadcrut5/data/HadCRUT.5.2.0.0/analysis/diagnostics/HadCRUT.5.2.0.0.analysis.summary_series.global.monthly.csv",
     "file": "d5dca054d2864379.csv",
@@ -333,6 +405,18 @@
       "content-type": "text/csv"
     },
     "retrieved_at": "2026-10-17T13:40:31.214142+00:00",
+    "licence": "per file: NOAA/NASA/EPA US Government works; HadCRUT5 OGL v3; Berkeley Earth CC BY-NC 4.0; NSIDC G02135 cite"
+  },
+  {
+    "request_fingerprint": "9e58e76209b62f2bce8bbba54fc409916cc0f0c7ec3b923564468335ca8a4d5b",
+    "url": "https://www.star.nesdis.noaa.gov/socd/lsa/SeaLevelRise/slr/slr_sla_gbl_free_ref_90.csv",
+    "file": "9e58e76209b62f2b.csv",
+    "sha256": "539ecde7a3e90e2a2f07c9a5a0a52e3ff34396fa57436d44375516a677c355a7",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-17T13:40:45.351295+00:00",
     "licence": "per file: NOAA/NASA/EPA US Government works; HadCRUT5 OGL v3; Berkeley Earth CC BY-NC 4.0; NSIDC G02135 cite"
   }
 ]

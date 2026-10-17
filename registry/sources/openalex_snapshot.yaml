@@ -1,0 +1,21 @@
+# V4 (agent V4MIND): OpenAlex public snapshot on S3 (research taxonomy: domains, fields, subfields, topics).
+# Connector: src/reva/adapters/connectors/atlas_mind_openalex.py (atlas.openalex_taxonomy -> KG only).
+source_key: openalex.snapshot
+title: OpenAlex snapshot (S3) -- research taxonomy entities
+provider_url: https://docs.openalex.org/download-all-data/openalex-snapshot
+lineage_family: openalex
+rights:
+  licence: CC0-1.0
+  licence_url: https://openalex.org/about
+  licence_evidence: "OpenAlex: 'all OpenAlex data is CC0' (about page; same licence as A-SCI's openalex.api)"
+  attribution: OpenAlex (OurResearch), CC0
+metadata:
+  allowed_hosts: [openalex.s3.amazonaws.com]
+  files:
+    - https://openalex.s3.amazonaws.com/data/jsonl/{domains,fields,subfields,topics}/manifest.json
+    - the gzip JSON-lines files each manifest lists (~7.5 MB in all, 2026-10-14 snapshot)
+  authentication: none
+  editorial_status: >-
+    Machine-built topic taxonomy (topic -> subfield -> field -> domain); Wikidata ids that OpenAlex gives on domains,
+    fields and subfields are kept as identifier statements. Counts are a live index at the snapshot date.
+  cadence: monthly snapshot
