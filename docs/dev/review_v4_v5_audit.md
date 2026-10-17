@@ -319,17 +319,17 @@ appended resolutions — nothing edited).
 
 | ID | Status | By | Where |
 |---|---|---|---|
-| H1 | open | — | |
-| H2 | open | — | |
-| M1 | open | — | |
-| M2 | open | — | |
+| H1 | **fixed** (919 Mondo claims — 823 + 96 subject-side — re-keyed onto REVA-made `reva_state:<state>:<filler>` nodes, old claims retracted `reclassified_by_reva`; 671 nodes + `mondo:altered_state_of`; QA `causal.disruption_axioms_unqualified` 0) | FIX4A | `docs/dev/v6_fix4a.md` |
+| H2 | **fixed in code** (`atlas.clingen` 1.1.0: Refuted / Disputed / No Known → `clingen:gene_disease_curation_negative`, unmapped); live re-ingest queued (disk 4.3 GB < 5 GB) — 296 still `associated_with` in the DB until it runs | FIX4A | `v6_fix4a.md` |
+| M1 | **fixed** (3,751 claims retracted `reclassified_by_reva`; 3,751 `doid:inheritance_mode` statements, family context) | FIX4A | `v6_fix4a.md` |
+| M2 | **fixed** (`reva causal refresh --origin live` after the DOID / Mondo reloads: 0 ungraded of 61,680 live claims) | FIX4A | `v6_fix4a.md` |
 | M3 | **fixed** (5 new estimate revisions on level variables; loader + engine refuse level/growth inconsistency; 0/301 current rows violate) | FIX4B | `docs/dev/v6_fix4b.md` §M3 |
 | M4 | **fixed** (declared variant preference `registry/predict/estimate_preferences.yaml`; residual ties → gap `unresolved_tie`, never alphabetical) | FIX4B | `v6_fix4b.md` §M4, `v5_pred_engine.md` §7c |
 | M5 | **fixed** (a: h = 0 = onset year, profile estimate; b: growth variable `output.real_gdp_per_capita_growth`; c: `panel_member` / "membership not checked") | FIX4B | `v6_fix4b.md` §M5 |
 | M6 | **fixed** (`PROJECTION_SQL` + engine baseline: `unknown_boundary` never an observation; 1,978 cells / 16 series) | FIX4B | `v6_fix4b.md` §M6 |
 | M7 | **fixed in code; 5 sealed questions void** (`fiscal_year_basis_mismatch`, appended resolution `39b404b0…`); `atlas.imf` 1.3.0 parser keeps the fiscal basis; live WEO re-ingest with the new parser not run (disk 4.5 GB < 5 GB) — queued command in the report | FIX4B | `v6_fix4b.md` §M7 |
 | M8 | **fixed** (V4LINK identity rules on P1278; live replay of the archived WDQS response: 52,458 kept, 1,005 retracted `reclassified_by_reva`, load 480) | FIX4C | `docs/dev/v6_fix4c.md` §M8 |
-| M9 | open | — | |
+| M9 | **fixed** (no label rule: RO:0002410 hierarchy or the reviewed `DEFINED_AS_CAUSATION` allow-list (IDO:0000664, quote-checked); 61 RO:0007001 claims retracted `reclassified_by_reva` → unmapped `doid:has_disease_driver` statements; owner decision on RO:0007001 recorded) | FIX4A | `v6_fix4a.md` |
 | L1 | **fixed in code** (`atlas.gleif` 1.0.3: parent edges from the relationship record's own fields; else `relationship_record: not_fetched`, no child fields); live `entities` run queued (disk 4.2 GB < 5 GB) | FIX4C | `v6_fix4c.md` §L1 |
 | L2 | **fixed** (families API serves the statement's own licence when the artifact was recorded for another source; NE zip archived under `atlas.naturalearth_admin1` / `naturalearth.admin1_10m` from ghcnm 1.0.2; existing artifact row immutable) | FIX4C | `v6_fix4c.md` §L2 |
 | L3 | **fixed** (`shock_profile = one_time_impulse` on the 5 run estimates, new revisions) | FIX4B | `v6_fix4b.md` |
@@ -337,6 +337,6 @@ appended resolutions — nothing edited).
 | L5 | **fixed in code** (`atlas.oecd.wellbeing` 1.0.2: `licence_review` on every cell; no per-observation upstream is published → owner decision stands); live re-ingest queued | FIX4C | `v6_fix4c.md` §L5 |
 | L6 | **fixed** (v4_v4health WHO GHE status, v6_plan registry counts, v4_v4bio placeholder line removed) | FIX4C | `v6_fix4c.md` §L6 |
 | L7 | **fixed** (HGNC targets all loaded by V4BIO since the audit: 0 dangling; remaining 478 edges (GEM 290, GloBI 40, Mondo taxon 148) marked `entity_loaded: false` in the families API) | FIX4C | `v6_fix4c.md` §L7 |
-| L8 | open | — | |
+| L8 | **fixed in code** (no source ids exist; `cbattr:identity_rule` on 948 Carbon Brief entities and `resolve:identity_rule` on 8 realms state the REVA-made rule; `atlas.attribution_cb` / `atlas.ecoregions` 1.1.0); live re-ingests queued (disk < 5 GB) | FIX4A | `v6_fix4a.md` |
 | L9 | **fixed in code** (`atlas.climate_indices` 1.0.1: STAR rows = cycle intervals, stated time in flags); live re-ingest queued | FIX4C | `v6_fix4c.md` §L9 |
 | §5 | **USGS fixed in code** (`atlas.usgs_myb_facilities` 1.0.2: country from the Facility ID GENC prefix; live run queued); the other curated mappings listed for maintainer review in `registry/curation/name_based_mappings.yaml` | FIX4C | `v6_fix4c.md` §5 |
