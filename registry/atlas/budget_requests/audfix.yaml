@@ -1,0 +1,39 @@
+# Budget request from agent AUDFIX (audit fixes, docs/dev/v3_audfix.md). ATLASCORE merge rule: max(current, request)
+# per source, never the sum. The six sources below now also fetch and archive the codebook their claims quote (audit
+# M4: one more request per file and run), and are re-ingested on 2026-10-17 after a first run the same day.
+agent: AUDFIX
+requests:
+  - source_key: harvard.dataverse.navco
+    # 8 data/version requests + 3 codebook PDFs (0.18 + 0.18 + 0.26 MB) = 11 per run (planned 13); 20/day left no
+    # room for the same-day re-run (8 used): 40.
+    daily_requests: 40
+    expected_bytes_per_day: 50000000
+    reason: "atlas.navco 1.1.0: + NAVCO 1.2/1.3/2.1 codebooks (archived, sha256-pinned); same-day re-run"
+  - source_key: harvard.dataverse.mec
+    # 2 + MEC codebook docx (44 KB) = 3 per run (planned 4)
+    daily_requests: 12
+    expected_bytes_per_day: 4000000
+    reason: "atlas.mec 1.1.0: + MEC codebook docx; same-day re-run"
+  - source_key: harvard.dataverse.massmob
+    # 2 + users manual PDF (123 KB) = 3 per run (planned 4)
+    daily_requests: 12
+    expected_bytes_per_day: 34000000
+    reason: "atlas.massmob 1.1.0: + MMP users manual; same-day re-run"
+  - source_key: archigos.leaders
+    # 3-4 + Archigos 4.1 codebook PDF (3.3 MB) per run (planned 11)
+    daily_requests: 30
+    expected_bytes_per_day: 15000000
+    reason: "atlas.archigos 1.1.0: + Archigos codebook PDF; same-day re-run"
+  - source_key: esrb.fcdb
+    # 1 + ESRB OP13 PDF (1.1 MB) = 2 per run (planned 2); 3/day left 1 after today's first run
+    daily_requests: 8
+    expected_bytes_per_day: 3000000
+    reason: "atlas.ecrises.esrb 1.1.0: + ESRB Occasional Paper 13 (Annex A codebook); same-day re-run"
+  - source_key: ties.unc
+    # 2 + TIES users manual PDF (99 KB) = 3 per run (planned 5)
+    daily_requests: 16
+    expected_bytes_per_day: 3000000
+    reason: "atlas.ties 1.1.0: + TIES users manual; same-day re-run"
+daily_totals_increase:
+  http_requests_total: "+0 (existing keys)"
+  http_bytes_total: "+0"

@@ -1,6 +1,6 @@
-policy_version: "budgets-1.3.10"
+policy_version: "budgets-1.3.11"
 daily:
-  http_requests_total: 12927
+  http_requests_total: 12984
   http_bytes_total: 3221225472
 per_source_daily_requests:
   worldbank.wdi: 200
@@ -15,8 +15,8 @@ per_source_daily_requests:
   # --- V3 atlas/KG sources ---
   # Merged by ATLASCORE (src/reva/atlas/budget_merge.py) from registry/atlas/budget_requests/*.yaml:
   # max of the requests per registered source, capped at 5000/day; reasons in the request files.
-  # archigos.leaders: requested by A-COUPS (a_coups.yaml)
-  archigos.leaders: 18
+  # archigos.leaders: requested by A-COUPS (a_coups.yaml), AUDFIX (audfix.yaml)
+  archigos.leaders: 30
   # bis.stats: requested by A-FISCAL (a_fiscal.yaml)
   bis.stats: 14
   # bmr.dataverse: requested by A-POL (a_pol.yaml)
@@ -43,8 +43,8 @@ per_source_daily_requests:
   cshapes.cran: 8
   # eia.opendata_bulk: requested by A-RESOURCES (a_resources.yaml)
   eia.opendata_bulk: 8
-  # esrb.fcdb: requested by A-ECRISES (a_ecrises.yaml)
-  esrb.fcdb: 3
+  # esrb.fcdb: requested by A-ECRISES (a_ecrises.yaml), AUDFIX (audfix.yaml)
+  esrb.fcdb: 8
   # eu.sanctionsmap: requested by A-SANCTIONS (a_sanctions.yaml)
   eu.sanctionsmap: 4
   # eusanct.kondata: requested by A-SANCTIONS (a_sanctions.yaml)
@@ -67,12 +67,12 @@ per_source_daily_requests:
   grambank.cldf: 6
   # harvard.dataverse.coldat: requested by A-COLONIAL (a_colonial.yaml)
   harvard.dataverse.coldat: 10
-  # harvard.dataverse.massmob: requested by A-CONTENTION (a_contention.yaml)
-  harvard.dataverse.massmob: 6
-  # harvard.dataverse.mec: requested by A-CONTENTION (a_contention.yaml)
-  harvard.dataverse.mec: 6
-  # harvard.dataverse.navco: requested by A-CONTENTION (a_contention.yaml)
-  harvard.dataverse.navco: 20
+  # harvard.dataverse.massmob: requested by A-CONTENTION (a_contention.yaml), AUDFIX (audfix.yaml)
+  harvard.dataverse.massmob: 12
+  # harvard.dataverse.mec: requested by A-CONTENTION (a_contention.yaml), AUDFIX (audfix.yaml)
+  harvard.dataverse.mec: 12
+  # harvard.dataverse.navco: requested by A-CONTENTION (a_contention.yaml), AUDFIX (audfix.yaml)
+  harvard.dataverse.navco: 40
   # harvard.dataverse.unvotes: requested by KGGEOPOL (kggeopol.yaml)
   harvard.dataverse.unvotes: 12
   # hief.dataverse: requested by A-SOCIETY (a_society.yaml)
@@ -147,8 +147,8 @@ per_source_daily_requests:
   statistics_jersey.opendata: 3
   # ti.cpi: requested by A-SOCIETY (a_society.yaml)
   ti.cpi: 6
-  # ties.unc: requested by A-SANCTIONS (a_sanctions.yaml)
-  ties.unc: 8
+  # ties.unc: requested by A-SANCTIONS (a_sanctions.yaml), AUDFIX (audfix.yaml)
+  ties.unc: 16
   # ucdp.downloads: requested by CAUSDATA (causdata.yaml), KGGEOPOL (kggeopol.yaml)
   ucdp.downloads: 30
   # un.desa_ims: requested by A-UN (a_un.yaml)

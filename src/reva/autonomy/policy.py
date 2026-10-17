@@ -70,9 +70,12 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   atlas.cowwars; new pax.peaceagreements 6, idmc.gidd 6); same caps.
 # * budgets.yaml -> budgets-1.3.10 (2026-10-17, SAMEAS): merge of sameas.yaml (pax.peaceagreements 6 -> 12: same-day
 #   re-run of atlas.pax after its 1.0.0 -> 1.1.0 change); same caps.
+# * budgets.yaml -> budgets-1.3.11 (2026-10-17, AUDFIX): merge of audfix.yaml (archived codebooks of the audit fixes,
+#   same-day re-runs: harvard.dataverse.navco 20 -> 40, .mec 6 -> 12, .massmob 6 -> 12, archigos.leaders 18 -> 30,
+#   esrb.fcdb 3 -> 8, ties.unc 8 -> 16); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "d9af2562e62c93e7c015fde00f20089140a284573606aefda4f2d3d76a24e139",
+    "budgets.yaml": "d894760865c4871afcc933496a62d8951c164974b06664292893868db298f3a0",
 }
 
 
