@@ -1,0 +1,38 @@
+# V4HEALTH mappings of the body / disease predicates (registry/kg/predicates_health.yaml) to the universal relation
+# families. No causal relation is mapped: ontology axioms that RO classifies under "causally related to" (disease has
+# infectious agent, has material basis in [germline mutation in], disease has basis in ..., has allergic trigger,
+# has major susceptibility factor) never become KG statements; they are T1 claims of the causal loader
+# (docs/dev/v4_v4health.md). Literal predicates (definition, xref) and the identity crosswalk mondo:equivalent_doid
+# are deliberately unmapped (an equivalence is not a relation family; V4LINK / same_as handles identity).
+version: 1
+agent: V4HEALTH
+note: >-
+  Ontology axioms read as families. Subtype = the source relation (RO id where the file gives one). Symptoms,
+  phenotypes, features and ClinGen gene-disease validity are associations (associated_with), never causes.
+mappings:
+  - {property: 'uberon:subclass_of', family: is_a, subtype: uberon_subclass_of, source: uberon.obo, subject_kinds: [anatomical_structure, cell_type]}
+  - {property: 'uberon:part_of', family: part_of, subtype: uberon_part_of, source: uberon.obo, subject_kinds: [anatomical_structure, cell_type], note: 'source relation BFO:0000050'}
+  - {property: 'uberon:has_part', family: has_part, subtype: uberon_has_part, source: uberon.obo, subject_kinds: [anatomical_structure, cell_type], note: 'source relation BFO:0000051'}
+  - {property: 'uberon:located_in', family: located_in, subtype: uberon_located_in, source: uberon.obo, subject_kinds: [anatomical_structure, cell_type], note: 'source relation RO:0001025'}
+  - {property: 'uberon:develops_from', family: context, subtype: uberon_develops_from, source: uberon.obo, subject_kinds: [anatomical_structure, cell_type], note: 'source relation RO:0002202'}
+  - {property: 'doid:subclass_of', family: is_a, subtype: doid_subclass_of, source: doid.obo, subject_kinds: [disease, taxon, symptom, phenotype, sequence_feature], note: 'also the is_a of the classes DOID imports (NCBITaxon lineage, SYMP, HP, SO, ...), qualifier graph'}
+  - {property: 'doid:has_location', family: located_in, subtype: doid_disease_has_location, source: doid.obo, subject_kinds: [disease], note: 'source relation RO:0004026'}
+  - {property: 'doid:has_symptom', family: associated_with, subtype: doid_has_symptom, source: doid.obo, subject_kinds: [disease], note: 'source relation RO:0002452'}
+  - {property: 'doid:has_phenotype', family: associated_with, subtype: doid_has_phenotype, source: doid.obo, subject_kinds: [disease], note: 'source relation RO:0002200'}
+  - {property: 'doid:has_feature', family: associated_with, subtype: doid_disease_has_feature, source: doid.obo, subject_kinds: [disease], note: 'source relation RO:0004029'}
+  - {property: 'doid:transmitted_by', family: context, subtype: doid_transmitted_by, source: doid.obo, subject_kinds: [disease], note: 'source relation RO:0002451'}
+  - {property: 'doid:derives_from', family: context, subtype: doid_derives_from, source: doid.obo, subject_kinds: [disease], note: 'source relation RO:0001000'}
+  - {property: 'doid:onset_during', family: occurs_during, subtype: doid_existence_starts_during, source: doid.obo, subject_kinds: [disease], note: 'source relation RO:0002488'}
+  - {property: 'doid:adjacent_to', family: context, subtype: doid_adjacent_to, source: doid.obo, subject_kinds: [disease], note: 'source relation RO:0002220'}
+  - {property: 'doid:has_origin', family: context, subtype: doid_has_origin, source: doid.obo, subject_kinds: [disease], note: source relation so#has_origin}
+  - {property: 'mondo:subclass_of', family: is_a, subtype: mondo_subclass_of, source: mondo.obo, subject_kinds: [disease]}
+  - {property: 'mondo:has_location', family: located_in, subtype: mondo_disease_has_location, source: mondo.obo, subject_kinds: [disease], note: 'source relation RO:0004026'}
+  - {property: 'mondo:inflammation_site', family: located_in, subtype: mondo_disease_has_inflammation_site, source: mondo.obo, subject_kinds: [disease], note: 'source relation RO:0004027'}
+  - {property: 'mondo:has_feature', family: associated_with, subtype: mondo_disease_has_feature, source: mondo.obo, subject_kinds: [disease], note: 'source relation RO:0004029'}
+  - {property: 'mondo:has_characteristic', family: context, subtype: mondo_has_characteristic, source: mondo.obo, subject_kinds: [disease], note: 'source relation RO:0000053'}
+  - {property: 'mondo:part_of', family: part_of, subtype: mondo_part_of, source: mondo.obo, subject_kinds: [disease], note: 'source relation BFO:0000050'}
+  - {property: 'mondo:shares_features_of', family: associated_with, subtype: mondo_disease_shares_features_of, source: mondo.obo, subject_kinds: [disease]}
+  - {property: 'mondo:responds_to', family: associated_with, subtype: mondo_disease_responds_to, source: mondo.obo, subject_kinds: [disease]}
+  - {property: 'mondo:in_taxon', family: context, subtype: mondo_in_taxon, source: mondo.obo, subject_kinds: [disease], note: 'source relation RO:0002162'}
+  - {property: 'mondo:transmitted_by', family: context, subtype: mondo_transmitted_by, source: mondo.obo, subject_kinds: [disease], note: 'source relation RO:0002451'}
+  - {property: 'clingen:gene_disease_validity', family: associated_with, subtype: clingen_gene_disease_validity, source: clingen.gene_validity, subject_kinds: [gene], object_kinds: [disease], note: ClinGen classification (Definitive ... Refuted) grades the evidence for the association; not a causal claim}

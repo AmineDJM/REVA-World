@@ -169,8 +169,19 @@ MONDO_RELS = {
 }
 #: Mondo bookkeeping relations: not facts about the disease (never loaded, counted)
 MONDO_META_RELS = ("excluded_subClassOf", "should_conform_to", "curated_content_resource", "seeAlso")
-MONDO_XREF_DBS = ("ICD10WHO", "ICD10CM", "icd11.foundation", "ICD11", "OMIM", "OMIMPS", "Orphanet", "MESH", "UMLS",
-                  "NCIT", "DOID")  # fmt: skip
+MONDO_XREF_DBS = (
+    "ICD10WHO",
+    "ICD10CM",
+    "icd11.foundation",
+    "ICD11",
+    "OMIM",
+    "OMIMPS",
+    "Orphanet",
+    "MESH",
+    "UMLS",
+    "NCIT",
+    "DOID",
+)
 
 
 @dataclass
@@ -193,8 +204,9 @@ class _Builder:
         self.rep: Counter[str] = Counter()
         self.skipped: Counter[str] = Counter()
 
-    def entity(self, c: str, label: str | None, *, kind: str | None = None, aliases: Iterable[str] = (),
-               note: str = "") -> None:  # fmt: skip
+    def entity(
+        self, c: str, label: str | None, *, kind: str | None = None, aliases: Iterable[str] = (), note: str = ""
+    ) -> None:
         from reva.kg.model import KgEntity
 
         if not label:
@@ -213,9 +225,18 @@ class _Builder:
             source_revision=self.revision,
         )
 
-    def statement(self, subj: str, pid: str, sid: str, selector: Mapping[str, Any], *, obj: str | None = None,
-                  value: Mapping[str, Any] | None = None, quals: Mapping[str, Any] | None = None,
-                  axiom: str | None = None) -> None:  # fmt: skip
+    def statement(
+        self,
+        subj: str,
+        pid: str,
+        sid: str,
+        selector: Mapping[str, Any],
+        *,
+        obj: str | None = None,
+        value: Mapping[str, Any] | None = None,
+        quals: Mapping[str, Any] | None = None,
+        axiom: str | None = None,
+    ) -> None:
         if len(sid) > 240:
             import hashlib
 
@@ -380,8 +401,14 @@ def uberon_kg(body: bytes, *, raw_sha256: str) -> Parts:
                 parts = v.split()
                 if tag == "intersection_of" and len(parts) == 1:
                     if parts[0] in live:
-                        b.statement(i, "uberon:subclass_of", f"is_a:{i}:{parts[0]}",
-                                    {"term": i, "tag": tag, "value": v}, obj=parts[0], axiom="intersection_of_genus")  # fmt: skip
+                        b.statement(
+                            i,
+                            "uberon:subclass_of",
+                            f"is_a:{i}:{parts[0]}",
+                            {"term": i, "tag": tag, "value": v},
+                            obj=parts[0],
+                            axiom="intersection_of_genus",
+                        )
                     continue
                 rel, tgt = relationship(v)
                 pid = UBERON_RELS.get(rel)
@@ -391,8 +418,14 @@ def uberon_kg(body: bytes, *, raw_sha256: str) -> Parts:
                 if tgt not in live:
                     b.skipped[f"target_outside_uberon_cl:{rel}"] += 1
                     continue
-                b.statement(i, pid, f"{rel}:{i}:{tgt}", {"term": i, "tag": tag, "value": v}, obj=tgt,
-                            axiom="intersection_of" if tag == "intersection_of" else "subclass_of_some")  # fmt: skip
+                b.statement(
+                    i,
+                    pid,
+                    f"{rel}:{i}:{tgt}",
+                    {"term": i, "tag": tag, "value": v},
+                    obj=tgt,
+                    axiom="intersection_of" if tag == "intersection_of" else "subclass_of_some",
+                )
     out = Parts(list(b.ents.values()), b.kg_statements())
     out.report = {
         "revision": rev,
@@ -411,8 +444,13 @@ def _common_term_statements(b: _Builder, s: OboStanza, ns: str, xref_dbs: Iterab
     i = s.id
     d = s.first("def")
     if d:
-        b.statement(i, f"{ns}:definition", f"definition:{i}", {"term": i, "tag": "def"},
-                    value={"type": "string", "value": d[:20000]})  # fmt: skip
+        b.statement(
+            i,
+            f"{ns}:definition",
+            f"definition:{i}",
+            {"term": i, "tag": "def"},
+            value={"type": "string", "value": d[:20000]},
+        )
     dbs = set(xref_dbs)
     for v, rest in s.tagged("xref"):
         db = _xref_db(v)
@@ -422,8 +460,14 @@ def _common_term_statements(b: _Builder, s: OboStanza, ns: str, xref_dbs: Iterab
         q: dict[str, Any] = {"db": db}
         if rest:
             q["annotations"] = rest[:1000]
-        b.statement(i, f"{ns}:xref", f"xref:{i}:{v}", {"term": i, "tag": "xref", "value": v},
-                    value={"type": "external_id", "value": v}, quals=q)  # fmt: skip
+        b.statement(
+            i,
+            f"{ns}:xref",
+            f"xref:{i}:{v}",
+            {"term": i, "tag": "xref", "value": v},
+            value={"type": "external_id", "value": v},
+            quals=q,
+        )
 
 
 # ============================================================================================== DOID (OBO Graphs JSON)
@@ -486,22 +530,41 @@ def doid_kg(body: bytes, *, raw_sha256: str, ri: RelationIndex) -> tuple[Parts, 
         d = _node_meta_def(n)
         if d:
             dx = [str(x) for x in ((m.get("definition") or {}).get("xrefs") or [])]
-            b.statement(c, "doid:definition", f"definition:{c}", {"node": c, "field": "meta.definition"},
-                        value={"type": "string", "value": d[:20000]}, quals={"def_xrefs": dx[:20]} if dx else None)  # fmt: skip
+            b.statement(
+                c,
+                "doid:definition",
+                f"definition:{c}",
+                {"node": c, "field": "meta.definition"},
+                value={"type": "string", "value": d[:20000]},
+                quals={"def_xrefs": dx[:20]} if dx else None,
+            )
         for x in m.get("xrefs") or []:
             v = str(x.get("val") or "")
             if not v:
                 continue
-            b.statement(c, "doid:xref", f"xref:{c}:{v}", {"node": c, "field": "meta.xrefs", "value": v},
-                        value={"type": "external_id", "value": v}, quals={"db": _xref_db(v)})  # fmt: skip
+            b.statement(
+                c,
+                "doid:xref",
+                f"xref:{c}:{v}",
+                {"node": c, "field": "meta.xrefs", "value": v},
+                value={"type": "external_id", "value": v},
+                quals={"db": _xref_db(v)},
+            )
         for p in m.get("basicPropertyValues") or []:
             pred = str(p.get("pred") or "")
-            if pred.endswith(("skos/core#exactMatch", "skos/core#closeMatch", "skos/core#narrowMatch",
-                              "skos/core#broadMatch")):  # fmt: skip
+            if pred.endswith(
+                ("skos/core#exactMatch", "skos/core#closeMatch", "skos/core#narrowMatch", "skos/core#broadMatch")
+            ):
                 v = str(p.get("val") or "")
                 kind = pred.rsplit("#", 1)[-1]
-                b.statement(c, "doid:xref", f"xref:{c}:{v}", {"node": c, "field": "basicPropertyValues", "pred": pred},
-                            value={"type": "external_id", "value": v}, quals={"db": _xref_db(v), "mapping": f"skos:{kind}"})  # fmt: skip
+                b.statement(
+                    c,
+                    "doid:xref",
+                    f"xref:{c}:{v}",
+                    {"node": c, "field": "basicPropertyValues", "pred": pred},
+                    value={"type": "external_id", "value": v},
+                    quals={"db": _xref_db(v), "mapping": f"skos:{kind}"},
+                )
 
     def axiom(subj: str, pred_iri: str, obj_iri: str, kind: str, graph: str) -> None:
         o = curie(obj_iri)
@@ -511,8 +574,15 @@ def doid_kg(body: bytes, *, raw_sha256: str, ri: RelationIndex) -> tuple[Parts, 
         sel = {"graph": graph, "axiom": kind, "sub": subj, "pred": pred_iri, "obj": o}
         if pred_iri == "is_a":
             if subj in created and o in nodes:
-                b.statement(subj, "doid:subclass_of", f"is_a:{subj}:{o}", sel, obj=o,
-                            axiom=kind, quals={"graph": graph} if graph != "doid.owl" else None)  # fmt: skip
+                b.statement(
+                    subj,
+                    "doid:subclass_of",
+                    f"is_a:{subj}:{o}",
+                    sel,
+                    obj=o,
+                    axiom=kind,
+                    quals={"graph": graph} if graph != "doid.owl" else None,
+                )
             else:
                 b.skipped["is_a_outside_created_classes"] += 1
             return
@@ -535,12 +605,12 @@ def doid_kg(body: bytes, *, raw_sha256: str, ri: RelationIndex) -> tuple[Parts, 
 
     for gr in graphs:
         gid = str(gr.get("id", "")).rsplit("/", 1)[-1]
-        for e in gr.get("edges") or []:
-            s = curie(str(e.get("sub")))
+        for edge in gr.get("edges") or []:
+            s = curie(str(edge.get("sub")))
             if s is None:
                 continue
-            axiom(s, str(e.get("pred")), str(e.get("obj")), "subclass_of" if e.get("pred") == "is_a" else
-                  "subclass_of_some", gid)  # fmt: skip
+            kind = "subclass_of" if edge.get("pred") == "is_a" else "subclass_of_some"
+            axiom(s, str(edge.get("pred")), str(edge.get("obj")), kind, gid)
     for ld in g.get("logicalDefinitionAxioms") or []:
         s = curie(str(ld.get("definedClassId")))
         if s is None:
@@ -584,8 +654,13 @@ def mondo_kg(body: bytes, *, raw_sha256: str, ri: RelationIndex) -> tuple[Parts,
         b.entity(i, s.first("name"), aliases=exact_synonyms(s))
         d = s.first("def")
         if d:
-            b.statement(i, "mondo:definition", f"definition:{i}", {"term": i, "tag": "def"},
-                        value={"type": "string", "value": d[:20000]})  # fmt: skip
+            b.statement(
+                i,
+                "mondo:definition",
+                f"definition:{i}",
+                {"term": i, "tag": "def"},
+                value={"type": "string", "value": d[:20000]},
+            )
         for v, rest in s.tagged("xref"):
             db = _xref_db(v)
             if db not in dbs:
@@ -594,8 +669,14 @@ def mondo_kg(body: bytes, *, raw_sha256: str, ri: RelationIndex) -> tuple[Parts,
             sources = _annotation_values(rest, "source")
             sel = {"term": i, "tag": "xref", "value": v}
             if db == "DOID" and "MONDO:equivalentTo" in sources:
-                b.statement(i, "mondo:equivalent_doid", f"equivalent_doid:{i}:{v}", sel, obj=v,
-                            quals={"xref_sources": sources[:10]})  # fmt: skip
+                b.statement(
+                    i,
+                    "mondo:equivalent_doid",
+                    f"equivalent_doid:{i}:{v}",
+                    sel,
+                    obj=v,
+                    quals={"xref_sources": sources[:10]},
+                )
                 continue
             q: dict[str, Any] = {"db": db}
             if sources:
@@ -611,8 +692,14 @@ def mondo_kg(body: bytes, *, raw_sha256: str, ri: RelationIndex) -> tuple[Parts,
                 parts = v.split()
                 if tag == "intersection_of" and len(parts) == 1:
                     if parts[0] in live:
-                        b.statement(i, "mondo:subclass_of", f"is_a:{i}:{parts[0]}",
-                                    {"term": i, "tag": tag, "value": v}, obj=parts[0], axiom="intersection_of_genus")  # fmt: skip
+                        b.statement(
+                            i,
+                            "mondo:subclass_of",
+                            f"is_a:{i}:{parts[0]}",
+                            {"term": i, "tag": tag, "value": v},
+                            obj=parts[0],
+                            axiom="intersection_of_genus",
+                        )
                     continue
                 rel, tgt_raw = relationship(v)
                 if rel in MONDO_META_RELS:
@@ -627,7 +714,9 @@ def mondo_kg(body: bytes, *, raw_sha256: str, ri: RelationIndex) -> tuple[Parts,
                 if ri.is_causal(rel):
                     if rel in MONDO_RELS or ri.resolve(rel) in MONDO_RELS:
                         raise drift(f"Mondo relation {rel} is mapped as a plain link but is causal by the rule")
-                    claims.add(i, rel, tgt, axiom=kind, selector={"tag": tag, **({"annotations": qual[:500]} if qual else {})})
+                    claims.add(
+                        i, rel, tgt, axiom=kind, selector={"tag": tag, **({"annotations": qual[:500]} if qual else {})}
+                    )
                     continue
                 pid = MONDO_RELS.get(rel) or MONDO_RELS.get(ri.resolve(rel))
                 if pid is None:
@@ -636,8 +725,15 @@ def mondo_kg(body: bytes, *, raw_sha256: str, ri: RelationIndex) -> tuple[Parts,
                 if pid == "mondo:part_of" and prefix(tgt) != "MONDO":
                     b.skipped["part_of_target_not_mondo"] += 1
                     continue
-                b.statement(i, pid, f"{rel}:{i}:{tgt}", sel, obj=tgt, axiom=kind,
-                            quals={"relation": rel} if pid == "mondo:has_feature" else None)  # fmt: skip
+                b.statement(
+                    i,
+                    pid,
+                    f"{rel}:{i}:{tgt}",
+                    sel,
+                    obj=tgt,
+                    axiom=kind,
+                    quals={"relation": rel} if pid == "mondo:has_feature" else None,
+                )
     out = Parts(list(b.ents.values()), b.kg_statements(), list(claims.records.values()))
     out.report = {
         "revision": rev,
@@ -669,8 +765,18 @@ def code_digest() -> str:
     return digest(code_digest, common)
 
 
-def _spec(name: str, key: str, atlas_source: str, url: str, hosts: tuple[str, ...], max_bytes: int,
-          provider: str, licence: str, dataset: str, notes: str) -> AtlasSourceSpec:  # fmt: skip
+def _spec(
+    name: str,
+    key: str,
+    atlas_source: str,
+    url: str,
+    hosts: tuple[str, ...],
+    max_bytes: int,
+    provider: str,
+    licence: str,
+    dataset: str,
+    notes: str,
+) -> AtlasSourceSpec:
     return AtlasSourceSpec(
         name=name,
         version=VERSION,
@@ -695,23 +801,47 @@ def _spec(name: str, key: str, atlas_source: str, url: str, hosts: tuple[str, ..
 
 def atlas_source() -> list[AtlasSourceSpec]:
     return [
-        _spec(UBERON_NAME, UBERON_KEY, "uberon", UBERON_URL, GH_HOSTS, MAX_UBERON_BYTES,
-              "Uberon anatomy ontology (OBO Foundry; GitHub release, human view)",
-              f"{RIGHTS['uberon']['licence']} ({RIGHTS['uberon']['licence_url']}); {RIGHTS['uberon']['attribution']}",
-              "anatomy", "KG only: UBERON + CL classes of the human view with is_a/part_of/has_part/located_in/"
-              "develops_from, definitions and FMA/MeSH/NCIt/UMLS/SNOMED xrefs."),
-        _spec(DOID_NAME, DOID_KEY, "doid", DOID_URL, (RO_HOST,), MAX_DOID_BYTES,
-              "Human Disease Ontology (doid.json, GitHub main)",
-              f"{RIGHTS['doid']['licence']} ({RIGHTS['doid']['licence_url']}); {RIGHTS['doid']['attribution']}",
-              "diseases", "KG: DOID diseases, is_a, location (UBERON), symptoms (SYMP), phenotypes, onset, "
-              "transmission, ICD/OMIM/ORDO/MeSH xrefs; causal axioms (has material basis in: pathogens, inheritance, "
-              "...) -> T1 claims via the causal loader."),
-        _spec(MONDO_NAME, MONDO_KEY, "mondo", MONDO_URL, GH_HOSTS, MAX_MONDO_BYTES,
-              "Mondo Disease Ontology (GitHub release)",
-              f"{RIGHTS['mondo']['licence']} ({RIGHTS['mondo']['licence_url']}); {RIGHTS['mondo']['attribution']}",
-              "diseases", "KG: Mondo diseases, is_a, location, features, DOID equivalences, ICD-10/ICD-11/OMIM/"
-              "Orphanet xrefs; causal axioms (infectious agent, germline mutation in HGNC gene, ...) -> T1 claims."),
-    ]  # fmt: skip
+        _spec(
+            UBERON_NAME,
+            UBERON_KEY,
+            "uberon",
+            UBERON_URL,
+            GH_HOSTS,
+            MAX_UBERON_BYTES,
+            "Uberon anatomy ontology (OBO Foundry; GitHub release, human view)",
+            f"{RIGHTS['uberon']['licence']} ({RIGHTS['uberon']['licence_url']}); {RIGHTS['uberon']['attribution']}",
+            "anatomy",
+            "KG only: UBERON + CL classes of the human view with is_a/part_of/has_part/located_in/"
+            "develops_from, definitions and FMA/MeSH/NCIt/UMLS/SNOMED xrefs.",
+        ),
+        _spec(
+            DOID_NAME,
+            DOID_KEY,
+            "doid",
+            DOID_URL,
+            (RO_HOST,),
+            MAX_DOID_BYTES,
+            "Human Disease Ontology (doid.json, GitHub main)",
+            f"{RIGHTS['doid']['licence']} ({RIGHTS['doid']['licence_url']}); {RIGHTS['doid']['attribution']}",
+            "diseases",
+            "KG: DOID diseases, is_a, location (UBERON), symptoms (SYMP), phenotypes, onset, "
+            "transmission, ICD/OMIM/ORDO/MeSH xrefs; causal axioms (has material basis in: pathogens, inheritance, "
+            "...) -> T1 claims via the causal loader.",
+        ),
+        _spec(
+            MONDO_NAME,
+            MONDO_KEY,
+            "mondo",
+            MONDO_URL,
+            GH_HOSTS,
+            MAX_MONDO_BYTES,
+            "Mondo Disease Ontology (GitHub release)",
+            f"{RIGHTS['mondo']['licence']} ({RIGHTS['mondo']['licence_url']}); {RIGHTS['mondo']['attribution']}",
+            "diseases",
+            "KG: Mondo diseases, is_a, location, features, DOID equivalences, ICD-10/ICD-11/OMIM/"
+            "Orphanet xrefs; causal axioms (infectious agent, germline mutation in HGNC gene, ...) -> T1 claims.",
+        ),
+    ]
 
 
 async def _fetch(run: Any, url: str, key: str, max_bytes: int, media: tuple[str, ...]) -> tuple[str, bytes, datetime]:
@@ -729,30 +859,41 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     ro_sha, ro_body, ro_at = await _fetch(run, RO_URL, "ro.obo", MAX_RO_BYTES, ("text/plain",))
     ri, ro_rev = ro_index(ro_body, raw_sha256=ro_sha)
     if name == UBERON_NAME:
-        sha, body, at = await _fetch(run, UBERON_URL, "uberon:human-view.obo", MAX_UBERON_BYTES,
-                                     ("application/octet-stream", "text/plain"))  # fmt: skip
+        sha, body, at = await _fetch(
+            run, UBERON_URL, "uberon:human-view.obo", MAX_UBERON_BYTES, ("application/octet-stream", "text/plain")
+        )
         parts, rev, key, short = uberon_kg(body, raw_sha256=sha), "", UBERON_KEY, "uberon"
         rev = parts.report["revision"]
     elif name == DOID_NAME:
-        sha, body, at = await _fetch(run, DOID_URL, "doid:doid.json", MAX_DOID_BYTES,
-                                     ("application/json", "text/plain"))  # fmt: skip
+        sha, body, at = await _fetch(
+            run, DOID_URL, "doid:doid.json", MAX_DOID_BYTES, ("application/json", "text/plain")
+        )
         parts, rev = doid_kg(body, raw_sha256=sha, ri=ri)
         key, short = DOID_KEY, "doid"
     elif name == MONDO_NAME:
-        sha, body, at = await _fetch(run, MONDO_URL, "mondo:mondo.obo", MAX_MONDO_BYTES,
-                                     ("application/octet-stream", "text/plain"))  # fmt: skip
+        sha, body, at = await _fetch(
+            run, MONDO_URL, "mondo:mondo.obo", MAX_MONDO_BYTES, ("application/octet-stream", "text/plain")
+        )
         parts, rev = mondo_kg(body, raw_sha256=sha, ri=ri)
         key, short = MONDO_KEY, "mondo"
     else:  # pragma: no cover - registry guarantees the names
         raise drift(f"unknown source {name}")
     del body
-    n_main = parts.report.get("terms_in_file") or parts.report.get("doid_classes") or parts.report.get(
-        "mondo_terms_in_file", 0)  # fmt: skip
+    n_main = (
+        parts.report.get("terms_in_file")
+        or parts.report.get("doid_classes")
+        or parts.report.get("mondo_terms_in_file", 0)
+    )
     if run.origin == "live" and int(n_main) < MIN_LIVE[short]:
         raise drift(f"{short}: only {n_main} classes: truncated release?", kind="truncated")
     retrieved = max(at, ro_at)
-    out: dict[str, Any] = {"source": key, "revision": rev, "ro_revision": ro_rev, "raw": {"file": sha, "ro": ro_sha},
-                           "build": parts.report}  # fmt: skip
+    out: dict[str, Any] = {
+        "source": key,
+        "revision": rev,
+        "ro_revision": ro_rev,
+        "raw": {"file": sha, "ro": ro_sha},
+        "build": parts.report,
+    }
     if not kg_available(run.engine):
         out["kg"] = {"status": "kg_unavailable"}
         return out
@@ -768,13 +909,15 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         parameters={"connector": name, "parser": PARSER_VERSION, "revision": rev, "ro_revision": ro_rev},
     )
     if parts.claims:
-        out["causal"] = deliver(run, parts, key=key, short=short, rev=rev, ro_rev=ro_rev, raws=[sha, ro_sha],
-                                retrieved=retrieved)  # fmt: skip
+        out["causal"] = deliver(
+            run, parts, key=key, short=short, rev=rev, ro_rev=ro_rev, raws=[sha, ro_sha], retrieved=retrieved
+        )
     return out
 
 
-def deliver(run: Any, parts: Parts, *, key: str, short: str, rev: str, ro_rev: str, raws: list[str],
-            retrieved: datetime) -> dict[str, Any]:  # fmt: skip
+def deliver(
+    run: Any, parts: Parts, *, key: str, short: str, rev: str, ro_rev: str, raws: list[str], retrieved: datetime
+) -> dict[str, Any]:
     from reva.adapters.connectors.causdata_common import ClaimDelivery, deliver_claims
 
     claims: _Claims = parts.codebook["claims"]
@@ -783,8 +926,9 @@ def deliver(run: Any, parts: Parts, *, key: str, short: str, rev: str, ro_rev: s
         source_key=key,
         dataset=short,
         dataset_revision=rev[-100:],
-        codebook=codebook({"doid": "Human Disease Ontology", "mondo": "Mondo Disease Ontology"}[short], rev,
-                          ro_rev, claims, url),  # fmt: skip
+        codebook=codebook(
+            {"doid": "Human Disease Ontology", "mondo": "Mondo Disease Ontology"}[short], rev, ro_rev, claims, url
+        ),
         raw_sha256s=sorted(set(raws)),
         retrieved_at=retrieved,
         origin=run.origin,

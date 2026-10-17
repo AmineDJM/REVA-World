@@ -17,7 +17,7 @@ Requests (one run; the full table is 65.5 M rows, so only provider-side slices a
 ``$apply=groupby`` for the year list, the country list and the cause list (code, title, level), then one request
 per country with ``DIM_AGEGROUP_CODE eq 'TOTAL' and DIM_SEX_CODE eq 'TOTAL'`` (all ages, both sexes) and
 ``FLAG_LEVEL le 2 or DIM_YEAR_CODE eq <latest year>``: the 27 cause groups of levels 0-2 for every year plus all
-226 causes for the latest year (~230 KB per country, ~42 MB per run). Other age/sex breakdowns and the
+226 causes for the latest year (~280 KB per country, ~51 MB per run). Other age/sex breakdowns and the
 level 3-5 causes of earlier years wait for a bigger machine (docs/dev/v4_v4health.md).
 
 What a cell is
@@ -25,7 +25,7 @@ What a cell is
 * ``indicator`` = ``ghe.<measure>|sex=TOTAL|age=TOTAL|cause=<GHE cause code>``, measure in ``deaths`` (count),
   ``deaths_rate100k`` (per 100 000 population), ``dalys`` (count), ``dalys_rate100k``.
 * ``value`` = the API's number exactly as served (decimal text); ``flags.low`` / ``flags.high`` = WHO's uncertainty
-  bounds for the counts (``VAL_*_COUNT_LOW/HIGH``; their level is not stated per row, ``interval_level:
+  bounds for the death counts (``VAL_DTHS_COUNT_LOW/HIGH``; DALY bounds not requested, see MEASURES; their level is not stated per row, ``interval_level:
   "not_stated_per_row"``); ``flags.cause_title`` / ``flags.cause_level`` from the cause list; ``flags.estimate_class
   = who_comparable_estimate``. A null value is Missing (``flags.missing = not_reported``), never zero; a 0.0 that WHO
   serves is WHO's estimate of zero and stays 0.
@@ -54,7 +54,7 @@ PARSER_VERSION = "atlas-who-ghe-parse-1"
 SOURCE_KEY = "who.ghe"
 HOST = "xmart-api-public.who.int"
 BASE = f"https://{HOST}/DEX_CMS/GHE_FULL"
-MAX_ITEM_BYTES = 8_000_000  # one country slice was ~230 kB on 2026-10-17
+MAX_ITEM_BYTES = 8_000_000  # one country slice was ~280 kB on 2026-10-17
 MAX_LEVEL_ALL_YEARS = 2
 MIN_COUNTRIES_LIVE = 150
 
@@ -71,10 +71,11 @@ RIGHTS: dict[str, str] = {
 MEASURES: tuple[tuple[str, str, str, str | None, str | None], ...] = (
     ("VAL_DTHS_COUNT_NUMERIC", "deaths", "deaths", "VAL_DTHS_COUNT_LOW", "VAL_DTHS_COUNT_HIGH"),
     ("VAL_DTHS_RATE100K_NUMERIC", "deaths_rate100k", "deaths per 100 000 population", None, None),
-    ("VAL_DALY_COUNT_NUMERIC", "dalys", "disability-adjusted life years (DALYs)", "VAL_DALY_COUNT_LOW",
-     "VAL_DALY_COUNT_HIGH"),
+    # DALY uncertainty bounds (VAL_DALY_COUNT_LOW/HIGH) are not requested: they add ~15 % to the 50 MB run and the
+    # V4 raw-archive cap is 150 MB per agent (docs/dev/v4_v4health.md, "finish on a bigger machine")
+    ("VAL_DALY_COUNT_NUMERIC", "dalys", "disability-adjusted life years (DALYs)", None, None),
     ("VAL_DALY_RATE100K_NUMERIC", "dalys_rate100k", "DALYs per 100 000 population", None, None),
-)  # fmt: skip
+)
 DIMS = ("DIM_COUNTRY_CODE", "DIM_YEAR_CODE", "DIM_GHECAUSE_CODE")
 SELECT: tuple[str, ...] = (
     *DIMS,
@@ -176,9 +177,9 @@ def parse_country(body: bytes, iso3: str) -> list[dict[str, Any]]:
             if not isinstance(r[c], Decimal) or r[c] != int(r[c]):
                 raise _err(f"{iso3}: row {i} {c} is not an integer")
         for m in MEASURES:
-            for c in (m[0], m[3], m[4]):
-                if c and r[c] is not None and not isinstance(r[c], Decimal):
-                    raise _err(f"{iso3}: row {i} {c} is not a number")
+            for col in (m[0], m[3], m[4]):
+                if col and r[col] is not None and not isinstance(r[col], Decimal):
+                    raise _err(f"{iso3}: row {i} {col} is not a number")
     return rows
 
 
@@ -217,7 +218,7 @@ def atlas_rows(
                 "age": "TOTAL",
                 "sex": "TOTAL",
             }
-            if lo and (r[lo] is not None or r[hi] is not None):
+            if lo and hi and (r[lo] is not None or r[hi] is not None):
                 flags["low"], flags["high"] = _num(r[lo]), _num(r[hi])
                 flags["interval_level"] = "not_stated_per_row"
             value = _num(r[col])

@@ -1,0 +1,5223 @@
+{
+ "graphs": [
+  {
+   "id": "http://purl.obolibrary.org/obo/doid.owl",
+   "meta": {
+    "basicPropertyValues": [
+     {
+      "pred": "http://purl.obolibrary.org/obo/IAO_0000700",
+      "val": "http://purl.obolibrary.org/obo/DOID_4"
+     },
+     {
+      "pred": "http://purl.org/dc/elements/1.1/description",
+      "val": "The Disease Ontology has been developed as a standardized ontology for human disease with the purpose of providing the biomedical community with consistent, reusable and sustainable descriptions of human disease terms, phenotype characteristics and related medical vocabulary disease concepts."
+     },
+     {
+      "pred": "http://purl.org/dc/elements/1.1/language",
+      "val": "en"
+     },
+     {
+      "pred": "http://purl.org/dc/elements/1.1/title",
+      "val": "Human Disease Ontology"
+     },
+     {
+      "pred": "http://purl.org/dc/terms/license",
+      "val": "https://creativecommons.org/publicdomain/zero/1.0/"
+     },
+     {
+      "pred": "http://www.geneontology.org/formats/oboInOwl#date",
+      "val": "30:09:2026 11:23"
+     },
+     {
+      "pred": "http://www.geneontology.org/formats/oboInOwl#default-namespace",
+      "val": "disease_ontology"
+     },
+     {
+      "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBOFormatVersion",
+      "val": "1.2"
+     },
+     {
+      "pred": "http://www.geneontology.org/formats/oboInOwl#saved-by",
+      "val": "lschriml"
+     },
+     {
+      "pred": "http://www.w3.org/2000/01/rdf-schema#comment",
+      "val": "The Disease Ontology content is available via the Creative Commons Public Domain Dedication CC0 1.0 Universal license (https://creativecommons.org/publicdomain/zero/1.0/)."
+     },
+     {
+      "pred": "http://www.w3.org/2002/07/owl#versionInfo",
+      "val": "2026-09-30"
+     }
+    ],
+    "version": "http://purl.obolibrary.org/obo/doid/releases/2026-09-30/doid.owl"
+   },
+   "nodes": [
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_0050117",
+     "lbl": "disease by infectious agent",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A disease that is the consequence of the presence of pathogenic microbial agents, including pathogenic viruses, pathogenic bacteria, fungi, protozoa, multicellular parasites, and aberrant proteins known as prions.",
+       "xrefs": [
+        "url:https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&ns=ncit&code=C26726"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007636"
+         }
+        ]
+       }
+      },
+      "comments": [
+       "DO:wk"
+      ],
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_CFDE_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_GXD_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_MGI_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_infectious_disease_slim"
+      ],
+      "synonyms": [
+       {
+        "pred": "hasExactSynonym",
+        "val": "infectious disease"
+       }
+      ],
+      "xrefs": [
+       {
+        "val": "ICD9CM:079.0"
+       },
+       {
+        "val": "UMLS_CUI:C0001485"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://purl.obolibrary.org/obo/OBI_9991118",
+        "val": "infectious disease"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:10115"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:11078"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:1304"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:1321"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:2040"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:2288"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:3099"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:4120"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:4620"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:5256"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:945"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:95"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:9532"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:9696"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_0050161",
+     "lbl": "lower respiratory tract disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A respiratory system disease which involves the lower respiratory tract.",
+       "xrefs": [
+        "url:http://en.wikipedia.org/wiki/lower_respiratory_tract"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007638"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_RAD_slim"
+      ],
+      "xrefs": [
+       {
+        "val": "ICD9CM:478.19"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:195823002"
+       },
+       {
+        "val": "UMLS_CUI:C0029581"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_0050177",
+     "lbl": "monogenic disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A genetic disease that is the result of one or more abnormal alleles and may be dominant, semi-dominant, or recessive.",
+       "xrefs": [
+        "url:https://www.genome.gov/For-Patients-and-Families/Genetic-Disorders"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007637"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_AGR_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_GXD_slim"
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_0050338",
+     "lbl": "primary bacterial infectious disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A bacterial infectious disease that results_in infection by bacteria as a result of their presence or activity within the normal, healthy host, and their intrinsic virulence is, in part, a necessary consequence of their need to reproduce and spread.",
+       "xrefs": [
+        "url:http://en.wikipedia.org/wiki/Infectious_disease"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007638"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_FlyBase_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_infectious_disease_slim"
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_0050737",
+     "lbl": "autosomal recessive disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "An autosomal genetic disease that is characterized by the presence of two mutated copies of the gene, both of which must be present in order for the disease or trait to develop.",
+       "xrefs": [
+        "url:http://ghr.nlm.nih.gov/handbook/inheritance/inheritancepatterns",
+        "url:http://www.nlm.nih.gov/medlineplus/ency/article/002052.htm"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007637"
+         },
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007640"
+         }
+        ]
+       }
+      },
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#creation_date",
+        "val": "2012-07-24T12:51:47Z"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_0050739",
+     "lbl": "autosomal genetic disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A monogenic disease that has_material_basis_in a mutation on one of the non-sex chromosomes.",
+       "xrefs": [
+        "url:http://ghr.nlm.nih.gov/glossary=autosomaldominant",
+        "url:http://ghr.nlm.nih.gov/handbook/inheritance/inheritancepatterns"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007637"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_MGI_slim"
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#creation_date",
+        "val": "2012-07-24T04:45:53Z"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_0060118",
+     "lbl": "thoracic disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A disease of anatomical entity that is located_in the thoracic cavity.",
+       "xrefs": [
+        "url:http://en.wikipedia.org/wiki/Thoracic_cavity"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007638"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_AGR_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_CFDE_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_GXD_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_MGI_slim"
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#creation_date",
+        "val": "2011-07-25T02:23:47Z"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_0060570",
+     "lbl": "cardiac tuberculosis",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A tuberculosis located in the heart.",
+       "xrefs": [
+        "url:https://pubmed.ncbi.nlm.nih.gov/28814447/"
+       ]
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_infectious_disease_slim"
+      ],
+      "synonyms": [
+       {
+        "pred": "hasNarrowSynonym",
+        "val": "cardiovascular tuberculosis"
+       }
+      ],
+      "xrefs": [
+       {
+        "val": "MESH:D014381"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_0080599",
+     "lbl": "Coronavirus infectious disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A viral infectious disease that has_material_basis_in Coronavirus.",
+       "xrefs": [
+        "url:https://www.cdc.gov/coronavirus/",
+        "url:https://www.ncbi.nlm.nih.gov/books/NBK7782/",
+        "url:https://www.who.int/health-topics/coronavirus"
+       ]
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_infectious_disease_slim"
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_0080600",
+     "lbl": "COVID-19",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A Coronavirus infectious disease that is characterized by fever, cough and shortness of breath and that has_material_basis_in Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2), a subtype of Betacoronavirus pandemicum.",
+       "xrefs": [
+        "url:https://pubmed.ncbi.nlm.nih.gov/32007143/",
+        "url:https://pubmed.ncbi.nlm.nih.gov/32007145/",
+        "url:https://www.cdc.gov/covid/about/",
+        "url:https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=2697049",
+        "url:https://www.who.int/emergencies/diseases/novel-coronavirus-2019"
+       ]
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_infectious_disease_slim",
+       "http://purl.obolibrary.org/obo/doid#NCIthesaurus"
+      ],
+      "synonyms": [
+       {
+        "pred": "hasExactSynonym",
+        "val": "2019 Novel Coronavirus (2019-nCoV)"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "2019-nCoV infection"
+       },
+       {
+        "synonymType": "http://purl.obolibrary.org/obo/OMO_0003012",
+        "pred": "hasExactSynonym",
+        "val": "COVID19"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "SARS-CoV-2 infection"
+       }
+      ],
+      "xrefs": [
+       {
+        "val": "ICD10CM:U07.1"
+       },
+       {
+        "val": "MESH:D000086382"
+       },
+       {
+        "val": "NCI:C171133"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:840539006"
+       },
+       {
+        "val": "UMLS_CUI:C5203670"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       },
+       {
+        "pred": "http://www.w3.org/2004/02/skos/core#exactMatch",
+        "val": "ICD10CM:U07.1"
+       },
+       {
+        "pred": "http://www.w3.org/2004/02/skos/core#exactMatch",
+        "val": "MESH:D000086382"
+       },
+       {
+        "pred": "http://www.w3.org/2004/02/skos/core#exactMatch",
+        "val": "NCI:C171133"
+       },
+       {
+        "pred": "http://www.w3.org/2004/02/skos/core#exactMatch",
+        "val": "UMLS_CUI:C5203670"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_104",
+     "lbl": "bacterial infectious disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A disease by infectious agent that results_in infection, has_material_basis_in Bacteria.",
+       "xrefs": [
+        "url:http://en.wikipedia.org/wiki/Pathogenic_bacteria"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007638"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_AGR_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_FlyBase_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_infectious_disease_slim",
+       "http://purl.obolibrary.org/obo/doid#NCIthesaurus"
+      ],
+      "xrefs": [
+       {
+        "val": "ICD10CM:A49.9"
+       },
+       {
+        "val": "MESH:D001424"
+       },
+       {
+        "val": "NCI:C2890"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:87628006"
+       },
+       {
+        "val": "UMLS_CUI:C0004623"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_114",
+     "lbl": "heart disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A cardiovascular system disease that involves the heart.",
+       "xrefs": [
+        "url:http://en.wikipedia.org/wiki/Heart_disease"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007638"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_FlyBase_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_RAD_slim",
+       "http://purl.obolibrary.org/obo/doid#NCIthesaurus"
+      ],
+      "xrefs": [
+       {
+        "val": "ICD10CM:I51.9"
+       },
+       {
+        "val": "ICD9CM:429.9"
+       },
+       {
+        "val": "MESH:D006331"
+       },
+       {
+        "val": "NCI:C3079"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:194707003"
+       },
+       {
+        "val": "UMLS_CUI:C0018799"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_1176",
+     "lbl": "bronchial disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A lower respiratory tract disease that affects the airways leading into the lungs, which is caused due to inflammation of the bronchi and bronchioles, infection, or blockage.",
+       "xrefs": [
+        "url:https://www.ncbi.nlm.nih.gov/pubmed/11685087"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007645"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_RAD_slim"
+      ],
+      "xrefs": [
+       {
+        "val": "MESH:D001982"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:41427001"
+       },
+       {
+        "val": "UMLS_CUI:C0006261"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:1175"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:12322"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_12365",
+     "lbl": "malaria",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A parasitic protozoa infectious disease characterized as a vector-borne infectious disease caused by the presence of protozoan parasites of the genus Plasmodium in the red blood cells, transmitted from an infected to an uninfected individual by the bite of anopheline mosquitoes, and characterized by periodic attacks of chills and fever that coincide with mass destruction of blood cells and the release of toxic substances by the parasite at the end of each reproductive cycle.",
+       "xrefs": [
+        "url:http://en.wikipedia.org/wiki/Malaria",
+        "url:https://www.merriam-webster.com/dictionary/malaria#medicalDictionary"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007638"
+         },
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007643"
+         }
+        ]
+       }
+      },
+      "comments": [
+       "Xref MGI."
+      ],
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_infectious_disease_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_rare_slim",
+       "http://purl.obolibrary.org/obo/doid#NCIthesaurus"
+      ],
+      "synonyms": [
+       {
+        "pred": "hasExactSynonym",
+        "val": "induced malaria"
+       }
+      ],
+      "xrefs": [
+       {
+        "val": "EFO:0001068"
+       },
+       {
+        "val": "GARD:6961"
+       },
+       {
+        "val": "ICD10CM:B54"
+       },
+       {
+        "val": "ICD9CM:084"
+       },
+       {
+        "val": "MESH:D008288"
+       },
+       {
+        "val": "NCI:C34797"
+       },
+       {
+        "val": "ORDO:673"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:154374002"
+       },
+       {
+        "val": "UMLS_CUI:C0024530"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:12552"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_12858",
+     "lbl": "Huntington's disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A neurodegenerative disease that has_material_basis_in autosomal dominant inheritance and is characterized by unwanted choreatic movements, behavioral and psychiatric disturbances and dementia and has_material_basis_in expansion of CAG triplet repeats (glutamine) resulting in neuron degeneration affecting muscle coordination, cognitive abilities.",
+       "xrefs": [
+        "url:http://en.wikipedia.org/wiki/Huntington_disease",
+        "url:http://www.orpha.net/consor/cgi-bin/Disease_Search.php?lng=EN&data_id=118&Disease_Disease_Search_diseaseGroup=huntington&Disease_Disease_Search_diseaseType=Pat&Disease(s)%20concerned=Huntington-disease&title=Huntington-disease&search=Disease_Search_Simple"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007636"
+         },
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007638"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_FlyBase_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_rare_slim",
+       "http://purl.obolibrary.org/obo/doid#NCIthesaurus"
+      ],
+      "synonyms": [
+       {
+        "synonymType": "http://purl.obolibrary.org/obo/OMO_0003012",
+        "pred": "hasExactSynonym",
+        "val": "HD"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "Huntington disease"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "Huntington's chorea"
+       }
+      ],
+      "xrefs": [
+       {
+        "val": "GARD:6677"
+       },
+       {
+        "val": "ICD10CM:G10"
+       },
+       {
+        "val": "ICD9CM:333.4"
+       },
+       {
+        "val": "KEGG:05016"
+       },
+       {
+        "val": "MESH:D006816"
+       },
+       {
+        "val": "MIM:143100"
+       },
+       {
+        "val": "NCI:C82342"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:58756001"
+       },
+       {
+        "val": "UMLS_CUI:C0020179"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_1287",
+     "lbl": "cardiovascular system disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A disease of anatomical entity which occurs in the blood, heart, blood vessels or the lymphatic system that passes nutrients (such as amino acids and electrolytes), gases, hormones, blood cells or lymph to and from cells in the body to help fight diseases and help stabilize body temperature and pH to maintain homeostasis.",
+       "xrefs": [
+        "url:http://en.wikipedia.org/wiki/Circulatory_system"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007638"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_AGR_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_CFDE_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_GXD_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_MGI_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_RAD_slim",
+       "http://purl.obolibrary.org/obo/doid#NCIthesaurus"
+      ],
+      "synonyms": [
+       {
+        "pred": "hasExactSynonym",
+        "val": "disease of subdivision of hemolymphoid system"
+       }
+      ],
+      "xrefs": [
+       {
+        "val": "ICD9CM:429.2"
+       },
+       {
+        "val": "MESH:D002318"
+       },
+       {
+        "val": "NCI:C2931"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:266275004"
+       },
+       {
+        "val": "UMLS_CUI:C0007222"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:73"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_1289",
+     "lbl": "neurodegenerative disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A central nervous system disease that results in the progressive deterioration of function or structure of neurons.",
+       "xrefs": [
+        "url:http://en.wikipedia.org/wiki/Degenerative_disease",
+        "url:http://en.wikipedia.org/wiki/Neurodegeneration"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007638"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_FlyBase_slim",
+       "http://purl.obolibrary.org/obo/doid#NCIthesaurus"
+      ],
+      "synonyms": [
+       {
+        "pred": "hasExactSynonym",
+        "val": "degenerative disease"
+       }
+      ],
+      "xrefs": [
+       {
+        "val": "ICD10CM:G31.9"
+       },
+       {
+        "val": "MESH:D019636"
+       },
+       {
+        "val": "NCI:C195952"
+       },
+       {
+        "val": "NCI:C27090"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:362975008"
+       },
+       {
+        "val": "UMLS_CUI:C0524851"
+       },
+       {
+        "val": "UMLS_CUI:C1285162"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:4874"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_1398",
+     "lbl": "parasitic infectious disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A disease by infectious agent that is carried out by a parasite which by definition is a pathogen that simultaneously injures and derives sustenance from its host.",
+       "xrefs": [
+        "url:http://www.ncbi.nlm.nih.gov/bookshelf/br.fcgi?book=mmed&part=A4071"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007646"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_AGR_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_infectious_disease_slim",
+       "http://purl.obolibrary.org/obo/doid#NCIthesaurus"
+      ],
+      "synonyms": [
+       {
+        "pred": "hasExactSynonym",
+        "val": "Ectoparasitic disease"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "parasitemia"
+       }
+      ],
+      "xrefs": [
+       {
+        "val": "ICD10CM:H44.12"
+       },
+       {
+        "val": "ICD9CM:360.13"
+       },
+       {
+        "val": "NCI:C34587"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:57100005"
+       },
+       {
+        "val": "UMLS_CUI:C0014238"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:11681"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:13509"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:1396"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:1494"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:2114"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:2293"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:2922"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:3564"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:4191"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:886"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:948"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:9639"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:9644"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_14067",
+     "lbl": "Plasmodium falciparum malaria",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A malaria described as a severe form of the disease caused by a parasite Plasmodium falciparum, which is marked by irrregular recurrence of paroxysms and prolonged or continuous fever.",
+       "xrefs": [
+        "url:https://www.merriam-webster.com/dictionary/falciparum%20malaria#medicalDictionary"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007643"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_infectious_disease_slim",
+       "http://purl.obolibrary.org/obo/doid#NCIthesaurus"
+      ],
+      "synonyms": [
+       {
+        "pred": "hasExactSynonym",
+        "val": "Malaria fever, subtertian"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "falciparum malaria"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "malignant tertian fever"
+       }
+      ],
+      "xrefs": [
+       {
+        "val": "ICD10CM:B50"
+       },
+       {
+        "val": "ICD9CM:084.0"
+       },
+       {
+        "val": "MESH:D016778"
+       },
+       {
+        "val": "NCI:C34798"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:62676009"
+       },
+       {
+        "val": "UMLS_CUI:C0024535"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_1485",
+     "lbl": "cystic fibrosis",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A syndrome that is characterized by the buildup of thick, sticky mucus that can damage many organs.",
+       "xrefs": [
+        "url:http://en.wikipedia.org/wiki/Cystic_fibrosis",
+        "url:http://ghr.nlm.nih.gov/condition/cystic-fibrosis",
+        "url:http://www.nhlbi.nih.gov/health/health-topics/topics/cf/",
+        "url:https://www.genome.gov/Genetic-Disorders/Cystic-Fibrosis"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007637"
+         },
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007638"
+         }
+        ]
+       }
+      },
+      "comments": [
+       "OMIM mapping confirmed by DO. [SN]."
+      ],
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_rare_slim",
+       "http://purl.obolibrary.org/obo/doid#NCIthesaurus"
+      ],
+      "synonyms": [
+       {
+        "synonymType": "http://purl.obolibrary.org/obo/OMO_0003012",
+        "pred": "hasExactSynonym",
+        "val": "CF"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "mucoviscidosis"
+       }
+      ],
+      "xrefs": [
+       {
+        "val": "GARD:6233"
+       },
+       {
+        "val": "ICD10CM:E84"
+       },
+       {
+        "val": "ICD9CM:277.0"
+       },
+       {
+        "val": "MESH:D003550"
+       },
+       {
+        "val": "MIM:219700"
+       },
+       {
+        "val": "NCI:C2975"
+       },
+       {
+        "val": "ORDO:586"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:85809002"
+       },
+       {
+        "val": "UMLS_CUI:C0010674"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:12447"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:13383"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:14395"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:1484"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       },
+       {
+        "pred": "http://www.w3.org/2004/02/skos/core#exactMatch",
+        "val": "MESH:D003550"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_1498",
+     "lbl": "cholera",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A primary bacterial infectious disease that is described as an acute, diarrheal illness caused by infection of the intestine with the bacterium Vibrio cholerae, which is characterized by profuse watery diarrhea, vomiting, leg cramps, circulatory collapse and shock.",
+       "xrefs": [
+        "url:http://www.cdc.gov/nczved/divisions/dfbmd/diseases/cholera/#what",
+        "url:http://www.cdc.gov/nczved/divisions/dfbmd/diseases/cholera/technical.html"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007637"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_FlyBase_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_infectious_disease_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_rare_slim",
+       "http://purl.obolibrary.org/obo/doid#GOLD",
+       "http://purl.obolibrary.org/obo/doid#gram-negative_bacterial_infectious_disease"
+      ],
+      "synonyms": [
+       {
+        "pred": "hasExactSynonym",
+        "val": "Cholera - Vibrio cholerae"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "Cholera due to Vibrio cholerae"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "Vibrio cholerae"
+       }
+      ],
+      "xrefs": [
+       {
+        "val": "GARD:6043"
+       },
+       {
+        "val": "ICD10CM:A00"
+       },
+       {
+        "val": "ICD9CM:001"
+       },
+       {
+        "val": "MESH:D002771"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:186087007"
+       },
+       {
+        "val": "UMLS_CUI:C0008354"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       },
+       {
+        "pred": "http://www.w3.org/2004/02/skos/core#exactMatch",
+        "val": "MESH:D002771"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_1579",
+     "lbl": "respiratory system disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A disease of anatomical entity that located_in the respiratory system which extends from the nasal sinuses to the diaphragm.",
+       "xrefs": [
+        "url:http://en.wikipedia.org/wiki/File:Respiratory_system_complete_en.svg",
+        "url:https://www.merriam-webster.com/dictionary/respiratory%20system#medicalDictionary"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007638"
+         },
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007643"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_AGR_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_CFDE_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_GXD_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_MGI_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_RAD_slim"
+      ],
+      "xrefs": [
+       {
+        "val": "ICD10CM:J98"
+       },
+       {
+        "val": "ICD9CM:519"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:155603009"
+       },
+       {
+        "val": "UMLS_CUI:C0029582"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:3226"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_225",
+     "lbl": "syndrome",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A disease characterized by a group of signs and symptoms that occur together and characterize a particular abnormality.",
+       "xrefs": [
+        "url:https://www.merriam-webster.com/dictionary/syndrome#medicalDictionary"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007643"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_AGR_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_CFDE_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_GXD_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_MGI_slim",
+       "http://purl.obolibrary.org/obo/doid#NCIthesaurus"
+      ],
+      "xrefs": [
+       {
+        "val": "MESH:D013577"
+       },
+       {
+        "val": "NCI:C28193"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:64572001"
+       },
+       {
+        "val": "UMLS_CUI:C0039082"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_2789",
+     "lbl": "parasitic protozoa infectious disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A parasitic infectious disease that is caused by parasitic protozoa which are microorganisms classified as unicellular eukaryotes.",
+       "xrefs": [
+        "url:http://en.wikipedia.org/wiki/Protozoan",
+        "url:http://en.wikipedia.org/wiki/Protozoan_infection"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007638"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_infectious_disease_slim",
+       "http://purl.obolibrary.org/obo/doid#NCIthesaurus"
+      ],
+      "synonyms": [
+       {
+        "pred": "hasExactSynonym",
+        "val": "mastigophora infectious disease"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "sarcomastigophora infectious disease"
+       }
+      ],
+      "xrefs": [
+       {
+        "val": "ICD10CM:B64"
+       },
+       {
+        "val": "MESH:D011528"
+       },
+       {
+        "val": "NCI:C34953"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:95896000"
+       },
+       {
+        "val": "UMLS_CUI:C0033740"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:0060003"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:10553"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:3734"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:3804"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:947"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_2841",
+     "lbl": "asthma",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A bronchial disease that is characterized by chronic inflammation and narrowing of the airways, which is caused by a combination of environmental and genetic factors. The disease has_symptom recurring periods of wheezing (a whistling sound while breathing), has_symptom chest tightness, has_symptom shortness of breath, has_symptom mucus production and has_symptom coughing.",
+       "xrefs": [
+        "url:http://www.nhlbi.nih.gov/health/dci/Diseases/Asthma/Asthma_WhatIs.html",
+        "url:https://www.ncbi.nlm.nih.gov/books/NBK430901/",
+        "url:https://www.ncbi.nlm.nih.gov/books/NBK7223/"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007637"
+         }
+        ]
+       }
+      },
+      "comments": [
+       "Xref MGI."
+      ],
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_rare_slim",
+       "http://purl.obolibrary.org/obo/doid#NCIthesaurus"
+      ],
+      "synonyms": [
+       {
+        "pred": "hasExactSynonym",
+        "val": "bronchial hyperreactivity"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "chronic obstructive asthma"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "chronic obstructive asthma with acute exacerbation"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "chronic obstructive asthma with status asthmaticus"
+       }
+      ],
+      "xrefs": [
+       {
+        "val": "GARD:10246"
+       },
+       {
+        "val": "ICD10CM:J45"
+       },
+       {
+        "val": "ICD9CM:493"
+       },
+       {
+        "val": "KEGG:05310"
+       },
+       {
+        "val": "MESH:D001249"
+       },
+       {
+        "val": "MIM:600807"
+       },
+       {
+        "val": "NCI:C28397"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:187687003"
+       },
+       {
+        "val": "UMLS_CUI:C0004096"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:12703"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:13829"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:13830"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:2840"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:5783"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       },
+       {
+        "pred": "http://www.w3.org/2004/02/skos/core#exactMatch",
+        "val": "MESH:D001249"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_331",
+     "lbl": "central nervous system disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A nervous system disease that affects either the spinal cord (myelopathy) or brain (encephalopathy) of the central nervous system.",
+       "xrefs": [
+        "url:http://en.wikipedia.org/wiki/Central_nervous_system_disease"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007638"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_AGR_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_CFDE_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_GXD_slim",
+       "http://purl.obolibrary.org/obo/doid#NCIthesaurus"
+      ],
+      "xrefs": [
+       {
+        "val": "ICD10CM:G96.9"
+       },
+       {
+        "val": "MESH:D002493"
+       },
+       {
+        "val": "NCI:C2934"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:267144009"
+       },
+       {
+        "val": "UMLS_CUI:C0007682"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_399",
+     "lbl": "tuberculosis",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A primary bacterial infectious disease that is located_in lungs, located_in lymph nodes, located_in pericardium, located_in brain, located_in pleura or located_in gastrointestinal tract, has_material_basis_in Mycobacterium tuberculosis, which is transmitted_by droplets released into the air when an infected person coughs or sneezes.",
+       "xrefs": [
+        "url:https://www.merckmanuals.com/home/infections/tuberculosis-and-related-infections/tuberculosis-tb"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007637"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_infectious_disease_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_rare_slim",
+       "http://purl.obolibrary.org/obo/doid#gram-positive_bacterial_infectious_disease"
+      ],
+      "xrefs": [
+       {
+        "val": "GARD:7827"
+       },
+       {
+        "val": "MESH:D014375"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:15202009"
+       },
+       {
+        "val": "UMLS_CUI:C0041295"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:10096"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:12688"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:12691"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:415"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:9901"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:9902"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       },
+       {
+        "pred": "http://www.w3.org/2004/02/skos/core#exactMatch",
+        "val": "MESH:D014376"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_4",
+     "lbl": "disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A disease is a disposition (i) to undergo pathological processes that (ii) exists in an organism because of one or more disorders in that organism.",
+       "xrefs": [
+        "url:https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3041577/"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007645"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_RAD_slim",
+       "http://purl.obolibrary.org/obo/doid#NCIthesaurus"
+      ],
+      "xrefs": [
+       {
+        "val": "MESH:D004194"
+       },
+       {
+        "val": "NCI:C2991"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:64572001"
+       },
+       {
+        "val": "UMLS_CUI:C0012634"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_630",
+     "lbl": "genetic disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A disease that has_material_basis_in genetic variations in the human genome.",
+       "xrefs": [
+        "url:http://ghr.nlm.nih.gov/"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007637"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_CFDE_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_RAD_slim",
+       "http://purl.obolibrary.org/obo/doid#NCIthesaurus"
+      ],
+      "xrefs": [
+       {
+        "val": "MESH:D030342"
+       },
+       {
+        "val": "NCI:C3101"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:32895009"
+       },
+       {
+        "val": "UMLS_CUI:C0019247"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_7",
+     "lbl": "disease of anatomical entity",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A disease that manifests in a defined anatomical structure.",
+       "xrefs": [
+        "url:https://www.merriam-webster.com/medical/anatomic"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007643"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_RAD_slim"
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:1"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:2"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:5"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:71"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:72"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:8"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_863",
+     "lbl": "nervous system disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A disease of anatomical entity that is located_in the central nervous system or located_in the peripheral nervous system.",
+       "xrefs": [
+        "url:http://en.wikipedia.org/wiki/Nervous_system"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007638"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_CFDE_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_GXD_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_MGI_slim",
+       "http://purl.obolibrary.org/obo/doid#NCIthesaurus"
+      ],
+      "xrefs": [
+       {
+        "val": "ICD10CM:G98"
+       },
+       {
+        "val": "ICD9CM:349.9"
+       },
+       {
+        "val": "MESH:D009422"
+       },
+       {
+        "val": "NCI:C26835"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:155262005"
+       },
+       {
+        "val": "UMLS_CUI:C0027765"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_934",
+     "lbl": "viral infectious disease",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A disease by infectious agent that results in infection, has_material_basis_in Viruses.",
+       "xrefs": [
+        "url:http://www.merck.com/mmhe/sec17/ch198/ch198a.html"
+       ],
+       "meta": {
+        "basicPropertyValues": [
+         {
+          "pred": "http://purl.org/dc/elements/1.1/type",
+          "val": "http://purl.obolibrary.org/obo/ECO_0007637"
+         }
+        ]
+       }
+      },
+      "subsets": [
+       "http://purl.obolibrary.org/obo/doid#DO_AGR_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_FlyBase_slim",
+       "http://purl.obolibrary.org/obo/doid#DO_infectious_disease_slim",
+       "http://purl.obolibrary.org/obo/doid#NCIthesaurus"
+      ],
+      "synonyms": [
+       {
+        "pred": "hasExactSynonym",
+        "val": "Viral Infection"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "Viral disease"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "virus infection"
+       }
+      ],
+      "xrefs": [
+       {
+        "val": "ICD10CM:A94"
+       },
+       {
+        "val": "ICD10CM:B34.9"
+       },
+       {
+        "val": "ICD9CM:060-066.99"
+       },
+       {
+        "val": "MESH:D001102"
+       },
+       {
+        "val": "MESH:D014777"
+       },
+       {
+        "val": "NCI:C3439"
+       },
+       {
+        "val": "NCI:C34396"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:34014006"
+       },
+       {
+        "val": "SNOMEDCT_US_2025_09_01:40610006"
+       },
+       {
+        "val": "UMLS_CUI:C0003723"
+       },
+       {
+        "val": "UMLS_CUI:C0042769"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+        "val": "DOID:1329"
+       },
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/IDO_0000664",
+     "lbl": "has material basis in",
+     "type": "PROPERTY",
+     "propertyType": "OBJECT",
+     "meta": {
+      "definition": {
+       "val": "Relating the disease to it’s causation (disease and disorder).",
+       "xrefs": [
+        "url:http://purl.obolibrary.org/obo/IDO_0000664"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/RO#_is_a",
+     "lbl": "is_a",
+     "type": "PROPERTY",
+     "propertyType": "OBJECT",
+     "meta": {
+      "definition": {
+       "val": "Relation defining child to partent inheritance type.",
+       "xrefs": [
+        "url:http://geneontology.org/docs/ontology-relations/",
+        "url:http://purl.obolibrary.org/obo/rex#is_a"
+       ]
+      },
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "disease_ontology"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/IAO_0000115",
+     "lbl": "definition",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/IAO_0000119",
+     "lbl": "definition source",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "Formal citation, e.g. identifier in external database to indicate / attribute source(s) for the definition. Free text indicate / attribute source(s) for the definition. EXAMPLE: Author Name, URI, MeSH Term C04, PUBMED ID, Wiki uri on 31.01.2007.",
+       "xrefs": [
+        "url:http://purl.obolibrary.org/obo/iao.owl"
+       ]
+      },
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.w3.org/2000/01/rdf-schema#isDefinedBy",
+        "val": "http://purl.obolibrary.org/obo/iao.owl"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/IAO_0000233",
+     "lbl": "term tracker item",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "A URL for a request or discussion of an ontology term."
+      }
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/IAO_0000700",
+     "lbl": "has ontology root term",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "Has ontology root term.",
+       "xrefs": [
+        "url:http://purl.obolibrary.org/obo/IAO_0000700"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/IAO_0100001",
+     "lbl": "term replaced by",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "Use on obsolete terms, relating the term to another term that can be used as a substitute.",
+       "xrefs": [
+        "url:https://www.ebi.ac.uk/ols/ontologies/iao/properties?iri=http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FIAO_0100001"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/OMO_0003012",
+     "lbl": "acronym",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/doid#DO_AGR_slim",
+     "lbl": "DO_AGR_slim",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "comments": [
+       "DO_AGR_slim"
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/doid#DO_CFDE_slim",
+     "lbl": "DO_CFDE_slim",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "comments": [
+       "DO_CFDE_slim"
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/doid#DO_FlyBase_slim",
+     "lbl": "DO_FlyBase_slim",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "comments": [
+       "DO_FlyBase_slim"
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/doid#DO_GXD_slim",
+     "lbl": "DO_GXD_slim",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "comments": [
+       "DO_GXD_slim"
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/doid#DO_IEDB_slim",
+     "lbl": "DO_IEDB_slim",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "comments": [
+       "DO_IEDB_slim"
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/doid#DO_MGI_slim",
+     "lbl": "DO_MGI_slim",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "comments": [
+       "DO_MGI_slim"
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/doid#DO_RAD_slim",
+     "lbl": "DO_RAD_slim",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "comments": [
+       "DO_RAD_slim"
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/doid#DO_cancer_slim",
+     "lbl": "DO_cancer_slim",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "comments": [
+       "DO_cancer_slim"
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/doid#DO_childhood_cancer_slim",
+     "lbl": "DO_childhood_cancer_slim",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "comments": [
+       "DO_childhood_cancer_slim"
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/doid#DO_infectious_disease_slim",
+     "lbl": "DO_infectious_disease_slim",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "comments": [
+       "DO_infectious_disease_slim"
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/doid#DO_rare_slim",
+     "lbl": "DO_rare_slim",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "comments": [
+       "DO_rare_slim"
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/doid#GOLD",
+     "lbl": "GOLD",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "comments": [
+       "GOLD"
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/doid#NCIthesaurus",
+     "lbl": "NCIthesaurus",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "comments": [
+       "NCIthesaurus"
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/doid#TopNodes_DOcancerslim",
+     "lbl": "TopNodes_DOcancerslim",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "comments": [
+       "TopNodes_DOcancerslim"
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/doid#gram-negative_bacterial_infectious_disease",
+     "lbl": "gram-negative_bacterial_infectious_disease",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "comments": [
+       "gram-negative_bacterial_infectious_disease"
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/doid#gram-positive_bacterial_infectious_disease",
+     "lbl": "gram-positive_bacterial_infectious_disease",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "comments": [
+       "gram-positive_bacterial_infectious_disease"
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/doid#sexually_transmitted_infectious_disease",
+     "lbl": "sexually_transmitted_infectious_disease",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "comments": [
+       "sexually_transmitted_infectious_disease"
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/doid#tick-borne_infectious_disease",
+     "lbl": "tick-borne_infectious_disease",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "comments": [
+       "tick-borne_infectious_disease"
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/doid#zoonotic_infectious_disease",
+     "lbl": "zoonotic_infectious_disease",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "comments": [
+       "zoonotic_infectious_disease"
+      ]
+     }
+    },
+    {
+     "id": "http://purl.org/dc/elements/1.1/date",
+     "lbl": "dc:date",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION"
+    },
+    {
+     "id": "http://purl.org/dc/elements/1.1/description",
+     "lbl": "description",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "Description.",
+       "xrefs": [
+        "url:http://purl.org/dc/elements/1.1/description"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://purl.org/dc/elements/1.1/language",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION"
+    },
+    {
+     "id": "http://purl.org/dc/elements/1.1/title",
+     "lbl": "title",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "Title.",
+       "xrefs": [
+        "url:http://purl.org/dc/elements/1.1/title"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://purl.org/dc/elements/1.1/type",
+     "lbl": "dc:type",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "The dc:type.",
+       "xrefs": [
+        "url:http://purl.org/dc/elements/1.1/type"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://purl.org/dc/terms/license",
+     "lbl": "license",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "License.",
+       "xrefs": [
+        "url:http://purl.org/dc/terms/license"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.geneontology.org/formats/oboInOwl#SubsetProperty",
+     "lbl": "subset_property",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "Subset property, name of subet.",
+       "xrefs": [
+        "url:http://www.geneontology.org/formats/oboInOwl#SubsetProperty"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.geneontology.org/formats/oboInOwl#SynonymTypeProperty",
+     "lbl": "synonym_type_property",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION"
+    },
+    {
+     "id": "http://www.geneontology.org/formats/oboInOwl#auto-generated-by",
+     "lbl": "auto-generated-by",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION"
+    },
+    {
+     "id": "http://www.geneontology.org/formats/oboInOwl#consider",
+     "lbl": "consider",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "Gives a term which may be an appropriate substitute for an obsolete term, but needs to be looked at carefully by a human expert before the replacement is done.",
+       "xrefs": [
+        "url:http://www.geneontology.org/formats/oboInOwl#consider"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.geneontology.org/formats/oboInOwl#creation_date",
+     "lbl": "creation_date",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "Date class was created.",
+       "xrefs": [
+        "url:http://www.geneontology.org/formats/oboInOwl#creation_date"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.geneontology.org/formats/oboInOwl#date",
+     "lbl": "date",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "Date.",
+       "xrefs": [
+        "url:http://purl.org/dc/elements/1.1/date"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.geneontology.org/formats/oboInOwl#default-namespace",
+     "lbl": "default-namespace",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "Default namespace.",
+       "xrefs": [
+        "url:http://www.geneontology.org/formats/oboInOwl#default-namespace"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.geneontology.org/formats/oboInOwl#hasAlternativeId",
+     "lbl": "has_alternative_id",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "ID of merged class.",
+       "xrefs": [
+        "url:http://www.geneontology.org/formats/oboInOwl#hasAlternativeId"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.geneontology.org/formats/oboInOwl#hasBroadSynonym",
+     "lbl": "has_broad_synonym",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "Broad synonym.",
+       "xrefs": [
+        "url:http://www.geneontology.org/formats/oboInOwl#hasBroadSynonym"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.geneontology.org/formats/oboInOwl#hasDbXref",
+     "lbl": "database_cross_reference",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "Reference database or publication source.",
+       "xrefs": [
+        "url:http://www.geneontology.org/formats/oboInOwl#hasDbXref"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.geneontology.org/formats/oboInOwl#hasExactSynonym",
+     "lbl": "has_exact_synonym",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "Exact synonym.",
+       "xrefs": [
+        "url:http://www.geneontology.org/formats/oboInOwl#hasExactSynonym"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.geneontology.org/formats/oboInOwl#hasNarrowSynonym",
+     "lbl": "has_narrow_synonym",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "Narrow synonym.",
+       "xrefs": [
+        "url:http://www.geneontology.org/formats/oboInOwl#hasNarrowSynonym"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.geneontology.org/formats/oboInOwl#hasOBOFormatVersion",
+     "lbl": "has_obo_format_version",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "Has OBO format version.",
+       "xrefs": [
+        "url:http://www.geneontology.org/formats/oboInOwl#hasOBOFormatVersion"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+     "lbl": "has_obo_namespace",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "Name space of the ontology.",
+       "xrefs": [
+        "url:http://www.geneontology.org/formats/oboInOwl#hasOBONamespace"
+       ]
+      },
+      "comments": [
+       "disease_ontology"
+      ]
+     }
+    },
+    {
+     "id": "http://www.geneontology.org/formats/oboInOwl#hasRelatedSynonym",
+     "lbl": "has_related_synonym",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "Has related synonym.",
+       "xrefs": [
+        "url:http://www.geneontology.org/formats/oboInOwl#hasRelatedSynonym"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.geneontology.org/formats/oboInOwl#hasSynonymType",
+     "lbl": "has_synonym_type",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION"
+    },
+    {
+     "id": "http://www.geneontology.org/formats/oboInOwl#id",
+     "lbl": "id",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "An identifier is an information content entity that is the outcome of a dubbing process and is used to refer to one instance of entity shared by a group of people to refer to that individual entity.",
+       "xrefs": [
+        "url:http://purl.obolibrary.org/obo/IAO_0020000"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.geneontology.org/formats/oboInOwl#inSubset",
+     "lbl": "in_subset",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "In subset.",
+       "xrefs": [
+        "url:http://www.geneontology.org/formats/oboInOwl#inSubset"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.geneontology.org/formats/oboInOwl#saved-by",
+     "lbl": "saved-by",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "Saved by.",
+       "xrefs": [
+        "url:http://www.geneontology.org/formats/oboInOwl#saved-by"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.w3.org/2000/01/rdf-schema#comment",
+     "lbl": "comment",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "Comment.",
+       "xrefs": [
+        "url:http://www.w3.org/2000/01/rdf-schema#comment"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.w3.org/2000/01/rdf-schema#label",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "A human readable name for this class.",
+       "xrefs": [
+        "url:http://www.w3.org/2000/01/rdf-schema#label",
+        "url:https://www.w3.org/TR/owl-guide/"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.w3.org/2002/07/owl#deprecated",
+     "lbl": "owl:deprecated",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "OWL deprecated.",
+       "xrefs": [
+        "url:http://www.w3.org/2002/07/owl#deprecated"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.w3.org/2004/02/skos/core#broadMatch",
+     "lbl": "has broader match",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "A skos concept mapping used to state a hierarchical mapping link between two concepts where the DO concept is broad and the xref is narrow (represents subtypes).",
+       "xrefs": [
+        "url:https://www.w3.org/2009/08/skos-reference/skos.html#broadMatch"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.w3.org/2004/02/skos/core#closeMatch",
+     "lbl": "has close match",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "A skos concept mapping used to link two concepts that are sufficiently similar that they can be used interchangeably.",
+       "xrefs": [
+        "url:https://www.w3.org/2009/08/skos-reference/skos.html#closeMatch"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.w3.org/2004/02/skos/core#exactMatch",
+     "lbl": "has exact match",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "A skos concept mapping used to link two concepts, indicating a high degree of confidence that the concepts can be used interchangeably.",
+       "xrefs": [
+        "url:https://www.w3.org/2009/08/skos-reference/skos.html#exactMatch"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.w3.org/2004/02/skos/core#narrowMatch",
+     "lbl": "has narrower match",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "A skos concept mapping used to state a hierarchical mapping link between two concepts where the DO concept is narrow (DO represents subtypes) and the xref is broad.",
+       "xrefs": [
+        "url:https://www.w3.org/2009/08/skos-reference/skos.html#narrowMatch"
+       ]
+      }
+     }
+    },
+    {
+     "id": "http://www.w3.org/2004/02/skos/core#relatedMatch",
+     "lbl": "has related match",
+     "type": "PROPERTY",
+     "propertyType": "ANNOTATION",
+     "meta": {
+      "definition": {
+       "val": "A skos concept mapping used to state an associative mapping link between two concepts.",
+       "xrefs": [
+        "https://www.w3.org/2009/08/skos-reference/skos.html#relatedMatch"
+       ]
+      }
+     }
+    }
+   ],
+   "edges": [
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_0050117",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_4"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_0050161",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_1579"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_0050177",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_630"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_0050338",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_104"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_0050737",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_0050739"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_0050739",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_0050177"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_0060118",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_7"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_0060570",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_114"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_0060570",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_399"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_0080599",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_934"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_0080600",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_0080599"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_0080600",
+     "pred": "http://purl.obolibrary.org/obo/IDO_0000664",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_2697049"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_0080600",
+     "pred": "http://purl.obolibrary.org/obo/RO_0002452",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000613"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_0080600",
+     "pred": "http://purl.obolibrary.org/obo/RO_0002452",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000614"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_0080600",
+     "pred": "http://purl.obolibrary.org/obo/RO_0002452",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0019153"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_104",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_0050117"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_114",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_0060118"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_114",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_1287"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_114",
+     "pred": "http://purl.obolibrary.org/obo/RO_0004026",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000915"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_1176",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_0050161"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_12365",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_2789"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_12365",
+     "pred": "http://purl.obolibrary.org/obo/IDO_0000664",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_5820"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_12365",
+     "pred": "http://purl.obolibrary.org/obo/RO_0002452",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0019174"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_12365",
+     "pred": "http://purl.obolibrary.org/obo/RO_0004005",
+     "obj": "http://purl.obolibrary.org/obo/MIM_609148"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_12365",
+     "pred": "http://purl.obolibrary.org/obo/RO_0004005",
+     "obj": "http://purl.obolibrary.org/obo/MIM_611162"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_12858",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_1289"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_1287",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_7"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_1289",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_331"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_1398",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_0050117"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_14067",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_12365"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_14067",
+     "pred": "http://purl.obolibrary.org/obo/IDO_0000664",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_5833"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_1485",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_0050737"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_1485",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_225"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_1485",
+     "pred": "http://purl.obolibrary.org/obo/IDO_0000664",
+     "obj": "http://purl.obolibrary.org/obo/GENO_0000148"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_1498",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_0050338"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_1498",
+     "pred": "http://purl.obolibrary.org/obo/IDO_0000664",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_666"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_1498",
+     "pred": "http://purl.obolibrary.org/obo/RO_0002451",
+     "obj": "http://purl.obolibrary.org/obo/TRANS_0000012"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_1498",
+     "pred": "http://purl.obolibrary.org/obo/RO_0002452",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000450"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_1498",
+     "pred": "http://purl.obolibrary.org/obo/RO_0002452",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000570"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_1498",
+     "pred": "http://purl.obolibrary.org/obo/RO_0002452",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0019145"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_1579",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_7"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_225",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_4"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_2789",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_1398"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_2841",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_1176"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_2841",
+     "pred": "http://purl.obolibrary.org/obo/RO_0002200",
+     "obj": "http://purl.obolibrary.org/obo/HP_0002795"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_2841",
+     "pred": "http://purl.obolibrary.org/obo/RO_0002452",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000061"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_2841",
+     "pred": "http://purl.obolibrary.org/obo/RO_0002452",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000604"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_2841",
+     "pred": "http://purl.obolibrary.org/obo/RO_0002452",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000614"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_2841",
+     "pred": "http://purl.obolibrary.org/obo/RO_0002452",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0019153"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_2841",
+     "pred": "http://purl.obolibrary.org/obo/RO_0002452",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0020000"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_2841",
+     "pred": "http://purl.obolibrary.org/obo/RO_0002452",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0020026"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_2841",
+     "pred": "http://purl.obolibrary.org/obo/RO_0002452",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0020032"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_2841",
+     "pred": "http://purl.obolibrary.org/obo/RO_0004005",
+     "obj": "http://purl.obolibrary.org/obo/MIM_600807"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_331",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_863"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_399",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_0050338"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_399",
+     "pred": "http://purl.obolibrary.org/obo/IDO_0000664",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_1773"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_399",
+     "pred": "http://purl.obolibrary.org/obo/RO_0002451",
+     "obj": "http://purl.obolibrary.org/obo/TRANS_0000008"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_630",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_4"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_7",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_4"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_863",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_7"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/DOID_934",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/DOID_0050117"
+    }
+   ],
+   "logicalDefinitionAxioms": [
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_0050117",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_4"
+     ]
+    },
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_0050161",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_4"
+     ],
+     "restrictions": [
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/RO_0004026",
+       "fillerId": "http://purl.obolibrary.org/obo/UBERON_0001558"
+      }
+     ]
+    },
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_0050177",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_4"
+     ],
+     "restrictions": [
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/RO_0004019",
+       "fillerId": "http://purl.obolibrary.org/obo/SO_0000704"
+      }
+     ]
+    },
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_0050737",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_4"
+     ],
+     "restrictions": [
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/IDO_0000664",
+       "fillerId": "http://purl.obolibrary.org/obo/GENO_0000148"
+      }
+     ]
+    },
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_0050739",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_4"
+     ],
+     "restrictions": [
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/IDO_0000664",
+       "fillerId": "http://purl.obolibrary.org/obo/GENO_0000934"
+      }
+     ]
+    },
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_0060118",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_4"
+     ],
+     "restrictions": [
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/RO_0004026",
+       "fillerId": "http://purl.obolibrary.org/obo/UBERON_0000915"
+      }
+     ]
+    },
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_0060570",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_399"
+     ],
+     "restrictions": [
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/RO_0004026",
+       "fillerId": "http://purl.obolibrary.org/obo/UBERON_0000948"
+      }
+     ]
+    },
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_0080599",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_4"
+     ],
+     "restrictions": [
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/IDO_0000664",
+       "fillerId": "http://purl.obolibrary.org/obo/NCBITaxon_11118"
+      }
+     ]
+    },
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_104",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_4"
+     ],
+     "restrictions": [
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/IDO_0000664",
+       "fillerId": "http://purl.obolibrary.org/obo/NCBITaxon_2"
+      }
+     ]
+    },
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_114",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_4"
+     ],
+     "restrictions": [
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/RO_0004026",
+       "fillerId": "http://purl.obolibrary.org/obo/UBERON_0000948"
+      }
+     ]
+    },
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_1176",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_4"
+     ],
+     "restrictions": [
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/RO_0004026",
+       "fillerId": "http://purl.obolibrary.org/obo/UBERON_0002185"
+      },
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/RO_0004026",
+       "fillerId": "http://purl.obolibrary.org/obo/UBERON_0002186"
+      }
+     ]
+    },
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_12365",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_2789"
+     ],
+     "restrictions": [
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/IDO_0000664",
+       "fillerId": "http://purl.obolibrary.org/obo/NCBITaxon_5820"
+      }
+     ]
+    },
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_1287",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_4"
+     ],
+     "restrictions": [
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/RO_0004026",
+       "fillerId": "http://purl.obolibrary.org/obo/UBERON_0004535"
+      }
+     ]
+    },
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_14067",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_12365"
+     ],
+     "restrictions": [
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/IDO_0000664",
+       "fillerId": "http://purl.obolibrary.org/obo/NCBITaxon_5833"
+      }
+     ]
+    },
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_1579",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_4"
+     ],
+     "restrictions": [
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/RO_0004026",
+       "fillerId": "http://purl.obolibrary.org/obo/UBERON_0001004"
+      }
+     ]
+    },
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_225",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_4"
+     ],
+     "restrictions": [
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/RO_0004019",
+       "fillerId": "http://purl.obolibrary.org/obo/SYMP_0000462"
+      }
+     ]
+    },
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_331",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_4"
+     ],
+     "restrictions": [
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/RO_0004026",
+       "fillerId": "http://purl.obolibrary.org/obo/UBERON_0001017"
+      }
+     ]
+    },
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_630",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_4"
+     ],
+     "restrictions": [
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/RO_0004019",
+       "fillerId": "http://purl.obolibrary.org/obo/SO_0001537"
+      }
+     ]
+    },
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_863",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_4"
+     ],
+     "restrictions": [
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/RO_0004026",
+       "fillerId": "http://purl.obolibrary.org/obo/UBERON_0001016"
+      }
+     ]
+    },
+    {
+     "definedClassId": "http://purl.obolibrary.org/obo/DOID_934",
+     "genusIds": [
+      "http://purl.obolibrary.org/obo/DOID_4"
+     ],
+     "restrictions": [
+      {
+       "propertyId": "http://purl.obolibrary.org/obo/IDO_0000664",
+       "fillerId": "http://purl.obolibrary.org/obo/NCBITaxon_10239"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "http://purl.obolibrary.org/obo/doid/imports/geno_import.owl",
+   "meta": {
+    "basicPropertyValues": [
+     {
+      "pred": "http://www.w3.org/2000/01/rdf-schema#comment",
+      "val": "Sourced from http://purl.obolibrary.org/obo/geno/releases/2026-02-02/geno.owl"
+     }
+    ],
+    "version": "http://purl.obolibrary.org/obo/doid/releases/2026-09-30/imports/geno_import.owl"
+   },
+   "nodes": [
+    {
+     "id": "http://purl.obolibrary.org/obo/GENO_0000141",
+     "lbl": "inheritance pattern",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/GENO_0000148",
+     "lbl": "autosomal recessive inheritance",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/GENO_0000933",
+     "lbl": "monogenic inheritance",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/GENO_0000934",
+     "lbl": "autosomal inheritance",
+     "type": "CLASS"
+    }
+   ],
+   "edges": [
+    {
+     "sub": "http://purl.obolibrary.org/obo/GENO_0000148",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/GENO_0000934"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/GENO_0000933",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/GENO_0000141"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/GENO_0000934",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/GENO_0000933"
+    }
+   ]
+  },
+  {
+   "id": "http://purl.obolibrary.org/obo/doid/imports/hp_import.owl",
+   "meta": {
+    "basicPropertyValues": [
+     {
+      "pred": "http://www.w3.org/2000/01/rdf-schema#comment",
+      "val": "Sourced from http://purl.obolibrary.org/obo/hp/releases/2026-09-01/hp.owl"
+     }
+    ],
+    "version": "http://purl.obolibrary.org/obo/doid/releases/2026-09-30/imports/hp_import.owl"
+   },
+   "nodes": [
+    {
+     "id": "http://purl.obolibrary.org/obo/HP_0000118",
+     "lbl": "Phenotypic abnormality",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/HP_0002086",
+     "lbl": "Abnormality of the respiratory system",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/HP_0002795",
+     "lbl": "Abnormal respiratory system physiology",
+     "type": "CLASS"
+    }
+   ],
+   "edges": [
+    {
+     "sub": "http://purl.obolibrary.org/obo/HP_0002086",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/HP_0000118"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/HP_0002795",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/HP_0002086"
+    }
+   ]
+  },
+  {
+   "id": "http://purl.obolibrary.org/obo/doid/imports/ncbitaxon_import.owl",
+   "meta": {
+    "basicPropertyValues": [
+     {
+      "pred": "http://www.w3.org/2000/01/rdf-schema#comment",
+      "val": "Sourced from http://purl.obolibrary.org/obo/ncbitaxon/2026-05-13/ncbitaxon.owl"
+     }
+    ],
+    "version": "http://purl.obolibrary.org/obo/doid/releases/2026-09-30/imports/ncbitaxon_import.owl"
+   },
+   "nodes": [
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_1",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_10239",
+     "lbl": "Viruses",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_11118",
+     "lbl": "Coronaviridae",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_1224",
+     "lbl": "Pseudomonadota",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_1236",
+     "lbl": "Gammaproteobacteria",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_131567",
+     "lbl": "cellular organisms",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_135623",
+     "lbl": "Vibrionales",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_1639119",
+     "lbl": "Plasmodiidae",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_1760",
+     "lbl": "Actinomycetes",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_1762",
+     "lbl": "Mycobacteriaceae",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_1763",
+     "lbl": "Mycobacterium",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_1773",
+     "lbl": "Mycobacterium tuberculosis",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_1783272",
+     "lbl": "Bacillati",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_2",
+     "lbl": "Bacteria",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_201174",
+     "lbl": "Actinomycetota",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_2499399",
+     "lbl": "Cornidovirineae",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_2501931",
+     "lbl": "Orthocoronavirinae",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_2509511",
+     "lbl": "Sarbecovirus",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_2559587",
+     "lbl": "Riboviria",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_2697049",
+     "lbl": "Severe acute respiratory syndrome coronavirus 2",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_2698737",
+     "lbl": "Sar",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_2732396",
+     "lbl": "Orthornavirae",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_2732408",
+     "lbl": "Pisuviricota",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_2732506",
+     "lbl": "Pisoniviricetes",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_2759",
+     "lbl": "Eukaryota",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_33630",
+     "lbl": "Alveolata",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_3379134",
+     "lbl": "Pseudomonadati",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_3418604",
+     "lbl": "Betacoronavirus pandemicum",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_418107",
+     "lbl": "Laverania",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_422676",
+     "lbl": "Aconoidasida",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_5794",
+     "lbl": "Apicomplexa",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_5819",
+     "lbl": "Haemosporida",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_5820",
+     "lbl": "Plasmodium <genus>",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_5833",
+     "lbl": "Plasmodium falciparum",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_641",
+     "lbl": "Vibrionaceae",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_662",
+     "lbl": "Vibrio",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_666",
+     "lbl": "Vibrio cholerae",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_694002",
+     "lbl": "Betacoronavirus",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_76804",
+     "lbl": "Nidovirales",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_77643",
+     "lbl": "Mycobacterium tuberculosis complex",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_85007",
+     "lbl": "Mycobacteriales",
+     "type": "CLASS"
+    }
+   ],
+   "edges": [
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_10239",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_1"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_11118",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_2499399"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_1224",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_3379134"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_1236",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_1224"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_131567",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_1"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_135623",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_1236"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_1639119",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_5819"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_1760",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_201174"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_1762",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_85007"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_1763",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_1762"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_1773",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_77643"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_1783272",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_2"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_2",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_131567"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_201174",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_1783272"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_2499399",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_76804"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_2501931",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_11118"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_2509511",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_694002"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_2559587",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_10239"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_2697049",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_3418604"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_2698737",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_2759"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_2732396",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_2559587"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_2732408",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_2732396"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_2732506",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_2732408"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_2759",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_131567"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_33630",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_2698737"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_3379134",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_2"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_3418604",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_2509511"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_418107",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_5820"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_422676",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_5794"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_5794",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_33630"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_5819",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_422676"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_5820",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_1639119"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_5833",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_418107"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_641",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_135623"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_662",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_641"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_666",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_662"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_694002",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_2501931"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_76804",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_2732506"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_77643",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_1763"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/NCBITaxon_85007",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/NCBITaxon_1760"
+    }
+   ]
+  },
+  {
+   "id": "http://purl.obolibrary.org/obo/doid/imports/omim_susc_import.owl",
+   "meta": {
+    "version": "http://purl.obolibrary.org/obo/doid/releases/2026-09-30/imports/omim_susc_import.owl"
+   },
+   "nodes": [
+    {
+     "id": "http://purl.obolibrary.org/obo/DOID_12365",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/MIM_000000",
+     "lbl": "omim_susceptibility",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/MIM_600807",
+     "lbl": "susceptibility to asthma",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/MIM_609148",
+     "lbl": "susceptibility to mild malaria",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/MIM_611162",
+     "lbl": "susceptibility to malaria",
+     "type": "CLASS"
+    }
+   ],
+   "edges": [
+    {
+     "sub": "http://purl.obolibrary.org/obo/MIM_600807",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/MIM_000000"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/MIM_609148",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/MIM_000000"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/MIM_611162",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/MIM_000000"
+    }
+   ]
+  },
+  {
+   "id": "http://purl.obolibrary.org/obo/doid/imports/ro_import.owl",
+   "meta": {
+    "basicPropertyValues": [
+     {
+      "pred": "http://www.w3.org/2000/01/rdf-schema#comment",
+      "val": "Sourced from http://purl.obolibrary.org/obo/ro/releases/2026-09-04/ro.owl"
+     }
+    ],
+    "version": "http://purl.obolibrary.org/obo/doid/releases/2026-09-30/imports/ro_import.owl"
+   },
+   "nodes": [
+    {
+     "id": "http://purl.obolibrary.org/obo/RO_0002200",
+     "lbl": "has phenotype",
+     "type": "PROPERTY",
+     "propertyType": "OBJECT"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/RO_0002451",
+     "lbl": "transmitted by",
+     "type": "PROPERTY",
+     "propertyType": "OBJECT"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/RO_0002452",
+     "lbl": "has symptom",
+     "type": "PROPERTY",
+     "propertyType": "OBJECT"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/RO_0004005",
+     "lbl": "has major susceptibility factor",
+     "type": "PROPERTY",
+     "propertyType": "OBJECT"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/RO_0004019",
+     "lbl": "disease has basis in",
+     "type": "PROPERTY",
+     "propertyType": "OBJECT"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/RO_0004026",
+     "lbl": "disease has location",
+     "type": "PROPERTY",
+     "propertyType": "OBJECT"
+    }
+   ],
+   "edges": []
+  },
+  {
+   "id": "http://purl.obolibrary.org/obo/doid/imports/so_import.owl",
+   "meta": {
+    "basicPropertyValues": [
+     {
+      "pred": "http://www.w3.org/2000/01/rdf-schema#comment",
+      "val": "Sourced from http://purl.obolibrary.org/obo/so/2026-08-07/so.owl"
+     }
+    ],
+    "version": "http://purl.obolibrary.org/obo/doid/releases/2026-09-30/imports/so_import.owl"
+   },
+   "nodes": [
+    {
+     "id": "http://purl.obolibrary.org/obo/SO_0000110",
+     "lbl": "sequence_feature",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SO_0000704",
+     "lbl": "gene",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SO_0001060",
+     "lbl": "sequence_variant",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SO_0001411",
+     "lbl": "biological_region",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SO_0001537",
+     "lbl": "structural_variant",
+     "type": "CLASS"
+    }
+   ],
+   "edges": [
+    {
+     "sub": "http://purl.obolibrary.org/obo/SO_0000704",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SO_0001411"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SO_0001411",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SO_0000110"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SO_0001537",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SO_0001060"
+    }
+   ]
+  },
+  {
+   "id": "http://purl.obolibrary.org/obo/doid/imports/symp_import.owl",
+   "meta": {
+    "basicPropertyValues": [
+     {
+      "pred": "http://www.w3.org/2000/01/rdf-schema#comment",
+      "val": "Sourced from http://purl.obolibrary.org/obo/symp/releases/2026-07-30/symp.owl"
+     }
+    ],
+    "version": "http://purl.obolibrary.org/obo/doid/releases/2026-09-30/imports/symp_import.owl"
+   },
+   "nodes": [
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0000061",
+     "lbl": "inflammation",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "Inflammation is a general symptom where there is a local response to cellular injury that is marked by capillary dilatation, leukocytic infiltration, redness, heat, pain, swelling, and often loss of function and that serves as a mechanism initiating the elimination of noxious agents and of damaged tissue.",
+       "xrefs": [
+        "url:http://www2.merriam-webster.com/cgi-bin/mwmednlm?book=Medical&va=inflammation"
+       ]
+      },
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0000146",
+     "lbl": "feces and droppings symptom",
+     "type": "CLASS",
+     "meta": {
+      "synonyms": [
+       {
+        "pred": "hasExactSynonym",
+        "val": "fecal"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0000410",
+     "lbl": "neurological and physiological symptom",
+     "type": "CLASS",
+     "meta": {
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0000450",
+     "lbl": "shock",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A cardiovascular system symptom that is characterized as a state of profound depression of the vital processes of the body that is characterized by pallor, rapid but weak pulse, rapid and shallow respiration, reduced total blood volume, and low blood pressure and that is caused usually by severe especially crushing injuries, hemorrhage, burns, or major surgery.",
+       "xrefs": [
+        "url:http://www.merriam-webster.com/medlineplus/shock"
+       ]
+      },
+      "xrefs": [
+       {
+        "val": "ICD9CM_2005:785.5"
+       },
+       {
+        "val": "UMLS_CUI:C0159051"
+       },
+       {
+        "val": "UMLS_ICD9CM_2005_AUI:A0284197"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0000459",
+     "lbl": "digestive system symptom",
+     "type": "CLASS",
+     "meta": {
+      "xrefs": [
+       {
+        "val": "ICD9CM_2005:787"
+       },
+       {
+        "val": "UMLS_CUI:C0159058"
+       },
+       {
+        "val": "UMLS_ICD9CM_2005_AUI:A0284224"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0000462",
+     "lbl": "symptom",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A symptom is a perceived change in function, sensation, loss, disturbance or appearance reported by a patient indicative of a disease.",
+       "xrefs": [
+        "url:https://link.springer.com/chapter/10.1007/978-1-4615-4789-1_5",
+        "url:https://www.merriam-webster.com/dictionary/symptom",
+        "url:https://www.nature.com/subjects/signs-and-symptoms"
+       ]
+      },
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0000514",
+     "lbl": "respiratory system and chest symptom",
+     "type": "CLASS",
+     "meta": {
+      "xrefs": [
+       {
+        "val": "ICD9CM_2005:786"
+       },
+       {
+        "val": "UMLS_CUI:C0476271"
+       },
+       {
+        "val": "UMLS_ICD9CM_2005_AUI:A0284200"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0000528",
+     "lbl": "cardiovascular system symptom",
+     "type": "CLASS",
+     "meta": {
+      "xrefs": [
+       {
+        "val": "ICD9CM_2005:785"
+       },
+       {
+        "val": "UMLS_CUI:C0159049"
+       },
+       {
+        "val": "UMLS_ICD9CM_2005_AUI:A0284192"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0000567",
+     "lbl": "general symptom",
+     "type": "CLASS",
+     "meta": {
+      "xrefs": [
+       {
+        "val": "ICD9CM_2005:780"
+       },
+       {
+        "val": "UMLS_CUI:C0159028"
+       },
+       {
+        "val": "UMLS_ICD9CM_2005_AUI:A0284119"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0000570",
+     "lbl": "diarrhea",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "Diarrhea is a feces and droppng symptom involving the abnormally frequent intestinal evacuations with more or less fluid stools.",
+       "xrefs": [
+        "url:http://www2.merriam-webster.com/cgi-bin/mwmednlm?book=Medical&va=diarrhea"
+       ]
+      },
+      "comments": [
+       "doid/symp duplicate - reviewed 10/2022, both DO & SYMP"
+      ],
+      "synonyms": [
+       {
+        "pred": "hasExactSynonym",
+        "val": "bacterial gastroenteritis"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "diarrhoea"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "fecal incontinence"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "incontinence of feces"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "loose bowel"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "loose bowels"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "the runs"
+       }
+      ],
+      "xrefs": [
+       {
+        "val": "ICD9CM_2005:787.91"
+       },
+       {
+        "val": "UMLS_CUI:C0011991"
+       },
+       {
+        "val": "UMLS_ICD9CM_2005_AUI:A0048148"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0000587",
+     "lbl": "abnormal chest sound",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A respiratory system and chest symptom that is characterized by a sound of breathing that is not similar to that of the sound of moving air and may include: rhonchi (a low-pitched breath sound), crackles (a high-pitched breath sound), wheezing (a high-pitched whistling sound caused by narrowing of the bronchial tubes), and stridor (a harsh, vibratory sound caused by narrowing of the upper airway).",
+       "xrefs": [
+        "url:https://www.healthline.com/health/breath-sounds#types"
+       ]
+      },
+      "xrefs": [
+       {
+        "val": "ICD9CM_2005:786.7"
+       },
+       {
+        "val": "UMLS_CUI:C0159056"
+       },
+       {
+        "val": "UMLS_ICD9CM_2005_AUI:A0284219"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0000598",
+     "lbl": "respiratory abnormality",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A respiratory system and chest symptom that is characterized by a respiration that is not normal and may include, but is not limited to: apnea, eupnea, orthopnea, dyspnea hyperpnea, hyperventilation, hypoventilation, tachypnea, Kussmaul respiration, Cheyne-Stokes respiration, sighing respiration, Biot respiration, apneustic breathing, central neurogenic hyperventilation, and central neurogenic hypoventilation.",
+       "xrefs": [
+        "url:https://www.ncbi.nlm.nih.gov/books/NBK470309/"
+       ]
+      },
+      "xrefs": [
+       {
+        "val": "ICD9CM_2005:786.0"
+       },
+       {
+        "val": "UMLS_CUI:C0159053"
+       },
+       {
+        "val": "UMLS_ICD9CM_2005_AUI:A0284202"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0000604",
+     "lbl": "wheezing",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "An abnormal chest sound that is characterized by breathing with difficulty usually with a whistling sound.",
+       "xrefs": [
+        "url:http://www2.merriam-webster.com/cgi-bin/mwmednlm?book=Medical&va=wheezing"
+       ]
+      },
+      "xrefs": [
+       {
+        "val": "ICD9CM_2005:786.07"
+       },
+       {
+        "val": "UMLS_CUI:C0043144"
+       },
+       {
+        "val": "UMLS_ICD9CM_2005_AUI:A0133941"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0000613",
+     "lbl": "fever",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A neurological and physiological symptom that is characterized by a rise of body temperature above the normal, whether as a natural response (as to infection) or artificially induced for therapeutic reasons.",
+       "xrefs": [
+        "url:http://www2.merriam-webster.com/cgi-bin/mwmednlm?book=Medical&va=fever"
+       ]
+      },
+      "synonyms": [
+       {
+        "pred": "hasExactSynonym",
+        "val": "pyrexia"
+       }
+      ],
+      "xrefs": [
+       {
+        "val": "ICD9CM_2005:780.6"
+       },
+       {
+        "val": "UMLS_CUI:C0015967"
+       },
+       {
+        "val": "UMLS_ICD9CM_2005_AUI:A0058972"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0000614",
+     "lbl": "cough",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A respiratory system and chest symptom that is characterized by an explosive expulsion of air from the lungs acting as a protective mechanism to clear the air passages or as a symptom of pulmonary disturbance.",
+       "xrefs": [
+        "url:http://www2.merriam-webster.com/cgi-bin/mwmednlm?book=Medical&va=cough"
+       ]
+      },
+      "xrefs": [
+       {
+        "val": "ICD9CM_2005:786.2"
+       },
+       {
+        "val": "UMLS_CUI:C0010200"
+       },
+       {
+        "val": "UMLS_ICD9CM_2005_AUI:A0043303"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0019145",
+     "lbl": "vomiting",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "Vomiting is a digestive system symptom characterized by throwing up the stomach contents.",
+       "xrefs": [
+        "url:http://www.merriam-webster.com/dictionary/vomiting"
+       ]
+      },
+      "synonyms": [
+       {
+        "pred": "hasExactSynonym",
+        "val": "emesis"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0019153",
+     "lbl": "dyspnea",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A respiratory abnormality that is characterized by difficult or labored respiration.",
+       "xrefs": [
+        "url:http://www2.merriam-webster.com/cgi-bin/mwmednlm?book=Medical&va=dyspnea"
+       ]
+      },
+      "synonyms": [
+       {
+        "pred": "hasExactSynonym",
+        "val": "breathing difficulty"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "breathlessness"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "difficulty breathing"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "labored respiration"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "shortness of breath"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0019174",
+     "lbl": "chills",
+     "type": "CLASS",
+     "meta": {
+      "synonyms": [
+       {
+        "pred": "hasExactSynonym",
+        "val": "rigors"
+       }
+      ],
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0020000",
+     "lbl": "airway stenosis",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A respiratory system and chest symptom that is characterized by a narrowing in the airway that obstructs the passage of air into the lungs.  Examples include tracheal and laryngotracheal stenosis.",
+       "xrefs": [
+        "url:https://throatdisorder.com/breathing-disorders/tracheal-stenosis/",
+        "url:https://www.ncbi.nlm.nih.gov/books/NBK554561/"
+       ]
+      },
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0020026",
+     "lbl": "chronic inflammation",
+     "type": "CLASS",
+     "meta": {
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0020031",
+     "lbl": "chest discomfort",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A respiratory system and chest symptom that is characterized by pain, pressure, tightness, or other discomfort originating in or radiating to the chest, which constitutes an important indicator of potentially serious cardiac or cardiovascular disorders.",
+       "xrefs": [
+        "url:https://www.ncbi.nlm.nih.gov/books/NBK416/"
+       ]
+      },
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/SYMP_0020032",
+     "lbl": "chest tightness",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A chest discomfort that is characterized by any type of pain or discomfort between your upper belly and lower neck."
+      },
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "symptoms"
+       }
+      ]
+     }
+    }
+   ],
+   "edges": [
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0000061",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000567"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0000146",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000459"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0000410",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000462"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0000450",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000528"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0000459",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000462"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0000514",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000462"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0000528",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000462"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0000567",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000462"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0000570",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000146"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0000587",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000514"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0000598",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000514"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0000604",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000587"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0000613",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000410"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0000614",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000514"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0019145",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000459"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0019153",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000598"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0019174",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000567"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0020000",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000514"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0020026",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000061"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0020031",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0000514"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/SYMP_0020032",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/SYMP_0020031"
+    }
+   ]
+  },
+  {
+   "id": "http://purl.obolibrary.org/obo/doid/imports/trans_import.owl",
+   "meta": {
+    "basicPropertyValues": [
+     {
+      "pred": "http://www.w3.org/2000/01/rdf-schema#comment",
+      "val": "Sourced from http://purl.obolibrary.org/obo/trans/releases/2026-03-13/trans.owl"
+     }
+    ],
+    "version": "http://purl.obolibrary.org/obo/doid/releases/2026-09-30/imports/trans_import.owl"
+   },
+   "nodes": [
+    {
+     "id": "http://purl.obolibrary.org/obo/TRANS_0000000",
+     "lbl": "transmission process",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "A process that is the means during which the pathogen is transmitted directly or indirectly from its natural reservoir, a susceptible host or source to a new host.",
+       "xrefs": [
+        "https://archive.cdc.gov/www_cdc_gov/csels/dsepd/ss1978/lesson1/section10.html",
+        "https://www.nursinghero.com/study-guides/microbiology/modes-of-disease-transmission"
+       ]
+      },
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "transmission_process"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/TRANS_0000001",
+     "lbl": "direct transmission",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "Direct transmission is a transmission process that is the means during which the pathogen is transmitted immediately from a reservoir, source or host to another host.",
+       "xrefs": [
+        "https://archive.cdc.gov/www_cdc_gov/csels/dsepd/ss1978/lesson1/section10.html"
+       ]
+      },
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "transmission_process"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/TRANS_0000002",
+     "lbl": "indirect transmission",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "Indirect transmission is a transmission process during which the pathogen is indirectly transferred from a reservoir, source or host to another host by intermediary vehicles, vectors or as airborne dust particles.",
+       "xrefs": [
+        "https://archive.cdc.gov/www_cdc_gov/csels/dsepd/ss1978/lesson1/section10.html"
+       ]
+      },
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "transmission_process"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/TRANS_0000008",
+     "lbl": "droplet spread transmission",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "Droplet spread transmission is a direct transmission process during which the pathogen is transmitted from a reservoir, source or host to another host by spray of aerosols over a short distance, spray from sneezing, coughing or talking.",
+       "xrefs": [
+        "https://archive.cdc.gov/www_cdc_gov/csels/dsepd/ss1978/lesson1/section10.html"
+       ]
+      },
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "transmission_process"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/TRANS_0000010",
+     "lbl": "vehicle-borne transmission",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "Vehicle-borne transmission is an indirect transmission process during which the pathogen is indirectly transferred from a reservoir, source or host to another host by inanimate intermediary vehicle objects.",
+       "xrefs": [
+        "https://archive.cdc.gov/www_cdc_gov/csels/dsepd/ss1978/lesson1/section10.html"
+       ]
+      },
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "transmission_process"
+       }
+      ]
+     }
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/TRANS_0000012",
+     "lbl": "vehicle-borne ingestion transmission",
+     "type": "CLASS",
+     "meta": {
+      "definition": {
+       "val": "Vehicle-borne ingestion transmission is an indirect vehicle-borne transmission process during which the pathogen is indirectly transferred from a reservoir, source or host to another host by ingestion of fluids or foods or food products including: food, water, milk, or meat products.",
+       "xrefs": [
+        "https://archive.cdc.gov/www_cdc_gov/csels/dsepd/ss1978/lesson1/section10.html"
+       ]
+      },
+      "basicPropertyValues": [
+       {
+        "pred": "http://www.geneontology.org/formats/oboInOwl#hasOBONamespace",
+        "val": "transmission_process"
+       }
+      ]
+     }
+    }
+   ],
+   "edges": [
+    {
+     "sub": "http://purl.obolibrary.org/obo/TRANS_0000001",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/TRANS_0000000"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/TRANS_0000002",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/TRANS_0000000"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/TRANS_0000008",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/TRANS_0000001"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/TRANS_0000010",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/TRANS_0000002"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/TRANS_0000012",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/TRANS_0000010"
+    }
+   ]
+  },
+  {
+   "id": "http://purl.obolibrary.org/obo/doid/imports/uberon_import.owl",
+   "meta": {
+    "basicPropertyValues": [
+     {
+      "pred": "http://www.w3.org/2000/01/rdf-schema#comment",
+      "val": "Sourced from http://purl.obolibrary.org/obo/uberon/releases/2026-06-19/uberon.owl"
+     }
+    ],
+    "version": "http://purl.obolibrary.org/obo/doid/releases/2026-09-30/imports/uberon_import.owl"
+   },
+   "nodes": [
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0000025",
+     "lbl": "tube",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0000061",
+     "lbl": "anatomical structure",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0000062",
+     "lbl": "organ",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0000064",
+     "lbl": "organ part",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0000072",
+     "lbl": "proximo-distal subdivision of respiratory tract",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0000117",
+     "lbl": "respiratory tube",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0000465",
+     "lbl": "material anatomical entity",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0000467",
+     "lbl": "anatomical system",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0000475",
+     "lbl": "organism subdivision",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0000915",
+     "lbl": "thoracic segment of trunk",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0000948",
+     "lbl": "heart",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0001004",
+     "lbl": "respiratory system",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0001016",
+     "lbl": "nervous system",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0001017",
+     "lbl": "central nervous system",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0001062",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0001558",
+     "lbl": "lower respiratory tract",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0002185",
+     "lbl": "bronchus",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0002186",
+     "lbl": "bronchiole",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0003103",
+     "lbl": "compound organ",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0004111",
+     "lbl": "anatomical conduit",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0004120",
+     "lbl": "mesoderm-derived structure",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0004121",
+     "lbl": "ectoderm-derived structure",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0004535",
+     "lbl": "cardiovascular system",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0005177",
+     "lbl": "trunk region element",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0005181",
+     "lbl": "thoracic segment organ",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0007100",
+     "lbl": "primary circulatory organ",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0009569",
+     "lbl": "subdivision of trunk",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0010000",
+     "lbl": "multicellular anatomical structure",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0010314",
+     "lbl": "structure with developmental contribution from neural crest",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0011216",
+     "lbl": "organ system subdivision",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0011676",
+     "lbl": "subdivision of organism along main body axis",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0013522",
+     "lbl": "subdivision of tube",
+     "type": "CLASS"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/UBERON_0015228",
+     "lbl": "circulatory organ",
+     "type": "CLASS"
+    }
+   ],
+   "edges": [
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0000025",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0004111"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0000061",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000465"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0000062",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0010000"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0000064",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0010000"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0000072",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0013522"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0000117",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000025"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0000465",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0001062"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0000467",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000061"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0000475",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0010000"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0000915",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0009569"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0000915",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0011676"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0000948",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0004120"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0000948",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0005181"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0000948",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0007100"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0000948",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0010314"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0001004",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000467"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0001016",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000467"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0001017",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0004121"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0001017",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0011216"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0001558",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000072"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0002185",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000117"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0002186",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000117"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0003103",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000062"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0004111",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0010000"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0004120",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000061"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0004121",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000061"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0004535",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000467"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0004535",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0010314"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0005177",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000062"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0005181",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000062"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0005181",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0005177"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0007100",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0015228"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0009569",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000475"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0010000",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000061"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0010314",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000061"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0011216",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0010000"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0011676",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000475"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0013522",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0000064"
+    },
+    {
+     "sub": "http://purl.obolibrary.org/obo/UBERON_0015228",
+     "pred": "is_a",
+     "obj": "http://purl.obolibrary.org/obo/UBERON_0003103"
+    }
+   ]
+  },
+  {
+   "id": "http://purl.obolibrary.org/obo/doid/obo/ext.owl",
+   "meta": {
+    "version": "http://purl.obolibrary.org/obo/doid/releases/2026-09-30/ext.owl"
+   },
+   "nodes": [
+    {
+     "id": "http://purl.obolibrary.org/obo/RO_0002452",
+     "type": "PROPERTY",
+     "propertyType": "OBJECT"
+    },
+    {
+     "id": "http://purl.obolibrary.org/obo/NCBITaxon_2697049",
+     "meta": {
+      "synonyms": [
+       {
+        "pred": "hasExactSynonym",
+        "val": "2019-nCoV"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "HCoV-19"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "Human coronavirus 2019"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "SARS-2"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "SARS-CoV-2"
+       },
+       {
+        "pred": "hasExactSynonym",
+        "val": "SARS2"
+       }
+      ]
+     }
+    }
+   ],
+   "edges": []
+  }
+ ]
+}

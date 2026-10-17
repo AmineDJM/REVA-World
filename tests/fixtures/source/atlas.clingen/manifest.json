@@ -1,0 +1,15 @@
+[
+  {
+    "request_fingerprint": "f7525ad06639129f328d4c34ed152c3f00d9f8d8f410574cee40841f9c292ff0",
+    "url": "https://search.clinicalgenome.org/kb/gene-validity/download",
+    "file": "gene_validity.csv",
+    "sha256": "ea9529d48040da9180102153274ce29abef1cb32cf5673044d3fbcb843a484e6",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain;charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "CC0 1.0",
+    "fixture_note": "trimmed: preamble + header + 10 curation rows (first 8 + HTT, CFTR) of the 2026-10-17 file"
+  }
+]

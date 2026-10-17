@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "d9792fed46075dd4e3e9113166c7e72f17d5a2ee329f210cdb891a7932346633",
+    "url": "https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/main/src/ontology/doid.json",
+    "file": "doid.json",
+    "sha256": "34de7b578c363f2e912304496e03b0247343b7949358b7c75178f343888760b1",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "CC0 1.0 (DOID); RO CC0 1.0",
+    "fixture_note": "trimmed: 32 DOID classes (seeds DOID:399,DOID:0060570,DOID:12365,DOID:14067,DOID:0080600,DOID:2841,DOID:12858,DOID:1485,DOID:1498 + is_a ancestors) of doid.json 2026-09-30 with their edges and logical definitions, the import-module classes they reference (+ import is_a ancestors), all property nodes; JSON re-serialised; ro.obo trimmed to the [Typedef] stanzas of the relations used by the trimmed ontology and their is_a ancestors"
+  },
+  {
+    "request_fingerprint": "fbce01ed22cdc0c9b28b5b8c53b01477be99745bb2b08ce2ff1ac9cd3e9f293a",
+    "url": "https://raw.githubusercontent.com/oborel/obo-relations/master/ro.obo",
+    "file": "ro.obo",
+    "sha256": "5e577715e68de04d5a06284b47103490263c3962bb796369685e97cf20afd539",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "CC0 1.0 (DOID); RO CC0 1.0",
+    "fixture_note": "trimmed: 32 DOID classes (seeds DOID:399,DOID:0060570,DOID:12365,DOID:14067,DOID:0080600,DOID:2841,DOID:12858,DOID:1485,DOID:1498 + is_a ancestors) of doid.json 2026-09-30 with their edges and logical definitions, the import-module classes they reference (+ import is_a ancestors), all property nodes; JSON re-serialised; ro.obo trimmed to the [Typedef] stanzas of the relations used by the trimmed ontology and their is_a ancestors"
+  }
+]

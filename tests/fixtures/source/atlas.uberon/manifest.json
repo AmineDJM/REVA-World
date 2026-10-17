@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "d889338d0ca1bf4d9545b4a4817b484a8452e46a00f009ab24ddeb857ae9f818",
+    "url": "https://github.com/obophenotype/uberon/releases/latest/download/human-view.obo",
+    "file": "human-view.obo",
+    "sha256": "a370173ae9de956567a1f5e849629e1da799193be0ef22dd6f0f715b84e076c9",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "CC BY 3.0 (UBERON); RO CC0 1.0",
+    "fixture_note": "trimmed: 76 UBERON/CL terms (seeds UBERON:0000948,UBERON:0002048,UBERON:0002107,UBERON:0000955,CL:0000540,UBERON:0002113 + is_a/part_of ancestors) of human-view.obo v2026-10-01 (header kept); ro.obo trimmed to the [Typedef] stanzas of the relations used by the trimmed ontology and their is_a ancestors"
+  },
+  {
+    "request_fingerprint": "fbce01ed22cdc0c9b28b5b8c53b01477be99745bb2b08ce2ff1ac9cd3e9f293a",
+    "url": "https://raw.githubusercontent.com/oborel/obo-relations/master/ro.obo",
+    "file": "ro.obo",
+    "sha256": "1c438dcae03a06456d1b53d3550c79a8f84235e44ae00b6dc8bf4a2d23d98234",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "CC BY 3.0 (UBERON); RO CC0 1.0",
+    "fixture_note": "trimmed: 76 UBERON/CL terms (seeds UBERON:0000948,UBERON:0002048,UBERON:0002107,UBERON:0000955,CL:0000540,UBERON:0002113 + is_a/part_of ancestors) of human-view.obo v2026-10-01 (header kept); ro.obo trimmed to the [Typedef] stanzas of the relations used by the trimmed ontology and their is_a ancestors"
+  }
+]

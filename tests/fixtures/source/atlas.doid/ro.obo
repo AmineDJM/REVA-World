@@ -1,0 +1,151 @@
+format-version: 1.2
+data-version: releases/2026-09-04
+subsetdef: common_anatomy ""
+subsetdef: efo_slim ""
+subsetdef: http://purl.obolibrary.org/obo/valid_for_go_annotation_extension ""
+subsetdef: http://purl.obolibrary.org/obo/valid_for_go_gp2term ""
+subsetdef: http://purl.obolibrary.org/obo/valid_for_go_ontology ""
+subsetdef: http://purl.obolibrary.org/obo/valid_for_gocam ""
+subsetdef: human_reference_atlas ""
+subsetdef: human_subset ""
+subsetdef: mouse_subset ""
+subsetdef: pheno_slim ""
+subsetdef: ro-eco ""
+subsetdef: RO:0002259 ""
+subsetdef: uberon_slim ""
+subsetdef: upper_level ""
+subsetdef: vertebrate_core ""
+idspace: cito http://purl.org/spar/cito/ 
+idspace: dc http://purl.org/dc/elements/1.1/ 
+idspace: foaf http://xmlns.com/foaf/0.1/ 
+idspace: oboInOwl http://www.geneontology.org/formats/oboInOwl# 
+idspace: skos http://www.w3.org/2004/02/skos/core# 
+idspace: swrl http://www.w3.org/2003/11/swrl# 
+idspace: swrla http://swrl.stanford.edu/ontologies/3.3/swrla.owl# 
+idspace: swrlb http://www.w3.org/2003/11/swrlb# 
+idspace: terms http://purl.org/dc/terms/ 
+ontology: ro
+property_value: foaf:homepage " https://github.com/oborel/obo-relations/" xsd:anyURI
+property_value: owl:versionInfo "2026-09-04" xsd:string
+property_value: terms:description "The OBO Relations Ontology (RO) is a collection of OWL relations (ObjectProperties) intended for use across a wide variety of biological ontologies." xsd:string
+property_value: terms:license https://creativecommons.org/publicdomain/zero/1.0/
+property_value: terms:title "OBO Relations Ontology" xsd:string
+
+[Typedef]
+id: RO:0002200
+name: has phenotype
+def: "A relationship that holds between a biological entity and a phenotype. Here a phenotype is construed broadly as any kind of quality of an organism part, a collection of these qualities, or a change in quality or qualities (e.g. abnormally increased temperature). The subject of this relationship can be an organism (where the organism has the phenotype, i.e. the qualities inhere in parts of this organism), a genomic entity such as a gene or genotype (if modifications of the gene or the genotype causes the phenotype), or a condition such as a disease (such that if the condition inheres in an organism, then the organism has the phenotype)." []
+subset: ro-eco
+property_value: IAO:0000114 IAO:0000125
+property_value: IAO:0000117 https://orcid.org/0000-0002-6601-2165
+range: UPHENO:0001001 ! phenotype
+is_a: RO:0016001 ! has phenotype or disease
+inverse_of: RO:0002201 ! phenotype of
+
+[Typedef]
+id: RO:0002321
+name: ecologically related to
+def: "A relationship that is mediated in some way by the environment or environmental feature (ENVO:00002297)" []
+subset: ro-eco
+property_value: IAO:0000116 "Awaiting class for domain/range constraint, see: https://github.com/OBOFoundry/Experimental-OBO-Core/issues/6" xsd:string
+property_value: IAO:0000117 https://orcid.org/0000-0002-6601-2165
+property_value: IAO:0000232 "Do not use this relation directly. It is intended as a grouping for a diverse set of relations, all involving ecological interactions" xsd:string
+
+[Typedef]
+id: RO:0002410
+name: causally related to
+def: "relation that links two events, processes, states, or objects such that one event, process, state, or object (a cause) contributes to the production of another event, process, state, or object (an effect) where the cause is partly or wholly responsible for the effect, and the effect is partly or wholly dependent on the cause." [https://en.wikipedia.org/wiki/Causality]
+property_value: IAO:0000116 "This branch of the ontology deals with causal relations between entities. It is divided into two branches: causal relations between occurrents/processes, and causal relations between material entities. We take an 'activity flow-centric approach', with the former as primary, and define causal relations between material entities in terms of causal relations between occurrents.\n\nTo define causal relations in an activity-flow type network, we make use of 3 primitives:\n\n * Temporal: how do the intervals of the two occurrents relate? \n * Is the causal relation regulatory?\n * Is the influence positive or negative?\n\nThe first of these can be formalized in terms of the Allen Interval Algebra. Informally, the 3 bins we care about are 'direct', 'indirect' or overlapping. Note that all causal relations should be classified under a RO temporal relation (see the branch under 'temporally related to'). Note that all causal relations are temporal, but not all temporal relations are causal. Two occurrents can be related in time without being causally connected. We take causal influence to be primitive, elucidated as being such that has the upstream changed, some qualities of the donwstream would necessarily be modified.\n\nFor the second, we consider a relationship to be regulatory if the system in which the activities occur is capable of altering the relationship to achieve some objective. This could include changing the rate of production of a molecule.\n\nFor the third, we consider the effect of the upstream process on the output(s) of the downstream process. If the level of output is increased, or the rate of production of the output is increased, then the direction is increased. Direction can be positive, negative or neutral or capable of either direction. Two positives in succession yield a positive, two negatives in succession yield a positive, otherwise the default assumption is that the net effect is canceled and the influence is neutral.\n\nEach of these 3 primitives can be composed to yield a cross-product of different relation types." xsd:string
+property_value: IAO:0000117 https://orcid.org/0000-0002-6601-2165
+property_value: IAO:0000232 "Do not use this relation directly. It is intended as a grouping for a diverse set of relations, all involving cause and effect." xsd:string
+
+[Typedef]
+id: RO:0002451
+name: transmitted by
+def: "A relationship that holds between a disease and organism" []
+property_value: IAO:0000112 "all dengue disease transmitted by some mosquito" xsd:string
+property_value: IAO:0000116 "Add domain and range constraints" xsd:string
+property_value: IAO:0000117 https://orcid.org/0000-0002-6601-2165
+is_a: RO:0002321 ! ecologically related to
+
+[Typedef]
+id: RO:0002452
+name: has symptom
+def: "A relation that holds between a disease or an organism and a phenotype" []
+property_value: IAO:0000117 https://orcid.org/0000-0002-6601-2165
+domain: OGMS:0000031 ! disease
+is_a: RO:0002200 ! has phenotype
+inverse_of: RO:0017007 ! symptom of
+
+[Typedef]
+id: RO:0004000
+name: condition has genetic basis in
+property_value: IAO:0000232 "Do not use this relation directly. It is intended as a grouping for a more specific relations" xsd:string
+domain: BFO:0000017 ! realizable entity
+is_a: RO:0002410 ! causally related to
+inverse_of: RO:0004010 ! is genetic basis for condition
+created_by: https://orcid.org/0000-0002-6601-2165
+creation_date: 2017-11-05T02:38:20Z
+
+[Typedef]
+id: RO:0004005
+name: has major susceptibility factor
+is_a: RO:0004000 ! condition has genetic basis in
+inverse_of: RO:0004015 ! is causal susceptibility factor for
+created_by: https://orcid.org/0000-0002-6601-2165
+creation_date: 2017-11-05T02:46:26Z
+
+[Typedef]
+id: RO:0004017
+name: realizable has basis in
+is_a: RO:0002410 ! causally related to
+inverse_of: RO:0004018 ! is basis for realizable
+created_by: https://orcid.org/0000-0002-6601-2165
+creation_date: 2017-11-05T03:20:01Z
+
+[Typedef]
+id: RO:0004019
+name: disease has basis in
+domain: OGMS:0000031 ! disease
+is_a: RO:0004017 ! realizable has basis in
+is_a: RO:0004023 ! causal relationship with disease as subject
+created_by: https://orcid.org/0000-0002-6601-2165
+creation_date: 2017-11-05T03:26:47Z
+
+[Typedef]
+id: RO:0004023
+name: causal relationship with disease as subject
+property_value: IAO:0000232 "Do not use this relation directly. It is intended as a grouping for a diverse set of relations, all of which have a disease as the subject." xsd:string
+domain: OGMS:0000031 ! disease
+is_a: RO:0002410 ! causally related to
+is_a: RO:0040035 ! disease relationship
+created_by: https://orcid.org/0000-0002-6601-2165
+creation_date: 2017-11-05T03:50:54Z
+
+[Typedef]
+id: RO:0004026
+name: disease has location
+def: "A relationship between a disease and an anatomical entity where the disease has one or more features that are located in that entity." []
+property_value: IAO:0000116 "TODO: complete range axiom once more of CARO has been mireoted in to this ontology" xsd:string
+property_value: IAO:0000232 "This relation is intentionally very general, and covers isolated diseases, where the disease is realized as a process occurring in the location, and syndromic diseases, where one or more of the features may be present in that location. Thus any given disease can have multiple locations in the sense defined here." xsd:string
+domain: OGMS:0000031 ! disease
+range: BFO:0000004 ! independent continuant
+is_a: RO:0040035 ! disease relationship
+created_by: https://orcid.org/0000-0002-6601-2165
+creation_date: 2017-11-05T04:06:02Z
+
+[Typedef]
+id: RO:0016001
+name: has phenotype or disease
+property_value: IAO:0000232 "Do not use this relation directly. It is intended as a grouping for a set of relations regarding presentation of phenotypes and disease." xsd:string
+property_value: seeAlso "https://github.com/oborel/obo-relations/issues/478" xsd:string
+property_value: terms:contributor https://orcid.org/0000-0002-7463-6306
+property_value: terms:date "2021-11-05T17:30:14Z" xsd:dateTime
+
+[Typedef]
+id: RO:0040035
+name: disease relationship
+def: "This relation groups  relations between diseases and any other kind of entity." []
+property_value: IAO:0000232 "Do not use this relation directly. It is intended as a grouping for a diverse set of relations, in which the subject or object is a disease." xsd:string
+created_by: https://orcid.org/0000-0002-6601-2165
+creation_date: 2018-09-26T00:00:32Z

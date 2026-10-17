@@ -1,0 +1,67 @@
+[
+  {
+    "request_fingerprint": "5a05746742d28395e83eb008844679547934f455b75564a85cdacd7293312a25",
+    "url": "https://xmart-api-public.who.int/DEX_CMS/GHE_FULL?$apply=groupby((DIM_YEAR_CODE))",
+    "file": "ghe_years.json",
+    "sha256": "71dd125ed47c4fe108af221abd058e91a398cb11ce21e2d7ac3d705f01ce3aa4",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "fixture_note": "years/countries/causes lists as served; FRA and NGA slices trimmed to the rows of 2000, 2019 and 2023 (levels 0-2 for 2000/2019, all causes for 2023), number text kept verbatim"
+  },
+  {
+    "request_fingerprint": "ba638ed81ac7f0ce601716c8236c830df7a58a9e58b2b6401dad324b543b76a7",
+    "url": "https://xmart-api-public.who.int/DEX_CMS/GHE_FULL?$apply=groupby((DIM_COUNTRY_CODE))",
+    "file": "ghe_countries.json",
+    "sha256": "3480fe5b9ffa8448369a86b999ffa7041014c266469d79653f13fe7613766933",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "fixture_note": "years/countries/causes lists as served; FRA and NGA slices trimmed to the rows of 2000, 2019 and 2023 (levels 0-2 for 2000/2019, all causes for 2023), number text kept verbatim"
+  },
+  {
+    "request_fingerprint": "6ed8122713d41c95fc44e8c7d9eee77570182b05757c291d225971cd28d02200",
+    "url": "https://xmart-api-public.who.int/DEX_CMS/GHE_FULL?$apply=groupby((DIM_GHECAUSE_CODE,DIM_GHECAUSE_TITLE,FLAG_LEVEL))",
+    "file": "ghe_causes.json",
+    "sha256": "5471d6df2bd98e02db6638fcf85f07aa65a64b467d01bd881a97da007f745b87",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "fixture_note": "years/countries/causes lists as served; FRA and NGA slices trimmed to the rows of 2000, 2019 and 2023 (levels 0-2 for 2000/2019, all causes for 2023), number text kept verbatim"
+  },
+  {
+    "request_fingerprint": "c030459840a4ccc54eea6e43a3bfa26be6789893a9a302ccd9c7d7ab2f366ed1",
+    "url": "https://xmart-api-public.who.int/DEX_CMS/GHE_FULL?$filter=DIM_COUNTRY_CODE%20eq%20'FRA'%20and%20DIM_AGEGROUP_CODE%20eq%20'TOTAL'%20and%20DIM_SEX_CODE%20eq%20'TOTAL'%20and%20(FLAG_LEVEL%20le%202%20or%20DIM_YEAR_CODE%20eq%202023)&$select=DIM_COUNTRY_CODE,DIM_YEAR_CODE,DIM_GHECAUSE_CODE,VAL_DTHS_COUNT_NUMERIC,VAL_DTHS_COUNT_LOW,VAL_DTHS_COUNT_HIGH,VAL_DTHS_RATE100K_NUMERIC,VAL_DALY_COUNT_NUMERIC,VAL_DALY_RATE100K_NUMERIC",
+    "file": "ghe_FRA.json",
+    "sha256": "2d47fd4f30c17c3ca852c9c30570bcaa1ec94edb9592d7edad31e460bba27357",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "fixture_note": "years/countries/causes lists as served; FRA and NGA slices trimmed to the rows of 2000, 2019 and 2023 (levels 0-2 for 2000/2019, all causes for 2023), number text kept verbatim"
+  },
+  {
+    "request_fingerprint": "b312cd647125251601e71fe431c96ef88938a4d60cffffc43ce645e8a060e9c9",
+    "url": "https://xmart-api-public.who.int/DEX_CMS/GHE_FULL?$filter=DIM_COUNTRY_CODE%20eq%20'NGA'%20and%20DIM_AGEGROUP_CODE%20eq%20'TOTAL'%20and%20DIM_SEX_CODE%20eq%20'TOTAL'%20and%20(FLAG_LEVEL%20le%202%20or%20DIM_YEAR_CODE%20eq%202023)&$select=DIM_COUNTRY_CODE,DIM_YEAR_CODE,DIM_GHECAUSE_CODE,VAL_DTHS_COUNT_NUMERIC,VAL_DTHS_COUNT_LOW,VAL_DTHS_COUNT_HIGH,VAL_DTHS_RATE100K_NUMERIC,VAL_DALY_COUNT_NUMERIC,VAL_DALY_RATE100K_NUMERIC",
+    "file": "ghe_NGA.json",
+    "sha256": "556d07398affcf09f98d8cfcff7666735ed6509861b3446557bbe17133bc888e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "fixture_note": "years/countries/causes lists as served; FRA and NGA slices trimmed to the rows of 2000, 2019 and 2023 (levels 0-2 for 2000/2019, all causes for 2023), number text kept verbatim"
+  }
+]

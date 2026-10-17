@@ -1,0 +1,496 @@
+# Atlas catalog: human body and diseases -- burden (agent V4HEALTH). Provider-declared concepts, not human-reviewed.
+# Series: who.ghe.ghe.<measure>|sex=TOTAL|age=TOTAL|cause=<WHO GHE cause code> (src/reva/adapters/connectors/atlas_who_ghe.py).
+# Concepts cover the 27 GHE cause groups of levels 0-2 (every year 2000-latest); level 3-5 causes exist for the latest year
+# only and are queried as series. French labels are REVA translations of the WHO English cause titles (the English
+# title is WHO's, verbatim). GHE causes are WHO categories, not Disease Ontology / Mondo classes (no ICD code per
+# cause in the API; never matched by name).
+domain: health_body
+labels: {fr: "Corps humain et maladies (charge de morbidité)", en: "Human body and diseases (burden)"}
+maintainer: V4HEALTH
+concepts:
+  - id: health_body.ghe.deaths.all_causes
+    labels: {"fr": "Décès : Toutes causes (OMS, GHE)", "en": "Deaths: All Causes (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'All Causes' (cause code 0, level 0), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=0"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.all_causes
+    labels: {"fr": "Taux de mortalité pour 100 000 : Toutes causes (OMS, GHE)", "en": "Death rate per 100 000: All Causes (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'All Causes' (cause code 0, level 0), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=0"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_10
+    labels: {"fr": "Décès : Maladies transmissibles, maternelles, périnatales et nutritionnelles (OMS, GHE)", "en": "Deaths: Communicable, maternal, perinatal and nutritional conditions (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Communicable, maternal, perinatal and nutritional conditions' (cause code 10, level 1), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=10"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_10
+    labels: {"fr": "Taux de mortalité pour 100 000 : Maladies transmissibles, maternelles, périnatales et nutritionnelles (OMS, GHE)", "en": "Death rate per 100 000: Communicable, maternal, perinatal and nutritional conditions (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Communicable, maternal, perinatal and nutritional conditions' (cause code 10, level 1), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=10"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_20
+    labels: {"fr": "Décès : Maladies infectieuses et parasitaires (OMS, GHE)", "en": "Deaths: Infectious and parasitic diseases (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Infectious and parasitic diseases' (cause code 20, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=20"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_20
+    labels: {"fr": "Taux de mortalité pour 100 000 : Maladies infectieuses et parasitaires (OMS, GHE)", "en": "Death rate per 100 000: Infectious and parasitic diseases (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Infectious and parasitic diseases' (cause code 20, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=20"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_380
+    labels: {"fr": "Décès : Infections respiratoires (OMS, GHE)", "en": "Deaths: Respiratory infections (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Respiratory infections' (cause code 380, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=380"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_380
+    labels: {"fr": "Taux de mortalité pour 100 000 : Infections respiratoires (OMS, GHE)", "en": "Death rate per 100 000: Respiratory infections (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Respiratory infections' (cause code 380, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=380"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_420
+    labels: {"fr": "Décès : Affections maternelles (OMS, GHE)", "en": "Deaths: Maternal conditions (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Maternal conditions' (cause code 420, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=420"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_420
+    labels: {"fr": "Taux de mortalité pour 100 000 : Affections maternelles (OMS, GHE)", "en": "Death rate per 100 000: Maternal conditions (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Maternal conditions' (cause code 420, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=420"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_490
+    labels: {"fr": "Décès : Affections néonatales (OMS, GHE)", "en": "Deaths: Neonatal conditions (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Neonatal conditions' (cause code 490, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=490"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_490
+    labels: {"fr": "Taux de mortalité pour 100 000 : Affections néonatales (OMS, GHE)", "en": "Death rate per 100 000: Neonatal conditions (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Neonatal conditions' (cause code 490, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=490"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_540
+    labels: {"fr": "Décès : Carences nutritionnelles (OMS, GHE)", "en": "Deaths: Nutritional deficiencies (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Nutritional deficiencies' (cause code 540, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=540"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_540
+    labels: {"fr": "Taux de mortalité pour 100 000 : Carences nutritionnelles (OMS, GHE)", "en": "Death rate per 100 000: Nutritional deficiencies (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Nutritional deficiencies' (cause code 540, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=540"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_600
+    labels: {"fr": "Décès : Maladies non transmissibles (OMS, GHE)", "en": "Deaths: Noncommunicable diseases (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Noncommunicable diseases' (cause code 600, level 1), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=600"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_600
+    labels: {"fr": "Taux de mortalité pour 100 000 : Maladies non transmissibles (OMS, GHE)", "en": "Death rate per 100 000: Noncommunicable diseases (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Noncommunicable diseases' (cause code 600, level 1), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=600"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_610
+    labels: {"fr": "Décès : Tumeurs malignes (OMS, GHE)", "en": "Deaths: Malignant neoplasms (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Malignant neoplasms' (cause code 610, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=610"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_610
+    labels: {"fr": "Taux de mortalité pour 100 000 : Tumeurs malignes (OMS, GHE)", "en": "Death rate per 100 000: Malignant neoplasms (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Malignant neoplasms' (cause code 610, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=610"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_790
+    labels: {"fr": "Décès : Autres tumeurs (OMS, GHE)", "en": "Deaths: Other neoplasms (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Other neoplasms' (cause code 790, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=790"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_790
+    labels: {"fr": "Taux de mortalité pour 100 000 : Autres tumeurs (OMS, GHE)", "en": "Death rate per 100 000: Other neoplasms (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Other neoplasms' (cause code 790, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=790"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_800
+    labels: {"fr": "Décès : Diabète sucré (OMS, GHE)", "en": "Deaths: Diabetes mellitus (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Diabetes mellitus' (cause code 800, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=800"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_800
+    labels: {"fr": "Taux de mortalité pour 100 000 : Diabète sucré (OMS, GHE)", "en": "Death rate per 100 000: Diabetes mellitus (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Diabetes mellitus' (cause code 800, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=800"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_810
+    labels: {"fr": "Décès : Troubles endocriniens, sanguins et immunitaires (OMS, GHE)", "en": "Deaths: Endocrine, blood, immune disorders (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Endocrine, blood, immune disorders' (cause code 810, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=810"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_810
+    labels: {"fr": "Taux de mortalité pour 100 000 : Troubles endocriniens, sanguins et immunitaires (OMS, GHE)", "en": "Death rate per 100 000: Endocrine, blood, immune disorders (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Endocrine, blood, immune disorders' (cause code 810, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=810"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_820
+    labels: {"fr": "Décès : Troubles mentaux et liés à l’usage de substances (OMS, GHE)", "en": "Deaths: Mental and substance use disorders (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Mental and substance use disorders' (cause code 820, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=820"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_820
+    labels: {"fr": "Taux de mortalité pour 100 000 : Troubles mentaux et liés à l’usage de substances (OMS, GHE)", "en": "Death rate per 100 000: Mental and substance use disorders (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Mental and substance use disorders' (cause code 820, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=820"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_940
+    labels: {"fr": "Décès : Affections neurologiques (OMS, GHE)", "en": "Deaths: Neurological conditions (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Neurological conditions' (cause code 940, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=940"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_940
+    labels: {"fr": "Taux de mortalité pour 100 000 : Affections neurologiques (OMS, GHE)", "en": "Death rate per 100 000: Neurological conditions (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Neurological conditions' (cause code 940, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=940"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_1020
+    labels: {"fr": "Décès : Maladies des organes des sens (OMS, GHE)", "en": "Deaths: Sense organ diseases (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Sense organ diseases' (cause code 1020, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=1020"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_1020
+    labels: {"fr": "Taux de mortalité pour 100 000 : Maladies des organes des sens (OMS, GHE)", "en": "Death rate per 100 000: Sense organ diseases (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Sense organ diseases' (cause code 1020, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=1020"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_1100
+    labels: {"fr": "Décès : Maladies cardiovasculaires (OMS, GHE)", "en": "Deaths: Cardiovascular diseases (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Cardiovascular diseases' (cause code 1100, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=1100"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_1100
+    labels: {"fr": "Taux de mortalité pour 100 000 : Maladies cardiovasculaires (OMS, GHE)", "en": "Death rate per 100 000: Cardiovascular diseases (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Cardiovascular diseases' (cause code 1100, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=1100"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_1170
+    labels: {"fr": "Décès : Maladies respiratoires (OMS, GHE)", "en": "Deaths: Respiratory diseases (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Respiratory diseases' (cause code 1170, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=1170"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_1170
+    labels: {"fr": "Taux de mortalité pour 100 000 : Maladies respiratoires (OMS, GHE)", "en": "Death rate per 100 000: Respiratory diseases (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Respiratory diseases' (cause code 1170, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=1170"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_1210
+    labels: {"fr": "Décès : Maladies digestives (OMS, GHE)", "en": "Deaths: Digestive diseases (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Digestive diseases' (cause code 1210, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=1210"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_1210
+    labels: {"fr": "Taux de mortalité pour 100 000 : Maladies digestives (OMS, GHE)", "en": "Death rate per 100 000: Digestive diseases (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Digestive diseases' (cause code 1210, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=1210"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_1260
+    labels: {"fr": "Décès : Maladies génito-urinaires (OMS, GHE)", "en": "Deaths: Genitourinary diseases (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Genitourinary diseases' (cause code 1260, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=1260"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_1260
+    labels: {"fr": "Taux de mortalité pour 100 000 : Maladies génito-urinaires (OMS, GHE)", "en": "Death rate per 100 000: Genitourinary diseases (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Genitourinary diseases' (cause code 1260, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=1260"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_1330
+    labels: {"fr": "Décès : Maladies de la peau (OMS, GHE)", "en": "Deaths: Skin diseases (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Skin diseases' (cause code 1330, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=1330"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_1330
+    labels: {"fr": "Taux de mortalité pour 100 000 : Maladies de la peau (OMS, GHE)", "en": "Death rate per 100 000: Skin diseases (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Skin diseases' (cause code 1330, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=1330"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_1340
+    labels: {"fr": "Décès : Maladies musculo-squelettiques (OMS, GHE)", "en": "Deaths: Musculoskeletal diseases (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Musculoskeletal diseases' (cause code 1340, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=1340"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_1340
+    labels: {"fr": "Taux de mortalité pour 100 000 : Maladies musculo-squelettiques (OMS, GHE)", "en": "Death rate per 100 000: Musculoskeletal diseases (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Musculoskeletal diseases' (cause code 1340, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=1340"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_1400
+    labels: {"fr": "Décès : Anomalies congénitales (OMS, GHE)", "en": "Deaths: Congenital anomalies (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Congenital anomalies' (cause code 1400, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=1400"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_1400
+    labels: {"fr": "Taux de mortalité pour 100 000 : Anomalies congénitales (OMS, GHE)", "en": "Death rate per 100 000: Congenital anomalies (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Congenital anomalies' (cause code 1400, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=1400"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_1470
+    labels: {"fr": "Décès : Affections bucco-dentaires (OMS, GHE)", "en": "Deaths: Oral conditions (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Oral conditions' (cause code 1470, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=1470"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_1470
+    labels: {"fr": "Taux de mortalité pour 100 000 : Affections bucco-dentaires (OMS, GHE)", "en": "Death rate per 100 000: Oral conditions (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Oral conditions' (cause code 1470, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=1470"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_1505
+    labels: {"fr": "Décès : Mort subite du nourrisson (OMS, GHE)", "en": "Deaths: Sudden infant death syndrome (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Sudden infant death syndrome' (cause code 1505, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=1505"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_1505
+    labels: {"fr": "Taux de mortalité pour 100 000 : Mort subite du nourrisson (OMS, GHE)", "en": "Death rate per 100 000: Sudden infant death syndrome (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Sudden infant death syndrome' (cause code 1505, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=1505"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_1510
+    labels: {"fr": "Décès : Traumatismes (OMS, GHE)", "en": "Deaths: Injuries (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Injuries' (cause code 1510, level 1), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=1510"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_1510
+    labels: {"fr": "Taux de mortalité pour 100 000 : Traumatismes (OMS, GHE)", "en": "Death rate per 100 000: Injuries (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Injuries' (cause code 1510, level 1), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=1510"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_1520
+    labels: {"fr": "Décès : Traumatismes non intentionnels (OMS, GHE)", "en": "Deaths: Unintentional injuries (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Unintentional injuries' (cause code 1520, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=1520"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_1520
+    labels: {"fr": "Taux de mortalité pour 100 000 : Traumatismes non intentionnels (OMS, GHE)", "en": "Death rate per 100 000: Unintentional injuries (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Unintentional injuries' (cause code 1520, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=1520"]
+    provider_declared: true
+  - id: health_body.ghe.deaths.cause_1600
+    labels: {"fr": "Décès : Traumatismes intentionnels (OMS, GHE)", "en": "Deaths: Intentional injuries (WHO GHE)"}
+    definition: "WHO Global Health Estimates, number of deaths attributed to the GHE cause 'Intentional injuries' (cause code 1600, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths|sex=TOTAL|age=TOTAL|cause=1600"]
+    provider_declared: true
+  - id: health_body.ghe.deaths_rate100k.cause_1600
+    labels: {"fr": "Taux de mortalité pour 100 000 : Traumatismes intentionnels (OMS, GHE)", "en": "Death rate per 100 000: Intentional injuries (WHO GHE)"}
+    definition: "WHO Global Health Estimates, deaths per 100 000 population attributed to the GHE cause 'Intentional injuries' (cause code 1600, level 2), all ages, both sexes; modelled estimates comparable across countries, with WHO uncertainty bounds for the counts in flags.low/high."
+    unit: "deaths per 100 000 population"
+    domain: health_body
+    subdomain: mortality_by_cause
+    theme: health_body
+    source_order: ["who.ghe.ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=1600"]
+    provider_declared: true

@@ -241,7 +241,8 @@ def _close(kind: str | None, line: int, tags: list[tuple[str, str, str]], what: 
 
 
 def data_version(header: Mapping[str, list[str]], what: str) -> str:
-    v = (header.get("data-version") or [None])[0]
+    vals = header.get("data-version") or []
+    v = vals[0] if vals else None
     if not v:
         raise drift(f"{what}: no data-version header")
     return str(v)
@@ -517,9 +518,9 @@ __all__ = [
     "claim_relation",
     "curie",
     "data_version",
-    "exact_synonyms",
     "digest",
     "drift",
+    "exact_synonyms",
     "kg_id",
     "load_kg",
     "load_predicates",

@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "939d40817fc09210bff4a730b53efc35fedbd32ff10ea6e1c421a8ec799c476f",
+    "url": "https://github.com/monarch-initiative/mondo/releases/latest/download/mondo.obo",
+    "file": "mondo.obo",
+    "sha256": "75e22415d5f16ecc5b3b2dbd626bdbdd46834f77e383cd993570e5b2605ddbb7",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "CC BY 4.0 (Mondo); RO CC0 1.0",
+    "fixture_note": "trimmed: 39 MONDO terms (seeds MONDO:0018076,MONDO:0005136,MONDO:0007739,MONDO:0009061,MONDO:0100096,MONDO:0004979 + is_a ancestors) of mondo.obo v2026-10-06 (header kept) + the 19 Typedef stanzas they use; ro.obo trimmed to the [Typedef] stanzas of the relations used by the trimmed ontology and their is_a ancestors"
+  },
+  {
+    "request_fingerprint": "fbce01ed22cdc0c9b28b5b8c53b01477be99745bb2b08ce2ff1ac9cd3e9f293a",
+    "url": "https://raw.githubusercontent.com/oborel/obo-relations/master/ro.obo",
+    "file": "ro.obo",
+    "sha256": "ba4f28441e059876ece8204204ee2a5aa01c1a2ef6685467a8bd984b07485a4a",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-17T13:45:00+00:00",
+    "licence": "CC BY 4.0 (Mondo); RO CC0 1.0",
+    "fixture_note": "trimmed: 39 MONDO terms (seeds MONDO:0018076,MONDO:0005136,MONDO:0007739,MONDO:0009061,MONDO:0100096,MONDO:0004979 + is_a ancestors) of mondo.obo v2026-10-06 (header kept) + the 19 Typedef stanzas they use; ro.obo trimmed to the [Typedef] stanzas of the relations used by the trimmed ontology and their is_a ancestors"
+  }
+]
