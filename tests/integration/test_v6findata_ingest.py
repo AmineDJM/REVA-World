@@ -49,9 +49,10 @@ async def test_findata_sources_end_to_end(db: Any) -> None:
     s = await _run(db, "atlas.bis_fin")
     lbs = read_atlas_table(db.store, next(t for t in s["tables"] if t["table"] == "bis.lbs_cp")["artifact_sha256"])
     assert set(lbs.filter(pl.col("provider_geo") == "FR")["iso3"].unique().to_list()) == {"FRA"}
-    assert lbs.filter(pl.col("provider_geo") == "5J")["iso3"].null_count() == lbs.filter(
-        pl.col("provider_geo") == "5J"
-    ).height
+    assert (
+        lbs.filter(pl.col("provider_geo") == "5J")["iso3"].null_count()
+        == lbs.filter(pl.col("provider_geo") == "5J").height
+    )
     s = await _run(db, "atlas.ff_factors")
     f = read_atlas_table(db.store, s["tables"][0]["artifact_sha256"])
     assert f["iso3"].null_count() == f.height  # the US stock-market universe is not a country statistic

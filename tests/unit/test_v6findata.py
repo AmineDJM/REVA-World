@@ -102,8 +102,12 @@ def test_h41_levels_and_week_averages() -> None:
     r = rep["h41_w"]
     assert r["series_type_L_skipped"] >= 1 and r["series_type_ACW_skipped"] >= 1  # district + change series skipped
     assert r.get("no_row_status_NA", 0) >= 1 and "-999999" not in h["value"].to_list()
-    days = {f["series_type"][0]: d for f, d in zip(
-        [json.loads(x) for x in h["flags"]], (h["period_end"] - h["period_start"]).dt.total_days(), strict=True)}
+    days = {
+        f["series_type"][0]: d
+        for f, d in zip(
+            [json.loads(x) for x in h["flags"]], (h["period_end"] - h["period_start"]).dt.total_days(), strict=True
+        )
+    }
     assert days == {"L": 1, "A": 7}
     assert all(rep["policy_quotes_found"].values())
 
