@@ -211,6 +211,81 @@ def atlas_baseline(
         return None, f"atlas baseline unavailable: {type(e).__name__}: {str(e)[:200]}"
 
 
+class RegistryBaseline:
+    """PRED-REGISTRY's sealed baseline forecasts as the baseline path, over a fallback (atlas persistence).
+
+    For a (concept, country), every quantity question of the registry on that concept and country gives one
+    forecast of its reference period (preferred model: the IMF WEO reference, else AR, else persistence). The
+    path is keyed by the engine's period labels (``2027Q1`` / ``2027``); periods without a forecast use the
+    fallback. Nothing is interpolated.
+    """
+
+    PREFERRED = ("forecast.reference_imf_weo", "forecast.registry_ar", "forecast.registry_persistence")
+
+    def __init__(self, conn: Connection, store: Any, fallback: Any, effects: DbEffectSource | None):
+        self.conn = conn
+        self.store = store
+        self.fallback = fallback
+        self.effects = effects
+        self._index: dict[tuple[str, str], list[dict[str, Any]]] | None = None
+        self.gap: str | None = None
+
+    def _load(self) -> dict[tuple[str, str], list[dict[str, Any]]]:
+        if self._index is None:
+            self._index = {}
+            try:
+                from reva.evaluation.registry import read as R
+
+                with self.conn.begin_nested():
+                    qs, _ = R.questions(self.conn, self.store, None, qtype="quantity", limit=100_000)
+                for q in qs:
+                    if q.get("concept_id") and q.get("geo"):
+                        self._index.setdefault((str(q["concept_id"]), str(q["geo"])), []).append(q)
+            except Exception as e:
+                self.gap = f"forecast registry unavailable: {type(e).__name__}: {str(e)[:160]}"
+        return self._index
+
+    def baseline(self, ref: VarRef, geo: str) -> dict[str, Any] | None:
+        base = self.fallback.baseline(ref, geo) if self.fallback is not None else None
+        concepts = (
+            self.effects.atlas_concepts_of(ref)
+            if self.effects is not None
+            else ([ref.id] if ref.kind == "atlas_concept" else [])
+        )
+        index = self._load()
+        path: dict[str, dict[str, Any]] = {}
+        for cid in concepts:
+            for q in index.get((cid, geo), []):
+                try:
+                    from reva.evaluation.registry import read as R
+
+                    with self.conn.begin_nested():
+                        full = R.question(self.conn, self.store, str(q["question_id"]))
+                except Exception:
+                    log.warning("registry question %s unreadable", q.get("question_id"))
+                    continue
+                fcs = {f["model"]: f for f in (full or {}).get("forecasts", []) if f.get("status") == "issued"}
+                model = next((m for m in self.PREFERRED if m in fcs and fcs[m].get("point") is not None), None)
+                if model is None:
+                    continue
+                label = str(q["reference_period"]).replace("-", "")
+                path[label] = {
+                    "value": fcs[model]["point"],
+                    "model": model,
+                    "question_id": q["question_id"],
+                    "batch_sha256": q.get("batch_sha256"),
+                    "unit": q.get("unit"),
+                }
+        if not path:
+            return base
+        out = dict(base or {"kind": "registry_baseline_forecast", "unit": next(iter(path.values()))["unit"]})
+        out["path"] = path
+        out["path_label_fr"] = (
+            "prévisions de référence scellées du registre (modèles de base), pas des prévisions de REVA"
+        )
+        return out
+
+
 # ------------------------------------------------------------------------------------------- plugin data
 def _value_decimal(vd: Mapping[str, Any] | None) -> Decimal | None:
     if not vd or vd.get("kind") != "decimal":

@@ -428,3 +428,21 @@ def test_annual_impact_response_to_a_user_stated_oil_price_assumption() -> None:
     assert hop["applicability"]["status"] == "group_unverified"
     assert not v["uncertainty_complete"] and all(p["degenerate"] for p in v["periods"][:4])
     assert r["direct_changes"][0]["basis_fr"].startswith("Hypothèse posée par l'utilisateur")
+
+
+def test_registry_baseline_path_is_used_only_for_its_exact_periods() -> None:
+    base = StaticBaselineSource(
+        {
+            ("atlas_concept:imf.inflation_cpi_avg", "FRA"): {
+                "value": "2.0",
+                "unit": "%",
+                "path": {"2027Q2": {"value": "3.0", "model": "forecast.registry_ar", "unit": "%"}},
+            }
+        }
+    )
+    irf = [{"h": h, "unit": "quarter", "point": -0.5} for h in range(6)]
+    e = est("b2", RATE, INFL, irf=irf, uncertainty={"status": "not_reported"})
+    v = var(run(decision(), [e], draws=200, baseline=base), "atlas_concept:imf.inflation_cpi_avg@FRA")
+    assert v["periods"][0]["scenario_level"]["p50"] == pytest.approx(1.75)  # persistence 2.0 − 0.25
+    assert v["periods"][1]["scenario_level"]["p50"] == pytest.approx(2.75)  # registry 3.0 − 0.25
+    assert "registry forecast forecast.registry_ar" in v["periods"][1]["scenario_level"]["note"]

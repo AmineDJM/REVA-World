@@ -724,7 +724,7 @@ class Engine:
                     periods.append({"period": self.periods[t], "missing_reason": n.reasons[t] or "missing"})
                     continue
                 p = {"period": self.periods[t], **_summary(col), "missing_reason": None}
-                lvl = _scenario_level(base, n.unit, col)
+                lvl = _scenario_level(base, n.unit, col, self.periods[t])
                 if lvl is not None:
                     p["scenario_level"] = lvl
                 periods.append(p)
@@ -737,11 +737,22 @@ class Engine:
         return entry
 
 
-def _scenario_level(base: Mapping[str, Any] | None, unit: str, delta: np.ndarray) -> dict[str, Any] | None:
-    if not base or base.get("value") is None:
+def _scenario_level(
+    base: Mapping[str, Any] | None, unit: str, delta: np.ndarray, period: str | None = None
+) -> dict[str, Any] | None:
+    """Baseline level + change, only when the units compose (pp on a % concept; percent on a level concept).
+
+    The baseline for ``period`` is PRED-REGISTRY's sealed baseline forecast of exactly that period when one exists
+    (``base["path"]``), else the latest observation held flat (persistence)."""
+    if not base:
+        return None
+    path = base.get("path") or {}
+    hit = path.get(period) if period else None
+    raw = hit["value"] if hit else base.get("value")
+    if raw is None:
         return None
     try:
-        b = float(base["value"])
+        b = float(raw)
     except (TypeError, ValueError):
         return None
     bu = str(base.get("unit") or "")
@@ -751,7 +762,12 @@ def _scenario_level(base: Mapping[str, Any] | None, unit: str, delta: np.ndarray
         out = _summary(b * (1 + delta / 100.0))
     else:
         return None
-    out["note"] = NO_DRIFT_NOTE
+    out["note"] = (
+        f"baseline = registry forecast {hit['model']} for {period} (sealed baseline, not a REVA conditional forecast); "
+        "scenario level = baseline + change"
+        if hit
+        else NO_DRIFT_NOTE
+    )
     return out
 
 

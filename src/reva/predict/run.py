@@ -33,15 +33,14 @@ def run_on_connection(
     t0 = time.perf_counter()
     effects = pdb.DbEffectSource(conn, origin=origin, as_of_max=as_of_max)
     claims = pdb.DbClaimSource(conn, origin=None if origin == "any" else origin)
-    baseline, baseline_gap = pdb.atlas_baseline(conn, store, effects)
+    atlas, baseline_gap = pdb.atlas_baseline(conn, store, effects)
+    baseline = pdb.RegistryBaseline(conn, store, atlas, effects)
     data = pdb.plugin_data(conn, store, decision, with_io=with_io)
-    from reva.predict.context import NoBaseline
-
     out = predict(
         decision,
         effects,
         claims,
-        baseline if baseline is not None else NoBaseline(),
+        baseline,
         data,
         draws=draws,
         seed=seed,
@@ -53,7 +52,8 @@ def run_on_connection(
         "database_read_only": True,
         "release": data.crude_provenance or None,
         "io": data.io_provenance or None,
-        "atlas_snapshot": getattr(baseline, "snapshot", None),
+        "atlas_snapshot": getattr(atlas, "snapshot", None),
+        "forecast_registry": baseline.gap or "read",
         "compute_seconds": round(time.perf_counter() - t0, 3),
     }
     return out
