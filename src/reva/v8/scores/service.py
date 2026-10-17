@@ -158,6 +158,16 @@ def track_detail(doc: Mapping[str, Any], tid: str, *, sealed: Mapping[str, int] 
     }
 
 
+def _target_fr(t: str) -> str:
+    return C.TARGETS.get(t, {}).get("label_fr", t)
+
+
+def _tlabel(task: str, variable: str) -> str:
+    from reva.v8.scores.build import MACRO_TARGET
+
+    return _target_fr(MACRO_TARGET.get((task, variable), f"{task}.{variable}"))
+
+
 def charts(tid: str, rows: Sequence[Mapping[str, Any]], root: Path = REPO) -> list[dict[str, Any]]:
     """Chart-ready series copied from the track's result files (nothing computed beyond selection)."""
     f = _Files(root)
@@ -176,7 +186,8 @@ def charts(tid: str, rows: Sequence[Mapping[str, Any]], root: Path = REPO) -> li
                 if bm:
                     out.append({
                         "kind": "ratio_by", "row": rid, "x_label_fr": "mois de l'origine (1 = janvier)",
-                        "title_fr": f"Ratio selon le mois d'origine — {r['candidate']} vs {r['benchmark']} ({r['loss']})",
+                        "title_fr": f"{_tlabel(r['task'], r['variable'])} — {r['candidate'].split('.')[-1]} / "
+                        f"{r['benchmark'].split('.')[-1]} ({r['loss'].upper()}) selon le mois d'origine",
                         "points": [{"x": x["month"], "y": x["relative"], "n": x["n"]} for x in bm["rows"]
                                    if x["variable"] == r["variable"]],
                         "source": {"file": rel, "pointer": "/descriptive/by_month"},
@@ -184,7 +195,7 @@ def charts(tid: str, rows: Sequence[Mapping[str, Any]], root: Path = REPO) -> li
             for s in desc.get("summaries", []):
                 if s.get("pit_hist10"):
                     out.append({
-                        "kind": "pit", "title_fr": f"PIT holdout — {s['model']} ({s['task']}, {s['variable']})",
+                        "kind": "pit", "title_fr": f"PIT holdout — {s['model'].split('.')[-1]} · {_tlabel(s['task'], s['variable'])}",
                         "model": s["model"], "task": s["task"], "variable": s["variable"], "counts": s["pit_hist10"],
                         "coverage80": s.get("coverage80"), "n": s.get("n"),
                         "source": {"file": rel, "pointer": "/descriptive/summaries"},
@@ -208,7 +219,7 @@ def charts(tid: str, rows: Sequence[Mapping[str, Any]], root: Path = REPO) -> li
             if r.get("by_horizon"):
                 out.append({
                     "kind": "ratio_by", "row": r["id"], "x_label_fr": "horizon (semaines)",
-                    "title_fr": f"{r['candidate_label_fr']} — WIS relatif par horizon ({r['target']})",
+                    "title_fr": f"{r['candidate_label_fr']} — WIS relatif par horizon ({_target_fr(r['target'])})",
                     "points": [{"x": int(k), "y": v, "n": None} for k, v in sorted(r["by_horizon"].items(), key=lambda kv: int(kv[0]))],
                     "source": r["source"],
                 })  # fmt: skip
@@ -216,7 +227,8 @@ def charts(tid: str, rows: Sequence[Mapping[str, Any]], root: Path = REPO) -> li
     if cov:
         out.append({
             "kind": "coverage", "title_fr": "Couverture des intervalles : observée vs nominale",
-            "points": [{"row": r["id"], "label": r["candidate_label_fr"], "nominal": float(k), "observed": v,
+            "points": [{"row": r["id"], "label": f"{r['candidate_label_fr']} · {_target_fr(r['target'])} · {r['metric'].upper()}",
+                        "nominal": float(k), "observed": v,
                         "benchmark_observed": (r.get("benchmark_coverage") or {}).get(k)}
                        for r in cov for k, v in (r["coverage"] or {}).items() if v is not None],
         })  # fmt: skip

@@ -5,7 +5,7 @@ import { Badge, EmptyState, ErrorState, MissingValue, Panel, Skeleton, SourceChi
 import type { CountryDetail, DomainDetail, Summary, Table } from './api';
 import { getCountry, getDomain } from './api';
 import { useLoad } from './useLoad';
-import { LICENCE_LABEL, NOTE_SHORT, frCadence, frDate, histPoints, licenceBreakdown } from './model';
+import { LICENCE_LABEL, NOTE_SHORT, frCadence, frDate, frYear, histPoints, licenceBreakdown } from './model';
 import { PendingCard } from './Pending';
 
 /** Domain detail: tables (source + licence on hover), countries with / without data, KG kinds, freshness, gaps. */
@@ -30,19 +30,19 @@ export function DomainPanel({ id, zone, zoneLabel, onClose, onCountry, onDomain 
   );
 }
 
-function SummaryStats({ s, places }: { s: Summary; places: number }) {
+function SummaryStats({ s, withData, places, zone }: { s: Summary; withData: number; places: number; zone: string }) {
   return (
     <div className="cv-stats">
-      <Stat label="Tables d’atlas" value={s.tables} size="sm" />
-      <Stat label="Lignes stockées" value={s.rows} size="sm" format={(v) => frCompact(Number(v))} />
-      <Stat label="Pays avec données" value={s.countries} size="sm" sub={`sur ${places}`} />
+      <Stat label="Pays couverts" value={withData} size="sm" sub={`sur ${places}${zone ? ' dans la zone' : ''}`} />
+      <Stat label="Tables" value={s.tables} size="sm" />
+      <Stat label="Lignes" value={s.rows} size="sm" format={(v) => frCompact(Number(v))} />
       {s.latest_year != null ? (
-        <Stat label="Dernière année observée" value={String(s.latest_year)} size="sm" format={(v) => String(v)} />
+        <Stat label="Dernière année" value={String(s.latest_year)} size="sm" format={(v) => String(v)} />
       ) : (
-        <Stat label="Dernière année observée" value={null} size="sm" missing={{ reason: 'aucune période passée stockée' }} />
+        <Stat label="Dernière année" value={null} size="sm" missing={{ reason: 'aucune période passée stockée' }} />
       )}
       <Stat label="Entités KG" value={s.kg_entities} size="sm" format={(v) => frCompact(Number(v))} />
-      {s.catalog && <Stat label="Concepts du catalogue sans table chargée" value={s.catalog.without_loaded_table} size="sm" sub={`sur ${frNumber(s.catalog.concepts)}`} />}
+      {s.catalog && <Stat label="Concepts sans table" value={s.catalog.without_loaded_table} size="sm" sub={`sur ${frNumber(s.catalog.concepts)} du catalogue`} />}
     </div>
   );
 }
@@ -74,58 +74,30 @@ function DomainBody({ d, zone, onCountry, onDomain }: { d: DomainDetail; zone: s
   const inZone = (c: { region: string; subregion?: string }) => !zone || c.region === zone || c.subregion === zone;
   const countries = d.countries.filter(inZone);
   const without = d.countries_without_data.filter(inZone);
-  const tables = allTables ? d.tables : d.tables.slice(0, 12);
+  const tables = allTables ? d.tables : d.tables.slice(0, 10);
   const neverLoaded = d.connectors.filter((c) => !c.acquired && c.tables_loaded.length === 0);
-  const places = d.countries.length + d.countries_without_data.length;
+  const nonSpatial = d.summary.tables === 0 && d.summary.kg_entities > 0 && countries.length === 0;
   return (
     <div className="cv-detail-body">
-      <SummaryStats s={d.summary} places={places} />
+      <SummaryStats s={d.summary} withData={countries.length} places={countries.length + without.length} zone={zone} />
       <LicenceBar s={d.summary} />
       <p className="cv-note v8-muted">{NOTE_SHORT}</p>
-
-      <h3 className="cv-h3">Tables ({d.tables.length})</h3>
-      {d.tables.length === 0 ? (
-        <EmptyState compact title="Aucune table d’atlas dans ce domaine">
-          Aucune source chargée ne publie de série rangée ici ; voir les connecteurs déclarés et les chargements en attente ci-dessous.
-        </EmptyState>
-      ) : (
-        <div className="cv-tablebox">
-          <table className="cv-list">
-            <thead>
-              <tr>
-                <th scope="col">Table</th>
-                <th scope="col" className="num">Lignes</th>
-                <th scope="col" className="num">Pays</th>
-                <th scope="col">Périodes</th>
-                <th scope="col">Chargée</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tables.map((t) => (
-                <TableRow key={t.key} t={t} />
-              ))}
-            </tbody>
-          </table>
-          {d.tables.length > 12 && (
-            <button type="button" className="v8-btn v8-btn-sm v8-btn-ghost" onClick={() => setAllTables((v) => !v)}>
-              {allTables ? 'Réduire' : `Voir les ${d.tables.length} tables`}
-            </button>
-          )}
-        </div>
+      {nonSpatial && (
+        <p className="cv-note">
+          <Badge kind="neutral">non localisé</Badge> Ce domaine a {frNumber(d.summary.kg_entities)} entités KG, mais aucune n’est rattachée à un pays : la grille par lieu ne peut pas les montrer.
+        </p>
       )}
 
-      <Histogram hist={d.hist} before={d.hist_before} from={d.hist_from ?? 1900} today={d.meta.today} />
-
       <h3 className="cv-h3">
-        Pays sans aucune donnée {zone ? 'dans la zone' : ''} ({without.length})
+        Pays sans aucune donnée{zone ? ' dans la zone' : ''} ({without.length})
       </h3>
       {without.length === 0 ? (
-        <p className="v8-muted">Chaque pays {zone ? 'de la zone ' : ''}a au moins une ligne ou une entité KG dans ce domaine.</p>
+        <p className="v8-muted cv-note">Chaque pays {zone ? 'de la zone ' : ''}a au moins une ligne ou une entité KG rattachée dans ce domaine.</p>
       ) : (
         <ul className="cv-chips" aria-label="Pays sans donnée">
           {without.map((c) => (
             <li key={c.iso3}>
-              <button type="button" className="cv-chip is-none" onClick={() => onCountry(c.iso3)} title={`${c.label} : aucune source chargée dans ce domaine (≠ absence du phénomène)`}>
+              <button type="button" className="cv-chip is-none" onClick={() => onCountry(c.iso3)} title={`${c.label} : rien de stocké n’est rattaché à ce pays dans ce domaine (≠ absence du phénomène)`}>
                 {c.label}
               </button>
             </li>
@@ -145,6 +117,28 @@ function DomainBody({ d, zone, onCountry, onDomain }: { d: DomainDetail; zone: s
           ))}
         </ul>
       </details>
+
+      <h3 className="cv-h3">Tables ({d.tables.length})</h3>
+      {d.tables.length === 0 ? (
+        <EmptyState compact title="Aucune table d’atlas dans ce domaine">
+          Aucune source chargée ne publie de série rangée ici ; voir les connecteurs déclarés et les chargements en attente ci-dessous.
+        </EmptyState>
+      ) : (
+        <>
+          <ul className="cv-tlist">
+            {tables.map((t) => (
+              <TableItem key={t.key} t={t} />
+            ))}
+          </ul>
+          {d.tables.length > 10 && (
+            <button type="button" className="v8-btn v8-btn-sm v8-btn-ghost" onClick={() => setAllTables((v) => !v)}>
+              {allTables ? 'Réduire' : `Voir les ${d.tables.length} tables`}
+            </button>
+          )}
+        </>
+      )}
+
+      <Histogram hist={d.hist} before={d.hist_before} from={d.hist_from ?? 1900} today={d.meta.today} />
 
       {d.kg_kinds.length > 0 && (
         <>
@@ -192,7 +186,7 @@ function DomainBody({ d, zone, onCountry, onDomain }: { d: DomainDetail; zone: s
       {d.pending.length > 0 && (
         <>
           <h3 className="cv-h3">Ce qui débloquerait davantage ({d.pending.length})</h3>
-          <div className="cv-cards">
+          <div className="cv-cards cv-cards-1">
             {d.pending.map((it) => (
               <PendingCard key={it.id} it={it} compact onDomain={onDomain} />
             ))}
@@ -209,34 +203,44 @@ function frNote(s: string): string {
     : s;
 }
 
-function TableRow({ t }: { t: Table }) {
+function TableItem({ t }: { t: Table }) {
   return (
-    <tr>
-      <td>
-        <span className="cv-tkey v8-mono">{t.key.replace(/^atlas\./, '')}</span>{' '}
+    <li className="cv-titem">
+      <div className="cv-titem-head">
+        <span className="cv-tkey v8-mono">{t.key.replace(/^atlas\./, '')}</span>
         <SourceChip source={t.source} label={LICENCE_LABEL[t.licence_class] ?? t.licence_class} licence={t.licence ?? null} details={tableDetails(t)} />
-        {t.read_error && <Badge kind="missing" title={t.read_error}>illisible</Badge>}
-      </td>
-      <td className="num v8-num">{frCompact(t.rows)}</td>
-      <td className="num v8-num">{t.countries || <span className="v8-subtle" title="Lignes sans code pays : agrégats, régions infranationales, grilles">—</span>}</td>
-      <td className="v8-num">
-        {t.period_min?.slice(0, 4) ?? '?'}–{t.latest_past_year ?? <MissingValue reason="seulement des périodes futures" compact />}
-        {t.future_rows > 0 && (
-          <Badge kind="projection" title={`${frNumber(t.future_rows)} lignes datées après aujourd’hui (projections, scénarios ou annonces)`}>
-            +futur
+        {t.read_error && (
+          <Badge kind="missing" title={t.read_error}>
+            illisible
           </Badge>
         )}
-      </td>
-      <td className="v8-num">
-        {frDate(t.recorded_at)}
         {t.overdue && (
           <Badge kind="missing" title={`Dernière récupération ${frDate(t.last_fetch_at)} ; cadence déclarée ${frCadence(t.cadence_seconds)}`}>
             à rafraîchir
           </Badge>
         )}
-      </td>
-    </tr>
+      </div>
+      <div className="cv-titem-meta v8-num">
+        {frCompact(t.rows)} lignes · {t.countries ? `${t.countries} pays` : <span title="Lignes sans code pays : agrégats, régions infranationales, grilles">hors pays</span>} · {frYear(yearOf(t.period_min))}–
+        {t.latest_past_year != null ? frYear(t.latest_past_year) : <MissingValue reason="seulement des périodes futures" compact />}
+        {t.future_rows > 0 && (
+          <>
+            {' '}
+            <Badge kind="projection" title={`${frNumber(t.future_rows)} lignes datées après aujourd’hui (projections, scénarios ou annonces)`}>
+              +futur
+            </Badge>
+          </>
+        )}{' '}
+        · chargée le {frDate(t.recorded_at)}
+      </div>
+    </li>
   );
+}
+
+function yearOf(iso: string | null): number | null {
+  if (!iso) return null;
+  const m = /^(-?\d+)-/.exec(iso);
+  return m ? Number(m[1]) : null;
 }
 
 function tableDetails(t: Table): string[] {
@@ -324,10 +328,10 @@ function CountryBody({ c, onDomain }: { c: CountryDetail; onDomain: (id: string)
         </p>
       )}
       <div className="cv-stats">
-        <Stat label="Domaines avec données" value={c.domains.length - c.domains_without_data.length} size="sm" sub={`sur ${c.domains.length}`} />
+        <Stat label="Domaines couverts" value={c.domains.length - c.domains_without_data.length} size="sm" sub={`sur ${c.domains.length}`} />
         <Stat label="Tables" value={c.tables.length} size="sm" />
         <Stat label="Lignes" value={c.tables.reduce((a, t) => a + t.rows, 0)} size="sm" format={(v) => frCompact(Number(v))} />
-        <Stat label="Entités KG rattachées" value={c.kg_kinds.reduce((a, k) => a + k.entities, 0)} size="sm" format={(v) => frCompact(Number(v))} />
+        <Stat label="Entités KG" value={c.kg_kinds.reduce((a, k) => a + k.entities, 0)} size="sm" format={(v) => frCompact(Number(v))} />
       </div>
       <p className="cv-note v8-muted">{NOTE_SHORT}</p>
       <ul className="cv-bars" aria-label="Couverture par domaine">
@@ -344,11 +348,11 @@ function CountryBody({ c, onDomain }: { c: CountryDetail; onDomain: (id: string)
                 </span>
                 <span className="cv-barmeta v8-num">
                   {rows > 0 ? (
-                    `${cell?.tables ?? 0} t · ${frCompact(rows)} · ${cell?.y0 ?? '?'}–${cell?.y1 ?? 'futur'}`
+                    `${cell?.tables ?? 0} t · ${frCompact(rows)} · ${frYear(cell?.y0)}–${cell?.y1 != null ? frYear(cell.y1) : 'futur'}`
                   ) : cell?.kg ? (
                     `KG ${frNumber(cell.kg)}`
                   ) : (
-                    <MissingValue reason="aucune source chargée" compact />
+                    <MissingValue reason="rien de rattaché à ce pays" compact />
                   )}
                   {rows > 0 && cell?.kg ? ` · KG ${frCompact(cell.kg)}` : ''}
                 </span>
@@ -374,7 +378,7 @@ function CountryBody({ c, onDomain }: { c: CountryDetail; onDomain: (id: string)
                 <td className="v8-mono cv-tkey">{t.key.replace(/^atlas\./, '')}</td>
                 <td className="num v8-num">{frCompact(t.rows)}</td>
                 <td className="v8-num">
-                  {t.y0 ?? '?'}–{t.y1 ?? 'futur'}
+                  {frYear(t.y0)}–{t.y1 != null ? frYear(t.y1) : 'futur'}
                   {t.future_rows > 0 && <span className="v8-subtle"> +{frCompact(t.future_rows)} futur</span>}
                 </td>
                 <td>

@@ -305,7 +305,11 @@ def get_paths(
         reason = (
             f"aucun chemin de {max_hops} liens au plus avec ces filtres"
             + (" (recherche bornée : un chemin peut exister au-delà)" if st.truncated else "")
-            + (f" ; {len(st.hubs_not_expanded)} nœud(s) très connecté(s) non traversé(s)" if st.hubs_not_expanded else "")
+            + (
+                f" ; {len(st.hubs_not_expanded)} nœud(s) très connecté(s) non traversé(s)"
+                if st.hubs_not_expanded
+                else ""
+            )
             + ("" if include_causal else " ; essayez d'inclure les affirmations causales attribuées")
         )
     data = PathsData.model_validate(
@@ -444,7 +448,9 @@ def _is_effect_node(idx: PathIndex, q: str) -> bool:
     return bool((idx.e_kind[idx.adj_edge[sl]] != EDGE_STATEMENT).any())
 
 
-@router.get("/paths/nodes", response_model=NodesResponse, responses={422: {"model": s.Problem}, 503: {"model": s.Problem}})
+@router.get(
+    "/paths/nodes", response_model=NodesResponse, responses={422: {"model": s.Problem}, 503: {"model": s.Problem}}
+)
 def get_nodes(
     request: Request,
     q: str = Query(..., min_length=1, max_length=200),
@@ -485,18 +491,14 @@ def get_nodes(
         {"node": refs[n], "match": m, "indexed": idx.idx(n) is not None}
         for n, m in sorted(uniq, key=lambda x: (idx.idx(x[0]) is None, 0 if x[1] in ("iso3", "id") else 1))
     ][:limit]
-    return NodesResponse(
-        data=NodesData.model_validate({"query": qs, "hits": hits}),
-        context_mode="registry",
-        origin="none",
-        modality="metadata",
-        warnings=[],
-        cost=t.cost(len(hits)),
-    )
+    meta: dict[str, Any] = {"context_mode": "registry", "origin": "none", "modality": "metadata", "warnings": []}
+    return NodesResponse(data=NodesData.model_validate({"query": qs, "hits": hits}), cost=t.cost(len(hits)), **meta)
 
 
 @router.get("/paths/status", response_model=StatusResponse)
-def get_status(request: Request, warm: bool = Query(False, description="Start loading/building the index")) -> StatusResponse:
+def get_status(
+    request: Request, warm: bool = Query(False, description="Start loading/building the index")
+) -> StatusResponse:
     t = Timer()
     if warm:
         with read_conn(request) as conn:
@@ -504,6 +506,5 @@ def get_status(request: Request, warm: bool = Query(False, description="Start lo
                 HOLDER.get(conn, lambda: _connect(request), wait_s=0.01)
             except IndexBuilding:
                 pass
-    return StatusResponse(
-        data=HOLDER.status(), context_mode="operations", origin="none", modality="metadata", warnings=[], cost=t.cost(0)
-    )
+    meta: dict[str, Any] = {"context_mode": "operations", "origin": "none", "modality": "metadata", "warnings": []}
+    return StatusResponse(data=HOLDER.status(), cost=t.cost(0), **meta)

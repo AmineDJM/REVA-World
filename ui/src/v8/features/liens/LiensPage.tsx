@@ -343,7 +343,7 @@ function SearchFooter({ d }: { d: PathsData }) {
       </p>
       {s.hubs_not_expanded_count > 0 && (
         <p>
-          Nœuds très connectés atteints mais non traversés ({s.hubs_not_expanded_count}) : {s.hubs_not_expanded.slice(0, 6).map((h) => h.label).join(', ')}
+          Nœuds très connectés atteints mais non développés — leurs voisins n’ont pas été explorés ({s.hubs_not_expanded_count}) : {s.hubs_not_expanded.slice(0, 6).map((h) => h.label).join(', ')}
           {s.hubs_not_expanded_count > 6 ? '…' : ''}
         </p>
       )}

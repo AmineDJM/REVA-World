@@ -232,7 +232,10 @@ def cells(rows: Iterable[Mapping[str, Any]]) -> dict[str, dict[str, Any]]:
         by[cell_key(r)].append(r)
     out: dict[str, dict[str, Any]] = {}
     for k, rs in by.items():
-        head = [r for r in rs if counts_in_headline(r)]
+        if k.endswith("~naive"):  # the naive column counts its own rows (never part of the headline)
+            head = [r for r in rs if r.get("benchmark_kind") == "naive" and not r.get("quarantined")]
+        else:
+            head = [r for r in rs if counts_in_headline(r)]
         ratios = [float(r["ratio"]) for r in head if r.get("ratio") is not None]
         ratios += [float(x) for r in head for x in (r.get("ratio_range") or [])]
         cnt = Counter(r["verdict"] for r in head)

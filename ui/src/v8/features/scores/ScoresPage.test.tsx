@@ -84,8 +84,9 @@ describe('ScoresPage', () => {
     renderAt('/v8/scores');
     const h = await screen.findByTestId('headline');
     expect(h).toHaveTextContent('REVA bat 1 · ne bat pas 1 · égalité 0 · en attente 1');
-    expect(h).toHaveTextContent('Combinaison officiel + nowcast REVA bat point WEO en vigueur à t');
-    expect(within(h).getByText('×0,63')).toBeInTheDocument();
+    expect(h).toHaveTextContent('Chômage — G7, année en cours — bat FMI (WEO)');
+    expect(h).toHaveTextContent('Combinaison officiel + nowcast REVA vs point WEO en vigueur à t');
+    expect(within(h).getAllByText('×0,63').length).toBeGreaterThan(0);
     expect(within(h).getByText('utilise la prévision officielle')).toBeInTheDocument();
     expect(within(h).getByText('avantage de fraîcheur')).toBeInTheDocument();
     expect(h).toHaveTextContent('3 « victoires » V6 contre un repère faible');

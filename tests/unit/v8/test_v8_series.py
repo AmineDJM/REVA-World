@@ -178,6 +178,7 @@ def env(tmp_path: Path) -> tuple[AtlasQuery, SeriesIndex]:
     q = AtlasQuery(snap, store, tmp_path / "cache")
     svc._META.clear()
     svc._PERIODS.clear()
+    svc._SLICES.clear()
     return q, SeriesIndex(q, cat)
 
 
@@ -265,3 +266,10 @@ def test_place_and_multi_series(env: tuple[AtlasQuery, SeriesIndex]) -> None:
     assert gdp["transforms"]["percap"]["ok"] and gdp["transforms"]["index"]["ok"]
     assert not cp["transforms"]["percap"]["ok"]  # monthly: no annual population to divide by
     assert m["population"] is None  # only on request
+
+
+def test_default_period_needs_half_of_the_best_coverage() -> None:
+    pers = [{"code": str(y), "obs": n, "proj": 0} for y, n in ((2020, 180), (2021, 190), (2022, 120), (2023, 5))]
+    assert svc.default_period(pers) == "2022"  # 2023 has a handful of early reporters only
+    assert svc.default_period([{"code": "2030", "obs": 0, "proj": 9}]) == "2030"
+    assert svc.default_period([]) is None

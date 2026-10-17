@@ -562,3 +562,8 @@
   color: var(--v8-fg-on-accent, #fff);
   text-decoration: none;
 }
+.lien-node-id {
+  font-weight: var(--v8-weight-regular, 400);
+  font-size: var(--v8-text-2xs, 10.5px);
+  color: var(--v8-fg-subtle, #94a3b8);
+}

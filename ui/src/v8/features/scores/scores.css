@@ -196,7 +196,7 @@
 }
 .sc-win-ratio {
   flex: none;
-  min-width: 3.6em;
+  min-width: 6.2em;
   font-weight: var(--v8-weight-semibold);
   color: var(--v8-win);
 }
@@ -208,7 +208,25 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--v8-space-2);
-  padding-left: 4.2em;
+}
+.sc-win-body {
+  flex: 1;
+  min-width: 0;
+}
+.sc-win-text {
+  margin: 0;
+  font-size: var(--v8-text-sm);
+}
+.sc-win-tests {
+  list-style: none;
+  margin: 2px 0 4px;
+  padding: 0;
+  font-size: var(--v8-text-xs);
+}
+.sc-mini thead th {
+  text-align: right;
+  font-weight: var(--v8-weight-semibold);
+  padding: 0 var(--v8-space-2);
 }
 .sc-mini {
   border-collapse: collapse;
@@ -254,8 +272,12 @@
   border-collapse: separate;
   border-spacing: 0;
   width: 100%;
-  min-width: 860px;
+  min-width: 820px;
   font-size: var(--v8-text-sm);
+  table-layout: fixed;
+}
+.sc-matrix col.sc-col-target {
+  width: 200px;
 }
 .sc-matrix th,
 .sc-matrix td {
@@ -302,8 +324,9 @@
   text-align: left;
   font-weight: var(--v8-weight-regular);
   padding-left: var(--v8-space-4) !important;
-  min-width: 220px;
-  max-width: 300px;
+  min-width: 170px;
+  max-width: 240px;
+  font-size: var(--v8-text-xs);
 }
 .sc-cell {
   display: flex;
@@ -311,8 +334,8 @@
   justify-content: center;
   gap: 3px;
   width: 100%;
-  min-width: 78px;
-  min-height: 48px;
+  min-width: 58px;
+  min-height: 40px;
   padding: 4px 6px;
   font: inherit;
   font-size: var(--v8-text-xs);
@@ -390,7 +413,7 @@
 }
 .sc-cell-na {
   display: block;
-  min-height: 48px;
+  min-height: 40px;
   border-radius: var(--v8-radius-sm);
   background: radial-gradient(circle, var(--v8-border-strong) 1px, transparent 1.5px) center / 100% 100% no-repeat;
   opacity: 0.6;
@@ -591,6 +614,7 @@
 }
 .sc-chart-better {
   fill: var(--v8-win-bg);
+  fill-opacity: 0.55;
 }
 .sc-chart-ref {
   stroke: var(--v8-fg-muted);
@@ -899,8 +923,9 @@
     grid-template-columns: minmax(0, 1fr);
     gap: var(--v8-space-4);
   }
-  .sc-win-caveats {
-    padding-left: 0;
+  .sc-win-ratio {
+    min-width: 0;
+    width: 100%;
   }
   .sc-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -938,4 +963,19 @@
   .sc-dl dd {
     margin-bottom: var(--v8-space-2);
   }
+}
+.sc-page > *,
+.sc-two > *,
+.sc-page .v8-panel {
+  min-width: 0;
+  max-width: 100%;
+}
+.sc-select {
+  min-width: 0;
+  width: auto;
+  flex: 1 1 160px;
+}
+.sc-filters {
+  padding: var(--v8-space-3) var(--v8-space-4);
+  border-bottom: 1px solid var(--v8-border);
 }

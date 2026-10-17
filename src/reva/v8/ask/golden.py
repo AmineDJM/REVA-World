@@ -208,7 +208,13 @@ def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - live t
     from reva.settings import get_settings
 
     s = get_settings()
+    import dataclasses
+
+    from reva.v8.ask.service import MemoForecasts
+
     b = build_backends(make_engine("api", s), s)
+    if b.forecasts is not None:  # as the V8 endpoint does (sealed manifests are immutable)
+        b = dataclasses.replace(b, forecasts=MemoForecasts(b.forecasts))
     cat = build_catalog()
     warm = getattr(b.atlas, "warm", None)
     t0 = time.perf_counter()

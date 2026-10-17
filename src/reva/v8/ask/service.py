@@ -9,6 +9,7 @@ immutable snapshots; the cache only spares recomputation when a page is reloaded
 
 from __future__ import annotations
 
+import dataclasses
 import hashlib
 import threading
 import time
@@ -111,10 +112,55 @@ class SeriesReader:
         }
 
 
+class MemoForecasts:
+    """Memo of the forecast-registry port (immutable sealed manifests; outcomes refreshed after ``ttl`` seconds).
+
+    The registry read path re-verifies every sealed manifest per call (104 batches on the dev DB against a
+    16-manifest LRU): ~20–35 s per call under load. Sealed content never changes, so the V8 page memoises the
+    answers per (family, geo) and per question for ``ttl`` (outcomes and scores can only appear later)."""
+
+    def __init__(self, inner: Any, ttl: float = 900.0) -> None:
+        self.inner = inner
+        self.name = getattr(inner, "name", "forecasts")
+        self.ttl = ttl
+        self._d: dict[tuple[Any, ...], tuple[float, Any]] = {}
+        self._lock = threading.Lock()
+
+    def _memo(self, key: tuple[Any, ...], fn: Any) -> Any:
+        now = time.monotonic()
+        with self._lock:
+            hit = self._d.get(key)
+            if hit is not None and now - hit[0] < self.ttl:
+                return hit[1]
+        v = fn()
+        with self._lock:
+            self._d[key] = (now, v)
+            if len(self._d) > 2000:
+                self._d.clear()
+        return v
+
+    def families(self) -> Any:
+        return self._memo(("families",), self.inner.families)
+
+    def questions(self, family: str, geo: str | None, *, limit: int) -> Any:
+        return self._memo(("q", family, geo, limit), lambda: self.inner.questions(family, geo, limit=limit))
+
+    def question(self, question_id: str) -> Any:
+        return self._memo(("d", question_id), lambda: self.inner.question(question_id))
+
+    def models(self) -> Any:
+        return self._memo(("models",), self.inner.models)
+
+
 class AskService:
     def __init__(
         self, backends: Any, catalog: Any, *, drafters: Any = None, ledger: Any = None, budget: Any = None
     ) -> None:
+        if getattr(backends, "forecasts", None) is not None and not isinstance(backends.forecasts, MemoForecasts):
+            try:
+                backends = dataclasses.replace(backends, forecasts=MemoForecasts(backends.forecasts))
+            except TypeError:  # not a dataclass (test double): used as is
+                pass
         self.backends = backends
         self.catalog = catalog
         self.drafters = drafters

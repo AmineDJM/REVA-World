@@ -49,14 +49,17 @@ UNGRADED = 5
 #: ``include_causal`` a chain of well-graded claims ranks before a chain of plain statements.
 GRADE_COST = {"A": 0.35, "B": 0.5, "C": 0.75, "D": 1.1, "E": 1.6, None: 1.6}
 #: Walking a claim or an estimate against its cause → effect direction ("B has cause A") costs more.
-AGAINST_CAUSAL_DIRECTION = 0.75
+AGAINST_CAUSAL_DIRECTION = 1.0
+#: V8 Liens damps hubs at half the hubs.yaml rate per doubling of degree: a country (≈4,000 links) costs ≈3 hops
+#: instead of 6, so "A — B — France — C" can beat a five-hop detour, while "Homo sapiens" (66,000) still costs ≈5.
+DEGREE_PENALTY_SCALE = 0.5
 ESTIMATE_COST = 0.6
 ESTIMATE_NO_UNCERTAINTY = 0.25
 SCOPE_COST = 0.9
 BRIDGE_COST = 1.2
 
 #: Index format version (bump when the arrays change; the on-disk cache is keyed by it).
-FORMAT = "v8paths-1"
+FORMAT = "v8paths-2"
 
 
 @dataclass(frozen=True)
@@ -243,12 +246,8 @@ class PathIndex:
         return self.families.index(fam)
 
     def summary(self) -> dict[str, Any]:
-        kinds = np.bincount(self.e_kind.astype(np.int64), minlength=len(EDGE_KINDS)) if len(self.e_kind) else []
-        return {
-            **self.meta,
-            "nodes": self.n_nodes,
-            "edges": {EDGE_KINDS[i]: int(kinds[i]) for i in range(len(EDGE_KINDS))} if len(self.e_kind) else {},
-        }
+        kinds = np.bincount(self.e_kind.astype(np.int64), minlength=len(EDGE_KINDS))
+        return {**self.meta, "nodes": self.n_nodes, "edges": {k: int(kinds[i]) for i, k in enumerate(EDGE_KINDS)}}
 
 
 def _penalty(deg: np.ndarray, reg: Registries) -> np.ndarray:
@@ -256,7 +255,9 @@ def _penalty(deg: np.ndarray, reg: Registries) -> np.ndarray:
     thr = reg.degree_threshold
     if thr > 0 and reg.degree_per_doubling > 0:
         big = deg > thr
-        pen[big] = reg.degree_per_doubling * (np.log2(deg[big].astype(np.float64)) - math.log2(thr))
+        pen[big] = (
+            DEGREE_PENALTY_SCALE * reg.degree_per_doubling * (np.log2(deg[big].astype(np.float64)) - math.log2(thr))
+        )
     return pen
 
 
@@ -380,7 +381,16 @@ def build_index(
         if a == b:
             continue
         cost = ESTIMATE_COST + (ESTIMATE_NO_UNCERTAINTY if e.uncertainty_status == "not_reported" else 0.0)
-        add(a, b, EDGE_ESTIMATE, e.row_id, -1, e.fixture, (NO_FAMILY, NO_FAMILY), (cost, cost + AGAINST_CAUSAL_DIRECTION))
+        add(
+            a,
+            b,
+            EDGE_ESTIMATE,
+            e.row_id,
+            -1,
+            e.fixture,
+            (NO_FAMILY, NO_FAMILY),
+            (cost, cost + AGAINST_CAUSAL_DIRECTION),
+        )
         n_es += 1
         if iso and b.endswith("@" + iso):
             qid = reg.iso3_qid.get(iso)
@@ -401,11 +411,11 @@ def build_index(
         vnode = estimate_node("variable", var)
         if vnode not in present:
             continue
-        for c in concepts:
+        for concept in concepts:
             bridges.append(
                 Bridge(
                     vnode,
-                    f"atlas:{c}",
+                    f"atlas:{concept}",
                     "registry/effects/variables.yaml atlas_concepts",
                     "est mesurée par (concept atlas, curation REVA)",
                     "is measured by (atlas concept, REVA curation)",
@@ -448,13 +458,11 @@ def build_index(
     penalty = _penalty(degree, reg)
     blocked = np.zeros(n, dtype=bool)
     for q, p in reg.penalised.items():
-        i = node_index.get(q)
-        if i is not None:
-            penalty[i] += p
+        if (pi_ := node_index.get(q)) is not None:
+            penalty[pi_] += p
     for q in reg.blocked:
-        i = node_index.get(q)
-        if i is not None:
-            blocked[i] = True
+        if (bi := node_index.get(q)) is not None:
+            blocked[bi] = True
     info = {
         "format": FORMAT,
         "built_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -658,7 +666,9 @@ def save(idx: PathIndex, directory: Path) -> Path:
         "meta": idx.meta,
     }
     tmp = path.with_suffix(".tmp.npz")
-    np.savez(tmp, header=np.frombuffer(json.dumps(header).encode(), dtype=np.uint8), **{a: getattr(idx, a) for a in _ARRAYS})
+    np.savez(
+        tmp, header=np.frombuffer(json.dumps(header).encode(), dtype=np.uint8), **{a: getattr(idx, a) for a in _ARRAYS}
+    )
     tmp.replace(path)
     for old in directory.glob("index-*.npz"):
         if old != path:

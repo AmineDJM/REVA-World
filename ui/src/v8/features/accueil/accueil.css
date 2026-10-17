@@ -129,6 +129,9 @@
   .v8a-glance {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .v8a-tile:nth-child(5) {
+    grid-column: 1 / -1;
+  }
   .v8a-glance-src {
     position: static;
     grid-column: 1 / -1;
@@ -235,7 +238,7 @@
 }
 .v8a-change {
   display: grid;
-  grid-template-columns: 44px 104px minmax(0, 1fr) auto;
+  grid-template-columns: 44px 96px minmax(0, 1fr);
   gap: var(--v8-space-3);
   align-items: baseline;
   padding: 6px 6px;
@@ -313,9 +316,21 @@
 }
 .v8a-change-links {
   display: flex;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  margin-top: 1px;
   font-size: var(--v8-text-xs);
+  min-width: 0;
+}
+.v8a-change-links a {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+}
+.v8a-change-sub > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .v8a-more {
   margin-top: var(--v8-space-3);
@@ -328,8 +343,7 @@
     grid-column: 2;
     grid-row: 1;
   }
-  .v8a-change-main,
-  .v8a-change-links {
+  .v8a-change-main {
     grid-column: 2;
   }
 }

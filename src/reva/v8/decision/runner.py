@@ -208,20 +208,94 @@ def data_fingerprint(conn: Connection) -> str:
 #: Cross-request caches of what is expensive and identical between runs on the same data (keyed by the data
 #: fingerprint / atlas snapshot / release; 15-minute time-to-live): the forecast-registry index (loading it
 #: re-hashes every sealed batch manifest), per-(variable, country) baselines, the FIGARO IO arrays or their gap.
-class SharedRegistryBaseline(pdb.RegistryBaseline):
-    """``RegistryBaseline`` whose question index is shared between requests (15 min), read-only as before."""
+def registry_paths(conn: Connection, store: Any) -> dict[tuple[str, str], dict[str, dict[str, Any]]]:
+    """PRED-REGISTRY's sealed baseline forecasts as paths per (concept, country), in ONE pass over the batches.
 
-    def _load(self) -> dict[tuple[str, str], list[dict[str, Any]]]:
-        if self._index is None:
-            hit = _shared().get("registry_index")
-            if hit is not None:
-                self._index = hit
-            else:
-                idx = super()._load()
-                if self.gap is None:
-                    _shared().put("registry_index", idx)
-                return idx
-        return self._index
+    Same selection as ``reva.predict.db.RegistryBaseline.baseline`` (quantity questions with a concept and a
+    geography; issued forecasts; preferred model IMF WEO reference, else AR, else persistence; forecasts of a
+    supplementary batch added to the original's; period label ``2027-Q1`` → ``2027Q1``), but without one
+    ``registry.read.question`` call per question: that call scans every batch manifest and, with more batches
+    than the registry's manifest cache holds, re-verifies all of them each time (minutes per scenario)."""
+    from reva.evaluation.registry import read as R
+
+    preferred = pdb.RegistryBaseline.PREFERRED
+    qinfo: dict[str, dict[str, Any]] = {}
+    orig: dict[str, dict[str, dict[str, Any]]] = {}
+    supp: dict[tuple[str, str], dict[str, dict[str, Any]]] = {}
+    for b in R.batches(conn, None):
+        m = R.CACHE.get(store, b["batch_sha256"])
+        if m.get("supplement_of"):
+            for f in m.get("forecasts") or []:
+                if f.get("status") == "issued":
+                    supp.setdefault((str(m["supplement_of"]), str(f["question_id"])), {})[str(f["model"])] = {
+                        **f,
+                        "_batch": b["batch_sha256"],
+                    }
+            continue
+        fresh = set()
+        for q in m.get("questions") or []:
+            qid = str(q["question_id"])
+            if qid in qinfo or q.get("type") != "quantity" or not q.get("concept_id") or not q.get("geo"):
+                continue
+            qinfo[qid] = {**{k: q.get(k) for k in ("concept_id", "geo", "reference_period", "unit")}, "batch": b}
+            fresh.add(qid)
+        for f in m.get("forecasts") or []:
+            qid = str(f["question_id"])
+            if qid in fresh and f.get("status") == "issued":
+                orig.setdefault(qid, {})[str(f["model"])] = {**f, "_batch": b["batch_sha256"]}
+    out: dict[tuple[str, str], dict[str, dict[str, Any]]] = {}
+    for qid, q in qinfo.items():
+        fcs = {**orig.get(qid, {}), **supp.get((str(q["batch"].get("batch_sha256")), qid), {})}
+        model = next((x for x in preferred if x in fcs and fcs[x].get("point") is not None), None)
+        if model is None:
+            continue
+        label = str(q["reference_period"]).replace("-", "")
+        out.setdefault((str(q["concept_id"]), str(q["geo"])), {})[label] = {
+            "value": fcs[model]["point"],
+            "model": model,
+            "question_id": qid,
+            "batch_sha256": fcs[model]["_batch"],  # the batch that sealed the chosen forecast
+            "unit": q.get("unit"),
+        }
+    return out
+
+
+class SharedRegistryBaseline(pdb.RegistryBaseline):
+    """``RegistryBaseline`` reading the registry through :func:`registry_paths` (one pass, shared between
+    requests for 15 minutes); the fallback (atlas persistence) and the output shape are unchanged."""
+
+    def _paths(self) -> dict[tuple[str, str], dict[str, dict[str, Any]]]:
+        hit = _shared().get("registry_paths")
+        if hit is not None:
+            return hit  # type: ignore[no-any-return]
+        try:
+            with self.conn.begin_nested():
+                paths = registry_paths(self.conn, self.store)
+        except Exception as e:
+            self.gap = f"forecast registry unavailable: {type(e).__name__}: {str(e)[:160]}"
+            return {}
+        _shared().put("registry_paths", paths)
+        return paths
+
+    def baseline(self, ref: VarRef, geo: str) -> dict[str, Any] | None:
+        base = self.fallback.baseline(ref, geo) if self.fallback is not None else None
+        concepts = (
+            self.effects.atlas_concepts_of(ref)
+            if self.effects is not None
+            else ([ref.id] if ref.kind == "atlas_concept" else [])
+        )
+        idx = self._paths()
+        path: dict[str, dict[str, Any]] = {}
+        for cid in concepts:
+            path.update(idx.get((cid, geo), {}))
+        if not path:
+            return base
+        out = dict(base or {"kind": "registry_baseline_forecast", "unit": next(iter(path.values()))["unit"]})
+        out["path"] = path
+        out["path_label_fr"] = (
+            "prévisions de référence scellées du registre (modèles de base), pas des prévisions de REVA"
+        )
+        return out
 
 
 class SharedBaseline:
@@ -679,7 +753,7 @@ def start_warmup(engine_getter: Callable[[], Any], store: Any) -> bool:
             with engine_getter().connect() as conn, conn.begin():
                 conn.execute(text("SET TRANSACTION READ ONLY"))
                 pdb.atlas_baseline(conn, store, None)
-                SharedRegistryBaseline(conn, store, None, None)._load()
+                SharedRegistryBaseline(conn, store, None, None)._paths()
             _WARM.update(state="warm", detail=None, seconds=round(time.perf_counter() - t0, 1))
         except Exception as e:  # never fatal: the first run will pay the cost instead
             _WARM.update(state="failed", detail=f"{type(e).__name__}: {str(e)[:200]}")

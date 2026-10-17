@@ -170,7 +170,7 @@ export function MatrixLegend({ metric }: { metric: Metric }) {
       <span className="cv-legend-sw is-kg" aria-hidden="true" />
       <span className="v8-muted">entités KG seulement</span>
       <span className="cv-legend-sw is-none" aria-hidden="true" />
-      <span className="v8-muted">aucune source chargée (≠ absence du phénomène)</span>
+      <span className="v8-muted">rien de rattaché à ce lieu (≠ absence du phénomène)</span>
     </div>
   );
 }

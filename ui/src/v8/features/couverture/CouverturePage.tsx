@@ -49,9 +49,7 @@ export default function CouverturePage() {
   const dec = useLoad('dec', () => getDecisions());
   const pend = useLoad('pend', () => getPending());
   const matrix = m.data;
-  useEffect(() => {
-    if (matrix) setDomainLabels(matrix.rows);
-  }, [matrix]);
+  if (matrix) setDomainLabels(matrix.rows); // idempotent; labels for cards and lists rendered below
 
   useEffect(() => {
     document.title = pays ? `${pays} · Couverture` : domaine ? `${matrix?.rows.find((r) => r.id === domaine)?.label ?? domaine} · Couverture` : 'Couverture';
@@ -90,6 +88,7 @@ export default function CouverturePage() {
 
       <AnswerStrip matrix={matrix} decisionsOpen={dec.data?.counts.open ?? (dec.status === 'error' ? null : undefined)} loads={pend.data ?? (pend.status === 'error' ? null : undefined)} onTab={(t) => set({ vue: t === 'matrice' ? '' : t })} />
 
+      <div className="cv-tabs">
       <Tabs
         label="Vues de la couverture"
         idBase="cv"
@@ -102,6 +101,7 @@ export default function CouverturePage() {
           { id: 'fraicheur', label: 'Fraîcheur' },
         ]}
       />
+      </div>
 
       <div className={`cv-layout${detailOpen ? ' has-detail' : ''}`}>
         <div className="cv-main" id={`cv-panel-${vue}`} role="tabpanel" aria-labelledby={`cv-tab-${vue}`}>
@@ -109,14 +109,12 @@ export default function CouverturePage() {
             <Panel
               title="Domaines × lieux"
               subtitle={METRICS.find((x) => x.id === metrique)?.hint}
-              actions={
-                <div className="cv-controls">
-                  <Seg label="Niveau" value={niveau} options={LEVELS} onChange={(v) => set({ niveau: v === 'region' ? '' : v, zone: '' }, false)} />
-                  <Seg label="Mesure" value={metrique} options={METRICS} onChange={(v) => set({ metrique: v === 'pays' ? '' : v }, false)} />
-                </div>
-              }
               flush
             >
+              <div className="cv-controls">
+                <Seg label="Niveau" value={niveau} options={LEVELS} onChange={(v) => set({ niveau: v === 'region' ? '' : v, zone: '' }, false)} />
+                <Seg label="Mesure" value={metrique} options={METRICS} onChange={(v) => set({ metrique: v === 'pays' ? '' : v }, false)} />
+              </div>
               {m.status === 'error' && !matrix && <ErrorState error={m.error} what="la matrice de couverture" onRetry={m.reload} />}
               {!matrix && m.status !== 'error' && <Skeleton height={640} label="Chargement de la matrice…" />}
               {matrix && (
@@ -187,9 +185,9 @@ function AnswerStrip({
       <Stat label="Tables d’atlas" value={meta.atlas_tables} size="md" />
       <Stat label="Lignes stockées" value={meta.atlas_rows} size="md" format={(v) => frCompact(Number(v))} />
       <Stat label="Entités KG" value={meta.kg_computed ? meta.kg_entities : null} size="md" format={(v) => frCompact(Number(v))} missing={{ reason: 'passe KG non calculée (--no-kg)' }} />
-      <Stat label="Domaines avec au moins une table" value={stats.total - stats.empty.length} size="md" sub={`sur ${stats.total}${stats.empty.length ? ` · sans table : ${stats.empty.join(', ')}` : ''}`} />
+      <Stat label="Domaines avec tables" value={stats.total - stats.empty.length} size="md" sub={`sur ${stats.total}${stats.empty.length ? ` · sans table : ${stats.empty.join(', ')}` : ''}`} />
       <button type="button" className="cv-strip-btn" onClick={() => onTab('decisions')}>
-        {decisionsOpen === undefined ? <Skeleton height={56} label="Chargement des décisions…" /> : <Stat label="Décisions du propriétaire ouvertes" value={decisionsOpen} size="md" missing={{ reason: 'liste indisponible' }} />}
+        {decisionsOpen === undefined ? <Skeleton height={56} label="Chargement des décisions…" /> : <Stat label="Décisions à prendre" value={decisionsOpen} size="md" missing={{ reason: 'liste indisponible' }} />}
       </button>
       <button type="button" className="cv-strip-btn" onClick={() => onTab('chargements')}>
         {loads === undefined ? (
@@ -199,7 +197,7 @@ function AnswerStrip({
             label="Chargements en attente"
             value={loads ? loads.counts.items - loads.counts.observed_done : null}
             size="md"
-            sub={loads ? `≈ ${frNumber(loads.disk_mb_open_loads / 1000, 1)} Go, 5 Go libres requis` : undefined}
+            sub={loads ? 'chacun exige 5 Go libres' : undefined}
             missing={{ reason: 'liste indisponible' }}
           />
         )}

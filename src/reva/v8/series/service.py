@@ -131,7 +131,7 @@ def resolve(
 _META: OrderedDict[tuple[str, int], dict[str, Any]] = OrderedDict()
 _PERIODS: OrderedDict[tuple[str, int, str], list[dict[str, Any]]] = OrderedDict()
 _CACHE_LOCK = threading.Lock()
-_MAX = 2048
+_MAX = 512
 
 
 def _cache_get(cache: OrderedDict[Any, Any], key: Any) -> Any:
@@ -395,6 +395,20 @@ def _choose(rows: list[dict[str, Any]], key: str) -> dict[str, dict[str, Any]]:
 # --------------------------------------------------------------------------- map slice
 
 
+def default_period(pers: list[dict[str, Any]]) -> str | None:
+    """The latest period whose observed places reach half of the best-covered period (a last year with a handful
+    of early reporters, or with projections only, is never the default view)."""
+    if not pers:
+        return None
+    best = max(p["obs"] for p in pers)
+    if best == 0:
+        return str(pers[-1]["code"])
+    return str([p for p in pers if p["obs"] * 2 >= best][-1]["code"])
+
+
+_SLICES: OrderedDict[tuple[Any, ...], dict[str, Any]] = OrderedDict()
+
+
 def map_slice(
     q: AtlasQuery,
     idx: SeriesIndex,
@@ -405,15 +419,32 @@ def map_slice(
     level: str = "adm0",
     projections: str = "exclude",
 ) -> dict[str, Any]:
+    """Cached per (snapshot, series, precision, period, level, projections): a snapshot is immutable."""
+    key = (q.snapshot.sha256, sid, precision, period, level, projections)
+    hit = _cache_get(_SLICES, key)
+    if hit is None:
+        hit = _map_slice(q, idx, sid, precision=precision, period=period, level=level, projections=projections)
+        _cache_put(_SLICES, key, hit)
+    return hit  # type: ignore[no-any-return]
+
+
+def _map_slice(
+    q: AtlasQuery,
+    idx: SeriesIndex,
+    sid: int,
+    *,
+    precision: str | None,
+    period: str | None,
+    level: str,
+    projections: str,
+) -> dict[str, Any]:
     meta = series_meta(q, idx, sid)
     prec = precision or meta["default_precision"] or "year"
     if prec not in PRECISIONS:
         raise ValidationProblem("unknown precision", precision=prec[:20])
     pers = periods(q, sid, prec)
     if period is None:
-        # latest period with observations (projections never pick the default period)
-        obs = [p for p in pers if p["obs"]]
-        period = (obs or pers)[-1]["code"] if pers else None
+        period = default_period(pers)
     out: dict[str, Any] = {
         "meta": meta,
         "precision": prec,

@@ -274,7 +274,7 @@ def kg_batches(
         {"since": since, "until": until, "origin": origin, "lim": PER_KIND_MAX * 10},
     ).mappings()
     kgc = counts.get("kg") or {}
-    groups: dict[tuple[str, str, datetime], list[Mapping[str, Any]]] = {}
+    groups: dict[tuple[str, str, datetime], list[Any]] = {}
     for r in rows:
         groups.setdefault((r["source_key"], r["origin"], r["bucket"]), []).append(r)
     out = []
@@ -421,7 +421,7 @@ def effect_changes(conn: Connection, since: datetime, until: datetime, origin: s
 
 def _activities(
     conn: Connection, kinds: list[str], since: datetime, until: datetime, *, like: str | None = None
-) -> list[Mapping[str, Any]]:
+) -> list[Any]:
     cond = "kind = ANY(:kinds)" + (" OR kind LIKE :like" if like else "")
     return list(
         conn.execute(

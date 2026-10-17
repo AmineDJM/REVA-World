@@ -14,11 +14,12 @@ const TONE_TITLE: Record<string, string> = {
   missing: 'Le détail de ce lien n’a pas été retrouvé dans la base (index plus récent ?).',
 };
 
-function NodeName({ id, nodes, onPick }: { id: string; nodes: Record<string, NodeRef>; onPick: (id: string) => void }) {
+function NodeName({ id, nodes, onPick, showId = false }: { id: string; nodes: Record<string, NodeRef>; onPick: (id: string) => void; showId?: boolean }) {
   const n = nodes[id];
   return (
     <button type="button" className={`lien-node-btn${n?.virtual ? ' is-virtual' : ''}${n && !n.label_loaded ? ' is-unlabelled' : ''}`} onClick={() => onPick(id)} title={`${id}${n?.kind ? ` · ${n.kind}` : ''}`}>
       {nodeLabel(nodes, id)}
+      {showId && <span className="lien-node-id v8-mono"> {id}</span>}
     </button>
   );
 }
@@ -26,6 +27,8 @@ function NodeName({ id, nodes, onPick }: { id: string; nodes: Record<string, Nod
 export function HopRow({ h, nodes, onPick }: { h: Hop; nodes: Record<string, NodeRef>; onPick: (id: string) => void }) {
   const tone = hopTone(h);
   const lic = licenceShort(h);
+  // two records with the same name (a protein and the drug target built on it): show their ids
+  const same = nodeLabel(nodes, h.from) === nodeLabel(nodes, h.to);
   const detail = h.detail ?? {};
   const wording = typeof detail.wording_fr === 'string' ? detail.wording_fr : null;
   const value = typeof detail.value === 'string' ? detail.value : null;
@@ -40,13 +43,13 @@ export function HopRow({ h, nodes, onPick }: { h: Hop; nodes: Record<string, Nod
       <span className="lien-hop-rail" aria-hidden="true" />
       <div className="lien-hop-main">
         <p className="lien-hop-sentence">
-          <NodeName id={h.from} nodes={nodes} onPick={onPick} />
+          <NodeName id={h.from} nodes={nodes} onPick={onPick} showId={same} />
           <span className="lien-rel">
             {' — '}
             {h.relation?.fr ?? KIND_FR[h.kind]}
             {' → '}
           </span>
-          <NodeName id={h.to} nodes={nodes} onPick={onPick} />
+          <NodeName id={h.to} nodes={nodes} onPick={onPick} showId={same} />
         </p>
         <p className="lien-hop-meta">
           <span className={`lien-tag tag-${tone}`} title={TONE_TITLE[tone]}>

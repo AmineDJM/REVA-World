@@ -249,7 +249,8 @@ class _Auth:
 
 @pytest.fixture()
 def client(cov_dir: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
-    from reva.api.deps import read_conn
+    from contextlib import contextmanager
+
     from reva.api.errors import install_error_handlers
     from reva.api.routes import v8_coverage
 
@@ -257,7 +258,12 @@ def client(cov_dir: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClien
     install_error_handlers(app)
     app.state.auth = _Auth()
     app.include_router(v8_coverage.router)
-    app.dependency_overrides[read_conn] = lambda: object()
+
+    @contextmanager
+    def fake_conn(request: Any) -> Iterator[object]:
+        yield object()
+
+    monkeypatch.setattr(v8_coverage, "read_conn", fake_conn)
     monkeypatch.setattr(svc, "staleness", lambda conn, c: {"tables_registered_since": 3, "last_registered_at": None})
     monkeypatch.setattr(svc, "observations", lambda conn, reg, origin="live": {"_checked_at": "now"})
     with TestClient(app) as tc:

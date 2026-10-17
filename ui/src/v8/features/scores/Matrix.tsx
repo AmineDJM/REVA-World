@@ -59,7 +59,7 @@ export function CellButton({ c, target, f, onOpen, active, r, col }: { c: Cell; 
             {k && k.en_attente > 0 && <span className="sc-cell-pend v8-num">{k.en_attente} ⏳</span>}
           </span>
           <Segments c={c} />
-          <span className="sc-cell-ratio v8-num">{range ?? (k && k.en_attente === n ? 'à juger' : '')}</span>
+          <span className="sc-cell-ratio v8-num">{range ?? (k && n > 0 && k.en_attente === n ? 'à juger' : '')}</span>
         </>
       )}
     </button>
@@ -89,6 +89,9 @@ export function Matrix({ matrix, forecasters, onOpen, activeKey, focusForecaster
     <div className="sc-matrix-box">
       <table className="sc-matrix" ref={ref} onKeyDown={onKey} aria-describedby="sc-matrix-help">
         <caption className="v8-sr-only">Tableau des scores : cibles en lignes, prévisionnistes officiels en colonnes</caption>
+        <colgroup>
+          <col className="sc-col-target" />
+        </colgroup>
         <thead>
           <tr>
             <th scope="col" className="sc-matrix-corner">

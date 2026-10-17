@@ -73,12 +73,12 @@ export function cellText(c: Cell | undefined, col: Column, metric: Metric, level
 /** Full French description of a cell (tooltip + accessible name). */
 export function cellTitle(rowLabel: string, col: Column, c: Cell | undefined, level: Level): string {
   const where = level === 'country' ? col.label : `${col.label} (${col.countries} pays)`;
-  if (!c) return `${rowLabel} · ${where} : aucune source chargée — ce n’est pas l’absence du phénomène.`;
+  if (!c) return `${rowLabel} · ${where} : rien de stocké n’est rattaché à ce lieu — ce n’est pas l’absence du phénomène.`;
   const parts: string[] = [];
   if (hasRows(c)) {
     if (level !== 'country') parts.push(`${c.countries_with_rows ?? 0} pays sur ${col.countries} avec des données`);
     parts.push(`${frNumber(c.rows ?? 0)} lignes`, `${c.tables ?? 0} table${(c.tables ?? 0) > 1 ? 's' : ''}`);
-    if (c.y0 != null && c.y1 != null) parts.push(`${c.y0}–${c.y1}`);
+    if (c.y0 != null && c.y1 != null) parts.push(`${frYear(c.y0)}–${frYear(c.y1)}`);
     else if (c.y1 != null) parts.push(`dernière année ${c.y1}`);
     if (c.y1 == null) parts.push('seulement des périodes futures (projections)');
     if ((c.future_rows ?? 0) > 0) parts.push(`${frNumber(c.future_rows ?? 0)} lignes datées après aujourd’hui (projections)`);
@@ -87,6 +87,12 @@ export function cellTitle(rowLabel: string, col: Column, c: Cell | undefined, le
   }
   if (c.kg) parts.push(`${frNumber(c.kg)} entités KG rattachées`);
   return `${rowLabel} · ${where} : ${parts.join(' · ')}`;
+}
+
+/** A year in astronomical numbering (0 = 1 av. J.-C.) as French text. */
+export function frYear(y: number | null | undefined): string {
+  if (y == null) return '?';
+  return y <= 0 ? `${(1 - y).toLocaleString('fr-FR')} av. J.-C.` : String(y);
 }
 
 export const LICENCE_LABEL: Record<string, string> = {
@@ -140,7 +146,7 @@ export const STATE_LABEL: Record<string, string> = {
 };
 
 export const STATUS_LABEL: Record<string, string> = {
-  open: 'ouverte',
+  open: 'à décider',
   queued: 'en file',
   blocked: 'bloqué',
   done: 'fait',

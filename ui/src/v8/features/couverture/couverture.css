@@ -1,6 +1,6 @@
 /* Couverture (V8COUVERTURE). Tokens only (var(--v8-*)), light/dark from the shell. */
 .cv-page {
-  --cv-label-w: 176px;
+  --cv-label-w: 204px;
   --cv-heat: var(--v8-observed);
   display: flex;
   flex-direction: column;
@@ -70,6 +70,18 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--v8-space-3);
+  padding: 0 var(--v8-space-5) var(--v8-space-4);
+}
+.cv-tabs {
+  overflow-x: auto;
+  max-width: 100%;
+  scrollbar-width: none;
+}
+.cv-strip > .v8-stat,
+.cv-strip-btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 .cv-seg {
   display: inline-flex;
@@ -262,13 +274,20 @@ tr.is-sel .cv-rowlabel {
   font-size: var(--v8-text-2xs);
   max-width: 70px;
 }
-.cv-level-country .cv-cell {
-  min-width: 13px;
-  width: 13px;
+.cv-level-country .cv-cell,
+.cv-level-country .cv-col {
+  min-width: 15px;
+  width: 15px;
+  max-width: 15px;
+}
+.cv-level-country .cv-matrix {
+  min-width: 0;
 }
 .cv-level-country .cv-cellbtn {
   height: 22px;
-  font-size: 8.5px;
+  font-size: 8px;
+  padding: 0;
+  letter-spacing: -0.3px;
   border-radius: 2px;
 }
 .cv-level-country .cv-matrix {
@@ -638,8 +657,9 @@ tr.is-sel .cv-rowlabel {
   padding: 0;
   margin: 0;
 }
-.cv-tag {
-  font: inherit;
+.cv-tags .cv-tag {
+  font-family: inherit;
+  line-height: 1.5;
   font-size: var(--v8-text-2xs);
   padding: 1px 7px;
   border-radius: var(--v8-radius-sm);
@@ -648,7 +668,7 @@ tr.is-sel .cv-rowlabel {
   color: var(--v8-fg);
   cursor: pointer;
 }
-.cv-tag.is-track {
+.cv-tags .cv-tag.is-track {
   font-family: var(--v8-font-mono);
   cursor: default;
   color: var(--v8-judged);
@@ -790,4 +810,30 @@ tr.is-sel .cv-rowlabel {
   .cv-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+.cv-tlist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+}
+.cv-titem {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--v8-border);
+  min-width: 0;
+}
+.cv-titem-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: center;
+}
+.cv-titem-meta {
+  font-size: var(--v8-text-2xs);
+  color: var(--v8-fg-muted);
+  margin-top: 2px;
+}
+.cv-cards-1 {
+  grid-template-columns: minmax(0, 1fr);
 }

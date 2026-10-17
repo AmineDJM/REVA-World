@@ -125,18 +125,18 @@ def node_refs(conn: Connection, idx: PathIndex | None, ids: Iterable[str]) -> di
             continue
         name_fr = lab.get("fr") or lab.get("en")
         name_en = lab.get("en") or lab.get("fr")
-        kind = kinds.get(q)
-        iso = qid_iso.get(q)
+        ekind = kinds.get(q)
+        cty = qid_iso.get(q)
         out[q] = {
             "id": q,
             "label": name_fr or f"{q} (libellé non chargé)",
             "label_en": name_en or f"{q} (label not loaded)",
             "label_loaded": bool(name_fr),
-            "kind": kind,
+            "kind": ekind,
             "kind_label": None,
             "virtual": False,
             "scope_iso3": None,
-            "fiche": {"kind": "country", "id": iso} if iso else {"kind": kind or "entity", "id": q},
+            "fiche": {"kind": "country", "id": cty} if cty else {"kind": ekind or "entity", "id": q},
             "degree": deg,
         }
     return out
@@ -257,14 +257,23 @@ def _source_label(key: str, titles: Mapping[str, str]) -> str:
     return titles.get(key) or key
 
 
+def _fr_num(x: Any) -> str:
+    t = str(x)
+    return t.replace(".", ",") if all(c in "+-0123456789.eE" for c in t) else t
+
+
 def _estimate_value(est: Mapping[str, Any]) -> str:
+    """French short value of an estimate as published: ``0,34 % pour un choc de 10 percent``; the sign only when the
+    source gives no number (never a filled zero)."""
     from reva.effects.query import UNIT_WORDS
 
     v = est.get("as_printed") or (None if est.get("point") is None else str(est["point"]))
     if v is None:
-        return f"signe {est.get('sign')}"
+        return f"signe {est.get('sign')}, valeur non chiffrée"
     unit = UNIT_WORDS.get(est.get("unit") or "", ("", ""))[1]
-    return f"{v}{unit}"
+    shock = est.get("shock") or None
+    tail = f" pour un choc de {_fr_num(shock['size'])} {shock['unit']}" if shock else ""
+    return f"{_fr_num(v)}{unit}{tail}"
 
 
 def render_hop(
@@ -297,15 +306,18 @@ def render_hop(
         st = det.statements.get(int(idx.e_ref[e]))
         pid = idx.pids[int(idx.e_pid[e])]
         ef = det.registry.edge_family(pid, "out" if h.rec_fwd else "in")
-        fam = None if ef is None else {"id": ef.family, "label": dict(ef.label), "inverse": ef.inverse}
-        out["family"] = fam
-        rel_fr = (fam or {}).get("label", {}).get("fr") or pid
-        rel_en = (fam or {}).get("label", {}).get("en") or pid
+        out["family"] = None if ef is None else {"id": ef.family, "label": dict(ef.label), "inverse": ef.inverse}
+        rel_fr = (ef.label.get("fr") if ef else None) or pid
+        rel_en = (ef.label.get("en") if ef else None) or pid
         if st is not None:
             pi = st["property_info"]
             p_fr = pi.get("label_fr") if h.rec_fwd else pi.get("inverse_label_fr")
             p_en = pi.get("label_en") if h.rec_fwd else pi.get("inverse_label_en")
-            out["property"] = {"pid": pid, "label_fr": p_fr or pi.get("label_fr"), "label_en": p_en or pi.get("label_en")}
+            out["property"] = {
+                "pid": pid,
+                "label_fr": p_fr or pi.get("label_fr"),
+                "label_en": p_en or pi.get("label_en"),
+            }
             prov = st["provenance"]
             out["source"] = {
                 "key": prov["source_key"],
@@ -434,7 +446,9 @@ def render_hop(
         out["detail"] = {"iso3": sc["iso3"], "estimates": len(sc["estimates"])}
     elif k == EDGE_BRIDGE:
         br = idx.bridges[int(idx.e_ref[e])]
-        out["relation"] = {"fr": br.label_fr, "en": br.label_en} if h.rec_fwd else {"fr": br.inverse_fr, "en": br.inverse_en}
+        out["relation"] = (
+            {"fr": br.label_fr, "en": br.label_en} if h.rec_fwd else {"fr": br.inverse_fr, "en": br.inverse_en}
+        )
         out["source"] = {"key": "reva.registry", "label": br.basis, "statement_id": None, "revision": None}
         out["strength"] = {"level": "declared_identifier_link", "label": f"lien d'identifiant déclaré ({br.basis})"}
     rel = (out["relation"] or {}).get("fr") or "?"
@@ -463,9 +477,7 @@ def render_path(
     hops = [render_hop(idx, h, nodes, det, flt) for h in p.hops]
     grades = [h["strength"].get("grade") for h in hops if h["kind"] == "causal_claim" and h.get("strength")]
     weakest = max((g for g in grades if g), key=GRADES.index, default=None) if grades else None
-    restricted = sorted(
-        {h["licence"]["licence"] for h in hops if h.get("licence") and h["licence"].get("restricted")}
-    )
+    restricted = sorted({h["licence"]["licence"] for h in hops if h.get("licence") and h["licence"].get("restricted")})
     return {
         "rank": rank,
         "cost": round(p.cost, 3),

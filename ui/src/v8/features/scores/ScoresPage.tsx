@@ -15,7 +15,7 @@ import { ChartView } from './Charts';
 import { DocViewer } from './DocViewer';
 import { Matrix } from './Matrix';
 import { RowsTable } from './RowsTable';
-import { EVALUATION_SHORT, METRIC_SHORT, VERDICT_FR, dayLabel, daysUntil, fmtP, fmtRatio, forecasterLabel, total, whenLabel } from './model';
+import { EVALUATION_SHORT, METRIC_SHORT, VERDICT_FR, dayLabel, daysUntil, fmtP, fmtRange, fmtRatio, forecasterLabel, total, whenLabel } from './model';
 import './scores.css';
 
 type Load<T> = { status: 'loading' } | { status: 'ok'; data: T } | { status: 'error'; error: unknown };
@@ -53,24 +53,53 @@ function CountsBar({ c, label }: { c: Counts; label: string }) {
   );
 }
 
-function WinLine({ w, vocab, onOpenTrack }: { w: Win; vocab: Vocab; onOpenTrack: (id: string, row?: string) => void }) {
-  const key = w.caveats.filter((c) => ['timeliness_edge', 'uses_official_forecast', 'final_vintage_outcome', 'same_institution_outcome', 'licence_restricted'].includes(c));
+type WinGroup = { key: string; track: string; target: string; forecaster: string | null | undefined; horizon: string; evaluation: string; wins: Win[] };
+
+/** Wins grouped by (track, target, forecaster, horizon): one line per group, each test listed underneath. */
+export function groupWins(wins: Win[]): WinGroup[] {
+  const by = new Map<string, WinGroup>();
+  for (const w of wins) {
+    const key = `${w.track}|${w.target}|${w.forecaster ?? ''}|${w.horizon_label_fr ?? ''}`;
+    const g = by.get(key) ?? { key, track: w.track, target: w.target, forecaster: w.forecaster, horizon: w.horizon_label_fr ?? '', evaluation: w.evaluation, wins: [] };
+    g.wins.push(w);
+    by.set(key, g);
+  }
+  return [...by.values()];
+}
+
+function WinLine({ g, label, vocab, onOpenTrack }: { g: WinGroup; label: string; vocab: Vocab; onOpenTrack: (id: string, row?: string) => void }) {
+  const cav = [...new Set(g.wins.flatMap((w) => w.caveats))].filter((c) => c in CAVEAT_SHORT);
+  const ratios = g.wins.map((w) => w.ratio).filter((x): x is number => typeof x === 'number');
+  const ps = g.wins.map((w) => w.p_holm).filter((x): x is number => typeof x === 'number');
+  const n = g.wins.length;
   return (
     <li className="sc-win">
-      <button type="button" className="sc-win-btn" onClick={() => onOpenTrack(w.track, w.id)}>
-        <span className="sc-win-ratio v8-num">{fmtRatio(w.ratio)}</span>
-        <span className="sc-win-text">
-          <strong>{w.candidate_label_fr}</strong> bat <em>{w.benchmark_label_fr}</em> — {forecasterLabel(w.forecaster)}, {w.horizon_label_fr}, {METRIC_SHORT[w.metric] ?? w.metric}
-          {w.p_holm != null ? `, p Holm ${fmtP(w.p_holm)}` : ''} · {EVALUATION_SHORT[w.evaluation] ?? w.evaluation}
+      <span className="sc-win-ratio v8-num">{fmtRange(Math.min(...ratios), Math.max(...ratios))}</span>
+      <div className="sc-win-body">
+        <p className="sc-win-text">
+          <strong>{label}</strong>, {g.horizon} — {n > 1 ? `${n} tests battent` : 'bat'} {forecasterLabel(g.forecaster)} · {EVALUATION_SHORT[g.evaluation] ?? g.evaluation}
+          {ps.length ? ` · p Holm ≤ ${fmtP(Math.max(...ps))}` : ''}
+        </p>
+        <ul className="sc-win-tests">
+          {g.wins.map((w) => (
+            <li key={w.id}>
+              <button type="button" className="sc-link" onClick={() => onOpenTrack(w.track, w.id)}>
+                {w.candidate_label_fr}
+              </button>{' '}
+              <span className="v8-subtle">
+                vs {w.benchmark_label_fr} · {METRIC_SHORT[w.metric] ?? w.metric} {fmtRatio(w.ratio)}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <span className="sc-win-caveats">
+          {cav.map((c) => (
+            <span key={c} className="sc-chip" title={vocab.caveats[c]}>
+              {CAVEAT_SHORT[c] ?? c}
+            </span>
+          ))}
         </span>
-      </button>
-      <span className="sc-win-caveats">
-        {key.map((c) => (
-          <span key={c} className="sc-chip" title={vocab.caveats[c]}>
-            {CAVEAT_SHORT[c] ?? c}
-          </span>
-        ))}
-      </span>
+      </div>
     </li>
   );
 }
@@ -83,9 +112,10 @@ const CAVEAT_SHORT: Record<string, string> = {
   licence_restricted: 'licence à vérifier',
 };
 
-function Headline({ p, onOpenTrack }: { p: Page; onOpenTrack: (id: string, row?: string) => void }) {
+function Headline({ p, onOpenTrack, compact = false }: { p: Page; onOpenTrack: (id: string, row?: string) => void; compact?: boolean }) {
   const h = p.headline;
   const weakWins = p.weak_reference.bat;
+  const targetLabels = new Map(p.matrix.flatMap((d) => d.targets.map((t) => [t.target, t.label_fr] as const)));
   return (
     <section className="sc-headline" aria-labelledby="sc-headline-title" data-testid="headline">
       <h2 id="sc-headline-title" className="sc-headline-title">
@@ -96,15 +126,15 @@ function Headline({ p, onOpenTrack }: { p: Page; onOpenTrack: (id: string, row?:
         {total(h).toLocaleString('fr-FR')} comparaisons jugées (chacune : une cible, un horizon, une métrique, une famille Holm). {p.headline_rule_fr}
       </p>
       <CountsBar c={h} label={`Répartition : ${h.bat} bat, ${h.ne_bat_pas} ne bat pas, ${h.egalite} égalité, ${h.en_attente} en attente`} />
-      <div className="sc-headline-grid">
+      {!compact && <div className="sc-headline-grid">
         <div>
           <h3 className="sc-h3">Les {h.bat} victoires, avec leurs réserves</h3>
           {p.wins.length === 0 ? (
             <p className="v8-muted">Aucune victoire contre un prévisionniste officiel.</p>
           ) : (
             <ul className="sc-wins">
-              {p.wins.map((w) => (
-                <WinLine key={w.id} w={w} vocab={p.vocab} onOpenTrack={onOpenTrack} />
+              {groupWins(p.wins).map((g) => (
+                <WinLine key={g.key} g={g} label={targetLabels.get(g.target) ?? g.target} vocab={p.vocab} onOpenTrack={onOpenTrack} />
               ))}
             </ul>
           )}
@@ -112,6 +142,17 @@ function Headline({ p, onOpenTrack }: { p: Page; onOpenTrack: (id: string, row?:
         <div className="sc-headline-side">
           <h3 className="sc-h3">Par type d’évaluation</h3>
           <table className="sc-mini">
+            <thead>
+              <tr>
+                <th scope="col">
+                  <span className="v8-sr-only">Évaluation</span>
+                </th>
+                <th scope="col" className="sc-hl-win" title="bat">✓</th>
+                <th scope="col" className="sc-hl-loss" title="ne bat pas">✗</th>
+                <th scope="col" className="sc-hl-tie" title="égalité">=</th>
+                <th scope="col" className="sc-hl-pend" title="en attente">⏳</th>
+              </tr>
+            </thead>
             <tbody>
               {Object.entries(p.by_evaluation).map(([k, c]) => (
                 <tr key={k}>
@@ -135,7 +176,7 @@ function Headline({ p, onOpenTrack }: { p: Page; onOpenTrack: (id: string, row?:
             </p>
           )}
         </div>
-      </div>
+      </div>}
     </section>
   );
 }
@@ -533,7 +574,7 @@ export default function ScoresPage() {
       {page.status === 'error' && <ErrorState error={page.error} what="le tableau des scores" onRetry={retry} />}
       {page.status === 'ok' && (
         <>
-          <Headline p={page.data} onOpenTrack={openTrack} />
+          <Headline p={page.data} onOpenTrack={openTrack} compact={Boolean(track)} />
           {track ? (
             <TrackView id={track} vocab={page.data.vocab} onBack={() => setTrack('', { replace: false })} onOpenDoc={openDoc} highlight={row} />
           ) : (
@@ -542,8 +583,8 @@ export default function ScoresPage() {
                 title="Tableau : cibles × prévisionnistes officiels"
                 subtitle={`${page.data.n_rows} comparaisons au registre ; chaque cellule s’ouvre sur ses lignes`}
                 flush
-                actions={
-                  <div className="sc-filters">
+              >
+                <div className="sc-filters">
                     <label className="v8-sr-only" htmlFor="sc-f">
                       Prévisionniste
                     </label>
@@ -567,8 +608,6 @@ export default function ScoresPage() {
                       ))}
                     </select>
                   </div>
-                }
-              >
                 <ForecasterFocus p={page.data} f={focusF} />
                 <Matrix matrix={page.data.matrix} forecasters={page.data.forecasters} onOpen={(k) => setCell(k, { replace: false })} activeKey={cell} focusForecaster={focusF} domainFilter={domain} />
               </Panel>

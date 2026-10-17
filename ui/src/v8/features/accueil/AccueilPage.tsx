@@ -72,7 +72,7 @@ function QuickActions() {
           id="v8a-ask-in"
           ref={ask}
           className="v8-input v8a-ask-in"
-          placeholder="Demander : « inflation en France depuis 2000 », « pourquoi … ? »"
+          placeholder="Demander… ex. inflation en France depuis 2000"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           onKeyDown={(e) => e.key === 'Escape' && (e.currentTarget.blur(), setQ(''))}
@@ -178,7 +178,7 @@ function ChangeRow({ it, highlighted }: { it: ChangeItem; highlighted: boolean }
         </div>
         <div className="v8a-change-sub">
           {Object.keys(it.counts).length > 0 && <span className="v8-num">{countsFr(it.counts)}</span>}
-          {it.summary && <span>{it.summary}</span>}
+          {it.summary && !(v && it.detail.status === 'void') && <span>{it.summary}</span>}
           {v && (
             <Badge kind={v.kind} size="xs">
               {v.text}
@@ -186,14 +186,16 @@ function ChangeRow({ it, highlighted }: { it: ChangeItem; highlighted: boolean }
           )}
           {it.source && <span className="v8a-src">{it.source}</span>}
         </div>
+        {it.links.length > 0 && (
+          <div className="v8a-change-links">
+            {it.links.slice(0, 2).map((l) => (
+              <Link key={l.href} to={l.href} tabIndex={-1} title={l.label}>
+                {l.label}
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
-      <span className="v8a-change-links">
-        {it.links.slice(0, 2).map((l) => (
-          <Link key={l.href} to={l.href} tabIndex={-1}>
-            {l.label}
-          </Link>
-        ))}
-      </span>
     </li>
   );
 }

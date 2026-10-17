@@ -280,7 +280,7 @@ class IndexWriter:
         db.executescript(
             """
             CREATE INDEX name_norm ON name(norm);
-            CREATE VIRTUAL TABLE name_fts USING fts5(norm, content='', tokenize='trigram', detail='full');
+            CREATE VIRTUAL TABLE name_fts USING fts5(norm, content='', tokenize='trigram', detail='full', columnsize=0);
             INSERT INTO name_fts(rowid, norm) SELECT nid, norm FROM name;
             INSERT INTO name_fts(name_fts) VALUES ('optimize');
             """
@@ -449,12 +449,16 @@ def _id_codes(conn: Connection, origin: str | None) -> dict[str, list[str]]:
     return out
 
 
+LOCAL_CODE_PREFIXES = {"iso3166_2", "nuts", "oecdreg", "iso3", "naturalearth", "ioc", "unii", "mesh", "icd11mms"}
+
+
 def _qid_codes(qid: str) -> list[str]:
     """The record's own id plus readable variants (``mondo:0005015`` → ``MONDO:0005015``, local part)."""
     out = [qid]
     if ":" in qid:
         prefix, local = qid.split(":", 1)
-        if any(c.isalpha() for c in local) and any(c.isdigit() for c in local) and len(local) >= 4:
+        mixed = any(c.isalpha() for c in local) and any(c.isdigit() for c in local) and len(local) >= 4
+        if mixed or prefix in LOCAL_CODE_PREFIXES:
             out.append(local)  # CHEMBL941, P04637, IGJSJL3JD5P30I6NJZ34 …
         if prefix in ("mondo", "doid", "uberon", "cl", "hp", "efo", "go", "so", "symp", "trans", "geno", "foodon"):
             out.append(f"{prefix.upper()}_{local}")
@@ -496,7 +500,7 @@ def kg_entities(conn: Connection, origin: str | None, skip: set[str]) -> Iterato
             id=qid,
             label_fr=label_fr,
             label_en=label_en,
-            sublabel=_short(desc, 56) if desc else "",
+            sublabel=_short(desc, 44) if desc and kind not in LOW_VALUE_KINDS else "",
             href="",
             entity_kind=kind,
             source=c["source_key"],
@@ -706,14 +710,15 @@ def decisions(conn: Connection, origin: str | None) -> Iterator[Doc]:
 
 def effects(conn: Connection, origin: str | None) -> Iterator[Doc]:
     from reva.effects import query as eq
+    from reva.effects.variables import default_resolver
 
     after: int | None = None
     org = origin or "any"
     while True:
-        rows = eq._rows(conn, origin=org, limit=eq.MAX_LIMIT, after_id=after, res=eq.default_resolver())
+        rows = eq._rows(conn, origin=org, limit=eq.MAX_LIMIT, after_id=after, res=default_resolver())
         if not rows:
             return
-        res = eq.default_resolver()
+        res = default_resolver()
         for r in rows:
             j = eq.estimate_json(r, res)
             c, e = j["cause"], j["effect"]

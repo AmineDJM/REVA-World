@@ -10,9 +10,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, Depends, Path, Query
+from fastapi import APIRouter, Depends, Path, Query, Request
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy.engine import Connection
 
 from reva.api.auth import require_scope
 from reva.api.deps import read_conn
@@ -145,33 +144,35 @@ def _pending() -> PendingRegistry:
 
 
 @router.get("/matrix", response_model=CoverageMatrix, summary="Domain x place coverage matrix (page bundle)")
-def coverage_matrix(
-    level: str = Query("region", pattern="^(region|subregion|country)$"),
-    conn: Connection = Depends(read_conn),
-) -> Any:
+def coverage_matrix(request: Request, level: str = Query("region", pattern="^(region|subregion|country)$")) -> Any:
     c = _cov()
-    return svc.matrix(c, level, svc.safe_pending(), svc.staleness(conn, c))
+    with read_conn(request) as conn:
+        stale = svc.staleness(conn, c)
+    return svc.matrix(c, level, svc.safe_pending(), stale)
 
 
 @router.get("/domains/{domain}", response_model=DomainDetail, summary="One domain: tables, countries, KG kinds, gaps")
-def coverage_domain(domain: str = Path(pattern="^[a-z_]{2,40}$"), conn: Connection = Depends(read_conn)) -> Any:
+def coverage_domain(request: Request, domain: str = Path(pattern="^[a-z_]{2,40}$")) -> Any:
     c = _cov()
     if domain not in c.domain_ids:
         raise NotFound("unknown coverage domain", domain=domain, known=c.domain_ids)
     reg = svc.safe_pending()
-    obs = svc.observations(conn, reg, c.doc["origin"]) if reg else {}
+    with read_conn(request) as conn:
+        obs = svc.observations(conn, reg, c.doc["origin"]) if reg else {}
+        stale = svc.staleness(conn, c)
     out = svc.domain_detail(c, domain, reg, obs)
-    out["meta"]["stale"] = svc.staleness(conn, c)
+    out["meta"]["stale"] = stale
     return out
 
 
 @router.get("/countries/{iso3}", response_model=CountryDetail, summary="One country: coverage profile per domain")
-def coverage_country(iso3: str = Path(pattern="^[A-Z]{3}$"), conn: Connection = Depends(read_conn)) -> Any:
+def coverage_country(request: Request, iso3: str = Path(pattern="^[A-Z]{3}$")) -> Any:
     c = _cov()
     if iso3 not in c.places:
         raise NotFound("unknown country key (registry/entities/country_crosswalk.json)", iso3=iso3)
     out = svc.country_detail(c, iso3, svc.safe_pending())
-    out["meta"]["stale"] = svc.staleness(conn, c)
+    with read_conn(request) as conn:
+        out["meta"]["stale"] = svc.staleness(conn, c)
     return out
 
 
@@ -181,12 +182,16 @@ def coverage_freshness() -> Any:
 
 
 @router.get("/pending", response_model=PendingView, summary="Queued loads, with a live check against the database")
-def coverage_pending(conn: Connection = Depends(read_conn)) -> Any:
+def coverage_pending(request: Request) -> Any:
     reg = _pending()
-    return svc.pending_view(reg, svc.observations(conn, reg), "load")
+    with read_conn(request) as conn:
+        obs = svc.observations(conn, reg)
+    return svc.pending_view(reg, obs, "load")
 
 
 @router.get("/decisions", response_model=PendingView, summary="Owner decisions (licences, keys, permissions, ...)")
-def coverage_decisions(conn: Connection = Depends(read_conn)) -> Any:
+def coverage_decisions(request: Request) -> Any:
     reg = _pending()
-    return svc.pending_view(reg, svc.observations(conn, reg), "decision")
+    with read_conn(request) as conn:
+        obs = svc.observations(conn, reg)
+    return svc.pending_view(reg, obs, "decision")

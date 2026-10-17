@@ -51,7 +51,7 @@ function ObservedBadge({ it }: { it: PendingItem }) {
   const title = o.checks
     .map((c) => `${c.connector}${c.min_version ? ` ≥ ${c.min_version}` : ''} : ${c.met ? 'exécuté' : 'non constaté'}${c.versions_acquired.length ? ` (versions ${c.versions_acquired.join(', ')})` : ''}${c.tables_missing.length ? ` ; tables manquantes ${c.tables_missing.join(', ')}` : ''}`)
     .join('\n');
-  const kind = o.state === 'done' ? 'win' : o.state === 'partial' ? 'neutral' : 'missing';
+  const kind = o.state === 'done' ? 'win' : 'neutral';
   return (
     <Badge kind={kind} title={`Vérifié dans la base (acquisitions par connecteur et tables enregistrées) :\n${title}`}>
       {STATE_LABEL[o.state]}
@@ -142,6 +142,7 @@ export function PendingTab({ type, onDomain }: { type: 'decision' | 'load'; onDo
             !(hideDone === 'faits' && it.observed?.state === 'done'),
         ),
       }))
+      .map((g) => ({ ...g, items: [...g.items].sort((a, b) => Number(a.observed?.state === 'done') - Number(b.observed?.state === 'done')) }))
       .filter((g) => g.items.length > 0);
   }, [v, q, dom, hideDone]);
   const domains = useMemo(() => [...new Set(v?.groups.flatMap((g) => g.items.flatMap((i) => i.unlocks.domains)) ?? [])].sort(), [v]);
@@ -199,11 +200,23 @@ function PendingSummary({ v, type }: { v: PendingView; type: 'decision' | 'load'
   }
   const items = v.groups.flatMap((g) => g.items);
   const disk = items.filter((i) => i.kind === 'disk' && i.observed?.state !== 'done' && i.status !== 'done');
+  const big = disk.filter((i) => (i.disk_mb ?? 0) >= 1000);
+  const small = disk.filter((i) => (i.disk_mb ?? 0) < 1000);
+  const smallMb = small.reduce((a, i) => a + (i.disk_mb ?? 0), 0);
+  const unknown = small.filter((i) => i.disk_mb == null).length;
   return (
     <p className="cv-answer">
       <strong className="v8-num">{v.counts.items}</strong> chargements recensés ; <strong className="v8-num">{v.counts.observed_done}</strong> déjà exécutés selon la base
-      {v.checked_at ? ` (vérifié ${frDateTime(v.checked_at)})` : ''}. Ceux qui attendent du disque demandent environ <strong className="v8-num">{frMb(v.disk_mb_open_loads)}</strong>
-      {v.disk_mb_unknown > 0 ? ` (+ ${frNumber(v.disk_mb_unknown)} sans estimation)` : ''} au total, et chacun exige <strong>5 Go libres</strong> au moment de l’exécution ({disk.length} en attente de disque).
+      {v.checked_at ? ` (vérifié ${frDateTime(v.checked_at)})` : ''}. Les <strong className="v8-num">{small.length}</strong> chargements de sources en attente de disque ajoutent environ{' '}
+      <strong className="v8-num">{frMb(smallMb)}</strong>
+      {unknown > 0 ? ` (+ ${frNumber(unknown)} sans estimation)` : ''}, mais chacun exige <strong>5 Go libres</strong> au moment de l’exécution
+      {big.map((b) => (
+        <span key={b.id}>
+          {' '}
+          ; « {b.title} » demande à lui seul {frMb(b.disk_mb)}
+        </span>
+      ))}
+      .
     </p>
   );
 }

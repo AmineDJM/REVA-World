@@ -26,8 +26,8 @@ export function RatioChart({ chart }: { chart: Chart }) {
   const ys = pts.map((p) => p.y);
   const x0 = Math.min(...xs);
   const x1 = Math.max(...xs);
-  const y0 = Math.min(0.4, ...ys) * 0.95;
-  const y1 = Math.max(1.2, ...ys) * 1.05;
+  const y0 = Math.min(0.9, ...ys) * 0.95;
+  const y1 = Math.max(1.1, ...ys) * 1.05;
   const sx = (x: number) => PAD.l + (x1 === x0 ? 0.5 : (x - x0) / (x1 - x0)) * (W - PAD.l - PAD.r);
   const sy = (y: number) => PAD.t + (1 - (y - y0) / (y1 - y0)) * (H - PAD.t - PAD.b);
   const ticks = [y0, 1, y1].map((v) => Number(v.toFixed(2)));

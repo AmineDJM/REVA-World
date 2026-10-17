@@ -101,11 +101,11 @@ class EdgeFilter:
             ok &= ~idx.e_fixture[edges]
         elif self.origin == "test_fixture":
             ok &= idx.e_fixture[edges]
-        return ok
+        return np.asarray(ok, dtype=bool)
 
 
 def edge_cost(idx: PathIndex, edges: np.ndarray, rec_fwd: np.ndarray) -> np.ndarray:
-    return np.where(rec_fwd, idx.e_cost_fwd[edges], idx.e_cost_rev[edges]).astype(np.float64)
+    return np.asarray(np.where(rec_fwd, idx.e_cost_fwd[edges], idx.e_cost_rev[edges]), dtype=np.float64)
 
 
 def _gather(idx: PathIndex, nodes: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -125,7 +125,8 @@ class _Side:
     start: int
     best: np.ndarray
     level: np.ndarray
-    records: list[tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]]  # per level: nodes(sorted), pos, parent, plevel
+    #: per level: nodes (sorted), CSR position, parent node, parent level
+    records: list[tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]]
 
 
 def _relax(
@@ -312,13 +313,16 @@ def _merge_variant(idx: PathIndex, kept: list[FoundPath], nodes: list[int], hops
         if len(p.nodes) != len(nodes) or _signature(idx, p.hops) != sig:
             continue
         diff = [i for i, (a, b) in enumerate(zip(p.nodes, nodes, strict=True)) if a != b]
-        if len(diff) == 1 and 0 < diff[0] < len(nodes) - 1:
-            if p.variant_position is None or p.variant_position == diff[0]:
+        # one intermediate node differs, or two adjacent ones (a country and its scoped estimate node, a facility
+        # and the region it is located in): the same route through another member of the same set
+        block = len(diff) == 1 or (len(diff) == 2 and diff[1] == diff[0] + 1)
+        if block and 0 < diff[0] and diff[-1] < len(nodes) - 1:
+            if p.variant_position is None:
                 p.variant_position = diff[0]
-                p.variants += 1
-                if len(p.variant_examples) < MAX_VARIANT_EXAMPLES:
-                    p.variant_examples.append(nodes[diff[0]])
-                return True
+            p.variants += 1
+            if len(p.variant_examples) < MAX_VARIANT_EXAMPLES and nodes[diff[0]] not in p.variant_examples:
+                p.variant_examples.append(nodes[diff[0]])
+            return True
     return False
 
 
@@ -352,7 +356,7 @@ def neighbourhood(
     for g in np.unique(gkey):
         sel = np.flatnonzero(gkey == g)
         name = idx.families[int(g)] if g >= 0 else EDGE_KINDS[-10 - int(g)]
-        totals[name] = int(len(sel))
+        totals[name] = len(sel)
         # most connected neighbour first (ties: claims by grade, then node id); one entry per neighbour
         deg = idx.degree[nbr[sel]].astype(np.int64)
         grade = np.where(idx.e_kind[edges[sel]] == EDGE_CLAIM, idx.e_grade[edges[sel]], 9).astype(np.int64)

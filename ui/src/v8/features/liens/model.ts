@@ -257,7 +257,7 @@ export function warningsFr(ws: { code: string; message: string }[], d: PathsData
     else if (w.code === 'community_edited') t = 'Certains liens viennent de Wikidata : contributions communautaires, non vérifiées par REVA.';
     else if (w.code === 'licence_restricted') {
       const ls = [...new Set(d.paths.flatMap((p) => p.restricted_licences))];
-      t = `Licences restrictives à respecter pour réutiliser ces liens : ${ls.join(' ; ') || w.message}.`;
+      t = `Licences restrictives à respecter pour réutiliser ces liens : ${(ls.join(' ; ') || w.message).replace(/\.+$/, '')}.`;
     } else if (w.code === 'fixture_data') t = 'Contient des données de test (test_fixture), pas des données publiées.';
     else t = w.message;
     if (t && !out.includes(t)) out.push(t);
