@@ -11,8 +11,8 @@ attributed numbers). Contract for other agents: `docs/dev/v5_effect_interface.md
 | Schema contract regenerated (2,292 objects, fingerprint `d2fe2f9235dbed10`, head 0019) | `migrations/schema_contract.json` |
 | Backup manifest | no change needed: `scripts/backup_restore.py` digests every table of schema `kg` generically |
 | Python package (vocabularies, validation, loader, readers, wording, uncertainty for Monte-Carlo, curation + automatic quote re-check) | `src/reva/effects/{vocab,variables,model,query,uncertainty,curation}.py` |
-| Effect-variable vocabulary (19 variables, en/fr, REVA definitions, curated atlas links: `prices.consumer_level -> imf.cpi_index`) | `registry/effects/variables.yaml` |
-| Curated publications (7 entries, 57 estimates) | `registry/effects/literature/*.yaml` |
+| Effect-variable vocabulary (25 variables, en/fr, REVA definitions, curated atlas links: `prices.consumer_level -> imf.cpi_index`) | `registry/effects/variables.yaml` |
+| Curated publications (10 entries, 73 estimates; every estimate states its `shock_profile`) | `registry/effects/literature/*.yaml` |
 | Connector `atlas.effects_lit@1.0.1` (source `effects.literature`, metered through `run_atlas_ingest`, raw PDFs archived, pinned sha256, quote re-check, load per publication) | `src/reva/adapters/connectors/atlas_effects_lit.py`, `registry/sources/effects_literature.yaml`, `registry/atlas/budget_requests/pred_effect.yaml` (merged: 40 req/day) |
 | API `/v1/effects/estimates`, `/v1/effects/estimates/{key}`, `/v1/effects/compare`, `/v1/effects/variables` (read scope, envelope warnings `attributed_estimates`, `no_pooling`, `licence_restricted`) | `src/reva/api/routes/effects.py` (+1 router line in `app.py`), `contracts/openapi.json` |
 | Tests: 37 unit (vocab = migration, every curated entry validates, 27 rejection rules, quote re-check, pdftotext on stdin, uncertainty bases, connector spec) + 6 integration on a throwaway DB (loader idempotence / revision / retraction / reinstatement / partial delivery, DB CHECKs and append-only, grants, sealed loads, REVA-run rows and readers, connector fixture run, API) | `tests/unit/effects/`, `tests/integration/test_effects_store.py`, synthetic fixture `tests/fixtures/effects/`, `tests/fixtures/source/atlas.effects_lit/` |
@@ -49,8 +49,11 @@ attributed numbers). Contract for other agents: `docs/dev/v5_effect_interface.md
 | `ramey_zubairy_2014` | Ramey & Zubairy, *Government Spending Multipliers in Good Times and in Bad*, NBER WP 20719 (Nov 2014), https://www.nber.org/system/files/working_papers/w20719/w20719.pdf | 269,086 | © authors, short quotation with credit | 6: 2- and 4-year integral multipliers, linear / high / low unemployment (Table 1, with SEs) |
 | `hazell_herreno_nakamura_steinsson_2021` | Hazell, Herreño, Nakamura & Steinsson, *The Slope of the Phillips Curve: Evidence from U.S. States*, NBER WP 28005 (rev. May 2021), https://www.nber.org/system/files/working_papers/w28005/w28005.pdf | 546,497 | © authors, short quotation with credit | 6: κ (cols 3, 4) and ψ (cols 3, 4) of Table 1; κ pre/post-1990 with time FE (Table 2 cols 5, 6) |
 | `ecb_op113_2010` | ESCB Task Force, *Energy markets and the euro area macroeconomy*, ECB OP 113 (Jun 2010), https://www.ecb.europa.eu/pub/pdf/scpops/ecbocp113.pdf | 2,836,963 | © ECB (no licence text captured) | 4: +10 % energy prices → consumer prices EA 0.36 %, FR 0.34 %, DE 0.37 %, producer prices EA 0.39 % (input-output, first round) |
+| `baumeister_hamilton_2018` | Baumeister & Hamilton, *Structural Interpretation of VARs with Incomplete Identification: Revisiting the Role of Oil Supply and Demand Shocks*, NBER WP 24167 (rev. Aug 2018), https://www.nber.org/system/files/working_papers/w24167/w24167.pdf | 1,214,556 | © authors, short quotation with credit | 3: short-run oil supply elasticity 0.15 (68% band 0.09-0.22), demand elasticity −0.35 (−0.51..−0.24), oil supply shock raising the real oil price 10% → world industrial production −0.50 % after 12 months (−0.91..−0.17) (Table 3 col. 1) |
+| `bobasu_ciccarelli_notarpietro_2025` | Bobasu, Ciccarelli & Notarpietro (eds.), *Monetary policy transmission: a reference guide through ESCB models and empirical benchmarks*, ECB OP 377 (2025, doi:10.2866/0318025), https://www.ecb.europa.eu/pub/pdf/scpops/ecb.op377en.pdf | 7,546,684 | © ECB, all rights reserved | 10: meta-analysis (409 studies) of an unexpected +25 bp policy-rate shock: output peak −0.25 % mean / −0.15 % median after ~2 years, price level −0.18 / −0.11 % after ~4 years, inflation −0.05 / −0.03 pp after ~3 years, publication-bias corrected output −0.14 / −0.08 %, price level −0.08 / −0.05 % |
+| `gutmann_neuenkirch_neumeier_2022` | Gutmann, Neuenkirch & Neumeier, *The Economic Effects of International Sanctions: An Event Study*, Trier Research Papers in Economics 3/21 (version 23 Dec 2022), https://www.uni-trier.de/fileadmin/fb4/prof/VWL/EWF/Research_Papers/2021-03.pdf | 945,852 | no licence statement (treated as all rights reserved) | 3: sanction episode (`event_type:sanction_episode`) → GDP per capita growth −1.32 pp (year 1), −1.50 pp (year 2), GDP per capita level −2.82 % over the first two years (158 countries, 1960-2016) |
 
-Raw archive: 7 PDFs, 7.8 MB (budget ≤ 100 MB). The PDFs are not redistributable; they live only in the raw
+Raw archive: 10 PDFs, 17.5 MB (budget ≤ 100 MB). The PDFs are not redistributable; they live only in the raw
 store (provenance) and are **not** committed (fixture tests use a synthetic CC0 text document).
 
 ## Load (dev DB)
@@ -73,6 +76,22 @@ LOAD_RESULTS
   2-year integral.
 * `/v1/effects/estimates?effect=imf.cpi_index` also returns ECB OP 113 and OP 241 consumer-price estimates through
   the curated link `prices.consumer_level -> imf.cpi_index` (`matched_via: variable:prices.consumer_level`).
+
+## PRED-ENGINE first links (lead request, 2026-10-17)
+
+| Reference decision link | Status |
+|---|---|
+| oil supply → oil price | **Loaded** (Baumeister & Hamilton 2018): supply elasticity 0.15, demand elasticity −0.35 (68% credible bands), and the activity effect of a supply shock that raises the real oil price 10%. The paper prints no "price response to an X mb/d cut"; the inverse-demand composition `Δln p = Δln q_supply_shift / (α_supply − β_demand)` would be REVA's computation and must be labelled as such (an `identity`-kind estimate or engine-side composition), not a quoted number. Kilian & Murphy and Caldara-Cavallo-Iacoviello are cited inside BH but not archived. |
+| ECB +50 bp → HICP / GDP / unemployment | **Loaded** (ECB OP 377 meta-analysis) for output, price level and inflation (+25 bp unexpected shock, `one_time_impulse`, mean / median / bias-corrected). The ESCB model simulations in the same paper are charts only (not transcribed). No unemployment response is printed in a table; none loaded. Scaling 25 bp → 50 bp is linear extrapolation by the engine, not a source number. |
+| India rice export ban → world rice price | **Not loaded.** Martin & Anderson (2011/2012; World Bank WPS 5645 / CEPR DP 8494: "about 45 percent of the 2006-8 rice price increase" due to insulating behaviour): the CEPR PDF answered HTTP 403 to a non-browser client (not worked around) and the World Bank PDF URL was not found in this session; moreover the number is a *contribution share of an observed price change*, which the closed `measure` vocabulary of 0019 cannot represent honestly (it is not a response to a defined shock). Owner/lead decision: add a `contribution_share` measure (needs a migration) or keep such numbers out. Variable `trade.export_restriction` added. |
+| EU ban on Russian oil / embargo → target GDP | **Loaded (generic)**: Gutmann, Neuenkirch & Neumeier (2022) sanction-episode event study (`event_type:sanction_episode`, `state_indicator`): −1.32 pp / −1.50 pp GDP-per-capita growth in years 1-2, −2.82 % level after two years. Not specific to oil embargoes or to Russia. Neuenkirch & Neumeier (2015, UN vs US sanctions) is behind a JavaScript repository page (not fetched). |
+| France retirement age 65 → employment | Variable `pension.minimum_pension_age` added. The published employment responses already curated by agent LIT in `registry/assumptions/retirement_employment_response.yaml` (verified quotes, but source texts *not archived*) are not yet effect estimates: importing them needs their source PDFs fetched and archived through `atlas.effects_lit` (next step). |
+
+Shock definitions: every curated estimate now records `shock_profile` (`meta.shock_profile`, JSON `shock_profile`):
+one-time structural impulses (Choi et al., Ramey-Zubairy, Baumeister-Hamilton activity effect, OP 377), state
+indicators (gravity dummies, sanction episodes), permanent level shifts (ECB OP 113 input-output), contemporaneous
+relations (Okun, Phillips, oil elasticities), cross-sectional (gravity elasticities) and `unspecified` (ECB OP 241,
+whose text does not say how the depreciation path is defined).
 
 ## What is missing and why
 

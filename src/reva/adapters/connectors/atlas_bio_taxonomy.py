@@ -89,7 +89,8 @@ COL_RANKS = ("domain", "realm", "kingdom", "phylum", "class")
 PAGE = 1000
 MAX_OFFSET = 100_000  # ChecklistBank search: offset + limit <= 100,000
 FACET_LIMIT = 50_000  # GBIF answers 500 above this and refuses facetOffset
-MAX_PARTITIONS = 600
+MAX_PARTITIONS = 300
+SCOPE_CHUNK = 100  # USAGE_ID values per ChecklistBank search
 MAX_PAGE_BYTES = 8_000_000
 MAX_FACET_BYTES = 6_000_000
 MAX_WD_BYTES = 40_000_000
@@ -310,39 +311,18 @@ def parse_backbone_meta(gbif_body: bytes, clb_body: bytes) -> BackboneMeta:
     )
 
 
-def usage_from_gbif_species(rec: Mapping[str, Any], *, raw: str) -> Usage:
-    """GBIF ``/species/{key}`` -> Usage with a classification from the record's ``<rank>Key`` fields."""
-    cls: list[tuple[str, str, str]] = []
-    for r in ("kingdom", "phylum", "class", "order", "family", "genus"):
-        k, n = rec.get(f"{r}Key"), rec.get(r)
-        if k is not None and n:
-            cls.append((str(k), str(n), r))
-    cls.append((str(rec["key"]), str(rec.get("canonicalName") or ""), str(rec.get("rank") or "").lower()))
-    return Usage(
-        id=str(rec["key"]),
-        name=str(rec.get("canonicalName") or ""),
-        rank=str(rec.get("rank") or "").lower(),
-        authorship=str(rec.get("authorship") or "").strip(),
-        parent_id=str(rec["parentKey"]) if rec.get("parentKey") is not None else None,
-        classification=tuple(cls),
-        raw=raw,
-        selector={"endpoint": "species", "key": rec["key"]},
-        parent_basis="parentKey",
-    )
-
-
 def check_scope_record(rec: Mapping[str, Any], sp: ScopeSpecies) -> str | None:
-    """Why a GBIF record cannot be loaded for a scope entry (None: it can)."""
-    if str(rec.get("key")) != str(sp.key):
+    """Why a ChecklistBank backbone record cannot be loaded for a scope entry (None: it can)."""
+    u = rec.get("usage") or {}
+    n = u.get("name") or {}
+    if str(rec.get("id")) != str(sp.key):
         return "key_differs"
-    if rec.get("datasetKey") != BACKBONE_KEY:
-        return "not_backbone"
-    if str(rec.get("taxonomicStatus")) != "ACCEPTED":
-        return f"status_{rec.get('taxonomicStatus')}"
-    if str(rec.get("rank")) != "SPECIES":
-        return f"rank_{rec.get('rank')}"
-    if rec.get("canonicalName") != sp.name:
-        return "canonical_name_differs"
+    if u.get("status") != "accepted":
+        return f"status_{u.get('status')}"
+    if n.get("rank") != "species":
+        return f"rank_{n.get('rank')}"
+    if n.get("scientificName") != sp.name:
+        return "scientific_name_differs"
     return None
 
 
@@ -394,9 +374,19 @@ def subtree(node: str, children: Mapping[str, Sequence[str]]) -> set[str]:
 
 
 async def facet_counts(
-    run: Any, *, needed: set[str], children: Mapping[str, Sequence[str]], roots: Sequence[str], raws: list[Any]
+    run: Any,
+    *,
+    needed: set[str],
+    children: Mapping[str, Sequence[str]],
+    roots: Sequence[str],
+    raws: list[Any],
+    partitionable: set[str] | None = None,
 ) -> FacetCounts:
-    """Partitioned higherTaxonKey facets until every needed key is counted (see module doc)."""
+    """Partitioned higherTaxonKey facets until every needed key is counted (see module doc).
+
+    ``partitionable``: the only taxa a partition may be opened on (the live run allows kingdom..order: a family is
+    never queried on its own -- 27k families include thousands with no accepted species, which no facet lists, and
+    a first live run spent its request budget opening them one by one)."""
     counts: dict[str, tuple[int, str, str, str]] = {}
     complete_cover: dict[str, tuple[str, str]] = {}  # key -> (partition, raw) of a complete partition containing it
     partitions: list[dict[str, Any]] = []
@@ -432,7 +422,7 @@ async def facet_counts(
                 complete_cover.setdefault(k, (pname, sha))
             continue
         for kid in kids:
-            if kid in done:
+            if kid in done or (partitionable is not None and kid not in partitionable):
                 continue
             if ({kid} | subtree(kid, children)) & (needed - set(counts)):
                 queue.append(kid)
@@ -631,20 +621,25 @@ async def ingest_gbif(run: Any) -> dict[str, Any]:
     scope_groups: dict[str, str] = {}
     refused: list[dict[str, Any]] = []
     if with_scope:
-        for sp in scope.species:
-            if only_keys and str(sp.key) not in only_keys:
-                continue
-            raw = await run.get(f"{GBIF_API}/species/{sp.key}", key=f"gbif:species:{sp.key}", max_bytes=1_000_000)
-            sha = run.archive(raw)
-            raws.append(raw)
-            rec = bc.json_body(raw, f"gbif species {sp.key}")
-            why = check_scope_record(rec, sp)
-            if why:
-                refused.append({"key": sp.key, "name": sp.name, "group": sp.group, "reason": why})
-                continue
-            u = usage_from_gbif_species(rec, raw=sha)
-            species.append(u)
-            scope_groups[u.id] = sp.group
+        wanted = [sp for sp in scope.species if not only_keys or str(sp.key) in only_keys]
+        for i in range(0, len(wanted), SCOPE_CHUNK):
+            chunk = sorted(wanted[i : i + SCOPE_CHUNK], key=lambda x: x.key)
+            recs, _total = await clb_pages(
+                run, CLB_BACKBONE, [("USAGE_ID", str(sp.key)) for sp in chunk], key=f"clb:53147:scope:{i}", raws=raws
+            )
+            by_id = {str(rec.get("id")): (rec, sha, sel) for rec, sha, sel in recs}
+            for sp in chunk:
+                hit = by_id.get(str(sp.key))
+                why = "not_in_backbone" if hit is None else check_scope_record(hit[0], sp)
+                if why or hit is None:
+                    refused.append({"key": sp.key, "name": sp.name, "group": sp.group, "reason": why})
+                    continue
+                u = usage_from_clb(hit[0], raw=hit[1], selector=hit[2])
+                if u is None:
+                    refused.append({"key": sp.key, "name": sp.name, "group": sp.group, "reason": "not_accepted"})
+                    continue
+                species.append(u)
+                scope_groups[u.id] = sp.group
     for u in species:
         usages.setdefault(u.id, u)
     for gid, gu in genus_usages_from_species(species).items():
@@ -656,7 +651,10 @@ async def ingest_gbif(run: Any) -> dict[str, Any]:
             children[u.parent_id].append(u.id)
     roots = sorted(u.id for u in usages.values() if u.rank == "kingdom")
     needed = {u.id for u in usages.values() if u.rank != "species"}
-    counts = await facet_counts(run, needed=needed, children=children, roots=roots, raws=raws)
+    partitionable = {u.id for u in usages.values() if u.rank in ("kingdom", "phylum", "class", "order")}
+    counts = await facet_counts(
+        run, needed=needed, children=children, roots=roots, raws=raws, partitionable=partitionable
+    )
     parts = gbif_kg(usages, counts, meta=meta, scope_groups=scope_groups)
     retrieved = max(r.retrieved_at for r in raws)
     kg = bc.load_kg(
@@ -1344,7 +1342,7 @@ def atlas_source() -> list[AtlasSourceSpec]:
             datasets=(GBIF_DATASET,),
             dataset_ids=(f"gbif:{BACKBONE_KEY}", "doi:10.15468/39omei", f"checklistbank:{CLB_BACKBONE}"),
             cadence_seconds=90 * bc.DAY,
-            planned_requests=400,
+            planned_requests=250,
             max_response_bytes=MAX_PAGE_BYTES,
             min_interval_seconds=0.5,
             parser_version=PARSER_VERSION,

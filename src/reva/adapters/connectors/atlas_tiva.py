@@ -52,7 +52,8 @@ from reva.adapters.connectors.atlas_industry_common import atlas_frame, canon, c
 from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.oecd_tiva"
-CONNECTOR_VERSION = "1.0.0"
+# 1.0.1: 1.0.0 was registered in the dev DB from a WIP snapshot of earlier code.
+CONNECTOR_VERSION = "1.0.1"
 PARSER_VERSION = "atlas-tiva-1"
 SOURCE_KEY = "oecd.sdmx"
 ATLAS_SOURCE = "oecd"
