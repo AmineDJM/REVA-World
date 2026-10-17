@@ -1,6 +1,6 @@
-policy_version: "budgets-1.3.8"
+policy_version: "budgets-1.3.9"
 daily:
-  http_requests_total: 12899
+  http_requests_total: 12921
   http_bytes_total: 3221225472
 per_source_daily_requests:
   worldbank.wdi: 200
@@ -35,8 +35,8 @@ per_source_daily_requests:
   cliopatria.github: 6
   # constitute.service: requested by A-LAW (a_law.yaml)
   constitute.service: 5
-  # cow.data: requested by A-HISTECON (a_histecon.yaml), A-SOCIETY (a_society.yaml), CAUSDATA (causdata.yaml)
-  cow.data: 34
+  # cow.data: requested by A-HISTECON (a_histecon.yaml), A-SOCIETY (a_society.yaml), CAUSDATA (causdata.yaml), CAUSMORE (causmore.yaml)
+  cow.data: 44
   # cow.terrchange: requested by A-COLONIAL (a_colonial.yaml)
   cow.terrchange: 6
   # cshapes.cran: requested by KGGEOPOL (kggeopol.yaml)
@@ -83,6 +83,8 @@ per_source_daily_requests:
   icb.data: 16
   # icow.paulhensel: requested by A-COLONIAL (a_colonial.yaml)
   icow.paulhensel: 8
+  # idmc.gidd: requested by CAUSMORE (causmore.yaml)
+  idmc.gidd: 6
   # ilostat.rplumber: requested by A-ILO (a_ilo.yaml), SIMWORLD (simworld.yaml)
   ilostat.rplumber: 60
   # imf.sdmx: requested by A-IMF (a_imf.yaml)
@@ -125,6 +127,8 @@ per_source_daily_requests:
   owid.compilations: 50
   # parlgov.dataverse: requested by A-SOCIETY (a_society.yaml)
   parlgov.dataverse: 6
+  # pax.peaceagreements: requested by CAUSMORE (causmore.yaml)
+  pax.peaceagreements: 6
   # powell_thyne.coups: requested by A-COUPS (a_coups.yaml)
   powell_thyne.coups: 6
   # rcs_dem.osf: requested by A-SOCIETY (a_society.yaml)

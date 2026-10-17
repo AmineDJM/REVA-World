@@ -66,9 +66,11 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 # * budgets.yaml -> budgets-1.3.7 (2026-10-16, lead): merge of the causality-wave requests (CAUSDATA icb.data,
 #   A-ECRISES, A-COUPS, A-SANCTIONS, A-CONTENTION, A-HAZARDS, CAUSCAND, ...); same caps (<= 5000/source, 3 GiB/day).
 # * budgets.yaml -> budgets-1.3.8 (2026-10-16, lead): merge of A-COLONIAL (coldat, icow, cow terrchange); same caps.
+# * budgets.yaml -> budgets-1.3.9 (2026-10-17, CAUSMORE): merge of causmore.yaml (cow.data 34 -> 44 for
+#   atlas.cowwars; new pax.peaceagreements 6, idmc.gidd 6); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "b0e253ab9b68412748c26a88328d3aa68951334402ba07b954689ae9df4a85c9",
+    "budgets.yaml": "73afadfc17d7c69c4807fa1315c0c49d25fad5d6d8d28dfb0076040986bbde64",
 }
 
 

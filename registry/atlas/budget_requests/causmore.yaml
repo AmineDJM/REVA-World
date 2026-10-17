@@ -1,0 +1,23 @@
+# Budget request from agent CAUSMORE (COW war data, PA-X peace agreements, IDMC disaster displacement events).
+# ATLASCORE merge rule: max(current, request) per source, never the sum.
+agent: CAUSMORE
+requests:
+  - source_key: cow.data
+    # Existing source (atlas.cow 26/day + atlas.mid, merged at 34). atlas.cowwars adds 4 CSVs (31 + 23 + 70 + 7 KB)
+    # and 4 codebook PDFs (82 + 106 + 99 + 86 KB) = 8 requests / ~0.5 MB per run (planned 10).
+    daily_requests: 44
+    expected_bytes_per_day: 11000000
+    reason: "atlas.cowwars (COW war data v4: inter/extra/intra v4.1/non-state + codebooks): 8 requests per run"
+  - source_key: pax.peaceagreements
+    # NEW source (registry/sources/pax.yaml): data CSV (3.6 MB) + codebook PDF (0.85 MB) = 2 requests (planned 3).
+    daily_requests: 6
+    expected_bytes_per_day: 10000000
+    reason: "atlas.pax (PA-X v10 CSV + codebook): 2 requests / 4.5 MB per run"
+  - source_key: idmc.gidd
+    # NEW source (registry/sources/idmc_gidd.yaml): HDX package_show (16 KB) + disaster workbook (1.7 MB) = 2 requests.
+    daily_requests: 6
+    expected_bytes_per_day: 4000000
+    reason: "atlas.idmc (HDX package record + IDMC GIDD disasters workbook): 2 requests / 1.7 MB per run"
+daily_totals_increase:
+  http_requests_total: "+22"
+  http_bytes_total: "+25_000_000"

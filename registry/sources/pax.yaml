@@ -1,0 +1,31 @@
+# V3 (agent CAUSMORE): PA-X Peace Agreements Database v10 (PeaceRep, University of Edinburgh).
+# Connector: src/reva/adapters/connectors/atlas_pax.py -> KG events pax:agt:* / pax:process:* (source_key
+# pax.peaceagreements) and T1 causal claims (reaction_to: UCDP conflict / COW war -> agreement) through
+# reva.causal.load_dataset_claims. Relation semantics: registry/causal/relations_causmore.yaml (dataset pax).
+source_key: pax.peaceagreements
+title: PA-X Peace Agreements Database v10 (2,257 peace agreements 1990-2025) and codebook v10
+provider_url: https://www.peaceagreements.org/
+lineage_family: pax
+rights:
+  licence: "CC BY-NC-SA 4.0 (PA-X terms of use: non-commercial use only, no fee; notify peacerep@ed.ac.uk of data use)"
+  licence_url: https://creativecommons.org/licenses/by-nc-sa/4.0/
+  attribution: >-
+    Bell, C., & Badanjak, S. (2019). Introducing PA-X: A new peace agreement database and dataset. Journal of Peace
+    Research, 56(3), 452-466. Bell, Badanjak et al. (2026). PA-X Codebook, Version 10. PeaceRep, University of
+    Edinburgh. https://www.peaceagreements.org/
+  licence_evidence: >-
+    www.peaceagreements.org/media/documents/Terms_of_Use.pdf (read 2026-10-17): "the content of the Databases is
+    provided under a Creative Commons AttributionNonCommercialShareAlike 4.0 International Licence (CC BY-NC-SA 4.0)";
+    "You may not charge a fee for any use you make of either Database and commercial use is strictly prohibited."
+    The site footer links https://creativecommons.org/licenses/by-nc-sa/4.0/.
+  open_licence: false
+  redistribution: non-commercial, share-alike, attribution; flagged for maintainer review (like CShapes, JST)
+metadata:
+  allowed_hosts: [www.peaceagreements.org]
+  files:
+    - https://www.peaceagreements.org/cms/documents/3957/pax_data_2257_agreements_v10.csv   # 3.6 MB
+    - https://www.peaceagreements.org/cms/documents/3956/PA_X_codebook_v10.pdf              # 0.85 MB
+  access_note: public download links on the home and downloads pages, no account or registration
+  authentication: none
+  cadence: yearly releases (v9 2025, v10 2026); quarterly check
+  review_flag: non-commercial licence (CC BY-NC-SA 4.0); the provider asks to be notified of data use

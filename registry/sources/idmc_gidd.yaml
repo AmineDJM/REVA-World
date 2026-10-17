@@ -1,0 +1,33 @@
+# V3 (agent CAUSMORE): IDMC Global Internal Displacement Database (GIDD) - Disasters, via HDX.
+# Connector: src/reva/adapters/connectors/atlas_idmc.py -> KG events idmc:event:* (disaster events) and
+# idmc:displacement:* (displacements reported per event, country, year), source_key idmc.gidd, and T1 causal claims
+# (has_effect: disaster event -> displacement) through reva.causal.load_dataset_claims.
+# Relation semantics: registry/causal/relations_causmore.yaml (dataset idmc_disasters).
+source_key: idmc.gidd
+title: IDMC Global Internal Displacement Database - Disasters (event-level internal displacements 2008-2024)
+provider_url: https://www.internal-displacement.org/database/displacement-data/
+lineage_family: idmc
+rights:
+  licence: "CC BY-NC 4.0 (stated in the workbook's README sheet; the HDX dataset record says CC BY)"
+  licence_url: https://creativecommons.org/licenses/by-nc/4.0/
+  attribution: >-
+    Internal Displacement Monitoring Centre (IDMC). Global Internal Displacement Database - Disasters.
+    https://www.internal-displacement.org/database/displacement-data/ (distributed on the Humanitarian Data Exchange)
+  licence_evidence: >-
+    README sheet of IDMC_GIDD_Disasters_Internal_Displacement_Data.xlsx (last update 2025-05-13): "USE LICENSE: This
+    content is licensed under CC BY-NC." HDX package_show (read 2026-10-17): license_id cc-by. REVA applies the more
+    restrictive statement of the provider's own file.
+  open_licence: false
+  redistribution: non-commercial with attribution; flagged for maintainer review (licence statements disagree)
+metadata:
+  allowed_hosts: [data.humdata.org, s3.us-east-1.amazonaws.com]
+  files:
+    - https://data.humdata.org/api/3/action/package_show?id=idmc_internal_displacement_conflict-violence_disasters
+    - resource IDMC_GIDD_Disasters_Internal_Displacement_Data.xlsx named by that record (1.7 MB; HDX answers 302 to
+      its S3 file store s3.us-east-1.amazonaws.com/hdx-production-filestore)
+  access_note: >-
+    HDX public dataset, no account. IDMC's own API (helix-tools-api.idmcdb.org) answers "Client is not registered"
+    without a registered client id and is not used.
+  authentication: none
+  cadence: yearly (GIDD release in May); quarterly check
+  review_flag: licence statements disagree (HDX CC BY vs README CC BY-NC); REVA applies CC BY-NC
