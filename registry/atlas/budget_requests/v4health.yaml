@@ -1,0 +1,35 @@
+# Budget request from agent V4HEALTH (V4: anatomy, diseases, burden). Merged into registry/policies/budgets.yaml by
+# python -m reva.atlas.budget_merge --write. Every ontology run also fetches the Relation Ontology ro.obo (0.46 MB)
+# under the same source key.
+agent: V4HEALTH
+requests:
+  - source_key: uberon.obo
+    # github.com release asset human-view.obo (12.6 MB) + raw.githubusercontent.com ro.obo. CC BY 3.0.
+    daily_requests: 8
+    expected_bytes_per_day: 30000000
+    reason: "UBERON human view: 2 requests per run (ontology + RO); 8/day allows retries (GitHub redirects to release-assets)"
+  - source_key: doid.obo
+    # raw.githubusercontent.com doid.json (24.2 MB) + ro.obo. CC0 1.0.
+    daily_requests: 8
+    expected_bytes_per_day: 55000000
+    reason: "Human Disease Ontology: 2 requests per run (doid.json + RO)"
+  - source_key: mondo.obo
+    # github.com release asset mondo.obo (53.3 MB) + ro.obo. CC BY 4.0.
+    daily_requests: 8
+    expected_bytes_per_day: 115000000
+    reason: "Mondo Disease Ontology: 2 requests per run (mondo.obo + RO)"
+  - source_key: clingen.gene_validity
+    # search.clinicalgenome.org gene-validity CSV (1.1 MB). CC0 1.0.
+    daily_requests: 4
+    expected_bytes_per_day: 5000000
+    reason: "ClinGen gene-disease validity summary CSV: 1 request per run"
+  - source_key: who.ghe
+    # xmart-api-public.who.int DEX_CMS/GHE_FULL: 3 list requests + 183 country slices (~280 kB each). CC BY 4.0.
+    daily_requests: 400
+    expected_bytes_per_day: 110000000
+    reason: "WHO Global Health Estimates: 186 requests per run (years, countries, causes + one per country); 400/day allows one retried run"
+daily_totals_increase:
+  http_requests_total: "+428"
+  http_bytes_total: "+315_000_000"
+notes: >-
+  All sources are open (no account, no key). The ontologies are monthly releases; WHO GHE changes about once a year.

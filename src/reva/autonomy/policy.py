@@ -81,9 +81,11 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   atlas.unsd_classif) and of the V4 requests filed since 1.3.13 (v4energy: worldbank.cmo, wri.gppd); same caps.
 # * budgets.yaml -> budgets-1.3.15 (2026-10-17, V4MIND): merge of v4mind.yaml (new hofstede.dimensions 4/day,
 #   openalex.snapshot 30/day; oecd.sdmx 76 -> 82, who.gho 129 -> 160, ilostat.rplumber 60 -> 75, openalex.api 400 -> 700).
+# * budgets.yaml -> budgets-1.3.16 (2026-10-17, V4HEALTH): merge of v4health.yaml (new uberon.obo 8/day, doid.obo 8/day,
+#   mondo.obo 8/day, clingen.gene_validity 4/day, who.ghe 400/day); same caps.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "e5fe92922011b7d23753b9a852afcb3d53fbb14762c3de20a97b8ae7980c77de",
+    "budgets.yaml": "5587b3d6bbc787c76a3e2e2d6cc21893e627998719501bdba97decd52e6c2be1",
 }
 
 

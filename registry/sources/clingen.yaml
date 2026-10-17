@@ -1,0 +1,20 @@
+# V4 (agent V4HEALTH): ClinGen gene-disease validity curations (summary CSV).
+# Connector: src/reva/adapters/connectors/atlas_clingen.py -> KG associations hgnc gene -> mondo disease.
+source_key: clingen.gene_validity
+title: ClinGen Gene-Disease Validity curations (summary CSV)
+provider_url: https://clinicalgenome.org
+lineage_family: clingen
+rights:
+  licence: CC0 1.0
+  licence_url: https://creativecommons.org/publicdomain/zero/1.0/
+  terms_url: https://clinicalgenome.org/docs/terms-of-use/
+  attribution: >-
+    Clinical Genome Resource (ClinGen), Gene-Disease Validity, https://search.clinicalgenome.org/kb/gene-validity
+    (ClinGen requests attribution and the access date).
+metadata:
+  allowed_hosts: [search.clinicalgenome.org]
+  file: https://search.clinicalgenome.org/kb/gene-validity/download
+  release_checked: FILE CREATED 2026-10-17 (1,130,959 bytes, 3,705 curations)
+  licence_basis: 'terms of use, checked 2026-10-17: "All curated content published by ClinGen is available free of restriction under the CC0 1.0 Universal (CC0 1.0) Public Domain Dedication."'
+  authentication: none
+  cadence: monthly check

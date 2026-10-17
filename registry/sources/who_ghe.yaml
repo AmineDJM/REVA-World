@@ -1,0 +1,19 @@
+# V4 (agent V4HEALTH): WHO Global Health Estimates, deaths and DALYs by cause/country/year (WHO data portal xMart).
+# Connector: src/reva/adapters/connectors/atlas_who_ghe.py -> atlas table who.ghe.
+source_key: who.ghe
+title: WHO Global Health Estimates (xMart DEX_CMS GHE_FULL)
+provider_url: https://www.who.int/data/global-health-estimates
+lineage_family: who
+rights:
+  licence: CC BY 4.0 (WHO additional terms)
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  terms_url: https://data.who.int/redirect-pages/footer/learn-more/terms-and-conditions
+  attribution: World Health Organization, Global Health Estimates (GHE)
+metadata:
+  allowed_hosts: [xmart-api-public.who.int]
+  endpoint: https://xmart-api-public.who.int/DEX_CMS/GHE_FULL
+  slice: all ages (TOTAL), both sexes (TOTAL); cause levels 0-2 every year, all 226 causes for the latest year
+  release_checked: rows committed 2026-09-21/22; years 2000-2023; 183 countries; 226 causes (levels 0-5)
+  not_fetched: GHE methods report (CC BY-NC-SA 3.0 IGO); age/sex breakdowns (65.5 M rows in the full table)
+  authentication: none
+  cadence: quarterly check

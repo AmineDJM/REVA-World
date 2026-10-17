@@ -1,0 +1,19 @@
+# V4 (agent V4HEALTH): Human Disease Ontology (DOID), OBO Graphs JSON release file.
+# Connector: src/reva/adapters/connectors/atlas_health_onto.py (atlas.doid) -> KG diseases + T1 causal claims.
+source_key: doid.obo
+title: Human Disease Ontology (doid.json)
+provider_url: https://disease-ontology.org
+lineage_family: obo_foundry
+rights:
+  licence: CC0 1.0
+  licence_url: https://creativecommons.org/publicdomain/zero/1.0/
+  attribution: Human Disease Ontology (Schriml LM et al.), https://disease-ontology.org
+metadata:
+  allowed_hosts: [raw.githubusercontent.com]
+  file: https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/main/src/ontology/doid.json
+  release_checked: 2026-09-30 (version IRI http://purl.obolibrary.org/obo/doid/releases/2026-09-30/doid.owl, 24,209,079 bytes)
+  why_json: the doid.obo flat release carries no logical axioms (location, pathogen, symptom); doid.json does
+  licence_check: graph meta dcterms:license must be https://creativecommons.org/publicdomain/zero/1.0/
+  relations: Relation Ontology ro.obo (CC0 1.0) fetched with every run
+  authentication: none
+  cadence: monthly check; DOID releases monthly

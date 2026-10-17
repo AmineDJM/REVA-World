@@ -1,0 +1,18 @@
+# V4 (agent V4HEALTH): Mondo Disease Ontology (GitHub release asset mondo.obo).
+# Connector: src/reva/adapters/connectors/atlas_health_onto.py (atlas.mondo) -> KG diseases + T1 causal claims.
+source_key: mondo.obo
+title: Mondo Disease Ontology (mondo.obo)
+provider_url: https://mondo.monarchinitiative.org
+lineage_family: obo_foundry
+rights:
+  licence: CC BY 4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: Mondo Disease Ontology, Monarch Initiative, https://mondo.monarchinitiative.org
+metadata:
+  allowed_hosts: [github.com, release-assets.githubusercontent.com, objects.githubusercontent.com, raw.githubusercontent.com]
+  file: https://github.com/monarch-initiative/mondo/releases/latest/download/mondo.obo
+  release_checked: v2026-10-06 (data-version releases/2026-10-06, 53,320,617 bytes)
+  licence_check: header property_value terms:license must be http://creativecommons.org/licenses/by/4.0/
+  relations: Relation Ontology ro.obo (CC0 1.0) fetched with every run
+  authentication: none
+  cadence: monthly check

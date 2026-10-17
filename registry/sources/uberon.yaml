@@ -1,0 +1,21 @@
+# V4 (agent V4HEALTH): Uberon multi-species anatomy ontology, human view (GitHub release asset).
+# Connector: src/reva/adapters/connectors/atlas_health_onto.py (atlas.uberon) -> KG anatomy (UBERON + CL classes).
+source_key: uberon.obo
+title: Uberon anatomy ontology, human view (uberon/subsets/human-view.obo)
+provider_url: https://obophenotype.github.io/uberon/
+lineage_family: obo_foundry
+rights:
+  licence: CC BY 3.0
+  licence_url: https://creativecommons.org/licenses/by/3.0/
+  attribution: >-
+    Uberon multi-species anatomy ontology (Mungall CJ et al., Uberon, an integrative multi-species anatomy
+    ontology, Genome Biology 2012;13:R5), human view, https://obophenotype.github.io/uberon/
+metadata:
+  allowed_hosts: [github.com, release-assets.githubusercontent.com, objects.githubusercontent.com, raw.githubusercontent.com]
+  file: https://github.com/obophenotype/uberon/releases/latest/download/human-view.obo
+  purl: http://purl.obolibrary.org/obo/uberon/subsets/human-view.obo
+  release_checked: v2026-10-01 (data-version uberon/releases/2026-10-01/subsets/human-view.owl, 12,572,132 bytes)
+  licence_check: header property_value dcterms-license must be http://creativecommons.org/licenses/by/3.0/
+  relations: Relation Ontology ro.obo (CC0 1.0) fetched with every run
+  authentication: none
+  cadence: monthly check; UBERON releases roughly monthly
