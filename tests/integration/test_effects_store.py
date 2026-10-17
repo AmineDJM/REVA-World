@@ -239,6 +239,7 @@ async def test_connector_fixture_run_loads_synthetic_entry(db) -> None:  # type:
     assert out["status"] == "completed", out
     s = out["summary"]["entries"]["synthetic_okun_fixture"]
     assert s["status"] == "loaded" and s["refused_by_text_check"] == {} and s["load"]["inserted"] == 3
+    assert out["summary"]["entries"]["synthetic_unreachable_fixture"]["status"] == "fetch_failed"
     cur = _current(db, "synthetic_okun_fixture")
     assert {r["transcription"] for r in cur.values()} == {"transcribed_double_checked"}
     again = await run_atlas_ingest(db.settings, db.worker, db.store, C.CONNECTOR_NAME, mode="fixture")

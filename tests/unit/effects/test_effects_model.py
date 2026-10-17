@@ -312,5 +312,5 @@ def test_connector_spec_and_entries() -> None:
     assert set(spec.dataset_ids) == {e.id for e in load_entries()}
     hosts = {e.document["url"].split("/")[2] for e in load_entries()}
     assert hosts <= set(spec.allowed_hosts)
-    assert [e.id for e in C.entries_for("test_fixture")] == ["synthetic_okun_fixture"]
+    assert [e.id for e in C.entries_for("test_fixture")] == ["synthetic_okun_fixture", "synthetic_unreachable_fixture"]
     assert LITERATURE_DIR.is_dir()

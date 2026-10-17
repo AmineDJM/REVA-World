@@ -1,0 +1,27 @@
+# SYNTHETIC test entry whose document has no captured response: the connector must report fetch_failed and go on.
+schema: reva-effects-literature/1
+id: synthetic_unreachable_fixture
+source_key: effects.literature
+citation: {text: "SYNTHETIC TEST ENTRY - document deliberately not captured.", short: "Synthetic unreachable"}
+document:
+  url: https://www.imf.org/reva-fixture/not-captured.pdf
+  media_type: application/pdf
+  sha256: null
+  version_read: synthetic
+as_of: "2026-10-01"
+rights: {licence: "CC0 (synthetic)", restricted: false}
+curation: {curated_by: test, curated_at: "2026-10-17", review_status: synthetic_fixture}
+estimates:
+  - id: never_loaded
+    shock_profile: unspecified
+    cause: {kind: variable, id: output.gap, transform: gap, definition: "synthetic"}
+    effect: {kind: variable, id: labour.unemployment_gap, transform: gap, definition: "synthetic"}
+    measure: slope
+    unit: pp_per_percent
+    sign: negative
+    point: -0.1
+    as_printed: "-0.1"
+    method: other
+    pdf_page: 1
+    locator: "nowhere"
+    quote: "-0.1"

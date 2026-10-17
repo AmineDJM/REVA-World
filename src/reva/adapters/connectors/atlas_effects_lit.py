@@ -28,9 +28,10 @@ from typing import Any
 from reva.atlas.sources import AtlasSourceSpec
 from reva.effects import curation as cur
 from reva.effects import model as effects_model
+from reva.kernel.errors import SourceResponseError
 
 CONNECTOR_NAME = "atlas.effects_lit"
-CONNECTOR_VERSION = "1.0.2"  # 1.0.0 was registered from an in-flight snapshot; 1.0.1 seeded before shock_profile
+CONNECTOR_VERSION = "1.0.3"  # 1.0.3: a refused document (e.g. HTTP 403) no longer aborts the other entries
 PARSER_VERSION = "atlas_effects_lit/1"
 SOURCE_KEY = "effects.literature"
 ATLAS_SOURCE = "effects"
@@ -92,7 +93,11 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         if only and entry.id != only:
             continue
         doc = entry.document
-        raw = await run.get(doc["url"], key=entry.id, media_types=(str(doc["media_type"]),), max_bytes=MAX_BYTES)
+        try:
+            raw = await run.get(doc["url"], key=entry.id, media_types=(str(doc["media_type"]),), max_bytes=MAX_BYTES)
+        except SourceResponseError as exc:  # a provider refusing the client is reported, never worked around
+            out["entries"][entry.id] = {"status": "fetch_failed", "url": doc["url"], "error": str(exc)[:300]}
+            continue
         sha = run.archive(raw)
         body = run.store.get("raw", sha)
         res: dict[str, Any] = {"document_sha256": sha, "bytes": len(body), "url": doc["url"]}
