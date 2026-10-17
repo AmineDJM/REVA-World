@@ -61,7 +61,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.attribution_cb"
-VERSION = "1.0.1"  # 1.0.0 was registered in the dev DB from an in-flight snapshot (different code)
+VERSION = "1.0.2"  # 1.0.2: publisher URL tails stripped from link DOIs; 1.0.1: 1.0.0 was an in-flight snapshot
 SOURCE_KEY = "carbonbrief.attribution"
 ATLAS_SOURCE = "attribution_cb"
 DATASET = "findings"
@@ -108,6 +108,7 @@ CLASSIFICATIONS: dict[str, tuple[str | None, str | None, str]] = {
 CAUSE_ID = "cbattr:human_caused_climate_change"
 CAUSE_QUOTE = "They calculated the specific contribution that human-caused climate change made to an individual extreme weather event."
 DOI_RE = re.compile(r"10\.\d{4,9}/[^\s,;]+")
+LINK_TAIL_RE = re.compile(r"/(abstract|full|pdf|epdf|meta|fulltext|summary)$")
 KG_PREDICATES: dict[str, tuple[str, str, str, str]] = {
     "cbattr:event_type": (
         "string",
@@ -253,7 +254,8 @@ def doi_of(row: Row) -> tuple[str | None, str | None]:
     if "doi.org/" in link or "/doi/" in link:
         m = DOI_RE.search(link)
         if m:
-            return m.group(0).rstrip(".)"), "link"
+            # publisher URL tails after the DOI (``.../10.1002/grl.50657/abstract``) are not part of the DOI
+            return LINK_TAIL_RE.sub("", m.group(0).rstrip(".)")), "link"
     return None, None
 
 
@@ -429,6 +431,14 @@ def claims(rows: list[Row], sha: str) -> tuple[list[Any], dict[str, Any]]:
                     "published_in": r["Source"],
                     "publication_year": r["Publication year"],
                     "doi_basis": basis,
+                    **(
+                        {
+                            "doi_note": "DOI read from the study link: it can name the containing publication (e.g. a "
+                            "BAMS 'Explaining Extreme Events' supplement), shared by several studies"
+                        }
+                        if basis == "link"
+                        else {}
+                    ),
                     "compiled_by": "Carbon Brief attribution map (coded classification of the study's finding)",
                     "licence": RIGHTS["licence"],
                 },

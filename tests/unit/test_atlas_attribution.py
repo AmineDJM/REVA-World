@@ -86,3 +86,12 @@ def test_kg_items_and_atlas_counts(rows: list[at.Row]) -> None:
     assert fr.height == len(rb.rows) > 0
     fl = json.loads(rb.rows[0]["flags"])
     assert fl["derived"] == "count" and fl["non_commercial"] is True and fl["no_derivatives"] is True
+
+
+def test_link_doi_tail_is_stripped() -> None:
+    r = at.Row(
+        1, {"Citation": "no doi here", "Link": "http://onlinelibrary.wiley.com/doi/10.1002/grl.50657/abstract"}, "k"
+    )
+    assert at.doi_of(r) == ("10.1002/grl.50657", "link")
+    r2 = at.Row(2, {"Citation": "X et al., 2020, doi:10.1029/2025GL115880", "Link": ""}, "k2")
+    assert at.doi_of(r2) == ("10.1029/2025GL115880", "citation")
