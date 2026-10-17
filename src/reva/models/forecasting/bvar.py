@@ -9,7 +9,7 @@ of a univariate AR(p) fitted on the same sample:
 * mean: own first lag ``delta_i`` (0 for growth rates: white-noise prior; 1 for persistent levels such as the
   unemployment rate: random-walk prior), every other coefficient 0;
 * standard deviation of the coefficient on variable j at lag l in equation i:
-  ``lambda1 / l**lambda3`` if j == i, ``lambda1 * lambda2 * sigma_i / (l**lambda3 * sigma_j)`` otherwise;
+  ``lambda1 / lag**lambda3`` if j == i, ``lambda1 * lambda2 * sigma_i / (l**lambda3 * sigma_j)`` otherwise;
   the intercept is diffuse (``100 * sigma_i``).
 
 With a fixed diagonal residual scale in the prior the posterior of each equation is Gaussian (Theil mixed
@@ -47,7 +47,7 @@ class BvarFit:
 
 def _ar_scale(y: np.ndarray, p: int) -> float:
     T = len(y)
-    X = np.column_stack([np.ones(T - p)] + [y[p - l : T - l] for l in range(1, p + 1)])
+    X = np.column_stack([np.ones(T - p)] + [y[p - lag : T - lag] for lag in range(1, p + 1)])
     coef, *_ = np.linalg.lstsq(X, y[p:], rcond=None)
     r = y[p:] - X @ coef
     return math.sqrt(float(r @ r) / max(1, len(r) - p - 1))
@@ -76,7 +76,7 @@ def fit_bvar(
     s = np.array([_ar_scale(Y[:, j], p) for j in range(n)])
     if np.any(s <= 0) or not np.all(np.isfinite(s)):
         return Abstain("degenerate univariate scale")
-    X = np.column_stack([np.ones(T - p)] + [Y[p - l : T - l, :] for l in range(1, p + 1)])
+    X = np.column_stack([np.ones(T - p)] + [Y[p - l : T - l, :] for lag in range(1, p + 1)])
     XtX = X.T @ X
     coef = np.zeros((k, n))
     chols = []
@@ -85,10 +85,10 @@ def fit_bvar(
         b0[1 + i] = float(own_lag_mean[i])
         v0 = np.empty(k)
         v0[0] = (100.0 * s[i]) ** 2
-        for l in range(1, p + 1):
+        for lag in range(1, p + 1):
             for j in range(n):
-                sd = lambda1 / l**lambda3 if j == i else lambda1 * lambda2 * s[i] / (l**lambda3 * s[j])
-                v0[1 + (l - 1) * n + j] = sd * sd
+                sd = lambda1 / lag**lambda3 if j == i else lambda1 * lambda2 * s[i] / (lag**lambda3 * s[j])
+                v0[1 + (lag - 1) * n + j] = sd * sd
         prec = np.diag(1.0 / v0) + XtX / s[i] ** 2
         try:
             V = np.linalg.inv(prec)
@@ -133,7 +133,7 @@ def simulate(
                 break
         else:
             return Abstain("explosive posterior draws (companion modulus >= 1) after redraws")
-        hist = [Y[-l] for l in range(1, p + 1)]  # most recent first
+        hist = [Y[-lag] for lag in range(1, p + 1)]  # most recent first
         for s in range(horizons):
             x = np.concatenate([[1.0], *hist[:p]])
             ynew = x @ B + Ls @ rng.standard_normal(n)
