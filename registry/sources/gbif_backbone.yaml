@@ -1,0 +1,20 @@
+# V4 (agent V4BIO): GBIF Backbone Taxonomy (legacy 2023-08-28 backbone, integer keys = Wikidata P846).
+# Connector: src/reva/adapters/connectors/atlas_bio_taxonomy.py (atlas.gbif_backbone) -> KG taxa gbif:<key>.
+source_key: gbif.backbone
+title: GBIF Backbone Taxonomy (api.gbif.org + ChecklistBank dataset 53147)
+provider_url: https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c
+lineage_family: gbif
+rights:
+  licence: CC BY 4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: >-
+    GBIF Secretariat: GBIF Backbone Taxonomy. Checklist dataset https://doi.org/10.15468/39omei accessed via GBIF.org
+    and ChecklistBank (dataset 53147).
+metadata:
+  allowed_hosts: [api.gbif.org, api.checklistbank.org]
+  dataset_record: https://api.gbif.org/v1/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c
+  checklistbank_copy: https://api.checklistbank.org/dataset/53147 (gbifKey checked; version must equal GBIF pubDate)
+  listings: ChecklistBank nameusage/search (rank, status=accepted, TAXON_ID; 1,000 per page, offset <= 100,000)
+  counts: GBIF species/search facet higherTaxonKey (rank=SPECIES, status=ACCEPTED), facetLimit 50,000, partitioned
+  release_checked: backbone pubDate 2023-08-28 (GBIF announced a COL-based 2026 backbone; Wikidata P14607 holds its ids)
+  authentication: none

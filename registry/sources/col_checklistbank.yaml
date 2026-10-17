@@ -1,0 +1,17 @@
+# V4 (agent V4BIO): Catalogue of Life (latest release through ChecklistBank, 3LR).
+# Connector: src/reva/adapters/connectors/atlas_bio_taxonomy.py (atlas.col_checklist) -> KG col:<id> taxa + metrics.
+source_key: col.checklistbank
+title: Catalogue of Life checklist (ChecklistBank API, latest release)
+provider_url: https://www.catalogueoflife.org
+lineage_family: col
+rights:
+  licence: CC BY 4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: >-
+    Bánki, O. et al. Catalogue of Life (release alias and DOI recorded in every revision). Species 2000 & ITIS
+    Catalogue of Life, Leiden, Netherlands.
+metadata:
+  allowed_hosts: [api.checklistbank.org]
+  release_record: https://api.checklistbank.org/dataset/3LR
+  release_checked: COL26.10 (2026-10-14, doi:10.48580/dgzh4, ChecklistBank key 316595)
+  authentication: none (ChecklistBank exports and text trees need a login and are not used)

@@ -269,7 +269,7 @@ def kg_parts(ecos: Sequence[Ecoregion], *, raw_sha256: str, source_revision: str
                 descriptions={
                     "en": "biogeographic realm of RESOLVE Ecoregions 2017",
                     "fr": "domaine biogéographique (Écorégions RESOLVE 2017)",
-                },  # fmt: skip
+                },
                 source_revision=source_revision,
             )
         )
@@ -300,7 +300,7 @@ def atlas_source() -> Any:
         field_mappings={
             "kg": list(PIDS),
             "entities": ["resolve_eco:<ECO_ID>", "resolve_biome:<BIOME_NUM>", "resolve_realm:<REALM>"],
-        },  # fmt: skip
+        },
         notes="Two byte ranges of the release zip (central directory, dbf member); polygons never downloaded.",
     )
 

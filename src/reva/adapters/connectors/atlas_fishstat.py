@@ -144,7 +144,7 @@ def parse_release(body: bytes) -> Release:
         country_names={r["UN_Code"]: r["Name_En"] for r in cty},
         species={
             r["3A_Code"]: Species(r["3A_Code"], r["Yearbook_Group_En"].strip(), r["Major_Group"].strip()) for r in sp
-        },  # fmt: skip
+        },
         sources={r["Code"]: r["Name_En"] for r in src},
         readme_ok=True,
         rows=qty,
@@ -261,7 +261,7 @@ def atlas_rows(cells: Mapping[tuple[str, str, int], Cell], *, raw_sha256: str) -
                 "raw_sha256": raw_sha256,
                 "selector": canon(
                     {"member": "Global_production_quantity.csv", "group_by": indicator, "year": year, "country": geo}
-                ),  # fmt: skip
+                ),
             }
         )
     return rows

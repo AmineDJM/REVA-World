@@ -22,7 +22,15 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any, Literal, Protocol
 
-from reva.estimation.core import EstimationError, Grid, LhsMode, LPSpec, event_study, local_projection, permutation_placebo
+from reva.estimation.core import (
+    EstimationError,
+    Grid,
+    LhsMode,
+    LPSpec,
+    event_study,
+    local_projection,
+    permutation_placebo,
+)
 from reva.estimation.data import (
     TREATMENTS_PATH,
     EventSet,
@@ -276,7 +284,10 @@ def run_event_study(
         "replication_gate": _gate_summary(replication_report),
         "caveats": CAVEATS,
         "caveats_fr": CAVEATS_FR,
-        "rights": {"restricted_sources": restricted, "non_commercial": any(r.get("non_commercial") for r in restricted)},
+        "rights": {
+            "restricted_sources": restricted,
+            "non_commercial": any(r.get("non_commercial") for r in restricted),
+        },
         "as_of": (req.as_of or _cutoff_date(panels.cutoff)).isoformat(),
     }
     doc["result_sha256"] = canonical_sha256(doc["results"])
@@ -295,8 +306,14 @@ def _restricted_sources(panel: PanelData, events: EventSet) -> list[dict[str, An
             out.append({"series": s["series"], **r})
     note = events.treatment.notes.lower()
     if "non-commercial" in note or "not an open licence" in note:
-        out.append({"treatment": events.treatment.id, "note": events.treatment.notes, "restricted": True,
-                    "non_commercial": "non-commercial" in note})
+        out.append(
+            {
+                "treatment": events.treatment.id,
+                "note": events.treatment.notes,
+                "restricted": True,
+                "non_commercial": "non-commercial" in note,
+            }
+        )
     return out
 
 
@@ -313,7 +330,9 @@ def _gate_summary(rep: Mapping[str, Any] | None) -> dict[str, Any] | None:
     }
 
 
-def interpret(lp: Any, es: Mapping[str, Any] | None, placebo: Mapping[str, Any] | None, req: EventStudyRequest) -> dict[str, Any]:
+def interpret(
+    lp: Any, es: Mapping[str, Any] | None, placebo: Mapping[str, Any] | None, req: EventStudyRequest
+) -> dict[str, Any]:
     """Plain flags (no prose verdict of causality): significance at 5 %, pre-trend test, placebo p-values."""
     sig = [e.h for e in lp.irf if e.ci_low > 0 or e.ci_high < 0]
     pre = (es or {}).get("pretrend_test") if isinstance(es, Mapping) else None
@@ -352,7 +371,9 @@ def archive_run(engine: Any, store: Any, doc: Mapping[str, Any]) -> str:
         "non_commercial": bool(doc["rights"]["non_commercial"]),
     }
     with engine.begin() as conn:
-        return str(repo.store_json_artifact(conn, store, dict(doc), "evaluation", schema_version=RUN_SCHEMA, rights=rights))
+        return str(
+            repo.store_json_artifact(conn, store, dict(doc), "evaluation", schema_version=RUN_SCHEMA, rights=rights)
+        )
 
 
 EFFECT_TRANSFORM = {"cumsum": "percent_change", "logdiff": "percent_change", "diff": "pp_change", "level": "level"}
@@ -451,7 +472,9 @@ def effect_estimates(doc: Mapping[str, Any], *, headline_h: int | None = None) -
     ]
 
 
-def write_effect_estimates(engine: Any, store: Any, doc: Mapping[str, Any], run_sha: str, *, origin: str) -> dict[str, Any]:
+def write_effect_estimates(
+    engine: Any, store: Any, doc: Mapping[str, Any], run_sha: str, *, origin: str
+) -> dict[str, Any]:
     """Write the run's estimate(s) through PRED-EFFECT's loader (``reva.effects``). Raises ``CapabilityGap``
     when the loader is not installed yet."""
     from reva.kernel.errors import CapabilityGap
