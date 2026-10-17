@@ -1,0 +1,175 @@
+# Dataset predicates of the V6 digital-world layer (agent V6DIGITAL, docs/dev/v6_digital.md), registered in the KG
+# allow-list (kg.property / kg.property_version) by src/reva/adapters/connectors/atlas_keepiton.py and
+# atlas_cfr_cyber.py through reva.kg.model.register_properties.
+#
+# * keepiton:* = Access Now #KeepItOn STOP (Shutdown Tracker Optimization Project) coding of one shutdown instance
+#   (`keepiton:shutdown:<count_year>:<row-hash>`), verbatim; column definitions quoted from Access Now's methodology
+#   page in each statement's qualifiers.
+# * cfr_cyber:* = Council on Foreign Relations Cyber Operations Tracker coding of one incident
+#   (`cfr_cyber:operation:<title-hash>`), verbatim. The sponsor is CFR's *suspected* state sponsor ("This data set
+#   identifies suspected threat actors and their state sponsors based on what the reporting suggests"): an
+#   attribution claim of the source, never a REVA finding.
+# Nothing here is causal: a cause coded by Access Now ("Protests", "Exam cheating") is the provider's stated context
+# of the shutdown, not an estimated effect.
+version: 1
+owner: V6DIGITAL
+predicates:
+  - pid: "keepiton:shutdown_type"
+    value_kind: string
+    reva_predicate: keepiton_shutdown_type
+    label_en: "shutdown type (Access Now STOP)"
+    label_fr: "type de coupure (Access Now STOP)"
+    derived: false
+    description: STOP column shutdown_type verbatim (Shutdown, Throttle, or both).
+  - pid: "keepiton:affected_network"
+    value_kind: string
+    reva_predicate: keepiton_affected_network
+    label_en: "affected network (Access Now STOP)"
+    label_fr: "réseau touché (Access Now STOP)"
+    derived: false
+    description: STOP column affected_network verbatim (Mobile, Broadband, or both).
+  - pid: "keepiton:shutdown_extent"
+    value_kind: string
+    reva_predicate: keepiton_shutdown_extent
+    label_en: "shutdown extent (Access Now STOP)"
+    label_fr: "étendue de la coupure (Access Now STOP)"
+    derived: false
+    description: STOP column shutdown_extent verbatim (Full network, Service-based, or both).
+  - pid: "keepiton:ordered_by"
+    value_kind: string
+    reva_predicate: keepiton_ordered_by
+    label_en: "ordered by, as coded (Access Now STOP)"
+    label_fr: "ordonnée par, selon le codage (Access Now STOP)"
+    derived: false
+    description: >-
+      STOP column ordered_by verbatim (Executive government, State government, Local government, Military, Law
+      enforcement, Judiciary, Non-government, Unknown): Access Now's attribution of the order, a coded claim.
+  - pid: "keepiton:actual_cause"
+    value_kind: string
+    reva_predicate: keepiton_actual_cause
+    label_en: "context / stated cause category (Access Now STOP)"
+    label_fr: "contexte / catégorie de cause (Access Now STOP)"
+    derived: false
+    description: >-
+      STOP column actual_cause verbatim (Protests, Conflict, Exam cheating, Elections, ...): the provider's
+      categorisation of the circumstances, not a causal estimate.
+  - pid: "keepiton:gov_justification"
+    value_kind: string
+    reva_predicate: keepiton_gov_justification
+    label_en: "official justification, as coded (Access Now STOP)"
+    label_fr: "justification officielle, selon le codage (Access Now STOP)"
+    derived: false
+    description: STOP column gov_justification verbatim (the government's stated reason as categorised by Access Now).
+  - pid: "keepiton:shutdown_status"
+    value_kind: string
+    reva_predicate: keepiton_shutdown_status
+    label_en: "status at publication (Access Now STOP)"
+    label_fr: "statut à la publication (Access Now STOP)"
+    derived: false
+    description: STOP column shutdown_status verbatim (Ended, Ongoing, Unknown) as of the dataset version read.
+  - pid: "keepiton:duration_days"
+    value_kind: quantity
+    reva_predicate: keepiton_duration_days
+    label_en: "duration in days (Access Now STOP)"
+    label_fr: "durée en jours (Access Now STOP)"
+    derived: false
+    description: STOP column duration when numeric (days, as published); text durations are not served by the export.
+  - pid: "keepiton:coded_field"
+    value_kind: string
+    reva_predicate: keepiton_coded_field
+    label_en: "coded field (Access Now STOP)"
+    label_fr: "champ codé (Access Now STOP)"
+    derived: false
+    description: >-
+      Any other STOP column of the instance, verbatim; qualifier `column` names it and `definition` quotes Access
+      Now's metadata description of the column.
+  - pid: "keepiton:service_affected"
+    value_kind: item
+    reva_predicate: keepiton_service_affected
+    label_en: "service affected (Access Now STOP)"
+    label_fr: "service touché (Access Now STOP)"
+    inverse_name: keepiton_affected_by_shutdown
+    inverse_label_en: "affected by shutdown (Access Now STOP)"
+    inverse_label_fr: "touché par une coupure (Access Now STOP)"
+    derived: false
+    description: >-
+      Shutdown instance -> `keepiton:service:<column>` when the STOP column <service>_affected is "Yes" (facebook,
+      twitter, whatsapp, instagram, telegram, other, sms, phonecall). The service entity is the provider's column,
+      not a matched company or product.
+  - pid: "keepiton:source_url"
+    value_kind: string
+    reva_predicate: keepiton_source_url
+    label_en: "source link (Access Now STOP)"
+    label_fr: "lien source (Access Now STOP)"
+    derived: false
+    description: One URL of the STOP columns info_source_link / an_link (split on ';'), verbatim.
+  - pid: "cfr_cyber:suspected_state_sponsor"
+    value_kind: item
+    reva_predicate: cfr_cyber_suspected_state_sponsor
+    label_en: "suspected state sponsor, as attributed by CFR"
+    label_fr: "État commanditaire présumé, selon l'attribution du CFR"
+    inverse_name: cfr_cyber_suspected_sponsor_of
+    inverse_label_en: "suspected sponsor of cyber operation (CFR attribution)"
+    inverse_label_fr: "commanditaire présumé d'une cyberopération (attribution du CFR)"
+    derived: false
+    description: >-
+      Incident -> country named in the tracker's Sponsor column (several sponsors split on ", "), resolved through
+      the exact-name scheme cfr_cyber_country (registry/atlas/geo_aliases/v6digital.yaml) to the reviewed country QID.
+      CFR: "This data set identifies suspected threat actors and their state sponsors based on what the reporting
+      suggests". An attribution claim of the source, never established by REVA.
+  - pid: "cfr_cyber:operation_type"
+    value_kind: string
+    reva_predicate: cfr_cyber_operation_type
+    label_en: "type of cyber operation (CFR)"
+    label_fr: "type de cyberopération (CFR)"
+    derived: false
+    description: CFR column Type verbatim (Espionage, Sabotage, Denial of service, Data destruction, Defacement, Doxing, Financial Theft).
+  - pid: "cfr_cyber:victim_category"
+    value_kind: string
+    reva_predicate: cfr_cyber_victim_category
+    label_en: "victim category (CFR)"
+    label_fr: "catégorie de victime (CFR)"
+    derived: false
+    description: CFR column Category verbatim (Government, Private sector, Civil society, Military; comma-separated).
+  - pid: "cfr_cyber:victims"
+    value_kind: string
+    reva_predicate: cfr_cyber_victims
+    label_en: "victims as described (CFR)"
+    label_fr: "victimes selon la description (CFR)"
+    derived: false
+    description: CFR column Victims verbatim (free text; victim countries are not coded in the CSV download).
+  - pid: "cfr_cyber:threat_actor_as_stated"
+    value_kind: string
+    reva_predicate: cfr_cyber_threat_actor_as_stated
+    label_en: "threat actor as stated (CFR)"
+    label_fr: "acteur de la menace tel que déclaré (CFR)"
+    derived: false
+    description: CFR column Affiliations verbatim (e.g. "APT 28", "Believed to be the work of APT 28"); never matched to an entity by name.
+  - pid: "cfr_cyber:sponsor_as_stated"
+    value_kind: string
+    reva_predicate: cfr_cyber_sponsor_as_stated
+    label_en: "sponsor as stated (CFR)"
+    label_fr: "commanditaire tel que déclaré (CFR)"
+    derived: false
+    description: CFR column Sponsor verbatim.
+  - pid: "cfr_cyber:description"
+    value_kind: string
+    reva_predicate: cfr_cyber_description
+    label_en: "description (CFR)"
+    label_fr: "description (CFR)"
+    derived: false
+    description: CFR column Description verbatim (truncated at 4,000 characters, flagged).
+  - pid: "cfr_cyber:government_response"
+    value_kind: string
+    reva_predicate: cfr_cyber_government_response
+    label_en: "government response (CFR)"
+    label_fr: "réponse gouvernementale (CFR)"
+    derived: false
+    description: CFR column Response verbatim (e.g. "Criminal charges <url>", "Sanctions <url>", "Unknown").
+  - pid: "cfr_cyber:source_url"
+    value_kind: string
+    reva_predicate: cfr_cyber_source_url
+    label_en: "source link (CFR)"
+    label_fr: "lien source (CFR)"
+    derived: false
+    description: CFR columns Sources_1..Sources_3, verbatim.
