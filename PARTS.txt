@@ -1,0 +1,9 @@
+# part branch bytes (concatenate parts of one file in name order; total of dump+tar parts below)
+reva.dump.part_000 reva-data-20261017c-b2 99614720
+reva.dump.part_001 reva-data-20261017c-b2 99614720
+reva.dump.part_002 reva-data-20261017c-b2 71636131
+reva_kg_causwd.dump.part_000 reva-data-20261017c-b2 3189395
+reva_kg_wdharvest.dump.part_000 reva-data-20261017c-b2 12608648
+var_delta.tar.part_000 reva-data-20261017c-b3 95354880
+extras.tar.gz reva-data-20261017c-b1 308088
+# total bytes of the split parts: 382018494
