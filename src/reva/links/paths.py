@@ -605,31 +605,41 @@ def find_paths(graph: PathGraph, q: PathQuery, *, deadline: float | None = None)
         _constrained_search(graph, q, g, parallel, dt, res, deadline)
         return _finish(graph, q, res)
     seen_candidates = 0
+    # Yen yields paths by non-decreasing cost, but the order of equal-cost paths follows the graph's insertion
+    # order (i.e. the database row order), so unrelated rows could flip which of two equally good paths is shown.
+    # Candidates tied with the k-th kept path are therefore also collected, and the kept paths are ranked like the
+    # constrained search's: (cost, hops, node ids) (SWEEP2).
+    found: list[tuple[float, list[str]]] = []
     try:
         for nodes in nx.shortest_simple_paths(g, q.source, q.target, weight="weight"):
             seen_candidates += 1
+            # once k paths are kept, only ties are being collected: stopping then cuts nothing that was asked
             if seen_candidates > MAX_YEN_CANDIDATES:
-                res.cut(f"more than {MAX_YEN_CANDIDATES} candidate paths examined")
+                if len(found) < q.k:
+                    res.cut(f"more than {MAX_YEN_CANDIDATES} candidate paths examined")
                 break
             if _late(deadline):
-                res.cut("time budget exhausted while ranking candidate paths")
+                if len(found) < q.k:
+                    res.cut("time budget exhausted while ranking candidate paths")
                 break
             if len(nodes) - 1 > q.max_hops:
                 continue
-            hops = []
-            cost = 0.0
-            for u, v in itertools.pairwise(nodes):
-                es = parallel[(u, v)]
-                e = _best_edge(graph, es)
-                cost += g[u][v]["weight"]
-                hops.append(
-                    Hop(e, len(es) - 1, {lang: render_hop(e, graph, lang) for lang in LANGS}, hop_label(e, graph))
-                )
-            res.paths.append(Path(list(nodes), hops, cost))
-            if len(res.paths) >= q.k:
+            cost = sum(g[u][v]["weight"] for u, v in itertools.pairwise(nodes))
+            if len(found) >= q.k and cost > found[q.k - 1][0] + 1e-9:
                 break
+            found.append((cost, list(nodes)))
     except nx.NetworkXNoPath:
         pass
+    found.sort(key=lambda x: (round(x[0], 9), len(x[1]), x[1]))
+    for _cost, nodes in found[: q.k]:
+        hops = []
+        cost = 0.0
+        for u, v in itertools.pairwise(nodes):
+            es = parallel[(u, v)]
+            e = _best_edge(graph, es)
+            cost += g[u][v]["weight"]
+            hops.append(Hop(e, len(es) - 1, {lang: render_hop(e, graph, lang) for lang in LANGS}, hop_label(e, graph)))
+        res.paths.append(Path(list(nodes), hops, cost))
     return _finish(graph, q, res)
 
 

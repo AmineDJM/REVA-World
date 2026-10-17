@@ -84,7 +84,9 @@ def test_path_columbus_to_portuguese_from_db(kg) -> None:  # type: ignore[no-unt
     chain = service.path_between(kg, "Q7322", "Q5146", via=["Q180897", "BRA"], origin="test_fixture", max_hops=3)
     (path,) = chain.paths
     assert "Q180897" in path.nodes and "Q155" in path.nodes
-    assert path.text["fr"][1].startswith("Isabelle la Catholique — signataire de → traité de Tordesillas (1494-07-02)")
+    # Ferdinand and Isabella tie; equal-cost paths are ranked by node ids, not by row order (SWEEP2), so the
+    # answer is the same whatever else the session database holds (e.g. test_kg_lang_ingest's language layer)
+    assert path.text["fr"][1].startswith("Ferdinand II d'Aragon — signataire de → traité de Tordesillas (1494-07-02)")
     assert all("[wikidata.links_fixture:" in t for t in path.text["en"])
 
 

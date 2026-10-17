@@ -91,7 +91,10 @@ async def test_language_layer_fixture_ingest_paths_and_idempotence(db: Any) -> N
         res = kq.paths(c, brazil, "glottolog:indo1319", max_hops=2)
         assert res["paths"], res
         assert [h["property"]["pid"] for h in res["paths"][0]["hops"]] == ["glottolog:spoken_in", "glottolog:family"]
-        res = kq.paths(c, brazil, portugal, max_hops=2)
+        # the language layer's own hops: other tests sharing the session DB may link Brazil and Portugal or
+        # Portuguese directly (test_links_db's Wikidata fixture: P37 official language), which is shorter (SWEEP2)
+        lang_props = ["glottolog:spoken_in", "glottolog:family", "glottolog:in_group", "glottolog:wikidata_item"]
+        res = kq.paths(c, brazil, portugal, max_hops=2, allowed_properties=lang_props)
         assert any(
             [h["property"]["pid"] for h in p["hops"]] == ["glottolog:spoken_in", "glottolog:spoken_in"]
             for p in res["paths"]
@@ -99,7 +102,7 @@ async def test_language_layer_fixture_ingest_paths_and_idempotence(db: Any) -> N
         # Brazil -> Portuguese -> Romance <- French -> France (in_group hops)
         res = kq.paths(c, brazil, "glottolog:roma1334", max_hops=2)
         assert [h["property"]["pid"] for h in res["paths"][0]["hops"]] == ["glottolog:spoken_in", "glottolog:in_group"]
-        res = kq.paths(c, brazil, "Q5146", max_hops=2)
+        res = kq.paths(c, brazil, "Q5146", max_hops=2, allowed_properties=lang_props)
         assert res["paths"] and res["paths"][0]["hops"][1]["property"]["pid"] == "glottolog:wikidata_item"
         # typology is literal: no path through a shared word order
         assert not c.execute(

@@ -17,6 +17,7 @@ from reva.links.paths import PathQuery, build_graph, find_chain, find_paths
 
 COLUMBUS, TORDESILLAS, BRAZIL, PORTUGUESE, PORTUGAL = "Q7322", "Q180897", "Q155", "Q5146", "Q45"
 COLONIAL_BRAZIL, PORTUGUESE_EMPIRE, ISABELLA, KINGDOM_PT = "Q2088324", "Q200464", "Q45859", "Q45670"
+FERDINAND = "Q12860"
 USA, EISENHOWER, SUEZ, UK, COLD_WAR, RES_1514, DECOLONIZATION, UN = (
     "Q30",
     "Q9916",
@@ -108,10 +109,16 @@ def test_columbus_tordesillas_brazil_portuguese_chain(graph) -> None:
     assert res.found, res.reason
     (path,) = res.paths
     assert path.nodes[0] == COLUMBUS and path.nodes[-1] == PORTUGUESE
-    assert TORDESILLAS in path.nodes and BRAZIL in path.nodes and ISABELLA in path.nodes
+    assert TORDESILLAS in path.nodes and BRAZIL in path.nodes
+    # Isabella and Ferdinand, both P1891 signatories of Tordesillas, tie at the same cost; equal-cost paths are
+    # ranked by (cost, hops, node ids), never by graph insertion order (SWEEP2), so Ferdinand (Q12860) is shown
+    tied = find_paths(graph, PathQuery(COLUMBUS, TORDESILLAS, k=2, max_hops=3))
+    assert [p.nodes for p in tied.paths] == [[COLUMBUS, FERDINAND, TORDESILLAS], [COLUMBUS, ISABELLA, TORDESILLAS]]
+    assert tied.paths[0].cost == tied.paths[1].cost
+    assert path.nodes[1] == FERDINAND
     fr, en = path.text["fr"], path.text["en"]
-    assert fr[0].startswith("Christophe Colomb — personnalité importante → Isabelle la Catholique")
-    assert fr[1].startswith("Isabelle la Catholique — signataire de → traité de Tordesillas (1494-07-02)")
+    assert fr[0].startswith("Christophe Colomb — personnalité importante → Ferdinand II d'Aragon")
+    assert fr[1].startswith("Ferdinand II d'Aragon — signataire de → traité de Tordesillas (1494-07-02)")
     assert en[-1].startswith("Brazil — official language → Portuguese (undated in source)")
     for hop in path.hops:
         assert hop.edge.evidence and all(e.statement_id for e in hop.edge.evidence)
