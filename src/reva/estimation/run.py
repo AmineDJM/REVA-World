@@ -600,8 +600,19 @@ def write_effect_estimates(
     engine: Any, store: Any, doc: Mapping[str, Any], run_sha: str, *, origin: str
 ) -> dict[str, Any]:
     """Write the run's estimate(s) through PRED-EFFECT's loader (``reva.effects.load_effect_estimates``) as
-    ``source_kind="reva_run"`` with the archived run document as the delivery's raw artifact."""
+    ``source_kind="reva_run"`` with the archived run document as the delivery's raw artifact.
+
+    Refused (rule declared before any write): a run whose replication gate is not open on its snapshot, or whose
+    pre-trend test rejects at 10 % or has a significant placebo lead -- such runs stay archived and documented,
+    never in the effect layer."""
     from reva import effects as fx
+
+    gate = doc.get("replication_gate") or {}
+    if not gate.get("gate_open"):
+        raise ValidationProblem("run has no open replication gate on its snapshot; not written")
+    bad = {"pretrend_test_rejects_at_10pct", "placebo_lead_significant"} & set(doc["interpretation"]["flags"])
+    if bad:
+        raise ValidationProblem("pre-trend diagnostics fail; the run is archived but not written", flags=sorted(bad))
 
     rep = fx.load_effect_estimates(
         engine,

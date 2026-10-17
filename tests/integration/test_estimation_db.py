@@ -159,7 +159,7 @@ def test_run_archive_and_effect_estimate(kg, tmp_path: Path, monkeypatch: pytest
         treatment=TREATMENT.id, outcome="concept:wb.ny.gdp.mktp.kd.zg", horizons=2, n_perm=10, origin="test_fixture"
     )
     with SnapshotPanels(SNAP, tmp_path / "cache") as panels, db.api.connect() as c:
-        doc = runmod.run_event_study(req, panels, conn=c)
+        doc = runmod.run_event_study(req, panels, conn=c, replication_report={"gate_open": True, "passed": ["t"]})
     h0 = doc["results"]["local_projection"]["irf"][0]
     assert h0["point"] == pytest.approx(-2.5, abs=0.8)
     sha = runmod.archive_run(db.worker, db.store, doc)
