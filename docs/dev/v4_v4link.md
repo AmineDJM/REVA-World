@@ -170,8 +170,8 @@ item → code classifications, **6,848** identity edges (5,331 resolved to entit
   completes it; when that query times out the property's check is recorded `incomplete` in the run summary.
 * **Disk.** The shared disk sat at 4.86–5.00 GiB free from 15:40; V4LINK ran the places pack at 5,001 MiB
   (5.24 GB) and stopped below 5,000 MiB. V4LINK's own raw archive: 4.1 MB (UNSD) + 8.4 MB (QLever).
-* **Budget invariant**: `tests/invariants/test_invariant_30_budgets.py::…cover_every_connector` fails on
-  `gleif.api` (V4INDUSTRY's registered source without a budget request), not on V4LINK's sources.
+* **Budget invariant** `tests/invariants/test_invariant_30_budgets.py`: 9 passed after budgets-1.3.24 (an
+  intermediate failure on `gleif.api` was V4INDUSTRY's, since fixed).
 
 ## 7. Commands
 
