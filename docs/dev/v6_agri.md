@@ -95,7 +95,7 @@ record the supply and demand conditions as they were believed to exist at the ti
 
 ### `ifpri_er.measures` + KG events
 * 82 measures (COVID-19 workbook 44: Ban 34, Licensing 7, Announcement 2, Not Binding 1; Ukraine-crisis workbook 38:
-  Ban 28, Licensing 10), 2020-03 → 2023-12 (end dates as coded).
+  Ban 28, Licensing 10), starts 2020-03-18 → 2022-03, ends up to 2023-12-31 (end dates as coded).
 * KG: entity `ifpri_er:<covid19|ukrrus>:<Code>` kind `export_restriction`; statements `ifpri_er:imposed_by` →
   country QID (`registry/entities/country_qids.json`, by IFPRI's ISO 3166-1 alpha-3) with the start/end interval,
   P580 / P582, `ifpri_er:announced`, `ifpri_er:last_update`, `ifpri_er:measure_category`, `ifpri_er:products`,
@@ -129,9 +129,10 @@ record the supply and demand conditions as they were believed to exist at the ti
   `usda_wasde:world_rice_supply_and_use_milled_basis.rice.ending_stocks|v=2026-10` @ "India" 2025 = 59
   (published_history, Est.), 2026 = 57 (projection), available_at 2026-10-10T00:00Z; the May 2026 vintage (`-V2`
   file) holds that report's numbers for the same marketing years.
-* **Who imports from whom (fixture replay).** `fao_tm.tm_staples_asia.27|5610|partner=165` … reporter `2`
-  (Afghanistan, AFG) rice imports by partner (partner M49 / iso3 in flags). Live: `31|5910|partner=<FAO code>`
-  @ India = India's milled-rice exports to each partner, 1986-2024.
+* **Who imports from whom (fixture replay of the real first 1,500 lines).** `fao_tm.tm_staples_asia`
+  `31|5610|partner=10` @ reporter `2` (Afghanistan, iso3 AFG), 2019 = 54.95 t of milled rice imported from
+  Australia (FAO partner code 10; partner M49 / iso3 / name in flags; flag letter + meaning). Live:
+  `31|5910|partner=<FAO code>` @ India (FAO code 100) = India's milled-rice export quantity to each partner, 1986-2024.
 
 ## Loaded (dev DB) — honest status
 
@@ -150,8 +151,9 @@ behind the dev-DB lock (see "Commands"). What is verified:
 ## For PRED-ENGINE (India rice export-ban decision)
 
 * The decision's direct variable `trade.export_restriction` now has **dated events** to estimate from (82 IFPRI
-  measures, incl. rice: Viet Nam 2020 ban `covid19:61`, Cambodia, Myanmar, Kazakhstan/Kyrgyzstan cereals, Russia /
-  Ukraine 2022 grain bans), and the **inputs** an exposure model needs: exporter shares and stocks (PSD, WASDE
+  measures, incl. rice: Viet Nam ban 2020-04-10..04-30 `ifpri_er:covid19:61`, Cambodia ban 2020-04-05..05-19
+  `covid19:67`, Myanmar licensing 2020-03-18..04-30 and 2020-05-01..09-30 `covid19:90`/`93`, Pakistan food ban
+  `covid19:92`, the EAEU rice/cereal bans of April-June 2020, Russia / Ukraine / Türkiye 2022 grain measures), and the **inputs** an exposure model needs: exporter shares and stocks (PSD, WASDE
   vintages), bilateral rice flows from Asian exporters (TM), and the FAO Food Price Index (V4ECON). REVA still
   states **no effect**: an export restriction → price estimate must come from an attributed publication
   (EFFECTS-MORE added WTO / Anderson-Ivanic-Martin estimates) or a pre-registered event study; association between
