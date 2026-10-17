@@ -109,3 +109,24 @@ def test_holdout_origins_exclude_v6_dates() -> None:
     assert ho and all(t.month not in (6, 12) for t in ho)
     assert all(t.date() < S.SPLIT for t in S.origins("g7rt", "development"))
     assert not C.gdp_fair(datetime(2020, 7, 1, tzinfo=UTC)) and C.gdp_fair(datetime(2021, 7, 1, tzinfo=UTC))
+
+
+def test_seal_supplement_only_g7_family_and_attributes_the_imf_input() -> None:
+    from reva.evaluation.beat_macro import seal as SE
+
+    t = datetime(2026, 11, 1, tzinfo=UTC)
+    c = Case("g7rt", "unemployment_rate", "USA", t, "cy", "2026", None, None, 1.0,
+             info={"raw": {"bridge": 4.2, "stack": 4.1}, "stack_lambda": 0.6})  # fmt: skip
+    c.preds[C.WEO] = Predictive("point", 4.0)
+    c.preds[K.key("stack")] = Predictive("empirical", 4.1, sample=(3.9, 4.1, 4.3))
+    q = {"family": "weo.unemployment", "cycle_horizon": 0, "type": "quantity", "frequency": "A",
+         "reference_period": "2026", "question_id": "q1", "geo": "USA", "iso3": "USA"}  # fmt: skip
+    other = {**q, "question_id": "q2", "geo": "BRA", "iso3": "BRA"}
+    orig = {"questions": [q, other], "origin": "live", "cycle": "2026-Q4", "specs": {}, "data": {},
+            "families": {"weo.unemployment": {}}, "_sha256": "x"}  # fmt: skip
+    sup = SE.supplement(orig, [c], issued_at=datetime(2026, 10, 17, tzinfo=UTC), model_key=K.key("stack"),
+                        family="weo.unemployment", horizon=0)  # fmt: skip
+    assert sup is not None and [f["question_id"] for f in sup["forecasts"]] == ["q1"]
+    f = sup["forecasts"][0]
+    assert f["status"] == "issued" and "USES THE IMF FORECAST AS AN INPUT" in f["claim"]
+    assert f["inputs"]["imf_weo_projection"] == 4.0

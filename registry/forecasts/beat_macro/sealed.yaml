@@ -1,0 +1,16 @@
+# BEAT-MACRO prospective issuance (append-only). Only holdout-confirmed scopes issue.
+schema: reva-beat-macro-sealed/1
+batches:
+  - scope: g7rt|unemployment_rate|cy|forecast.bm_stack|benchmark.imf_weo|ae
+    registry_family: weo.unemployment
+    cycle: 2026-Q4
+    cycle_horizon: 0
+    target: '2026'
+    model: forecast.bm_stack@1.0.0
+    batch_sha256: 43d9d1bf046aafaf63cc6253738d1dd40a5210539388ea14b3c92257a2cd8944
+    supplement_of: 96c6ad481671 (original registry batch 1 of cycle 2026-Q4)
+    issued_at_utc: '2026-10-17'
+    questions: 7 (USA, JPN, DEU, FRA, GBR, ITA, CAN)
+    inputs: IMF WEO 2026-10 (in force; attributed input), OECD MEI edition 202608, past errors of the November bucket
+    uses_official_forecast: true
+    resolution: first WEO vintage publishing 2026 as an actual (registry rule; normally April 2027)

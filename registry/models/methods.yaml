@@ -1101,6 +1101,7 @@ models:
     assumptions: [past relative accuracy informative about the next]
   - model_key: forecast.bm_stack
     version: "1.0.0"
+    information_source: imf.weo.point
     kind: forecast
     approval_status: candidate
     description: >-
