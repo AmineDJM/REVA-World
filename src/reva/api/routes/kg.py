@@ -195,6 +195,12 @@ class KgSearchResponse(s.Envelope):
     data: KgSearch
 
 
+class KgHopFamily(s.ApiModel):
+    id: str = Field(description="Universal relation family (registry/kg/relations_v4.yaml); never causal")
+    label: dict[str, str] = Field(description="Family reading in path order, {en, fr}")
+    inverse: bool
+
+
 class KgHop(KgStatementOut):
     from_: KgRef = Field(alias="from")
     to: KgRef
@@ -206,6 +212,9 @@ class KgHop(KgStatementOut):
     wording: str
     causal_assertion: dict[str, Any] | None = Field(
         description="Set only for has cause / has effect: who asserts the causal relation"
+    )
+    family: KgHopFamily | None = Field(
+        None, description="V4 relation family of the hop read in path order (null: property mapped to no family)"
     )
 
 
@@ -497,7 +506,9 @@ def get_path(
         env["warnings"].append(
             s.ApiWarning(code="truncated", message="; ".join(res["search"]["truncation_reasons"])[:500])
         )
-    return KgPathResponse(data=KgPathResult.model_validate(res), **env)
+    from reva.kg.family_query import annotate_hops
+
+    return KgPathResponse(data=KgPathResult.model_validate(annotate_hops(res)), **env)
 
 
 def _pids(pids: list[str] | None) -> None:

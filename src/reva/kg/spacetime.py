@@ -33,10 +33,13 @@ definition); it is labelled ``basis: iso3166_2_code_prefix`` and never used to l
 from __future__ import annotations
 
 import calendar
+import json
 import re
 from collections.abc import Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date
+from functools import lru_cache
+from pathlib import Path
 from typing import Any, Literal
 
 from reva.kg.model import KgProperty, KgStatement, KgTime
@@ -365,6 +368,19 @@ def parse_place(value: str, *, level: int | None = None) -> PlaceId:
             raise ValueError(f"geoBoundaries id {v} is ADM{lv}, not level {level}")
         return PlaceId("geoboundaries", v, lv, country_iso3=m.group(1))
     raise ValueError(f"not an ISO 3166-1 alpha-3, ISO 3166-2 or geoBoundaries id: {value!r}")
+
+
+ISO3166_1_FILE = Path(__file__).resolve().parents[3] / "registry" / "reference" / "iso-codes_4.20.1_iso_3166-1.json"
+
+
+@lru_cache(maxsize=1)
+def iso2_to_iso3() -> dict[str, str]:
+    """ISO 3166-1 alpha-2 → alpha-3 from the pinned Debian iso-codes mirror (the standard's own table)."""
+    try:
+        doc = json.loads(ISO3166_1_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):  # pragma: no cover - the registry file is part of the repo
+        return {}
+    return {str(e["alpha_2"]): str(e["alpha_3"]) for e in doc.get("3166-1", []) if e.get("alpha_2")}
 
 
 def located_in_statement(

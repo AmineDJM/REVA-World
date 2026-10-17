@@ -1,0 +1,434 @@
+[
+  {
+    "request_fingerprint": "42e814bc498051e3684d09c019432b2281da6e05de7f10c65f0cb4261e9f5f30",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_climatology_tas,pr_climatology_monthly_1995-2014_median_historical_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "42e814bc498051e3.json",
+    "sha256": "e2706c993d4f15915fe345fc9cc5af808cd64b9a9491397fc684245e6062b48b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:58.858637+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "6babdf834747b1d2daf242738f6d985dd88d60a3cdcc0009732b044708d10803",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_climatology_tas,pr_climatology_monthly_2020-2039_median_ssp126_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "6babdf834747b1d2.json",
+    "sha256": "3176b092e8bb3476d63d29fd0a36d7ba8e5f93f33be46cd038d75094c3a7352a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:59.089482+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "10046290fa5d6a0fbb1491f1673a67679af7afc2dda75a560ca286a280683d11",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_climatology_tas,pr_climatology_monthly_2020-2039_median_ssp245_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "10046290fa5d6a0f.json",
+    "sha256": "2b19971035615ff66d9fb52dc58c108a75f398673301784344742df64ed9f15f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:35:02.386608+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "1bcc830c1d90995801d563b668b8286a2c1fbb8194e074c9d3ef3ee9ecf24409",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_climatology_tas,pr_climatology_monthly_2020-2039_median_ssp370_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "1bcc830c1d909958.json",
+    "sha256": "62396128252845c92a41becc8dac397b0f6f0fcbabcf45e57da5047977ffe2ee",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:35:04.993312+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "69e4e3a6178028fac8a90cca462ce6da85148853a94a9652e8595f9d11fb9367",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_climatology_tas,pr_climatology_monthly_2020-2039_median_ssp585_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "69e4e3a6178028fa.json",
+    "sha256": "f7c3242cd434d9fd0a9e740ab46311df3f64684b3dfab90e13855514f727ea57",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:35:07.636958+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "b91151b36836cbd75a65105743b3b32e5e424f177845c5e7ab49bec3744e718d",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_climatology_tas,pr_climatology_monthly_2040-2059_median_ssp126_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "b91151b36836cbd7.json",
+    "sha256": "1231c5060409611e6e1403d3db23c7a16821aae28840c521ea01d9b6dbf8995d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:59.942797+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "78ea8b6b0ce688b8b8297df5948ac08ddf76b9968d1aae2926e70053acf33281",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_climatology_tas,pr_climatology_monthly_2040-2059_median_ssp245_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "78ea8b6b0ce688b8.json",
+    "sha256": "1dbeff8b0787d9f974175417512faced834066ca2d727bf09d27dbb6fa01a7a5",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:35:02.610331+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "42e9f821063fde0febd5241e63017b05b3bf29ff577f19eebee5e427cfec44c6",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_climatology_tas,pr_climatology_monthly_2040-2059_median_ssp370_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "42e9f821063fde0f.json",
+    "sha256": "711eba7b2deac5025675873f801ed5746dc23825578572fe5a3acfc2f3dcef3c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:35:05.784222+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "d3add38f63cb9f0ae951799614daae03c3c31e1e954ef7d5effadd80e0278329",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_climatology_tas,pr_climatology_monthly_2040-2059_median_ssp585_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "d3add38f63cb9f0a.json",
+    "sha256": "3a2f0191c73ee9c68d81a78d7ee530f476a98d8af85aa8109d789dedba4d148f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:35:08.361551+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "eed93bf0238ccdebc8f43c772bacb04d6b6aa9fbd5023da2fe3681e6fd89e83c",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_climatology_tas,pr_climatology_monthly_2060-2079_median_ssp126_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "eed93bf0238ccdeb.json",
+    "sha256": "b6a660c4827ffb77b47298cad93343119bec0882b9d0072fd4d2e02c7803ed16",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:35:00.794394+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "c6952cba2521febf260d9fe600210962f7af397c7ac7786a7c7254af310d5cc4",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_climatology_tas,pr_climatology_monthly_2060-2079_median_ssp245_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "c6952cba2521febf.json",
+    "sha256": "451502c05a393d35ed5e0226fe7abf1cebd10a5558e8851f5ae95a181b75805f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:35:03.334223+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "e757526d8a1675ea513b0b2ddc9c593f492e68c9d281704d8553f77fe7aa6e42",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_climatology_tas,pr_climatology_monthly_2060-2079_median_ssp370_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "e757526d8a1675ea.json",
+    "sha256": "d722a68934180a9e7ec0bb4d0471c502789b4dd0bd0c06f3892bfc5291cb02e2",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:35:06.001600+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "3485347eecd1cabb6aaf5dbe6737fd7dfbf7dba8bcf3b617e0c21d81bde61899",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_climatology_tas,pr_climatology_monthly_2060-2079_median_ssp585_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "3485347eecd1cabb.json",
+    "sha256": "49b9bb8f31d9ace6a8035bcf1ac1db8d0b135621ec8f67c5f3db34f0ef306343",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:35:09.108350+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "57e3a4e3eced183d13668c61a9b9c7bde91defc9bcb60d6ec34e7666b34ab81e",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_climatology_tas,pr_climatology_monthly_2080-2099_median_ssp126_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "57e3a4e3eced183d.json",
+    "sha256": "4eb99a603528480c1aa165e3154e070f26883ab4e30708c588d7e0f902a1c82f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:35:01.578797+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "2b2b623d5e49578460aa5b3c6052522547a97ead19ceea6a4dceba6dc7795633",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_climatology_tas,pr_climatology_monthly_2080-2099_median_ssp245_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "2b2b623d5e495784.json",
+    "sha256": "abb49a27bea922b1860730b40c6bd85444724b74462bbd1d44b323763531498d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:35:04.127220+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "4c046d1808f201856c51855fb0d579db27cea14d6e5b730e245873d8a193ec13",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_climatology_tas,pr_climatology_monthly_2080-2099_median_ssp370_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "4c046d1808f20185.json",
+    "sha256": "16d1e60bb03927c4f84abd3b8db631885beeb38182ba6fbfb9f6fb70dcca1d66",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:35:06.803118+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "6dc1af17445b1070dfe4afd25adf49666e755d06ea5707316732da1fe615e1c7",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_climatology_tas,pr_climatology_monthly_2080-2099_median_ssp585_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "6dc1af17445b1070.json",
+    "sha256": "365467c618d80aecf185dd45565d5a676fd723b79f31908ed24d5ab919dfd285",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:35:09.284288+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "b5068c14afb0cc16cf59fa5429980b706950eb1b5f8538a3615d4bca2e5eeff5",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_timeseries_tas,pr_timeseries_annual_1950-2014_median_historical_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "b5068c14afb0cc16.json",
+    "sha256": "adfb244b0b474ecfb4abb03953a356d20c06af026acb4729da3ad02b58ff76dd",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:35.529772+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "633771a893ebd4e13ed0c1bb173320679a51a71906e52c821ee715ae560b8e68",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_timeseries_tas,pr_timeseries_annual_1950-2014_p10_historical_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "633771a893ebd4e1.json",
+    "sha256": "77d42865940d67e08d08a858e01e7e310488614ba022677bad1aecbdeda27fe6",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:38.091072+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "9962500c34a53133880170c9726c02434ae372e3caf2cea20420e58e18e3862a",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_timeseries_tas,pr_timeseries_annual_1950-2014_p90_historical_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "9962500c34a53133.json",
+    "sha256": "bf4f06558320c481cc9575fa26c37a83b168068eabdb0afc9ba0cbbffc329a8f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:50.313548+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "1d598872fe6b7884b929ffcdc2683cbe499a33d606a0efc5b95f7ba930d4873a",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_timeseries_tas,pr_timeseries_annual_2015-2100_median_ssp126_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "1d598872fe6b7884.json",
+    "sha256": "5407a256e78012e6d6fd6ebbc9c94e501bad9b3930671196381862a7f9aa2477",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:35.711815+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "f5d6cf99f913b28701b7abd765c6b8667fa5f148e46c7aefbfef11d1de7b603b",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_timeseries_tas,pr_timeseries_annual_2015-2100_median_ssp245_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "f5d6cf99f913b287.json",
+    "sha256": "038ffc188be3a70b88be98ede7d995e6c10d10496d058be25a4c2d69b996cd4b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:35.885758+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "65c2e469c5eb274cac518dd7628317e6d8e7565931ef57d868291c901d69a644",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_timeseries_tas,pr_timeseries_annual_2015-2100_median_ssp370_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "65c2e469c5eb274c.json",
+    "sha256": "7555c85fa56b46580d2b8b8dec10db975995efce9fb4387f4d1ce2a89a6013c3",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:36.140235+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "a64fa79a88a191104f95fe2e39eaaafa84790392ba2a17ee76153212a53cb935",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_timeseries_tas,pr_timeseries_annual_2015-2100_median_ssp585_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "a64fa79a88a19110.json",
+    "sha256": "051d588cf07a966c697a3e60c10bee8263a47f6a503b3a38ab6d7454e9fdddb0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:37.875779+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "e004a19db993492e51e4376b2c62a8d5e4f3909c0a4b7be3a5fe58d49b5f4a47",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_timeseries_tas,pr_timeseries_annual_2015-2100_p10_ssp126_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "e004a19db993492e.json",
+    "sha256": "ccd6fbd690676007ebb20fd4072d6b1d4a91b67ebd62d76e9970d2e2f8d53601",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:40.393060+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "8fd77f1f9c42bffe112ecca48ea84e7a4babb0f3f64f847c7f7d154e7227c6c7",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_timeseries_tas,pr_timeseries_annual_2015-2100_p10_ssp245_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "8fd77f1f9c42bffe.json",
+    "sha256": "97af04432813b3315e25e74eaa815ff3b2b3a6e4f6910046438dfa9a7255655b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:42.804518+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "39de30baf6be2f4b3ce0fe0a189b2798cc0c2935e9f7531d719bcdb1a1327dfd",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_timeseries_tas,pr_timeseries_annual_2015-2100_p10_ssp370_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "39de30baf6be2f4b.json",
+    "sha256": "72d996d20a59511594c36dbae5e1c672566a15f78739d04f3c9ccb46e830a1a7",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:45.462460+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "3ea5ede6c66eee9ff07d7ad78cd415d5dcd94ee65fa47e49c15a215e421e72d6",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_timeseries_tas,pr_timeseries_annual_2015-2100_p10_ssp585_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "3ea5ede6c66eee9f.json",
+    "sha256": "7f618aceb9d28d2a01edb68b28043dd2532e47eac9aee4d72d46a525f4161d3a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:48.014035+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "3b1629131d37a4b9c6e9c6014096b56e5182bcbb4ab3f466b29fc876e0b12018",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_timeseries_tas,pr_timeseries_annual_2015-2100_p90_ssp126_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "3b1629131d37a4b9.json",
+    "sha256": "6f2952044763f00ae79b2f55f1f2c74aa8f0e1db223445b22322d8a3bf189fd0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:52.984092+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "a1efef6e9b4cc300148b1a3445b95170d6f722c95c0ddf15cbec28be75183f51",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_timeseries_tas,pr_timeseries_annual_2015-2100_p90_ssp245_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "a1efef6e9b4cc300.json",
+    "sha256": "febca4400025cbc3018c7fa96c57f505a70053e6914638508687044b1ec8dbdc",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:55.466127+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "52f1faf0c4499c5d95ff0de2870bab90516a99f85d53855f5c0fd1f02e7600da",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_timeseries_tas,pr_timeseries_annual_2015-2100_p90_ssp370_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "52f1faf0c4499c5d.json",
+    "sha256": "01284a802f109e0200da0c812c114fc975e901c3a895e587d11256fc7934321e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:58.463928+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "5d2e4ce4ba9a1c6ddf83039771e563c1f5031faef7c011f2da9ada6274b7447e",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cmip6-x0.25_timeseries_tas,pr_timeseries_annual_2015-2100_p90_ssp585_ensemble_all_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "5d2e4ce4ba9a1c6d.json",
+    "sha256": "186a7dabeab3163a3c53f9b80cf14569ea68dadf54c1c47c750294eaf3054be8",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:58.682504+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "7ccf0dd225a2f9ba7d9b212984b2d12df5ad9f30a574ef7763b934f1273760a9",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cru-x0.5_timeseries_tas,pr_timeseries_annual_1901-2024_mean_historical_cru_ts4.09_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "7ccf0dd225a2f9ba.json",
+    "sha256": "402a982849f81d284ae701015a595c2f5df2ad56d30fd094a583941c2733e3b5",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:33.292051+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "f99755c60e4d066593fb5d4139d29ebe472c104f6de307a3d58bd3fc4b3cadba",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cru-x0.5_timeseries_tas,pr_timeseries_monthly_1901-2024_mean_historical_cru_ts4.09_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "f99755c60e4d0665.json",
+    "sha256": "4adf0f3d7965a8799f2c31cf4aa1a42b0799f01dd2a02caa6d8f77d3881f5e53",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:32.933496+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "3fbc72bf077d5a13c49d4694fbf09eaf72f0c1ed1e4c208467c2a829e77b1a23",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/era5-x0.25_timeseries_tas,pr_timeseries_annual_1950-2024_mean_historical_era5_x0.25_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "3fbc72bf077d5a13.json",
+    "sha256": "fe944ab2a878420c83cbd2ce8bf8298f0e23b3d4e1de5bb676370bab155d1e8e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:33.914149+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "44adf42c8202012ca9085a48e7e41c590e656ad5b5d69a781f6506b5c7825100",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/era5-x0.25_timeseries_tas,pr_timeseries_monthly_1950-2024_mean_historical_era5_x0.25_mean/BVT,FRA,KSV,MLI?_format=json",
+    "file": "44adf42c8202012c.json",
+    "sha256": "598d7b6a0d186002cf65f9c64c21dea69d55611b150bbe77a1b6513297447f4c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-17T13:34:33.699823+00:00",
+    "licence": "CC BY 4.0"
+  }
+]

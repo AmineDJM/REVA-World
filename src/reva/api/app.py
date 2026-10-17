@@ -230,6 +230,7 @@ def create_app(
     app.include_router(__import__("reva.api.routes.ask", fromlist=["router"]).router)  # V3 questions (NLQA)
     app.include_router(__import__("reva.api.routes.atlas", fromlist=["router"]).router)  # V3 atlas (ATLASCORE)
     app.include_router(__import__("reva.api.routes.kg", fromlist=["router"]).router)  # V3 knowledge graph (KGCORE)
+    app.include_router(__import__("reva.api.routes.kg_families", fromlist=["router"]).router)  # V4 families (V4CORE)
     app.include_router(__import__("reva.api.routes.links", fromlist=["router"]).router)  # V3 links (LINKS)
     app.include_router(__import__("reva.api.routes.events", fromlist=["router"]).router)  # V3 event view (EVENTS)
     app.include_router(__import__("reva.api.routes.causal", fromlist=["router"]).router)  # V3 causality (CAUSCORE)

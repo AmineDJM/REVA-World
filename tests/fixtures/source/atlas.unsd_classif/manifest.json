@@ -1,0 +1,57 @@
+[
+  {
+    "request_fingerprint": "9d1acbc435d712c4251df356aa9f545b14ac2dd369a29ffef3619019749c813b",
+    "url": "https://unstats.un.org/unsd/classifications/Econ/Download/In%20Text/CPC_Ver_2_1_english_structure.txt",
+    "file": "9d1acbc435d712c4.txt",
+    "sha256": "a3d03290054ddb3f974be6a40f1a2273baf3e5373db0073fadcfc3b4374fd31b",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-17T13:32:58+00:00",
+    "licence": "UN Statistics Division classification publication (UN terms of use; pending maintainer review)",
+    "note": "EXCERPT: header + every row of CPC section 0 (ISO-8859-1 bytes verbatim)",
+    "excerpt_of_sha256": "1c3e88e5fa67b9ba0d27594cb3363f717321f58fe0308be60b326ebf927c1b92"
+  },
+  {
+    "request_fingerprint": "133b31fea4c3f483404eeaad6801cba593842f469d4463bc18063cf37384136c",
+    "url": "https://unstats.un.org/unsd/classifications/Econ/Download/In%20Text/ISIC_Rev_4_english_structure.Txt",
+    "file": "133b31fea4c3f483.txt",
+    "sha256": "0d38ddb7e31697fffe086ba47ec04f5bee9ccedcac2e5bdcd392a3e1cb349371",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-17T13:32:56+00:00",
+    "licence": "UN Statistics Division classification publication (UN terms of use; pending maintainer review)",
+    "note": "EXCERPT: header + sections A and B (all their divisions/groups/classes), verbatim lines of the live file",
+    "excerpt_of_sha256": "18b645efc5a0b001fda5852cfd0690eb579011651e405631e50cb2d271ee2cc6"
+  },
+  {
+    "request_fingerprint": "99a5887ac043a493c7e9ec1be47dbca4367177e9732fa2cbb4fb3552aa231be1",
+    "url": "https://unstats.un.org/unsd/classifications/Econ/tables/CPC/CPCv21_ISIC4/cpc21-isic4.txt",
+    "file": "99a5887ac043a493.txt",
+    "sha256": "0fe09f86bf53070ee1f29bd9c59e58c47ae65ae3a245fb1911c269e47cc8af95",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-17T13:33:00+00:00",
+    "licence": "UN Statistics Division classification publication (UN terms of use; pending maintainer review)",
+    "note": "EXCERPT: header + every correspondence row of CPC section 0",
+    "excerpt_of_sha256": "0272188c086fb5d8efa3923749cc7b5a1bd5a12e7719843d26c2f2b38ea2f392"
+  },
+  {
+    "request_fingerprint": "675b985a299b27b04ba61d814209d20339b0a39c9c197f03b88cc5aeb367891e",
+    "url": "https://unstats.un.org/unsd/classifications/Econ/tables/CPC/CPCv21_ISIC4/readme.txt",
+    "file": "675b985a299b27b0.txt",
+    "sha256": "213503bb85da882a79de1e1b5e37e5347323d9194c809690d014469c979ddd67",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-17T13:33:02+00:00",
+    "licence": "UN Statistics Division classification publication (UN terms of use; pending maintainer review)",
+    "note": "full live file"
+  }
+]

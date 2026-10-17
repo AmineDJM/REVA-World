@@ -1,0 +1,22 @@
+# V4 (agent V4INDUSTRY): UNSD Classifications Registry (ISIC Rev.4, CPC Ver.2.1, CPC 2.1 - ISIC 4 correspondence),
+# connector atlas.unsd_classif (KG industries and products).
+source_key: unsd.classifications
+title: UN Statistics Division - Classifications Registry (economic and social classifications)
+provider_url: https://unstats.un.org/unsd/classifications/Econ
+lineage_family: unsd_classifications
+rights:
+  licence: "UN Statistics Division classification publication (UN terms of use; pending maintainer review)"
+  licence_url: https://www.un.org/en/about-us/terms-of-use
+  attribution: "United Nations Statistics Division, Classifications Registry (unstats.un.org/unsd/classifications)"
+  review: >-
+    pending maintainer review: the download pages carry no dataset licence; ISIC and CPC are international statistical
+    standards adopted by the UN Statistical Commission and published for free use, while the general UN website terms
+    restrict redistribution of materials. Flagged on every statement (licence_status un_terms_of_use_pending_review).
+metadata:
+  allowed_hosts: [unstats.un.org]
+  authentication: none
+  files:
+    - Download/In Text/ISIC_Rev_4_english_structure.Txt
+    - Download/In Text/CPC_Ver_2_1_english_structure.txt
+    - tables/CPC/CPCv21_ISIC4/cpc21-isic4.txt (+ readme.txt)
+  cadence: rarely revised (ISIC Rev.5 published 2024-2026; Rev.4 kept as the basis of TiVA/ICIO and most national data)

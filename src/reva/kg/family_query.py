@@ -321,3 +321,87 @@ def family_paths(
     if not allowed and not res.get("found"):
         res["not_found_reason"] = f"no source property is mapped to the families {fams} yet"
     return annotate_hops(res, reg)
+
+
+# ---------------------------------------------------------------------------------------------- places
+MAX_PLACE_DEPTH = 6
+
+
+def entity_places(
+    conn: Connection, qid: str, *, origin: str | None = None, reg: FamilyRegistry | None = None
+) -> dict[str, Any]:
+    """Where an entity is: the evidenced ``located_in`` chain upward (ADM2 → ADM1 → country …), coordinates
+    (P625) of the entity and of each level, and the ISO3 of the country level when the reviewed registry has it.
+    """
+    from reva.kg import spacetime as stime
+
+    kq._check_qid(qid)
+    kq._check_origin(origin)
+    reg = reg or registry()
+    up = sorted(p for p, d in reg.properties_for({"located_in"}) if d == "out")
+    edges: list[dict[str, Any]] = []
+    frontier = {qid}
+    seen = {qid}
+    for _ in range(MAX_PLACE_DEPTH):
+        if not frontier:
+            break
+        rows = [
+            dict(r)
+            for r in conn.execute(
+                text(f"""SELECT s.subject_qid, s.property_pid, s.object_qid, s.statement_key, s.source_key,
+                                s.origin FROM kg.statement_current s
+                          WHERE s.subject_qid = ANY(:f) AND s.property_pid = ANY(:p) AND s.object_qid IS NOT NULL
+                            {kq._origin_sql(origin)}
+                          ORDER BY s.id LIMIT 500"""),
+                {"f": sorted(frontier), "p": up, "origin": origin},
+            ).mappings()
+        ]
+        edges += rows
+        frontier = {r["object_qid"] for r in rows} - seen
+        seen |= frontier
+    reg_iso3 = kq.country_qid_registry()
+    by_iso2 = {i2: reg_iso3.get(i3, f"iso3:{i3}") for i2, i3 in stime.iso2_to_iso3().items()}
+    # the chain prefers administrative containment; a generic "location" (P276) is used only when nothing else
+    order = [*stime.ADMIN_ORDER, *sorted(set(up) - set(stime.ADMIN_ORDER))]
+    chain = stime.place_chain(qid, edges, located_in_pids=order, max_depth=MAX_PLACE_DEPTH, country_by_iso2=by_iso2)
+    nodes = [s.qid for s in chain]
+    labels = kq.labels_for(conn, nodes)
+    kinds = kq.kinds_for(conn, nodes)
+    coords: dict[str, dict[str, Any]] = {}
+    for r in conn.execute(
+        text(f"""SELECT s.subject_qid, s.value, s.statement_key, s.source_key FROM kg.statement_current s
+                  WHERE s.subject_qid = ANY(:n) AND s.property_pid = 'P625' AND s.value IS NOT NULL
+                    {kq._origin_sql(origin)} ORDER BY s.subject_qid, (s.rank = 'preferred') DESC, s.id"""),
+        {"n": nodes, "origin": origin},
+    ).mappings():
+        v = r["value"] or {}
+        if r["subject_qid"] in coords or "latitude" not in v or "longitude" not in v:
+            continue
+        coords[r["subject_qid"]] = {"latitude": v["latitude"], "longitude": v["longitude"],
+                                    "statement_key": r["statement_key"], "source_key": r["source_key"]}  # fmt: skip
+    iso3_by_qid = {q: i for i, q in reg_iso3.items()}
+    out_chain = []
+    for s in chain:
+        iso3 = iso3_by_qid.get(s.qid) or (s.qid.split(":", 1)[1] if s.qid.startswith("iso3:") else None)
+        out_chain.append(
+            {
+                "entity": kq._ref(s.qid, labels, kinds),
+                "level": s.level,
+                "via": s.via,
+                "statement_key": s.statement_key,
+                "basis": s.basis,
+                "iso3": iso3,
+                "coordinates": coords.get(s.qid),
+            }
+        )
+    return {
+        "qid": qid,
+        "label": kq._display(qid, labels),
+        "chain": out_chain,
+        "levels": stime.chain_levels(chain),
+        "country_iso3": next((c["iso3"] for c in out_chain if c["iso3"]), None),
+        "coordinates": coords.get(qid),
+        "located_in_properties": up,
+        "note": "Each level is an evidenced located_in statement (or, for an ISO 3166-2 code without a stated "
+        "parent, the country its code prefix names). Nothing is inferred from names or geometry here.",
+    }

@@ -1,0 +1,129 @@
+# Evidence rules for V4 identifier bridges (owner: V4LINK; code: src/reva/adapters/connectors/v4link_common.py,
+# loader: src/reva/adapters/connectors/atlas_v4link_wikidata.py). Spec: docs/roadmap/v4_world_model.md (V4LINK row).
+#
+# A bridge is created ONLY from an identifier that a source publishes. Here the source is Wikidata (CC0,
+# community-edited): an item holding identifier A (e.g. ChEBI 15377) is linked to that identifier by the statement
+#     chebi:15377 --v4link:wikidata_item--> Q283
+# and an item holding two identifiers (ChEBI 15377 and PubChem CID 962) is the evidence that the two
+# identifiers name the same thing: chebi:15377 -> Q283 <- pubchem_cid:962 (two identity hops through the item).
+# Never by name or label similarity, never by date. Same machinery as the event same_as rules
+# (registry/events/same_as_rules.yaml), applied to non-event entities:
+#   * `max_items_per_value: 1` -- a value held by several Wikidata items is AMBIGUOUS (reported, never linked):
+#     linking it would merge the items;
+#   * `one_value_per_holder: true` -- an item holding several values of one property (two ChEBI ids, a range and
+#     a code of ICD-10) is ambiguous for that property (reported, never linked): linking it would merge the values;
+#   * only best-rank statements are read (preferred when the item has one, else normal; deprecated never);
+#   * a value that does not match `value_re` is reported (`malformed`), never repaired by guessing.
+# `relation: identity` writes v4link:wikidata_item (scheme id -> item, evidence of identity).
+# `relation: classification` writes v4link:classified_as (item -> classification code): Wikidata states the code
+#   OF the item (e.g. crude oil -> HS 2022 code 2709); a product/industry/occupation item is classified under the
+#   code, it is not the code itself. Several codes per item are allowed there (one_value_per_holder: false), a code
+#   on several items too (max_items_per_value: null).
+# `prefix` is the KG entity id prefix of the scheme. Domain agents (V4CHEM, V4BIO, V4HEALTH, V4INDUSTRY, V4ECON)
+# own the entities; a bridge to an id they have not loaded is kept and counted as `unresolved` in the report until
+# they load it. If an owner keys its entities differently, change `prefix`/`normalize` here (one place) and
+# re-run `uv run reva atlas ingest atlas.v4link_wikidata`: the old statements are retracted, the new ones loaded.
+#
+# Changelog: 1 (2026-10-17, V4LINK) first rules.
+version: 1
+packs:
+  # One WDQS query per pack (budget key wikidata.wdqs). `require_two` = the item must hold values of at least two
+  # DIFFERENT properties of the pack (only bridging items are fetched); `min_sitelinks` bounds the size of huge
+  # packs (a size filter, documented in the report: items below it are simply not fetched, never "not the same").
+  - id: places
+    properties: [P300, P605]
+    require_two: false
+    with_country: true
+    note: "ISO 3166-2 subdivisions and NUTS regions (all items); the item's P17 country is loaded with them."
+  - id: classifications
+    properties: [P5471, P11373, P1796, P4496, P8283]
+    require_two: false
+    note: "Wikidata items classified under HS 2022, CPC 2.1, ISIC Rev.4, NACE Rev.2, ISCO-08 codes (all items)."
+  - id: health
+    properties: [P494, P7329, P7807, P5270, P699]
+    require_two: true
+    note: "Disease items holding two or more of ICD-10, ICD-11 (MMS / Foundation), MONDO, Disease Ontology."
+  - id: anatomy
+    properties: [P1554]
+    require_two: false
+    note: "UBERON anatomy items (all) -- the bridge from UBERON to Wikidata items (P927 anatomical location etc.)."
+  - id: chemistry
+    properties: [P683, P662]
+    require_two: true
+    min_sitelinks: 10
+    note: "Compounds holding ChEBI and PubChem CID with >= 10 sitelinks (152k items hold both; bounded for disk)."
+  - id: taxa
+    properties: [P846, P685]
+    require_two: true
+    min_sitelinks: 30
+    note: "Taxa holding GBIF (legacy backbone key) and NCBI taxon with >= 30 sitelinks (596k hold both; bounded)."
+  - id: genes
+    properties: [P354, P351]
+    require_two: true
+    min_sitelinks: 3
+    note: "Human genes holding HGNC and NCBI Gene ids with >= 3 sitelinks (43.6k hold both; bounded)."
+  - id: companies
+    properties: [P1278, P5531]
+    require_two: true
+    note: "Organisations holding a Legal Entity Identifier and a SEC Central Index Key (2.2k items)."
+rules:
+  - {property: P300, label: "ISO 3166-2 code", prefix: "iso3166_2:", relation: identity, kind_hint: region_adm1,
+     value_re: "^[A-Z]{2}-[A-Z0-9]{1,3}$", one_value_per_holder: true, max_items_per_value: 1}
+  - {property: P605, label: "NUTS code", prefix: "nuts:", relation: identity, kind_hint: region_nuts,
+     value_re: "^[A-Z]{2}[A-Z0-9]{0,3}$", one_value_per_holder: true, max_items_per_value: 1,
+     note: "Wikidata does not tie P605 to a NUTS version; the NUTS version (2016/2021/2024) is recorded as qualifiers when present."}
+  - {property: P5471, label: "2022 Harmonized System Code", prefix: "hs2022:", relation: classification,
+     normalize: strip_dots, value_re: "^[0-9]{2}([0-9]{2}([0-9]{2})?)?$", one_value_per_holder: false}
+  - {property: P11373, label: "Central Product Classification Code version 2.1", prefix: "cpc21:",
+     relation: classification, value_re: "^[0-9]{1,5}$", one_value_per_holder: false}
+  - {property: P1796, label: "International Standard Industrial Classification code Rev.4", prefix: "isic4:",
+     relation: classification, value_re: "^([A-U]|[0-9]{2,4})$", one_value_per_holder: false}
+  - {property: P4496, label: "NACE code rev.2", prefix: "nace2:", relation: classification,
+     value_re: "^([A-U]|[0-9]{2}(\\.[0-9]{1,2})?)$", one_value_per_holder: false}
+  - {property: P8283, label: "ISCO-08 occupation class", prefix: "isco08:", relation: classification,
+     value_re: "^[0-9]{1,4}$", one_value_per_holder: false}
+  - {property: P494, label: "ICD-10 ID", prefix: "icd10:", relation: identity, kind_hint: disease,
+     value_re: "^([IVXL]{1,5}|[A-Z][0-9]{2}(\\.[0-9A-Z]{1,4})?(-[A-Z][0-9]{2}(\\.[0-9A-Z]{1,4})?)?)$",
+     note: "Roman-numeral values are ICD-10 chapters (e.g. 'I'), kept as stated.",
+     one_value_per_holder: true, max_items_per_value: 1}
+  - {property: P7329, label: "ICD-11 ID (MMS)", prefix: "icd11:", relation: identity, kind_hint: disease,
+     value_re: "^[0-9A-Z]{2,4}(\\.[0-9A-Z]{1,4})?(-[0-9A-Z]{2,4}(\\.[0-9A-Z]{1,4})?)?$", one_value_per_holder: true,
+     max_items_per_value: 1}
+  - {property: P7807, label: "ICD-11 ID (Foundation)", prefix: "icd11f:", relation: identity, kind_hint: disease,
+     value_re: "^[0-9]{3,12}$", one_value_per_holder: true, max_items_per_value: 1}
+  - {property: P5270, label: "Mondo ID", prefix: "mondo:", relation: identity, kind_hint: disease,
+     normalize: strip_prefix_mondo, value_re: "^[0-9]{7}$", one_value_per_holder: true, max_items_per_value: 1}
+  - {property: P699, label: "Disease Ontology ID", prefix: "doid:", relation: identity, kind_hint: disease,
+     normalize: strip_prefix_doid, value_re: "^[0-9]{1,8}$", one_value_per_holder: true, max_items_per_value: 1}
+  - {property: P1554, label: "UBERON ID", prefix: "uberon:", relation: identity, kind_hint: anatomical_structure,
+     normalize: strip_prefix_uberon, value_re: "^[0-9]{7}$", one_value_per_holder: true, max_items_per_value: 1}
+  - {property: P683, label: "ChEBI ID", prefix: "chebi:", relation: identity, kind_hint: compound,
+     normalize: strip_prefix_chebi, value_re: "^[0-9]{1,7}$", one_value_per_holder: true, max_items_per_value: 1}
+  - {property: P662, label: "PubChem CID", prefix: "pubchem_cid:", relation: identity, kind_hint: compound,
+     value_re: "^[1-9][0-9]{0,11}$", one_value_per_holder: true, max_items_per_value: 1}
+  - {property: P846, label: "GBIF taxon key (legacy backbone, Wikidata 'GBIF-species-ID (before 2026 update)')",
+     prefix: "gbif:", relation: identity, kind_hint: taxon, value_re: "^[1-9][0-9]{0,11}$",
+     one_value_per_holder: true, max_items_per_value: 1,
+     note: >-
+       Wikidata renamed P846 'before 2026 update' and created P14607 'GBIF taxon ID' (571 items hold it with NCBI on
+       2026-10-17). V4BIO decides which GBIF key its taxa carry; P14607 is inactive until then.}
+  - {property: P14607, label: "GBIF taxon ID (2026 backbone)", prefix: "gbif2026:", relation: identity,
+     kind_hint: taxon, value_re: "^[A-Za-z0-9]{1,24}$", one_value_per_holder: true, max_items_per_value: 1,
+     status: inactive}
+  - {property: P685, label: "NCBI taxonomy ID", prefix: "ncbitaxon:", relation: identity, kind_hint: taxon,
+     value_re: "^[1-9][0-9]{0,9}$", one_value_per_holder: true, max_items_per_value: 1}
+  - {property: P354, label: "HGNC ID", prefix: "hgnc:", relation: identity, kind_hint: gene,
+     normalize: strip_prefix_hgnc, value_re: "^[1-9][0-9]{0,6}$", one_value_per_holder: true, max_items_per_value: 1}
+  - {property: P351, label: "Entrez Gene ID", prefix: "ncbigene:", relation: identity, kind_hint: gene,
+     value_re: "^[1-9][0-9]{0,11}$", one_value_per_holder: true, max_items_per_value: 1}
+  - {property: P1278, label: "Legal Entity Identifier", prefix: "lei:", relation: identity, kind_hint: company,
+     value_re: "^[A-Z0-9]{18}[0-9]{2}$", one_value_per_holder: true, max_items_per_value: 1}
+  - {property: P5531, label: "Central Index Key (SEC EDGAR)", prefix: "sec_cik:", relation: identity,
+     kind_hint: company, normalize: strip_leading_zeros, value_re: "^[1-9][0-9]{0,9}$", one_value_per_holder: true,
+     max_items_per_value: 1,
+     note: "EDGAR pads CIKs to 10 digits; the key drops the padding (the value as stated is kept as a qualifier)."}
+  - {property: P13333, label: "Global Energy Monitor Wiki ID", prefix: "gem_wiki:", relation: identity,
+     kind_hint: facility, value_re: "^.+$", one_value_per_holder: true, max_items_per_value: 1, status: inactive,
+     note: >-
+       13,809 items hold a GEM wiki page title (spaces, accents, punctuation), which is not a valid KG key; GEM
+       tracker rows carry the wiki URL, so V4ENERGY can bridge once a key encoding is agreed (owner decision).}

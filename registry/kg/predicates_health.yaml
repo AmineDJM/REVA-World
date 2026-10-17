@@ -1,0 +1,122 @@
+# Dataset predicates of the human-body / disease layer (owner: V4HEALTH). Not Wikidata properties: they are
+# registered in the KG allow-list (kg.property / kg.property_version) by the connectors themselves through
+# reva.kg.model.register_properties (src/reva/adapters/connectors/health_obo_common.py), like the language layer
+# (registry/kg/predicates_lang.yaml). Families: registry/kg/relations_v4.d/v4health.yaml.
+#
+# Honesty:
+# * Every statement is what the ontology / dataset file states, axiom by axiom (selector = file + term + relation
+#   + filler). Nothing is inferred (no reasoner is run), nothing is matched by name.
+# * NO predicate here is causal. An ontology relation that the Relation Ontology (RO) itself classifies under
+#   "causally related to" (RO:0002410) -- e.g. "disease has infectious agent", "has material basis in germline
+#   mutation in", DOID "has material basis in" (IDO:0000664, defined by DOID as "Relating the disease to it's
+#   causation") -- is never a KG link: it is delivered to the causal loader as an attributed T1 claim
+#   (docs/dev/v4_v4health.md, "Causal axioms").
+# * gene-disease validity (ClinGen) is an association with a curated evidence classification, never causation.
+# * A connection through these statements is a connection, not a cause (KGCORE path wording).
+#
+# `ro`: the Relation Ontology id the ontology file maps the relation to (definition quoted verbatim from the
+# archived ro.obo in the report). `family`: the V4 relation family (informative; the binding mapping is the
+# relations_v4.d drop-in).
+
+version: 1
+owner: V4HEALTH
+predicates:
+  # ------------------------------------------------------------------ UBERON (anatomy, human view) + CL
+  - {pid: "uberon:subclass_of", value_kind: item, reva_predicate: uberon_subclass_of, family: is_a,
+     label_en: "is a (UBERON is_a)", label_fr: "est un(e) (UBERON is_a)",
+     inverse_name: uberon_superclass_of, inverse_label_en: "has subclass (UBERON)", inverse_label_fr: "a pour sous-classe (UBERON)"}
+  - {pid: "uberon:part_of", value_kind: item, reva_predicate: uberon_part_of, family: part_of, ro: "BFO:0000050",
+     label_en: "is part of (UBERON)", label_fr: "fait partie de (UBERON)",
+     inverse_name: uberon_has_part_inverse, inverse_label_en: "has part (UBERON, inverse of part of)", inverse_label_fr: "comprend (UBERON, inverse de « fait partie de »)"}
+  - {pid: "uberon:has_part", value_kind: item, reva_predicate: uberon_has_part, family: has_part, ro: "BFO:0000051",
+     label_en: "has part (UBERON)", label_fr: "comprend (UBERON)",
+     inverse_name: uberon_part_of_inverse, inverse_label_en: "is part of (UBERON, inverse of has part)", inverse_label_fr: "fait partie de (UBERON, inverse de « comprend »)"}
+  - {pid: "uberon:located_in", value_kind: item, reva_predicate: uberon_located_in, family: located_in, ro: "RO:0001025",
+     label_en: "is located in (UBERON)", label_fr: "est situé(e) dans (UBERON)",
+     inverse_name: uberon_location_of, inverse_label_en: "is the location of (UBERON)", inverse_label_fr: "est le lieu de (UBERON)"}
+  - {pid: "uberon:develops_from", value_kind: item, reva_predicate: uberon_develops_from, family: context, ro: "RO:0002202",
+     label_en: "develops from (UBERON)", label_fr: "se développe à partir de (UBERON)",
+     inverse_name: uberon_develops_into, inverse_label_en: "develops into (UBERON)", inverse_label_fr: "se développe en (UBERON)"}
+  - {pid: "uberon:xref", value_kind: external_id, reva_predicate: uberon_xref,
+     label_en: "database cross-reference (UBERON xref)", label_fr: "référence croisée (xref UBERON)"}
+  - {pid: "uberon:definition", value_kind: string, reva_predicate: uberon_definition,
+     label_en: "definition (UBERON, verbatim)", label_fr: "définition (UBERON, verbatim, en anglais)"}
+  # ------------------------------------------------------------------ Human Disease Ontology (DOID)
+  - {pid: "doid:subclass_of", value_kind: item, reva_predicate: doid_subclass_of, family: is_a,
+     label_en: "is a (Disease Ontology is_a)", label_fr: "est un(e) (Disease Ontology is_a)",
+     inverse_name: doid_superclass_of, inverse_label_en: "has subclass (Disease Ontology)", inverse_label_fr: "a pour sous-classe (Disease Ontology)"}
+  - {pid: "doid:has_location", value_kind: item, reva_predicate: doid_disease_has_location, family: located_in, ro: "RO:0004026",
+     label_en: "disease has location (Disease Ontology)", label_fr: "a pour localisation (maladie, Disease Ontology)",
+     inverse_name: doid_location_of_disease, inverse_label_en: "is the location of the disease (Disease Ontology)", inverse_label_fr: "est la localisation de la maladie (Disease Ontology)"}
+  - {pid: "doid:has_symptom", value_kind: item, reva_predicate: doid_has_symptom, family: associated_with, ro: "RO:0002452",
+     label_en: "has symptom (Disease Ontology)", label_fr: "a pour symptôme (Disease Ontology)",
+     inverse_name: doid_symptom_of, inverse_label_en: "is a symptom of (Disease Ontology)", inverse_label_fr: "est un symptôme de (Disease Ontology)"}
+  - {pid: "doid:has_phenotype", value_kind: item, reva_predicate: doid_has_phenotype, family: associated_with, ro: "RO:0002200",
+     label_en: "has phenotype (Disease Ontology)", label_fr: "a pour phénotype (Disease Ontology)",
+     inverse_name: doid_phenotype_of, inverse_label_en: "is a phenotype of (Disease Ontology)", inverse_label_fr: "est un phénotype de (Disease Ontology)"}
+  - {pid: "doid:has_feature", value_kind: item, reva_predicate: doid_disease_has_feature, family: associated_with, ro: "RO:0004029",
+     label_en: "disease has feature (Disease Ontology)", label_fr: "a pour caractéristique (maladie, Disease Ontology)",
+     inverse_name: doid_feature_of_disease, inverse_label_en: "is a feature of the disease (Disease Ontology)", inverse_label_fr: "est une caractéristique de la maladie (Disease Ontology)"}
+  - {pid: "doid:transmitted_by", value_kind: item, reva_predicate: doid_transmitted_by, family: context, ro: "RO:0002451",
+     label_en: "transmitted by (Disease Ontology)", label_fr: "transmis(e) par (Disease Ontology)",
+     inverse_name: doid_transmits, inverse_label_en: "transmits (Disease Ontology)", inverse_label_fr: "transmet (Disease Ontology)"}
+  - {pid: "doid:derives_from", value_kind: item, reva_predicate: doid_derives_from, family: context, ro: "RO:0001000",
+     label_en: "derives from (Disease Ontology; e.g. cancer -> cell type of origin)", label_fr: "dérive de (Disease Ontology ; p. ex. cancer -> type cellulaire d'origine)",
+     inverse_name: doid_derivation_of, inverse_label_en: "is the origin of (Disease Ontology)", inverse_label_fr: "est l'origine de (Disease Ontology)"}
+  - {pid: "doid:onset_during", value_kind: item, reva_predicate: doid_existence_starts_during, family: occurs_during, ro: "RO:0002488",
+     label_en: "existence starts during (Disease Ontology; onset)", label_fr: "commence pendant (Disease Ontology ; début)",
+     inverse_name: doid_onset_period_of, inverse_label_en: "is the onset period of (Disease Ontology)", inverse_label_fr: "est la période de début de (Disease Ontology)"}
+  - {pid: "doid:adjacent_to", value_kind: item, reva_predicate: doid_adjacent_to, family: context, ro: "RO:0002220",
+     label_en: "adjacent to (Disease Ontology)", label_fr: "adjacent(e) à (Disease Ontology)",
+     inverse_name: doid_adjacent_to_inverse, inverse_label_en: "adjacent to (Disease Ontology, inverse)", inverse_label_fr: "adjacent(e) à (Disease Ontology, inverse)"}
+  - {pid: "doid:has_origin", value_kind: item, reva_predicate: doid_has_origin, family: context, ro: "so#has_origin",
+     label_en: "has origin (Disease Ontology, SO relation)", label_fr: "a pour origine (Disease Ontology, relation SO)",
+     inverse_name: doid_origin_of, inverse_label_en: "is the origin of (Disease Ontology, SO relation)", inverse_label_fr: "est l'origine de (Disease Ontology, relation SO)"}
+  - {pid: "doid:xref", value_kind: external_id, reva_predicate: doid_xref,
+     label_en: "database cross-reference (Disease Ontology xref: ICD-10-CM, ICD-9-CM, ICD-11, MeSH, OMIM, ORDO, UMLS, NCIt, SNOMED CT, GARD ...)",
+     label_fr: "référence croisée (xref Disease Ontology : CIM-10-CM, CIM-9-CM, CIM-11, MeSH, OMIM, ORDO, UMLS, NCIt, SNOMED CT, GARD ...)"}
+  - {pid: "doid:definition", value_kind: string, reva_predicate: doid_definition,
+     label_en: "definition (Disease Ontology, verbatim)", label_fr: "définition (Disease Ontology, verbatim, en anglais)"}
+  # ------------------------------------------------------------------ Mondo Disease Ontology (MONDO)
+  - {pid: "mondo:subclass_of", value_kind: item, reva_predicate: mondo_subclass_of, family: is_a,
+     label_en: "is a (Mondo is_a)", label_fr: "est un(e) (Mondo is_a)",
+     inverse_name: mondo_superclass_of, inverse_label_en: "has subclass (Mondo)", inverse_label_fr: "a pour sous-classe (Mondo)"}
+  - {pid: "mondo:has_location", value_kind: item, reva_predicate: mondo_disease_has_location, family: located_in, ro: "RO:0004026",
+     label_en: "disease has location (Mondo)", label_fr: "a pour localisation (maladie, Mondo)",
+     inverse_name: mondo_location_of_disease, inverse_label_en: "is the location of the disease (Mondo)", inverse_label_fr: "est la localisation de la maladie (Mondo)"}
+  - {pid: "mondo:inflammation_site", value_kind: item, reva_predicate: mondo_disease_has_inflammation_site, family: located_in, ro: "RO:0004027",
+     label_en: "disease has inflammation site (Mondo)", label_fr: "a pour site d'inflammation (maladie, Mondo)",
+     inverse_name: mondo_inflammation_site_of, inverse_label_en: "is the inflammation site of (Mondo)", inverse_label_fr: "est le site d'inflammation de (Mondo)"}
+  - {pid: "mondo:has_feature", value_kind: item, reva_predicate: mondo_disease_has_feature, family: associated_with, ro: "RO:0004029",
+     label_en: "disease has feature (Mondo; incl. 'major feature')", label_fr: "a pour caractéristique (maladie, Mondo ; y c. « caractéristique majeure »)",
+     inverse_name: mondo_feature_of_disease, inverse_label_en: "is a feature of the disease (Mondo)", inverse_label_fr: "est une caractéristique de la maladie (Mondo)"}
+  - {pid: "mondo:has_characteristic", value_kind: item, reva_predicate: mondo_has_characteristic, family: context, ro: "RO:0000053",
+     label_en: "has characteristic (Mondo)", label_fr: "a pour attribut (Mondo)",
+     inverse_name: mondo_characteristic_of, inverse_label_en: "is a characteristic of (Mondo)", inverse_label_fr: "est un attribut de (Mondo)"}
+  - {pid: "mondo:part_of", value_kind: item, reva_predicate: mondo_part_of, family: part_of, ro: "BFO:0000050",
+     label_en: "is part of (Mondo)", label_fr: "fait partie de (Mondo)",
+     inverse_name: mondo_has_part_inverse, inverse_label_en: "has part (Mondo, inverse)", inverse_label_fr: "comprend (Mondo, inverse)"}
+  - {pid: "mondo:shares_features_of", value_kind: item, reva_predicate: mondo_disease_shares_features_of, family: associated_with,
+     label_en: "disease shares features of (Mondo)", label_fr: "partage des caractéristiques de (maladie, Mondo)",
+     inverse_name: mondo_features_shared_by, inverse_label_en: "has features shared by (Mondo)", inverse_label_fr: "a des caractéristiques partagées par (Mondo)"}
+  - {pid: "mondo:responds_to", value_kind: item, reva_predicate: mondo_disease_responds_to, family: associated_with,
+     label_en: "disease responds to (Mondo)", label_fr: "répond à (maladie, Mondo)",
+     inverse_name: mondo_response_of_disease, inverse_label_en: "is responded to by the disease (Mondo)", inverse_label_fr: "suscite une réponse de la maladie (Mondo)"}
+  - {pid: "mondo:in_taxon", value_kind: item, reva_predicate: mondo_in_taxon, family: context, ro: "RO:0002162",
+     label_en: "in taxon (Mondo; non-human animal disease)", label_fr: "dans le taxon (Mondo ; maladie animale non humaine)",
+     inverse_name: mondo_taxon_of_disease, inverse_label_en: "taxon of the disease (Mondo)", inverse_label_fr: "taxon de la maladie (Mondo)"}
+  - {pid: "mondo:equivalent_doid", value_kind: item, reva_predicate: mondo_equivalent_doid,
+     label_en: "equivalent Disease Ontology class (Mondo xref annotated MONDO:equivalentTo)",
+     label_fr: "classe équivalente de la Disease Ontology (xref Mondo annotée MONDO:equivalentTo)",
+     inverse_name: doid_equivalent_mondo, inverse_label_en: "equivalent Mondo class (Mondo xref MONDO:equivalentTo)", inverse_label_fr: "classe Mondo équivalente (xref Mondo MONDO:equivalentTo)"}
+  - {pid: "mondo:xref", value_kind: external_id, reva_predicate: mondo_xref,
+     label_en: "database cross-reference (Mondo xref: ICD-10 WHO, ICD-10-CM, ICD-11 foundation, OMIM, Orphanet, MeSH, UMLS, NCIt)",
+     label_fr: "référence croisée (xref Mondo : CIM-10 OMS, CIM-10-CM, fondation CIM-11, OMIM, Orphanet, MeSH, UMLS, NCIt)"}
+  - {pid: "mondo:definition", value_kind: string, reva_predicate: mondo_definition,
+     label_en: "definition (Mondo, verbatim)", label_fr: "définition (Mondo, verbatim, en anglais)"}
+  # ------------------------------------------------------------------ ClinGen gene-disease validity
+  - {pid: "clingen:gene_disease_validity", value_kind: item, reva_predicate: clingen_gene_disease_validity, family: associated_with,
+     label_en: "gene-disease validity curation (ClinGen; association with an evidence classification, not causation)",
+     label_fr: "validité gène-maladie (ClinGen ; association avec classement de preuve, pas une causalité)",
+     inverse_name: clingen_disease_gene_validity, inverse_label_en: "gene curated for this disease (ClinGen gene-disease validity)",
+     inverse_label_fr: "gène évalué pour cette maladie (validité gène-maladie ClinGen)"}

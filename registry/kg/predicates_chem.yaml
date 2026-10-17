@@ -1,0 +1,141 @@
+# Dataset predicates of the chemistry & physics-of-matter layer (owner: V4CHEM). Not Wikidata properties: the
+# connectors register them in the KG allow-list (kg.property / kg.property_version) through
+# reva.kg.model.register_properties, like predicates_lang.yaml / predicates_polity.yaml. WDHARVEST's
+# registry/kg/properties.yaml (Wikidata only) is not touched; the Wikidata properties this layer needs are
+# requested in registry/kg/property_requests/v4chem.yaml.
+#
+# Entity keys (all provider identifiers, never REVA-made names):
+#   element:<Z>           a chemical element, keyed by its atomic number Z (IUPAC: the atomic number *is* the
+#                         element's identity); labels from PubChem's periodic table.          kind chemical_element
+#   nuclide:<Z>-<A>[m..]  a nuclide (isotope; isomers m, m2, ... as the AMDC/NUBASE names them), Z from the element
+#                         page it is listed on, A and the isomer suffix from the AMDC nuclide symbol.   kind isotope
+#   pubchem:cid:<n>       a PubChem compound (CID).                                              kind compound
+#   chebi:<n>             a ChEBI entity (CHEBI:<n>); kind compound / chemical_class / chemical_role /
+#                         chemical_element / isotope / mineral (see atlas_chem_chebi.chebi_kind).
+#   codata:<slug>         a CODATA recommended value (NIST); slug = the NIST quantity name lower-cased with
+#                         runs of non-alphanumerics replaced by "_" (the verbatim name is the entity label).
+#                                                                                                kind physical_constant
+#
+# Honesty:
+# * Every statement is what one source states. PubChem element pages aggregate several contributors (IUPAC CIAAW,
+#   AMDC/IAEA, NIST PML, Jefferson Lab, Los Alamos National Laboratory, IUPAC IPTEI); each statement records which one
+#   (qualifier provided_by = PubChem Reference.SourceName) and that contributor's licence URL / note. IUPAC IPTEI is
+#   CC BY-NC-ND 4.0 (non-commercial, no derivatives): flagged licence_noncommercial on every such statement.
+# * *_formula_element (made_of) statements are read from a source's molecular formula: the element symbols and
+#   counts are the formula's (symbols are IUPAC identifiers resolved through the PubChem periodic table, never names);
+#   mass_share is COMPUTED by REVA (count x standard atomic weight from the same release / the formula mass) and
+#   carries qualifier computed_by=reva with its inputs.
+# * Half-lives are kept verbatim; *_seconds companions are unit conversions computed by REVA (computed_by=reva).
+# * ChEBI relations are ChEBI's (release number in each statement). None of these predicates is causal.
+version: 1
+owner: V4CHEM
+predicates:
+  # ------------------------------------------------------------------ elements (PubChem periodic table / pages)
+  - {pid: "pubchem:element_symbol", value_kind: string, reva_predicate: pubchem_element_symbol, label_en: "element symbol (PubChem periodic table)", label_fr: "symbole de l'élément (tableau périodique PubChem)", family: context}
+  - {pid: "pubchem:atomic_mass", value_kind: quantity, reva_predicate: pubchem_atomic_mass, label_en: "atomic mass, u (PubChem periodic table)", label_fr: "masse atomique, u (tableau périodique PubChem)", family: measured_by}
+  - {pid: "pubchem:electron_configuration", value_kind: string, reva_predicate: pubchem_electron_configuration, label_en: "electron configuration (PubChem periodic table)", label_fr: "configuration électronique (tableau périodique PubChem)", family: context}
+  - {pid: "pubchem:electronegativity", value_kind: quantity, reva_predicate: pubchem_electronegativity, label_en: "electronegativity, Pauling scale (PubChem periodic table)", label_fr: "électronégativité, échelle de Pauling (tableau périodique PubChem)", family: measured_by}
+  - {pid: "pubchem:atomic_radius", value_kind: quantity, reva_predicate: pubchem_atomic_radius, label_en: "atomic radius, pm (PubChem periodic table)", label_fr: "rayon atomique, pm (tableau périodique PubChem)", family: measured_by}
+  - {pid: "pubchem:ionization_energy", value_kind: quantity, reva_predicate: pubchem_ionization_energy, label_en: "first ionization energy, eV (PubChem periodic table)", label_fr: "première énergie d'ionisation, eV (tableau périodique PubChem)", family: measured_by}
+  - {pid: "pubchem:electron_affinity", value_kind: quantity, reva_predicate: pubchem_electron_affinity, label_en: "electron affinity, eV (PubChem periodic table)", label_fr: "affinité électronique, eV (tableau périodique PubChem)", family: measured_by}
+  - {pid: "pubchem:oxidation_states", value_kind: string, reva_predicate: pubchem_oxidation_states, label_en: "oxidation states (PubChem periodic table)", label_fr: "états d'oxydation (tableau périodique PubChem)", family: context}
+  - {pid: "pubchem:standard_state", value_kind: string, reva_predicate: pubchem_standard_state, label_en: "standard state (PubChem periodic table)", label_fr: "état standard (tableau périodique PubChem)", family: context}
+  - {pid: "pubchem:melting_point", value_kind: quantity, reva_predicate: pubchem_melting_point, label_en: "melting point, K (PubChem periodic table)", label_fr: "point de fusion, K (tableau périodique PubChem)", family: measured_by}
+  - {pid: "pubchem:boiling_point", value_kind: quantity, reva_predicate: pubchem_boiling_point, label_en: "boiling point, K (PubChem periodic table)", label_fr: "point d'ébullition, K (tableau périodique PubChem)", family: measured_by}
+  - {pid: "pubchem:density", value_kind: quantity, reva_predicate: pubchem_density, label_en: "density, g/cm3 (PubChem periodic table)", label_fr: "masse volumique, g/cm3 (tableau périodique PubChem)", family: measured_by}
+  - {pid: "pubchem:group_block", value_kind: string, reva_predicate: pubchem_group_block, label_en: "group / block (PubChem periodic table)", label_fr: "groupe / bloc (tableau périodique PubChem)", family: context}
+  - pid: "pubchem:year_discovered"
+    value_kind: string
+    reva_predicate: pubchem_year_discovered
+    label_en: "year discovered (PubChem periodic table)"
+    label_fr: "année de découverte (tableau périodique PubChem)"
+    family: occurs_during
+    description: >-
+      The YearDiscovered cell verbatim ("1774", "Ancient"); a 4-digit year is also the statement's point_in_time
+      (year precision). Who discovered the element is not in this table (Wikidata P61 discoverer and the verbatim
+      history texts below carry it, attributed).
+  - {pid: "pubchem:atomic_weight", value_kind: quantity, reva_predicate: pubchem_atomic_weight, label_en: "atomic weight, u (as given by one PubChem contributor)", label_fr: "poids atomique, u (selon un contributeur PubChem)", family: measured_by}
+  - {pid: "pubchem:crustal_abundance", value_kind: quantity, reva_predicate: pubchem_crustal_abundance, label_en: "estimated abundance in the Earth's crust, mg/kg (PubChem: Jefferson Lab)", label_fr: "abondance estimée dans la croûte terrestre, mg/kg (PubChem : Jefferson Lab)", family: measured_by}
+  - {pid: "pubchem:oceanic_abundance", value_kind: quantity, reva_predicate: pubchem_oceanic_abundance, label_en: "estimated abundance in the Earth's oceans, mg/L (PubChem: Jefferson Lab)", label_fr: "abondance estimée dans les océans, mg/L (PubChem : Jefferson Lab)", family: measured_by}
+  - pid: "pubchem:history_text"
+    value_kind: monolingualtext
+    reva_predicate: pubchem_history_text
+    label_en: "history of discovery and use (verbatim text, PubChem contributor)"
+    label_fr: "histoire de la découverte et de l'usage (texte verbatim, contributeur PubChem)"
+    family: discovered_by
+    description: >-
+      One statement per paragraph of the element page's History section, verbatim, with the contributor
+      (CIAAW, Jefferson Lab, LANL) and its licence. REVA does not extract discoverer names from the text (that would
+      be name matching); structured discoverers come from Wikidata P61 (community-edited) when harvested.
+  # ------------------------------------------------------------------ nuclides (AMDC/NUBASE and CIAAW/NIST via PubChem)
+  - {pid: "pubchem:isotope_of", value_kind: item, reva_predicate: isotope_of, label_en: "is a nuclide of the element", label_fr: "est un nucléide de l'élément", inverse_name: has_isotope, inverse_label_en: "has nuclide", inverse_label_fr: "a pour nucléide", family: is_a}
+  - {pid: "pubchem:mass_number", value_kind: quantity, reva_predicate: mass_number, label_en: "mass number A (from the AMDC nuclide symbol)", label_fr: "nombre de masse A (symbole AMDC du nucléide)", family: context}
+  - {pid: "pubchem:nuclide_mass", value_kind: quantity, reva_predicate: pubchem_nuclide_mass, label_en: "atomic mass of the nuclide, u (contributor named in provided_by)", label_fr: "masse atomique du nucléide, u (contributeur indiqué)", family: measured_by}
+  - {pid: "pubchem:half_life", value_kind: string, reva_predicate: pubchem_half_life, label_en: "half-life as published (AMDC via PubChem)", label_fr: "demi-vie telle que publiée (AMDC via PubChem)", family: measured_by}
+  - {pid: "pubchem:half_life_seconds", value_kind: quantity, reva_predicate: pubchem_half_life_seconds, label_en: "half-life in seconds (unit conversion computed by REVA from the AMDC value)", label_fr: "demi-vie en secondes (conversion d'unité calculée par REVA)", family: measured_by}
+  - {pid: "pubchem:nuclide_discovery_year", value_kind: time, reva_predicate: nuclide_discovery_year, label_en: "year the nuclide was discovered (AMDC via PubChem)", label_fr: "année de découverte du nucléide (AMDC via PubChem)", family: occurs_during}
+  - {pid: "pubchem:decay_mode", value_kind: string, reva_predicate: pubchem_decay_mode, label_en: "decay mode and intensity, % (AMDC via PubChem, verbatim)", label_fr: "mode de désintégration et intensité, % (AMDC via PubChem, verbatim)", family: context}
+  - {pid: "pubchem:isotopic_abundance", value_kind: quantity, reva_predicate: pubchem_isotopic_abundance, label_en: "natural isotopic abundance, mole fraction (CIAAW or NIST via PubChem)", label_fr: "abondance isotopique naturelle, fraction molaire (CIAAW ou NIST via PubChem)", family: measured_by}
+  # ------------------------------------------------------------------ compounds (PubChem PUG-REST)
+  - {pid: "pubchem:molecular_formula", value_kind: string, reva_predicate: pubchem_molecular_formula, label_en: "molecular formula (PubChem)", label_fr: "formule moléculaire (PubChem)", family: context}
+  - {pid: "pubchem:molecular_weight", value_kind: quantity, reva_predicate: pubchem_molecular_weight, label_en: "molecular weight, g/mol (PubChem, computed by PubChem)", label_fr: "masse molaire, g/mol (PubChem, calculée par PubChem)", family: measured_by}
+  - {pid: "pubchem:exact_mass", value_kind: quantity, reva_predicate: pubchem_exact_mass, label_en: "exact mass, Da (PubChem, computed by PubChem)", label_fr: "masse exacte, Da (PubChem, calculée par PubChem)", family: measured_by}
+  - {pid: "pubchem:iupac_name", value_kind: string, reva_predicate: pubchem_iupac_name, label_en: "IUPAC name (PubChem, computed by Lexichem)", label_fr: "nom IUPAC (PubChem, calculé par Lexichem)", family: context}
+  - {pid: "pubchem:inchikey", value_kind: external_id, reva_predicate: inchikey, label_en: "InChIKey (PubChem)", label_fr: "InChIKey (PubChem)", family: context}
+  - {pid: "pubchem:formal_charge", value_kind: quantity, reva_predicate: pubchem_formal_charge, label_en: "formal charge (PubChem)", label_fr: "charge formelle (PubChem)", family: context}
+  - pid: "pubchem:formula_element"
+    value_kind: item
+    reva_predicate: pubchem_made_of_element
+    label_en: "is made of the element (from the PubChem molecular formula)"
+    label_fr: "est composé de l'élément (formule moléculaire PubChem)"
+    inverse_name: pubchem_element_in
+    inverse_label_en: "element present in (PubChem molecular formula)"
+    inverse_label_fr: "élément présent dans (formule moléculaire PubChem)"
+    family: made_of
+    description: >-
+      One statement per element symbol of the PubChem MolecularFormula; qualifiers atom_count (from the formula),
+      mass_share (computed by REVA = atom_count x PubChem periodic-table atomic mass / sum over the formula; decimal
+      string, 6 significant digits), computed_by=reva, formula verbatim.
+  - pid: "pubchem:chebi_deposit"
+    value_kind: item
+    reva_predicate: pubchem_standardises_chebi
+    label_en: "is PubChem's standardised compound for the ChEBI deposit"
+    label_fr: "est le composé standardisé PubChem du dépôt ChEBI"
+    inverse_name: chebi_standardised_as_pubchem
+    inverse_label_en: "ChEBI deposit standardised by PubChem as"
+    inverse_label_fr: "dépôt ChEBI standardisé par PubChem en"
+    family: context
+    description: >-
+      PubChem's own link: the ChEBI substance (PubChem source "ChEBI", registry id CHEBI:<n>, SID) is standardised
+      to this CID (PUG-REST substance/sourceid/ChEBI/.../cids and .../xrefs/RegistryID joined on SID). An
+      identifier crosswalk published by PubChem, not a name match.
+  # ------------------------------------------------------------------ ChEBI ontology (release N)
+  - {pid: "chebi:is_a", value_kind: item, reva_predicate: chebi_is_a, label_en: "is a (ChEBI)", label_fr: "est un (ChEBI)", inverse_name: chebi_has_subclass, inverse_label_en: "has subclass (ChEBI)", inverse_label_fr: "a pour sous-classe (ChEBI)", family: is_a}
+  - {pid: "chebi:has_part", value_kind: item, reva_predicate: chebi_has_part, label_en: "has part (ChEBI)", label_fr: "a pour partie (ChEBI)", inverse_name: chebi_part_of, inverse_label_en: "is part of (ChEBI)", inverse_label_fr: "est une partie de (ChEBI)", family: has_part}
+  - {pid: "chebi:has_role", value_kind: item, reva_predicate: chebi_has_role, label_en: "has role (ChEBI)", label_fr: "a pour rôle (ChEBI)", inverse_name: chebi_role_of, inverse_label_en: "is the role of (ChEBI)", inverse_label_fr: "est le rôle de (ChEBI)", family: is_a}
+  - {pid: "chebi:has_functional_parent", value_kind: item, reva_predicate: chebi_has_functional_parent, label_en: "has functional parent (ChEBI)", label_fr: "a pour parent fonctionnel (ChEBI)", inverse_name: chebi_functional_parent_of, inverse_label_en: "is functional parent of (ChEBI)", inverse_label_fr: "est parent fonctionnel de (ChEBI)", family: context}
+  - {pid: "chebi:has_parent_hydride", value_kind: item, reva_predicate: chebi_has_parent_hydride, label_en: "has parent hydride (ChEBI)", label_fr: "a pour hydrure parent (ChEBI)", inverse_name: chebi_parent_hydride_of, inverse_label_en: "is parent hydride of (ChEBI)", inverse_label_fr: "est hydrure parent de (ChEBI)", family: context}
+  - {pid: "chebi:is_conjugate_acid_of", value_kind: item, reva_predicate: chebi_is_conjugate_acid_of, label_en: "is conjugate acid of (ChEBI)", label_fr: "est l'acide conjugué de (ChEBI)", inverse_name: chebi_conjugate_acid_is, inverse_label_en: "has conjugate acid (ChEBI)", inverse_label_fr: "a pour acide conjugué (ChEBI)", family: context}
+  - {pid: "chebi:is_conjugate_base_of", value_kind: item, reva_predicate: chebi_is_conjugate_base_of, label_en: "is conjugate base of (ChEBI)", label_fr: "est la base conjuguée de (ChEBI)", inverse_name: chebi_conjugate_base_is, inverse_label_en: "has conjugate base (ChEBI)", inverse_label_fr: "a pour base conjuguée (ChEBI)", family: context}
+  - {pid: "chebi:is_enantiomer_of", value_kind: item, reva_predicate: chebi_is_enantiomer_of, label_en: "is enantiomer of (ChEBI)", label_fr: "est l'énantiomère de (ChEBI)", inverse_name: chebi_enantiomer_is, inverse_label_en: "has enantiomer (ChEBI)", inverse_label_fr: "a pour énantiomère (ChEBI)", family: context}
+  - {pid: "chebi:is_tautomer_of", value_kind: item, reva_predicate: chebi_is_tautomer_of, label_en: "is tautomer of (ChEBI)", label_fr: "est le tautomère de (ChEBI)", inverse_name: chebi_tautomer_is, inverse_label_en: "has tautomer (ChEBI)", inverse_label_fr: "a pour tautomère (ChEBI)", family: context}
+  - {pid: "chebi:is_substituent_group_from", value_kind: item, reva_predicate: chebi_is_substituent_group_from, label_en: "is substituent group from (ChEBI)", label_fr: "est un groupe substituant issu de (ChEBI)", inverse_name: chebi_substituent_group_is, inverse_label_en: "has substituent group (ChEBI)", inverse_label_fr: "a pour groupe substituant (ChEBI)", family: context}
+  - {pid: "chebi:formula", value_kind: string, reva_predicate: chebi_formula, label_en: "formula (ChEBI)", label_fr: "formule (ChEBI)", family: context}
+  - {pid: "chebi:mass", value_kind: quantity, reva_predicate: chebi_mass, label_en: "average mass, Da (ChEBI)", label_fr: "masse moyenne, Da (ChEBI)", family: measured_by}
+  - {pid: "chebi:charge", value_kind: quantity, reva_predicate: chebi_charge, label_en: "net charge (ChEBI)", label_fr: "charge nette (ChEBI)", family: context}
+  - {pid: "chebi:definition", value_kind: monolingualtext, reva_predicate: chebi_definition, label_en: "definition (ChEBI, verbatim)", label_fr: "définition (ChEBI, verbatim)", family: context}
+  - pid: "chebi:formula_element"
+    value_kind: item
+    reva_predicate: chebi_made_of_element
+    label_en: "is made of the element (from the ChEBI formula)"
+    label_fr: "est composé de l'élément (formule ChEBI)"
+    inverse_name: chebi_element_in
+    inverse_label_en: "element present in (ChEBI formula)"
+    inverse_label_fr: "élément présent dans (formule ChEBI)"
+    family: made_of
+    description: >-
+      As pubchem:formula_element, from the ChEBI chemical_data formula (only plain formulas: no R groups, no
+      polymer "n" subscripts, no isotope labels; others are reported as unparsed). atom_count from the formula;
+      mass_share computed by REVA from PubChem periodic-table atomic masses.
+  # ------------------------------------------------------------------ CODATA (NIST)
+  - {pid: "codata:value", value_kind: quantity, reva_predicate: codata_value, label_en: "CODATA recommended value (NIST)", label_fr: "valeur recommandée CODATA (NIST)", family: measured_by}
