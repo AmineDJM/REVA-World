@@ -12,6 +12,7 @@ const PAD = { l: 52, r: 12, t: 12, b: 28 };
  */
 export function FanChart({ periods, unit, label }: { periods: PeriodValue[]; unit: string; label: string }) {
   const { drawn, missing } = bands(periods);
+  const levels = periods.some((p) => p.scenario_level);
   const xs = periods.map((p) => p.period);
   const x = (i: number) => PAD.l + (xs.length <= 1 ? (W - PAD.l - PAD.r) / 2 : (i * (W - PAD.l - PAD.r)) / (xs.length - 1));
   const lo = Math.min(0, ...drawn.map((d) => d.p05));
@@ -87,6 +88,7 @@ export function FanChart({ periods, unit, label }: { periods: PeriodValue[]; uni
               <th scope="col">5 %</th>
               <th scope="col">médiane</th>
               <th scope="col">95 %</th>
+              {levels && <th scope="col">niveau scénario (médiane)</th>}
             </tr>
           </thead>
           <tbody>
@@ -94,7 +96,7 @@ export function FanChart({ periods, unit, label }: { periods: PeriodValue[]; uni
               <tr key={p.period}>
                 <th scope="row">{p.period}</th>
                 {p.missing_reason ? (
-                  <td colSpan={3} className="v5-missing">
+                  <td colSpan={levels ? 4 : 3} className="v5-missing">
                     non calculé : {missingFr(p.missing_reason)}
                   </td>
                 ) : (
@@ -102,6 +104,7 @@ export function FanChart({ periods, unit, label }: { periods: PeriodValue[]; uni
                     <td>{fmt(p.p05)}</td>
                     <td>{fmt(p.p50)}</td>
                     <td>{fmt(p.p95)}</td>
+                    {levels && <td title={p.scenario_level?.note ?? undefined}>{p.scenario_level ? fmt(p.scenario_level.p50) : '—'}</td>}
                   </>
                 )}
               </tr>
