@@ -29,6 +29,9 @@ MODELS: dict[str, tuple[str, str]] = {
     "forecast.beat_agri_rev": ("1.0.0", "rev"),
     "forecast.beat_agri_wx": ("1.0.0", "wx"),
 }
+#: cases.compute_candidates also fills a wx point for other corn/soybean series (it keys on the crop only); those
+#: are outside every pre-registered wx cell (never scored) and are not issued here.
+WX_SERIES = ("us.corn.yield", "us.corn.production", "us.soybeans.yield", "us.soybeans.production")
 QUANTILES = (0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95)
 
 
@@ -91,7 +94,10 @@ def build_batch(
                 keys = [k for k in confirmed if k.split("|")[2] == m and q["series"] in C.GROUPS[k.split("|")[0]]
                         and k.split("|")[1] == rec["window"]]  # fmt: skip
                 status = ("confirmed on the holdout: " + ", ".join(keys)) if keys else "NOT confirmed on the holdout"
-                f = _forecast(q, mk, rec["points"].get(m), rec["sds"].get(m),
+                point, sd = rec["points"].get(m), rec["sds"].get(m)
+                if m == "wx" and q["series"] not in WX_SERIES:
+                    point = sd = None  # protocol: wx is defined for U.S. corn/soybeans yield and production only
+                f = _forecast(q, mk, point, sd,
                               f"REVA correction of the WASDE projection (uses USDA's number); {status}")  # fmt: skip
             fs.append(f)
     return {

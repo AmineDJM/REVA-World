@@ -179,3 +179,27 @@ def test_sealed_batch_labels_and_question_ids() -> None:
     assert "NOT confirmed" in lab[qw["question_id"]]
     ref = next(x for x in b["forecasts"] if x["model"] == "forecast.reference_usda_wasde")
     assert "predictive" not in ref and "USDA" in ref["attribution"]
+
+
+def test_wx_issued_only_on_us_corn_soybeans_yield_production() -> None:
+    from reva.evaluation.beat_agri import seal as SE
+
+    rec = {
+        "series": "world.corn.production",
+        "marketing_year": 2026,
+        "k": 5,
+        "window": "mid",
+        "release": "2026-10-09",
+        "truth_rule": "x",
+        "wasde_point": 1.0,
+        "points": {"wx": 1.1, "bc": 1.0, "rev": 1.0},
+        "sds": {"wx": 0.1},
+    }
+    b = SE.build_batch(
+        {"release_in_force": "2026-10-09", "records": [rec]},
+        now=datetime(2026, 10, 18, tzinfo=UTC),
+        confirmed=[],
+        pins={},
+    )
+    wx = next(f for f in b["forecasts"] if f["model"] == "forecast.beat_agri_wx")
+    assert wx["status"] == "abstained"
