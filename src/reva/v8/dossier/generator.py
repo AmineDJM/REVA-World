@@ -427,6 +427,7 @@ def build_document(
             summary.append(r.sentence(f"summary.{s.id}.missing", s.missing, {})[0])
     for nc in t.not_covered:
         not_covered.append(M.NotCovered(what=nc.what, reason=nc.reason, section=None))
+    _renumber(notes, summary, sections)
     title, _ = r.sentence("title", t.title, {})
     subtitle, _ = r.sentence("subtitle", t.subtitle, {})
     fns = notes.list()
@@ -475,6 +476,55 @@ def build_document(
             timings_ms=dict(ctx.timings),
         ),
     )
+
+
+def _renumber(notes: Notes, summary: list[M.Sentence], sections: list[M.Section]) -> None:
+    """Footnotes numbered in reading order (summary first, then sections), in place."""
+    order: dict[int, int] = {}
+
+    def see(n: int | None) -> None:
+        if n is not None and n not in order:
+            order[n] = len(order) + 1
+
+    def parts_of(b: M.Block) -> list[M.Part]:
+        if isinstance(b, M.ParagraphBlock):
+            return [p for x in b.sentences for p in x.parts]
+        if isinstance(b, M.ListBlock):
+            return [p for x in b.items for p in x.parts]
+        if isinstance(b, M.TableBlock):
+            return [p for row in b.rows for c in row for p in c.parts]
+        return []
+
+    allparts = [p for x in summary for p in x.parts]
+    for sec in sections:
+        for b in sec.blocks:
+            if isinstance(b, M.ChartBlock):
+                for cs in b.series:
+                    see(cs.fn)
+            for p in parts_of(b):
+                see(p.fn)
+            allparts += parts_of(b)
+    for p in [p for x in summary for p in x.parts]:
+        see(p.fn)
+    # summary first: rebuild the order with summary notes leading
+    lead = [p.fn for x in summary for p in x.parts if p.fn is not None]
+    final: dict[int, int] = {}
+    for n in [*lead, *order]:
+        if n not in final:
+            final[n] = len(final) + 1
+    for f in notes.by_key.values():
+        if f.n not in final:
+            final[f.n] = len(final) + 1
+    for p in allparts:
+        if p.fn is not None:
+            p.fn = final[p.fn]
+    for sec in sections:
+        for b in sec.blocks:
+            if isinstance(b, M.ChartBlock):
+                for cs in b.series:
+                    cs.fn = final[cs.fn]
+    for f in notes.by_key.values():
+        f.n = final[f.n]
 
 
 def _count_values(summary: list[M.Sentence], sections: list[M.Section]) -> int:

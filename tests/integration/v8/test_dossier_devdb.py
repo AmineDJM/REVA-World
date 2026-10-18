@@ -78,8 +78,10 @@ def test_showcase_brief(gen: object, kind: str, sid: str) -> None:
                         assert all(p.fn in fns for p in c.parts if p.t == "value")
             if isinstance(b, M.ChartBlock):
                 assert all(s.fn in fns for s in b.series)
-    nums = [p for s in _sentences(doc) for p in s.parts if p.t == "value" and p.exact and re.fullmatch(r"-?[\d.]+", p.exact)]
-    assert all(fns[p.fn].licence or fns[p.fn].source.startswith("reva") for p in nums if p.fn)  # type: ignore[index]
+    nums = [
+        p for s in _sentences(doc) for p in s.parts if p.t == "value" and p.exact and re.fullmatch(r"-?[\d.]+", p.exact)
+    ]
+    assert all(fns[p.fn].licence or fns[p.fn].source.startswith("reva") for p in nums if p.fn)
     assert doc.not_covered, "every brief states what it does not cover"
     md, html = to_markdown(doc), to_html(doc)
     assert all(f"[^{f.n}]:" in md and f'id="fn{f.n}"' in html for f in doc.footnotes)

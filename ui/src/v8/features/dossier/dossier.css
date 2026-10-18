@@ -131,7 +131,7 @@
 
 /* tables */
 .dos-table-box { overflow-x: auto; margin: 8px 0 16px; }
-.dos-table { border-collapse: collapse; width: 100%; font-family: var(--v8-font-sans, system-ui); font-size: var(--v8-text-sm, 12.5px); line-height: 1.45; }
+.dos-table { overflow-wrap: normal; border-collapse: collapse; width: 100%; font-family: var(--v8-font-sans, system-ui); font-size: var(--v8-text-sm, 12.5px); line-height: 1.45; }
 .dos-table caption { text-align: left; font-family: var(--dos-serif); font-style: italic; color: var(--v8-fg-muted, #565d6a); font-size: 14px; padding-bottom: 4px; }
 .dos-table th { text-align: left; font-weight: 600; border-bottom: 1.5px solid var(--v8-fg, #15171c); padding: 5px 8px; }
 .dos-table td { border-bottom: 1px solid var(--v8-border, #e2e4e8); padding: 5px 8px; vertical-align: top; }

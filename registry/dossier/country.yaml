@@ -7,7 +7,7 @@ label: Pays
 resolver: country
 id_pattern: "^[A-Za-z]{3}$"
 title: "{$subject}"
-subtitle: "Dossier pays · {$iso3}"
+subtitle: "Dossier pays"
 honesty:
   - "Chaque nombre est la valeur que publie sa source (note en bas de page : source, licence, période, référence de l'artefact) ; la meilleure source disponible suit l'ordre déclaré par l'atlas, sans mélange ni imputation."
   - "Une valeur absente est écrite « manquant » avec sa raison : elle n'est jamais remplacée par zéro."

@@ -206,7 +206,7 @@ function Toc({ doc }: { doc: DossierDoc }) {
     [doc],
   );
   return (
-    <details className="dos-toc" open>
+    <details className="dos-toc" open={typeof window === 'undefined' || !window.matchMedia || window.matchMedia('(min-width: 1040px)').matches}>
       <summary>Sommaire</summary>
       <ol>
         {items.map((it) => (
