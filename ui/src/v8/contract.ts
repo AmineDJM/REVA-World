@@ -46,6 +46,13 @@ export const v8Links = {
   ask: (q: string) => `/v8/demander?${new URLSearchParams({ q }).toString()}`,
   decision: (ref?: string) => (ref ? `/v8/decision?${new URLSearchParams({ ref }).toString()}` : '/v8/decision'),
   scoreboard: (track?: string) => (track ? `/v8/scores?track=${encodeURIComponent(track)}` : '/v8/scores'),
+  /** Comparer: repeated `s` (series keys as Monde/Comparer use them) and comma-joined ISO3 `g`. */
+  compare: (series: string[], geos: string[]) => {
+    const p = new URLSearchParams();
+    for (const s of series) p.append('s', s);
+    if (geos.length) p.set('g', geos.join(','));
+    return `/v8/comparer?${p.toString()}`;
+  },
   path: (from: string, to: string) => `/v8/liens?${new URLSearchParams({ from, to }).toString()}`,
   board: (id: string) => `/v8/tableaux/${encodeURIComponent(id)}`,
 };
