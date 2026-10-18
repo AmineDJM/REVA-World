@@ -34,7 +34,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.ncei_cag"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 PARSER_VERSION = "atlas_ncei_cag/1"
 SOURCE_KEY = "noaa.ncei_cag"
 ATLAS_SOURCE = "ncei_cag"

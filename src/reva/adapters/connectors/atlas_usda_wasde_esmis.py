@@ -53,7 +53,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.usda_wasde_esmis"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 PARSER_VERSION = "atlas_usda_wasde_esmis/1"
 SOURCE_KEY = "usda.wasde_esmis"
 ATLAS_SOURCE = "usda_wasde_esmis"
