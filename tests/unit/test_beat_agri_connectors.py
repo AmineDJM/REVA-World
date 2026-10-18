@@ -111,3 +111,19 @@ def test_cag_parse() -> None:
     assert jul[1990] == "72"
     with pytest.raises(cag.CagError):
         cag.parse_csv((FIX / "atlas.ncei_cag" / "cag_261_tavg.csv").read_bytes(), region=262, param="tavg")
+
+
+def test_archive_naming_variants_and_default_namespace() -> None:
+    r = W.Release(date(2019, 3, 8), ("/x/latest.pdf", "/x/latest.xml", "/x/latest.txt"))
+    assert r.report_file() == "/x/latest.xml"
+    r2 = W.Release(date(2018, 10, 11), ("/y/WASDE-582-October-11-2018.xml", "/y/WASDE-582-October-11-2018.pdf"))
+    assert r2.report_file() == "/y/WASDE-582-October-11-2018.xml"
+    assert W.Release(date(2014, 1, 23), ("/z/wasde-01-23-2014.asc",)).report_file() is None
+    # some 2010 / 2015 reports declare xmlns="wasde" on the root
+    body = (
+        (E / "wasde-07-10-2015.xml")
+        .read_bytes()
+        .replace(b'<Report Name="wasde">', b'<Report Name="wasde" xmlns="wasde">', 1)
+    )
+    assert body != (E / "wasde-07-10-2015.xml").read_bytes()
+    assert len(W.parse_xml(body).cells) == 60

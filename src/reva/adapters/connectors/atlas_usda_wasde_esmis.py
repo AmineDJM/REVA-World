@@ -9,7 +9,8 @@ evaluate WASDE's projections at every release date.
 
 * **Which reports.** Every release listed with a release date in ``[first, last]`` (defaults 1998-01-01 -> today;
   the listing is read newest first until a page reaches ``first``; option ``pages`` = explicit page numbers).
-  Per release one report file: the XML (``wasde-MM-DD-YYYY.xml`` / ``wasdeMMYY[vN].xml``) for releases from
+  Per release one report file: the XML (``wasde-MM-DD-YYYY.xml`` / ``wasdeMMYY[vN].xml``; 2018-10..2021-07 the
+  archive names it ``latest.xml`` or ``WASDE-<n>-<Month>-<DD>-<YYYY>.xml``) for releases from
   :data:`XML_FROM` (2010-07, the first XML), else the plain-text report (``.txt``). Announcements, ``.doc``,
   revision workbooks and ``ORIG``/``R1`` copies are never read. A release without such a file (or whose file does
   not hold the tables) is recorded with its reason, never filled.
@@ -53,7 +54,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 
 NAME = "atlas.usda_wasde_esmis"
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 PARSER_VERSION = "atlas_usda_wasde_esmis/1"
 SOURCE_KEY = "usda.wasde_esmis"
 ATLAS_SOURCE = "usda_wasde_esmis"
@@ -139,7 +140,9 @@ MONTHS = {
 _FOOT = re.compile(r"_?\b\d{1,2}/")
 _NUM = re.compile(r"^-?\d[\d,]*(\.\d+)?$|^-?\.\d+$")
 _MY = re.compile(r"(\d{4})/(\d{2})")
-_REPORT_FILE = re.compile(r"^wasde(-\d{2}-\d{2}-\d{4}|\d{4}(v\d)?)\.(xml|txt)$", re.IGNORECASE)
+_REPORT_FILE = re.compile(
+    r"^(wasde(-\d{2}-\d{2}-\d{4}|\d{4}(v\d)?)|latest|wasde-\d+-[a-z]+-\d{1,2}-\d{4})\.(xml|txt)$", re.IGNORECASE
+)
 _ROW = re.compile(r"<tr\b.*?</tr>", re.DOTALL)
 _TIME = re.compile(r'<time datetime="(\d{4}-\d{2}-\d{2})T')
 _HREF = re.compile(r'href="(/sites/default/release-files/[^"]+)"')
@@ -287,6 +290,9 @@ def parse_xml(body: bytes) -> ReportParse:
         root = ET.fromstring(body)  # noqa: S314 - DTD/entity declarations refused above; expat fetches nothing
     except ET.ParseError as e:
         raise EsmisError(f"XML does not parse: {e}") from e
+    for el in root.iter():
+        if isinstance(el.tag, str) and "}" in el.tag:
+            el.tag = el.tag.split("}", 1)[1]  # some 2010 reports declare a default namespace (xmlns="wasde")
     rep = ReportParse()
     found: dict[tuple[str, int], Cell] = {}
     for sr in root:
