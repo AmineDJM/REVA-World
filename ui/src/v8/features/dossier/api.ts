@@ -134,19 +134,7 @@ export async function getSubjects(q: string | null, kind: string | null, signal?
   return SubjectList.parse(r.body);
 }
 
-/** Front-end route of a brief (one URL per brief). */
-export function dossierHref(kind: string, id: string): string {
-  return `/v8/dossier/${encodeURIComponent(kind)}/${encodeURIComponent(id)}`;
-}
-
-export const KIND_LABEL: Record<string, string> = {
-  country: 'Pays',
-  commodity: 'Matière première',
-  disease: 'Maladie',
-  drug: 'Médicament',
-  conflict: 'Conflit',
-  decision: 'Décision',
-};
+export { dossierHref, KIND_LABEL } from './links';
 
 export const VALUE_KIND_LABEL: Record<ValueKind, string> = {
   observed: 'observé',

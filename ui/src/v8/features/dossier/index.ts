@@ -6,7 +6,7 @@
  */
 import { lazy } from 'react';
 import type { PaletteHit, V8Feature } from '../../contract';
-import { dossierHref, getSubjects, KIND_LABEL } from './api';
+import { dossierHref, KIND_LABEL } from './links';
 
 const FEATURED: { kind: string; id: string; label: string; words: string[] }[] = [
   { kind: 'country', id: 'FRA', label: 'France', words: ['france', 'fra'] },
@@ -54,6 +54,7 @@ export const feature: V8Feature = {
     const q = query.trim();
     if (q.length < 3) return [];
     try {
+      const { getSubjects } = await import('./api');
       const res = await getSubjects(q, null, signal);
       return res.hits.slice(0, 6).map((h) => ({
         id: `dossier:${h.kind}:${h.id}`,

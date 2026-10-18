@@ -202,9 +202,10 @@ def test_index_search_and_resolution(env: tuple[AtlasQuery, SeriesIndex]) -> Non
 def test_map_slice_values_and_typed_missing(env: tuple[AtlasQuery, SeriesIndex]) -> None:
     q, idx = env
     sid, *_ = svc.resolve(idx, series="src.ds.GDP")
-    d = svc.map_slice(q, idx, sid, precision=None, period=None)
-    # the default period is the latest with an observation (2022), never a projection-only year
-    assert d["precision"] == "year" and d["period"] == "2022"
+    default = svc.map_slice(q, idx, sid, precision=None, period=None)
+    # default: the latest period with at least half of the best coverage (2021: 2 of 3), never projection-only
+    assert default["precision"] == "year" and default["period"] == "2021"
+    d = svc.map_slice(q, idx, sid, precision=None, period="2022")
     assert [p["code"] for p in d["periods"]] == ["2020", "2021", "2022", "2023"]
     assert d["periods"][-1] == {"code": "2023", "label": "2023", "obs": 0, "proj": 1}
     vals = {v["iso3"]: v["v"] for v in d["values"]}
