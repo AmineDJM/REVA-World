@@ -74,7 +74,7 @@ export function Rail({
         {features.length > 0 ? <NavItems features={features} collapsed={collapsed} /> : <p className="v8-rail-empty">Aucune section installée.</p>}
       </nav>
       <div className="v8-rail-foot">
-        <a className="v8-nav-link v8-nav-old" href="/" title="Écrans précédents (V1–V5)">
+        <a className="v8-nav-link v8-nav-old" href="/world" title="Écrans précédents (V1–V5)">
           <span className="v8-nav-icon" aria-hidden="true">
             ↩
           </span>
@@ -117,7 +117,7 @@ export function NavSheet({ open, onClose, features, username, onLogout }: { open
         <div className="v8-sheet-grip" aria-hidden="true" />
         <NavItems features={features} onNavigate={onClose} />
         <div className="v8-sheet-foot">
-          <a className="v8-nav-link" href="/">
+          <a className="v8-nav-link" href="/world">
             <span className="v8-nav-icon" aria-hidden="true">
               ↩
             </span>

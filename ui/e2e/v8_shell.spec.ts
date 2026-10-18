@@ -66,7 +66,7 @@ test('frame: rail lists the discovered features, breadcrumbs, data status, old s
   expect(await rail.getByRole('link').count()).toBeGreaterThan(0);
   await expect(page.getByRole('navigation', { name: 'Fil d’Ariane' })).toContainText('Console');
   await expect(page.getByTestId('v8-health')).toHaveAttribute('data-status', /ready|not_ready|unreachable/);
-  await expect(page.getByRole('link', { name: /Anciens écrans/ })).toHaveAttribute('href', '/');
+  await expect(page.getByRole('link', { name: /Anciens écrans/ })).toHaveAttribute('href', '/world');
   await shot(page, 'v8-light-home');
 });
 

@@ -28,8 +28,10 @@ const loadV8 = () => import('./v8/shell/V8Root');
 const V8Root = lazy(loadV8);
 
 const isV8 = (pathname: string) => pathname === '/v8' || pathname.startsWith('/v8/');
-// Landing on /v8: fetch the console chunk in parallel with the session check (no waterfall).
-if (typeof window !== 'undefined' && isV8(window.location.pathname)) void loadV8().catch(() => undefined);
+/** V8QA sign-off: `/` (and `/login` once signed in) open the V8 console; the old screens keep their paths. */
+const toV8 = (pathname: string) => pathname === '/' || pathname === '' || pathname === '/login';
+// Landing on /v8 (or on / which redirects there): fetch the console chunk in parallel with the session check.
+if (typeof window !== 'undefined' && (isV8(window.location.pathname) || toV8(window.location.pathname))) void loadV8().catch(() => undefined);
 
 const NAV = [
   { to: '/world', label: 'World' },
@@ -72,7 +74,7 @@ export function App() {
     document.title = page ? `${page.label} · REVA World` : 'REVA World';
   }, [location.pathname]);
 
-  if (state.status === 'checking') return isV8(location.pathname) ? <div className="v8-boot" aria-busy="true" /> : <Loading what="session" />;
+  if (state.status === 'checking') return isV8(location.pathname) || toV8(location.pathname) ? <div className="v8-boot" aria-busy="true" /> : <Loading what="session" />;
   if (state.status === 'error') {
     return (
       <main id="main">
@@ -92,6 +94,8 @@ export function App() {
       setState({ status: 'anonymous' });
     }
   };
+
+  if (toV8(location.pathname)) return <Navigate to={`/v8${location.search}${location.hash}`} replace />;
 
   if (isV8(location.pathname)) {
     return (
@@ -145,7 +149,6 @@ export function App() {
         <ErrorBoundary resetKey={location.pathname}>
         <Suspense fallback={<Loading what="screen" />}>
           <Routes>
-            <Route path="/" element={<Navigate to="/world" replace />} />
             <Route path="/world" element={<WorldPage />} />
             <Route path="/country" element={<Navigate to="/country/FRA" replace />} />
             <Route path="/country/:iso3" element={<CountryPage />} />
@@ -159,7 +162,6 @@ export function App() {
             <Route path="/runs" element={<RunsPage />} />
             <Route path="/runs/:id" element={<RunPage />} />
             <Route path="/v3/*" element={<V3App />} />
-            <Route path="/login" element={<Navigate to="/world" replace />} />
             <Route path="*" element={<p>Unknown screen. Choose a screen from the navigation.</p>} />
           </Routes>
         </Suspense>

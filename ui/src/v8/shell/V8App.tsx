@@ -136,7 +136,7 @@ export function V8App({ features, problems = [], username, onLogout, defaultProv
       { id: 'rail', label: collapsed ? 'Déplier la navigation' : 'Replier la navigation', keywords: ['navigation', 'menu', 'rail'], run: toggleRail, hint: '[' },
       { id: 'help', label: 'Raccourcis clavier', keywords: ['aide', 'raccourcis', 'clavier', 'help'], run: () => setHelpOpen(true), hint: '?' },
       { id: 'recents', label: 'Effacer les éléments récents', keywords: ['récents', 'historique'], run: clearRecents },
-      { id: 'old', label: 'Anciens écrans (V1–V5)', keywords: ['ancien', 'v3', 'planète', 'retour'], run: () => (window.location.href = '/') },
+      { id: 'old', label: 'Anciens écrans (V1–V5)', keywords: ['ancien', 'v3', 'planète', 'retour'], run: () => (window.location.href = '/world') },
     ],
     [theme, pref, setPref, collapsed, toggleRail],
   );
