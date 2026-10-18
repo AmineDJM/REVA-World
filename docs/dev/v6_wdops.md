@@ -41,6 +41,14 @@ queued work, in priority order: (1) causal harvester queue → `reva kg import-h
 * P642 (qualifier "of", A-LAW) rejected again: deleted on Wikidata.
 * Every other request (13 files) was already merged.
 
+## Tests
+
+`tests/unit/test_wdops.py` (5): shared-ledger routing, causal share arithmetic, QLever pack parsing/building
+(snapshot precedence, deprecated and non-item rows, entity creation), V4BIO QLever query/parse.
+`tests/unit/test_bio_v4.py`: `atlas.bio_qlever` added to the spec set; its captured fixture is **pending its first
+live run** (`PENDING_LIVE_FIXTURE`, an explicit `xfail` test), because QLever answered 429 and disk stayed under the
+ingest floor. ruff, ruff format, mypy clean on the touched modules.
+
 ## Paths
 
 | Path | Used for | Cost |
@@ -67,6 +75,9 @@ next run).
 | causal statements seen | 1,675 → **2,997** |
 | import into `reva` (22:14 UTC) | 1,055 loads seen, 772 imported (260 already imported, 23 `wikidata.wdqs` row loads skipped by design); 1,652 raw objects copied; entities 1,662 inserted / 676 unchanged / 461 conflicting (same revision, other kind) / 25 stale; statements **10,678 inserted**, 7,159 unchanged; verification 24,528 identical / 3 differing (newer allow-list adds ISBN refs, as before) / 0 missing |
 | `reva causal refresh --origin live` | 2,986 Wikidata claims scanned, **1,314 new**, 1,672 unchanged; 352 endpoints still without a KG entity (385 claims); grading over all 62,994 live claims: B 59,198 · C 221 · D 3,502 · E 73 |
+| 2026-10-18 sessions | 00:03 UTC (692 wbapi, stopped by the container restart) and 16:39/16:43 UTC (82 wbapi; stopped by the disk floor when free space fell to 3.7–4.5 GB): fetched 3,086 → **3,836**, causal statements seen 2,997 → 3,733; frontier 9,430 (tiers 4–8) |
+| import into `reva` (2026-10-18 17:01 UTC) | 80 new loads: 750 entities, **4,276 statements** inserted; verification over 28,807 current CAUSWD statements: 28,804 identical / 3 differing (ISBN refs, as above) / 0 missing |
+| `reva causal refresh --origin live` (17:03 UTC) | 3,825 Wikidata claims scanned, **811 new**; 997 endpoints still without a KG entity (1,105 claims, mostly far ends of hop-1 items); grading over 63,833 live claims: B 59,198 · C 270 · D 4,289 · E 76 |
 | example | Great Depression `Q8698` → P828 *has cause* → Wall Street crash of 1929 `Q201684` (statement on Q8698, rev 2553658571, unreferenced) |
 
 ### Priority 3 — V4 specs
@@ -133,7 +144,13 @@ reuse, idempotent loads and imports).
    `flock /tmp/reva-devdb.lock uv run reva kg import-harvest --from-db reva_kg_wdops`, verify, then drop
    `reva_kg_wdops`. At ~3,000 entities/day this is weeks of budget: a bigger egress quota or a Wikidata dump
    (owner decision) is the real fix.
-4. **Not retried**: `atlas.ourairports`, `atlas.rcs_dem` (free disk 4.9 GB < 5 GB on 2026-10-18).
+4. **Daily routine atlas retries (2026-10-18)**: `atlas.ourairports` **loaded** (86,258 airport records, 247
+   countries; KG 6,339 entities / 54,954 statements; 4 requests, 27.7 MB; public-domain terms). `atlas.rcs_dem` **not
+   run**: free disk was 4.6 GB when it got the dev-DB lock (re-run: `flock /tmp/reva-devdb.lock uv run reva atlas
+   ingest atlas.rcs_dem` with ≥ 5 GB free).
+5. **Left queued**: `reva kg import-harvest --from-db reva_kg_wdops` (650 label snapshots of chemical-element objects
+   harvested 2026-10-18 00:06, no statements; detached step waiting for ≥ 5 GiB free), then drop `reva_kg_wdops`
+   (27 MB, WDOPS's own). `reva_kg_causwd` (85 MB) is CAUSWD's and stays.
 
 ## Owner decisions
 
