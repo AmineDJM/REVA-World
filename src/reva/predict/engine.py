@@ -57,7 +57,15 @@ from reva.predict.context import (
     PluginData,
     engine_variables,
 )
-from reva.predict.decision import REGISTRY_DIR, Decision, DirectChange, VarRef, direct_changes, quarter_labels
+from reva.predict.decision import (
+    REGISTRY_DIR,
+    Decision,
+    DirectChange,
+    VarRef,
+    direct_changes,
+    parse_quarter,
+    quarter_labels,
+)
 from reva.simulation import rng
 
 ENGINE_ID = "reva.predict.engine@1.0.0"
@@ -623,11 +631,49 @@ class Engine:
         dc = node.decision_change
         opts = dict(self.d.plugin_options.get(pp.RETIREMENT_KEY) or {})
         months = int(dc.change) if dc is not None else 0
-        derived = "first_birth_year" not in opts
-        if derived:
-            opts["first_birth_year"] = self.d.start_year - months // 12
+        # The decision's start is binding (V6 FIXPOP): the first affected birth cohort is derived from the start
+        # quarter and the reference legal-age path so that no one's eligibility changes before the start, and the
+        # plugin reports only the calendar years of the decision horizon.
+        sy, sq = parse_quarter(self.d.start)
+        last_year = parse_quarter(self.periods[-1])[0]
+        fc = pp.retirement_first_cohort(node.geo, str(opts.get("reference_path", "law_in_force_2026")), months, sy, sq)
+        r = pp.PluginResult(model=pp.RETIREMENT_KEY)
+        if fc.first_birth_year is None:
+            r.gaps.append(
+                {
+                    "code": "first_cohort_underivable",
+                    "geo": node.geo,
+                    "message": f"the first affected birth cohort cannot be derived from the start {self.d.start} "
+                    f"and the reference path ({fc.problem}); the retirement model is not run",
+                    "derivation": fc.derivation,
+                }
+            )
+            return r
+        stated = opts.get("first_birth_year")
+        if stated is not None and int(stated) < fc.first_birth_year:
+            r.gaps.append(
+                {
+                    "code": "decision_start_conflict",
+                    "geo": node.geo,
+                    "message": f"plugin option first_birth_year {stated} would change eligibility before the decision "
+                    f"starts ({self.d.start}); the first cohort consistent with the start is {fc.first_birth_year}",
+                    "derivation": fc.derivation,
+                }
+            )
+            return r
+        opts["first_birth_year"] = int(stated) if stated is not None else fc.first_birth_year
+        ref_year = int(opts.get("reference_year", 2024))
+        if last_year <= ref_year:
+            r.gaps.append(
+                {
+                    "code": "horizon_before_base_year",
+                    "geo": node.geo,
+                    "message": f"the decision horizon ends in {last_year}, not after the model's base year {ref_year}",
+                }
+            )
+            return r
+        opts["periods"] = last_year - ref_year  # model years ref_year+1 .. last horizon year
         if self.pdata.retirement_runner is None:
-            r = pp.PluginResult(model=pp.RETIREMENT_KEY)
             r.gaps.append(
                 {
                     "code": "plugin_data_missing",
@@ -635,11 +681,19 @@ class Engine:
                 }
             )
             return r
-        res = pp.run_retirement(self.pdata.retirement_runner, node.geo, months, opts, self.n)
-        if derived:
-            res.provenance["first_birth_year_derivation"] = (
-                f"start year {self.d.start_year} minus target age {months // 12} (derived, not stated by the decision)"
-            )
+        res = pp.run_retirement(
+            self.pdata.retirement_runner, node.geo, months, opts, self.n, first_year=sy, last_year=last_year
+        )
+        res.provenance["first_birth_year_derivation"] = {
+            **fc.derivation,
+            "used": opts["first_birth_year"],
+            "source": "stated by the decision (not earlier than derived)" if stated is not None else "derived",
+        }
+        res.provenance["reported_years"] = {
+            "frequency": "calendar year (annual values, not quarterly)",
+            "years": [sy, last_year],
+            "horizon_quarters": [self.periods[0], self.periods[-1]],
+        }
         return res
 
     def _plugin_variable(self, o: pp.PluginOutput, node: Node, hid: str, model: str) -> dict[str, Any]:

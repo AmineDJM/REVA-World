@@ -78,9 +78,10 @@ decisions:
       social.retirement_age:
         reference_path: law_in_force_2026
         reference_year: 2024
-        periods: 8
-        # Derived, not stated by the decision: the cohort reaching 65 in the start year (2027 - 65 = 1962) is the
-        # first one the target level applies to.
-        first_birth_year: 1962
+        # first_birth_year and the model periods are NOT stated here (V6 FIXPOP): the engine derives the first
+        # affected cohort from the start (2027Q1) and the reference legal-age path, so that no one's eligibility
+        # changes before the start (FRA law_in_force_2026: cohort 1964 reaches 62y9m from 2026-10 -> excluded;
+        # first cohort 1965), and reports the calendar years of the horizon (2027, 2028) only. The former
+        # "2027 - 65 = 1962" made cohorts 1962-1964 lose eligibility they reach in 2024-2026 (effects from 2025).
     anchors: []
     anchor_labels: {}

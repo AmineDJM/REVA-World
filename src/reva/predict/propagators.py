@@ -163,8 +163,103 @@ RETIREMENT_OUTPUTS = {
 }
 
 
-def run_retirement(runner: Any, iso3: str, target_months: int, options: dict[str, Any], n: int) -> PluginResult:
-    """Run the registered retirement-age plugin once (deterministic) and keep its central (L1) yearly outputs."""
+@dataclass
+class FirstCohort:
+    """First birth cohort a retirement-age decision may affect without acting before its start."""
+
+    first_birth_year: int | None
+    derivation: dict[str, Any]
+    problem: str | None = None
+
+
+def _ym(index: int) -> str:
+    return f"{index // 12}-{index % 12 + 1:02d}"
+
+
+def retirement_first_cohort(
+    iso3: str, reference_path: str, target_months: int, start_year: int, start_quarter: int
+) -> FirstCohort:
+    """Earliest birth year ``c`` such that no member of cohort ``c`` or of any later cohort reaches the
+    eligibility age (the reference path's legal age, or the decided level if lower) before the decision's
+    first month. A person born in month ``m`` of year ``c`` reaches age ``A`` months during month
+    ``12c + (m - 1) + A`` (the retirement model's convention: births uniform within month cohorts).
+
+    Applying the decided level to an earlier cohort would change eligibility *before* the decision starts
+    (e.g. FRA, 65 from 2027Q1: cohort 1962 reaches its reference age 62y6m in 2024-2025). Cohorts are whole
+    birth years: a cohort partly eligible before the start keeps the reference path (stated in the
+    derivation). Only birth-cohort-based rule paths are derivable; anything else is a typed problem."""
+    from reva.models.social import retirement_age as ra
+    from reva.models.social import rules as rl
+
+    start_index = start_year * 12 + (start_quarter - 1) * 3
+    try:
+        table = rl.load_rule_table(iso3)
+        age_kind, track = ra._lever(table)
+        ref = rl.TablePath(table, reference_path, age_kind, track)
+    except Exception as e:  # unknown country table / path / lever: typed, never guessed
+        return FirstCohort(None, {}, f"{type(e).__name__}: {e}")
+    if ref.basis != "birth_cohort":
+        return FirstCohort(None, {}, f"reference path basis {ref.basis!r}: first cohort not derivable")
+
+    def earliest(c: int) -> tuple[int, int, int]:
+        ages = [ref.age_months(c, m, start_year) for m in range(1, 13)]
+        idx = min(c * 12 + (m - 1) + min(a, target_months) for m, a in zip(range(1, 13), ages, strict=True))
+        return idx, min(ages), max(ages)
+
+    first: int | None = None
+    first_info: tuple[int, int, int] | None = None
+    excluded: dict[str, Any] | None = None
+    for c in range(start_year - 40, start_year - 81, -1):  # youngest plausible claimants -> older cohorts
+        try:
+            info = earliest(c)
+        except rl.RuleCoverageGap as e:
+            excluded = {"birth_year": c, "reason": f"no sourced reference row: {e}"}
+            break
+        if info[0] < start_index:
+            excluded = {
+                "birth_year": c,
+                "reference_age_months": [info[1], info[2]],
+                "first_eligible_month": _ym(info[0]),
+                "reason": "members would be affected before the decision starts",
+            }
+            break
+        first, first_info = c, info
+    if first is None or first_info is None:
+        return FirstCohort(None, {"excluded": excluded}, "no birth cohort satisfies the start date")
+    return FirstCohort(
+        first,
+        {
+            "rule": "earliest birth year whose members (and all later cohorts) first reach the eligibility age "
+            "(reference legal age, or the decided level if lower) on or after the decision's first month",
+            "decision_first_month": _ym(start_index),
+            "reference_path": reference_path,
+            "first_cohort": {
+                "birth_year": first,
+                "reference_age_months": [first_info[1], first_info[2]],
+                "first_eligible_month": _ym(first_info[0]),
+            },
+            "previous_cohort_excluded": excluded,
+            "rule_table": {"country": iso3, "version": table.version, "digest": table.digest()},
+        },
+    )
+
+
+def run_retirement(
+    runner: Any,
+    iso3: str,
+    target_months: int,
+    options: dict[str, Any],
+    n: int,
+    *,
+    first_year: int | None = None,
+    last_year: int | None = None,
+) -> PluginResult:
+    """Run the registered retirement-age plugin once (deterministic) and keep its central (L1) yearly outputs.
+
+    ``first_year``/``last_year``: the calendar years of the decision horizon. Years after ``last_year``
+    are not reported (outside the horizon); a year before ``first_year`` is never reported, and a
+    non-zero value there means the scenario acts before the decision starts: that output is refused with
+    an ``effect_before_start`` gap (never shown, never zeroed)."""
     spec = {
         "model_key": RETIREMENT_KEY,
         "model_version": str(options.get("model_version", "1.0.0")),
@@ -211,6 +306,32 @@ def run_retirement(runner: Any, iso3: str, target_months: int, options: dict[str
         series.setdefault(str(key), {})[int(year)] = float(d)
     for key, by_year in sorted(series.items()):
         unit, label = RETIREMENT_OUTPUTS[key]
+        early = {y: v for y, v in by_year.items() if first_year is not None and y < first_year and v != 0.0}
+        if early:
+            res.gaps.append(
+                {
+                    "code": "effect_before_start",
+                    "geo": iso3,
+                    "output": key,
+                    "years": sorted(early),
+                    "message": f"the scenario changes {key} before the decision starts ({first_year}); "
+                    "output refused (the first affected cohort is inconsistent with the start date)",
+                }
+            )
+            continue
+        kept = {
+            y: v
+            for y, v in by_year.items()
+            if (first_year is None or y >= first_year) and (last_year is None or y <= last_year)
+        }
+        if not kept:
+            continue
+        notes = ["deterministic model output (no estimate uncertainty sampled); results are 'qualified'"]
+        if first_year is not None:
+            notes.append(
+                f"annual calendar-year values {min(kept)}-{max(kept)} (not quarterly): the years of the decision "
+                f"horizon; no cohort is affected before the decision starts, so earlier years are not reported"
+            )
         res.outputs.append(
             PluginOutput(
                 variable=VarRef("plugin_output", f"{RETIREMENT_KEY}.{key}"),
@@ -218,8 +339,8 @@ def run_retirement(runner: Any, iso3: str, target_months: int, options: dict[str
                 unit=unit,
                 label_fr=label,
                 frequency="year",
-                yearly={y: np.full(n, val) for y, val in sorted(by_year.items())},
-                notes=["deterministic model output (no estimate uncertainty sampled); results are 'qualified'"],
+                yearly={y: np.full(n, val) for y, val in sorted(kept.items())},
+                notes=notes,
             )
         )
     return res
