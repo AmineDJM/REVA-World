@@ -114,6 +114,8 @@ for (const s of STOPS) {
     timings[s.name] = ms;
     info.annotations.push({ type: 'timing', description: `${s.name}: ${ms} ms` });
     expect(await unnamed(page), 'interactive elements without an accessible name').toEqual([]);
+    // honesty: no rendering artefact where a value should be (a missing value is typed, never NaN/undefined; « null » can be quoted from a source)
+    expect(await page.locator('main.v8-main').innerText()).not.toMatch(/\bNaN\b|\bundefined\b|\[object Object\]|\bInfinity\b/);
     // the error boundary never fired
     await expect(page.getByText('Cette section a échoué')).toHaveCount(0);
     if (SHOTS) {

@@ -160,7 +160,7 @@ test.describe('phone', () => {
   });
 });
 
-test('old screens keep working at / with a visible "Nouvelle console V8" link', async ({ page }) => {
+test('old screens keep working at /world (`/` now opens /v8) with a visible "Nouvelle console V8" link', async ({ page }) => {
   await page.goto('/world');
   const link = page.getByRole('link', { name: /Nouvelle console V8/ });
   await expect(link).toBeVisible();

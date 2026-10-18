@@ -57,4 +57,4 @@ V8BOARDS (Tableaux + Accueil feed), V8COUVERTURE, V8DOSSIER, then V8QA (end-to-e
 phone layout, performance, honesty-badge audit). In parallel the V7 BEAT tracks continue and widen
 (BEAT-NOWCAST vs GDPNow/NY Fed/Cleveland Fed; BEAT-AGRI vs USDA WASDE).
 
-Old screens stay reachable until V8QA signs off; then `/` redirects to `/v8`.
+Old screens stay reachable until V8QA signs off; then `/` redirects to `/v8`. **Done 2026-10-18 (V8QA, docs/dev/v8_v8qa.md):** `/` → `/v8`; old screens stay at their paths (`/world`, `/v3/…`), linked from « Anciens écrans ».
