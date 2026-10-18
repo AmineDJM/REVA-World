@@ -26,6 +26,7 @@ classes:
     - provisional
     - observation_gridded      # CRU TS station interpolation
     - announced_schedule       # cbcal: a meeting date as announced (the announcement is the observation)
+    - final_vintage            # NCEI nClimDiv (atlas_ncei_cag): observed value in the current, revisable release
   # a provider estimate of a PAST period: answers observation questions, labelled "estimate"
   estimate:
     - estimate

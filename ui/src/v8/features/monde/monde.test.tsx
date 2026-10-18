@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen, waitFor, within } from '@testing-librar
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { MapResponse, PlaceResponse } from './api';
-import { classColors, classify, effectiveMode, legendRows, quantileBreaks } from './scale';
+import { classColors, classify, classOf, colorOf, effectiveMode, legendRows, quantileBreaks } from './scale';
 import { mondeHref, readState, selectorKey, writeSelector } from './url';
 import { v8Links } from '../../contract';
 import { feature } from './index';
@@ -181,9 +181,28 @@ describe('scale', () => {
   });
   it('diverging is symmetric around zero with a neutral middle class', () => {
     const c = classify([-50, -10, 0, 5, 100], 'diverging');
-    expect(c.breaks[3]).toBeCloseTo(-12.5);
-    expect(c.breaks[4]).toBeCloseTo(12.5);
-    expect(classColors(c, false)[4]).toBe('#f0efec');
+    expect(c.breaks).toEqual([-50, -10, -5, 5, 10, 50]);
+    expect(classOf(c, 100)).toBe(c.n - 1); // the extreme value sits in the extreme class
+    expect(classColors(c, false)).toHaveLength(7);
+    expect(classColors(c, false)[3]).toBe('#f0efec');
+    expect(classOf(c, 0)).toBe(3);
+  });
+
+  it('diverging: one extreme value does not flatten the others into the neutral class (live « empty map »)', () => {
+    // inflation-like slice: Venezuela 252 %, a deflation at −4.7 %, most places between 1 % and 12 %
+    const vals = [252, 99.9, 81, 41, 34, 28, 23, 20, 15, 12, 11, 9, 8, 7, 6, 5.5, 5, 4.5, 4, 3.6, 3.2, 3, 2.8, 2.5, 2.2, 2, 1.8, 1.5, 1.2, 1, 0.5, -0.4, -1.2, -4.7];
+    const c = classify(vals, 'diverging');
+    const colors = classColors(c, false);
+    const neutral = vals.filter((x) => colorOf(c, colors, x) === '#f0efec').length;
+    expect(neutral).toBeLessThan(vals.length / 3);
+    expect(new Set(vals.map((x) => classOf(c, x))).size).toBeGreaterThanOrEqual(6);
+    expect(c.breaks.slice(0, 4).map((x) => -x).reverse()).toEqual(c.breaks.slice(4)); // symmetric
+  });
+
+  it('diverging with few distinct magnitudes keeps colours aligned with classes', () => {
+    const c = classify([-1, 1, 1, 1], 'diverging');
+    expect(classColors(c, false)).toHaveLength(c.n);
+    expect(classColors(c, false)[(c.n - 1) / 2]).toBe('#f0efec');
   });
 });
 

@@ -4,7 +4,7 @@
  *  - quantile: classes hold about the same number of places (skewed distributions);
  *  - linear: equal intervals (near-uniform spread, few values);
  *  - log: equal intervals of log10 (strictly positive values spanning > 3 orders of magnitude);
- *  - diverging: both signs present → two hues around a neutral grey at 0, symmetric.
+ *  - diverging: both signs present → two hues around a neutral grey at 0, symmetric (bounds = quantiles of |v|).
  * `auto` takes the server's hint (scale_hint), computed from the observed values of the slice.
  * Sequential = one hue light→dark (blue ramp, validated in light and dark); diverging = red ↔ blue + grey.
  */
@@ -73,12 +73,27 @@ export function classify(values: number[], mode: ScaleMode, k = 7): Classes {
   if (mode === 'quantile') breaks = quantileBreaks(v, Math.min(k, 6));
   else if (mode === 'linear') breaks = new Set(v).size <= 6 ? [...new Set(v)].slice(0, -1) : equalBreaks(min, max, 6);
   else if (mode === 'log') breaks = equalBreaks(min, max, k, Math.log10, (x) => 10 ** x);
-  else {
-    const m = Math.max(Math.abs(min), Math.abs(max));
-    // 4 classes per arm, symmetric; values within ±m/8 of zero are the neutral class
-    breaks = [-0.75 * m, -0.5 * m, -0.25 * m, -m / 8, m / 8, 0.25 * m, 0.5 * m, 0.75 * m];
-  }
+  else breaks = divergingBreaks(v);
   return { mode, breaks, n: breaks.length + 1, min, max, values: v };
+}
+
+/**
+ * Diverging breaks, symmetric around 0: the arm bounds are quantiles of |v| (fifths), so one extreme value
+ * (inflation 250 % next to 2–10 % elsewhere) does not flatten every other place into the neutral class — the
+ * live-data « empty map » (V8QA). The neutral class holds |v| ≤ the first fifth; each arm has 4 classes.
+ */
+export function divergingBreaks(sorted: number[]): number[] {
+  const abs = sorted.map(Math.abs).filter((x) => x > 0).sort((a, b) => a - b);
+  const arm: number[] = [];
+  for (let i = 1; i <= 4; i++) {
+    const q = abs[Math.floor((i * (abs.length - 1)) / 5)];
+    if (q !== undefined && q > 0 && (arm.length === 0 || q > arm[arm.length - 1]!)) arm.push(q);
+  }
+  if (arm.length === 0) {
+    const m = abs[abs.length - 1] ?? 1;
+    arm.push(m / 8, m / 4, m / 2, (3 * m) / 4);
+  }
+  return [...arm.map((x) => -x).reverse(), ...arm];
 }
 
 export function classOf(c: Classes, x: number): number {
@@ -91,7 +106,8 @@ export function classOf(c: Classes, x: number): number {
 export function classColors(c: Classes, dark: boolean): string[] {
   if (c.mode === 'diverging') {
     const d = dark ? DIV_DARK : DIV_LIGHT;
-    return [...d.neg, d.mid, ...d.pos];
+    const k = Math.max(0, Math.min(4, (c.n - 1) / 2));
+    return [...d.neg.slice(4 - k), d.mid, ...d.pos.slice(0, k)];
   }
   const ramp = dark ? SEQ_DARK : SEQ_LIGHT;
   if (c.n >= ramp.length) return ramp.slice(0, c.n);

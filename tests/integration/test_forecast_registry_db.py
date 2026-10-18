@@ -242,6 +242,10 @@ def test_05_void_by_registry_rule_is_appended_never_edited(env: Env, monkeypatch
             text("SELECT count(*) FROM model.evaluation WHERE metrics->>'kind' = 'registry_score'")
         ).scalar()
     monkeypatch.setattr(svc, "handled_questions", lambda conn, sha: set())  # pretend it is still open
+    # its reference period has ended (as in test_02; the real date decides otherwise for some horizons)
+    monkeypatch.setattr(svc, "period_ended", lambda q, today: True)
+    real_extract = svc.extract_series  # time has passed: the later version's cells are no longer future-dated
+    monkeypatch.setattr(svc, "extract_series", lambda frame, fam, recorded=None: real_extract(frame, fam, None))
     # FIX7 (QA-PRED X11): its period has ended -> a void needs logged counterfactual scores; refused before any write
     with pytest.raises(ValueError, match="requires counterfactual=True"):
         svc.void_questions(env.worker, env.store, void, origin="test_fixture")
