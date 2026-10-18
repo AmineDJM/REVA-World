@@ -220,7 +220,11 @@ function Changes() {
   const [extra, setExtra] = useState<{ items: ChangeItem[]; cursor: string | null } | null>(null);
   const kindsParam = kind || DEFAULT_FEED_KINDS.join(',');
   const st = useApi((s) => getChanges({ since, limit: 100, kinds: kindsParam }, s), [since, kindsParam]);
-  useEffect(() => setExtra(null), [since, kind]);
+  const [shown, setShown] = useState(20);
+  useEffect(() => {
+    setExtra(null);
+    setShown(20);
+  }, [since, kind]);
   const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -311,7 +315,7 @@ function Changes() {
       )}
       {items.length > 0 && (
         <div ref={listRef} className="v8a-feed">
-          {groupByDay(items).map((g) => (
+          {groupByDay(items.slice(0, Math.max(shown, highlight ? items.findIndex((i) => i.id === highlight) + 1 : 0))).map((g) => (
             <section key={g.day} aria-label={g.day}>
               <h3 className="v8a-day">{g.day}</h3>
               <ul className="v8a-change-list">
@@ -321,10 +325,16 @@ function Changes() {
               </ul>
             </section>
           ))}
-          {cursor && (
-            <button type="button" className="v8-btn v8-btn-sm v8a-more" onClick={() => void loadMore()}>
-              Plus ancien…
+          {shown < items.length ? (
+            <button type="button" className="v8-btn v8-btn-sm v8a-more" onClick={() => setShown((n) => n + 30)}>
+              Afficher {Math.min(30, items.length - shown)} de plus ({items.length - shown} restants chargés)
             </button>
+          ) : (
+            cursor && (
+              <button type="button" className="v8-btn v8-btn-sm v8a-more" onClick={() => void loadMore().then(() => setShown((n) => n + 30))}>
+                Plus ancien…
+              </button>
+            )
           )}
         </div>
       )}
@@ -367,16 +377,16 @@ function Decisions() {
       )}
       {open.length > 0 && (
         <ul className="v8a-dec-list">
-          {open.slice(0, 5).map((d) => (
+          {open.slice(0, 4).map((d) => (
             <li key={d.id} className="v8a-dec" title={d.action ? `À faire : ${d.action}` : undefined}>
               <span className="v8a-dec-kind">{d.kind_label}</span>
               <span className="v8a-dec-title">{d.title}</span>
               {d.unlocks?.text && <span className="v8a-dec-why">Débloque : {d.unlocks.text}</span>}
             </li>
           ))}
-          {open.length > 5 && (
+          {open.length > 4 && (
             <li className="v8a-dec-more">
-              <Link to="/v8/couverture?vue=decisions">+ {open.length - 5} autres</Link>
+              <Link to="/v8/couverture?vue=decisions">+ {open.length - 4} autres</Link>
             </li>
           )}
         </ul>

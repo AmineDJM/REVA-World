@@ -814,3 +814,13 @@
     display: none;
   }
 }
+.v8b-wrap {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.v8b-fc-official th {
+  font-weight: var(--v8-weight-semibold, 600);
+}
+.v8b-alert-quiet {
+  font-size: var(--v8-text-xs, 11.5px);
+}

@@ -53,8 +53,23 @@ function Failure({ error, what }: { error: unknown; what: string }) {
   );
 }
 
+/** Fixed-footprint placeholder; after 4 s it says the read is still running (some registry reads take ~10 s). */
 function Skeleton() {
-  return <ShellSkeleton lines={3} />;
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setSlow(true), 4000);
+    return () => clearTimeout(t);
+  }, []);
+  return (
+    <>
+      <ShellSkeleton lines={3} />
+      {slow && (
+        <p className="v8b-meta muted" role="status">
+          Lecture toujours en cours : le serveur répond lentement pour cet élément.
+        </p>
+      )}
+    </>
+  );
 }
 
 const fmtDate = (iso: string | null | undefined) => {
@@ -77,8 +92,8 @@ export function SeriesBody({ item, visible }: { item: Extract<BoardItem, { kind:
     <div className="v8b-series">
       <div className="v8b-series-head">
         {last ? (
-          <span className="v8b-big v8-num" title={`Valeur observée ${last.year} · source ${last.source}${v.snapshot ? ` · instantané ${v.snapshot.slice(0, 12)}` : ''}`}>
-            {frValue(last.value!, v.unit)}
+          <span className="v8b-big v8-num" title={`Valeur exacte ${frDecimal(last.value!, 12)} · observée ${last.year} · source ${last.source}${v.snapshot ? ` · instantané ${v.snapshot.slice(0, 12)}` : ''}`}>
+            {frDecimal(last.value!, headlineDigits(last.value!))}
           </span>
         ) : (
           <Missing reason={lastAny?.missingReason ?? 'aucune valeur observée sur la période chargée'} />
@@ -97,15 +112,41 @@ export function SeriesBody({ item, visible }: { item: Extract<BoardItem, { kind:
           />
         )}
         {proj.length > 0 && (
-          <Badge kind="projection" title="Valeurs publiées comme projections par la source : jamais traitées comme observations">
-            projection {proj[0]!.year}–{proj[proj.length - 1]!.year}
+          <Badge kind="projection" title="Valeurs publiées comme projections ou estimations hors période observée par la source : jamais traitées comme observations">
+            projection {yearRanges(proj.map((p) => p.year))}
           </Badge>
         )}
         {v.breaks.length > 0 && <span className="v8b-badge-warn">changement de source {v.breaks.join(', ')}</span>}
       </p>
-      {v.sourcesWithoutData.length > 0 && <p className="v8b-meta muted">Sans donnée ici : {v.sourcesWithoutData.join(', ')}</p>}
+      {v.sourcesWithoutData.length > 0 && (
+        <p className="v8b-meta muted v8b-wrap" title={v.sourcesWithoutData.join('\n')}>
+          {v.sourcesWithoutData.length} série{v.sourcesWithoutData.length > 1 ? 's' : ''} consultée{v.sourcesWithoutData.length > 1 ? 's' : ''} sans donnée pour ce pays
+        </p>
+      )}
     </div>
   );
+}
+
+/** "1980–1989, 2026–2031" from sorted years. */
+export function yearRanges(years: number[]): string {
+  const ys = [...new Set(years)].sort((a, b) => a - b);
+  const out: string[] = [];
+  let a = ys[0];
+  let b = ys[0];
+  for (const y of ys.slice(1).concat([NaN])) {
+    if (y === b! + 1) b = y;
+    else {
+      if (a !== undefined) out.push(a === b ? String(a) : `${a}–${b}`);
+      a = b = y;
+    }
+  }
+  return out.join(', ');
+}
+
+/** Display digits of a headline number (exact value in its tooltip): big numbers whole, small ones to 2 decimals. */
+export function headlineDigits(value: string): number {
+  const a = Math.abs(Number(value));
+  return a >= 1000 ? 0 : a >= 100 ? 1 : 2;
 }
 
 // ------------------------------------------------------------------ entity

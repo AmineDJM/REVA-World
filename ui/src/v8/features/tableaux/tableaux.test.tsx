@@ -6,6 +6,7 @@ import { envelope, mockFetch } from '../../../test/fetchMock';
 import FORECAST from './__fixtures__/forecast_question_fra_cpi_2026.json';
 import SERIES from './__fixtures__/headline_series_fra_inflation.json';
 import { BoardView } from './BoardView';
+import { yearRanges } from './items';
 import { feature } from './index';
 import { readLocalBoards, writeLocalBoards } from './local';
 import { Markdown, safeHref } from './Markdown';
@@ -221,6 +222,7 @@ describe('BoardView', () => {
     expect(await series.findByText('0,93')).toBeInTheDocument();
     expect(series.getByText(/2025 · observé/)).toBeInTheDocument();
     expect(series.getByText(/projection 2026–2031/)).toBeInTheDocument();
+    expect(yearRanges([1980, 1981, 1982, 2026, 2027, 2030])).toBe('1980–1982, 2026–2027, 2030');
     expect(series.getByText(/changement de source/)).toBeInTheDocument();
     expect(series.getByRole('img', { name: /projections \(pointillés\)/ })).toBeInTheDocument();
     // forecast: sealed, pending, IMF first and attributed
