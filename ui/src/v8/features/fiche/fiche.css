@@ -830,6 +830,9 @@
   .fiche-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .fiche-stat:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
   .fiche-stat {
     padding: 10px;
   }
