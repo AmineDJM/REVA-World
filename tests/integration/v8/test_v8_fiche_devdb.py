@@ -32,7 +32,9 @@ def env() -> dict[str, Any]:
     try:
         eng = make_engine("api", s)
         with eng.connect() as conn:
-            if not conn.execute(text("SELECT EXISTS (SELECT 1 FROM kg.entity_current WHERE qid = 'Q142')")).scalar_one():
+            if not conn.execute(
+                text("SELECT EXISTS (SELECT 1 FROM kg.entity_current WHERE qid = 'Q142')")
+            ).scalar_one():
                 pytest.skip("not the dev database (no Q142)")
             snap, _ = request_snapshot(conn, store, origin=None)
     except Exception as e:
@@ -59,7 +61,9 @@ def _build(env: dict[str, Any], kind: str, ident: str, **kw: Any) -> dict[str, A
     return build(env["conn"], env["atlas"], env["store"], kind, ident, origin=None, **kw)
 
 
-@pytest.mark.parametrize("kind,ident", [("country", "FRA"), ("country", "fra"), ("country", "FR"), ("pays", "fr"), ("entity", "Q142")])
+@pytest.mark.parametrize(
+    "kind,ident", [("country", "FRA"), ("country", "fra"), ("country", "FR"), ("pays", "fr"), ("entity", "Q142")]
+)
 def test_country_url_forms_resolve_to_iso3(env: dict[str, Any], kind: str, ident: str) -> None:
     from reva.v8.entity.resolve import resolve
 
@@ -78,7 +82,9 @@ def test_country_url_forms_resolve_to_iso3(env: dict[str, Any], kind: str, ident
         ("commodity", "brent", ("commodity", "crude_oil")),
     ],
 )
-def test_provider_ids_and_anchors_resolve(env: dict[str, Any], kind: str, ident: str, canonical: tuple[str, str]) -> None:
+def test_provider_ids_and_anchors_resolve(
+    env: dict[str, Any], kind: str, ident: str, canonical: tuple[str, str]
+) -> None:
     from reva.v8.entity.resolve import resolve
 
     with env["conn"]() as conn:
@@ -145,7 +151,10 @@ def test_anchor_bundle_is_labelled(env: dict[str, Any]) -> None:
             assert s["source"]["verification"] == "outside_atlas_snapshot"
 
 
-@pytest.mark.parametrize("kind,ident", [("gene", "hgnc:76"), ("disease", "mondo:0005148"), ("facility", "gppd:WRI1002735"), ("taxon", "gbif:5219404")])
+@pytest.mark.parametrize(
+    "kind,ident",
+    [("gene", "hgnc:76"), ("disease", "mondo:0005148"), ("facility", "gppd:WRI1002735"), ("taxon", "gbif:5219404")],
+)
 def test_other_kinds_are_honest(env: dict[str, Any], kind: str, ident: str) -> None:
     _assert_honest(_build(env, kind, ident, use_cache=False))
 

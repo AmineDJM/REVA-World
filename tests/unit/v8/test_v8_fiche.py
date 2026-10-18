@@ -110,7 +110,11 @@ def test_forecast_probability_and_interval_records() -> None:
 
 
 def _src(name: str, lic: str, restricted: bool = False) -> dict[str, Any]:
-    return {"source": name, "label": name, "licence": {"licence": lic, "restricted": restricted, "non_commercial": False}}
+    return {
+        "source": name,
+        "label": name,
+        "licence": {"licence": lic, "restricted": restricted, "non_commercial": False},
+    }
 
 
 def test_headline_missing_is_typed_never_zero() -> None:
@@ -132,7 +136,10 @@ def test_headline_missing_is_typed_never_zero() -> None:
 def test_sources_summary_counts_and_licences() -> None:
     res = Resolved(kind="drug", id="chembl:CHEMBL941", via="qid", qid="chembl:CHEMBL941")
     b = empty_bundle(res)
-    b["facts"] = [{"source": _src("chembl.api", "CC BY-SA 3.0", True)}, {"source": _src("chembl.api", "CC BY-SA 3.0", True)}]
+    b["facts"] = [
+        {"source": _src("chembl.api", "CC BY-SA 3.0", True)},
+        {"source": _src("chembl.api", "CC BY-SA 3.0", True)},
+    ]
     out = sources_summary(b)
     assert out == [
         {"source": "chembl.api", "label": "chembl.api", "n_values": 2, "licences": ["CC BY-SA 3.0"], "restricted": True,
