@@ -121,7 +121,11 @@ function Glance() {
       {tile(
         'Prévisions scellées',
         totals ? totals.questions.toLocaleString('fr-FR') : null,
-        totals ? `${totals.pending.toLocaleString('fr-FR')} en attente · ${totals.resolved.toLocaleString('fr-FR')} résolues` : 'questions',
+        totals && totals.pending !== null && totals.resolved !== null
+          ? `${totals.pending.toLocaleString('fr-FR')} en attente · ${totals.resolved.toLocaleString('fr-FR')} résolues`
+          : totals
+            ? 'questions · statuts en cours de calcul'
+            : 'questions',
         cal.status === 'ok' && !totals ? 'error' : cal.status,
         v8Links.scoreboard(),
         cal.status === 'ok' && !totals ? 'Totaux du registre servis par /v1/v8/scores (absent)' : undefined,
@@ -129,8 +133,8 @@ function Glance() {
       {tile(
         'Prochaine résolution',
         cal.status === 'ok' && cal.data.nextResolution ? dateFr(cal.data.nextResolution, { day: 'numeric', month: 'short' }) : null,
-        cal.status === 'ok' && cal.data.nextResolution ? relDays(daysUntil(cal.data.nextResolution)) : 'calendrier',
-        cal.status,
+        cal.status === 'ok' && cal.data.nextResolution ? relDays(daysUntil(cal.data.nextResolution)) : cal.status === 'ok' && cal.data.refreshing ? 'en cours de calcul' : 'calendrier',
+        cal.status === 'ok' && cal.data.refreshing ? 'loading' : cal.status,
         v8Links.scoreboard(),
       )}
       {tile('Décisions en attente', openDecisions !== null ? String(openDecisions) : null, 'du propriétaire', dec.status, '/v8/couverture?vue=decisions', dec.status === 'error' ? classifyV3Error(dec.error).title : undefined)}
@@ -380,6 +384,16 @@ function Decisions() {
 
 function Calendar() {
   const st = useApi(() => getCalendar(), []);
+  const refreshing = st.status === 'ok' && st.data.refreshing;
+  const reload = st.reload;
+  useEffect(() => {
+    if (!refreshing) return;
+    const t = setTimeout(() => {
+      getCalendar.reset();
+      reload();
+    }, 8000);
+    return () => clearTimeout(t);
+  }, [refreshing, reload]);
   const d = st.status === 'ok' ? st.data : null;
   const upcoming = d ? d.upcoming.filter((u) => !u.overdue).slice(0, 7) : [];
   const overdue = d ? d.upcoming.filter((u) => u.overdue) : [];
@@ -388,7 +402,11 @@ function Calendar() {
     <Panel
       id="v8a-calendar"
       title="Prochaines résolutions"
-      subtitle={d?.totals ? `${d.totals.pending.toLocaleString('fr-FR')} questions scellées en attente · ${d.totals.resolved.toLocaleString('fr-FR')} résolues` : 'prévisions scellées et tests pré-enregistrés'}
+      subtitle={
+        d?.totals && d.totals.pending !== null && d.totals.resolved !== null
+          ? `${d.totals.pending.toLocaleString('fr-FR')} questions scellées en attente · ${d.totals.resolved.toLocaleString('fr-FR')} résolues`
+          : 'prévisions scellées et tests pré-enregistrés'
+      }
       actions={
         <Link className="v8-btn v8-btn-ghost v8-btn-sm" to={v8Links.scoreboard()}>
           Scores
@@ -403,7 +421,22 @@ function Calendar() {
           Service des scores absent : aperçu sur les {d.sample.n} premières questions en attente (sur {d.sample.total.toLocaleString('fr-FR')}).
         </p>
       )}
-      {d && upcoming.length === 0 && events.length === 0 && (
+      {d && d.refreshing && (
+        <p className="v8a-note" role="status">
+          Le service des scores calcule l’état du registre (premier appel après démarrage) : dates de résolution bientôt disponibles.{' '}
+          <button
+            type="button"
+            className="v8-btn v8-btn-ghost v8-btn-sm"
+            onClick={() => {
+              getCalendar.reset();
+              st.reload();
+            }}
+          >
+            Actualiser
+          </button>
+        </p>
+      )}
+      {d && !d.refreshing && upcoming.length === 0 && events.length === 0 && (
         <EmptyState compact title="Aucune résolution à venir">
           Le registre ne contient pas de question scellée en attente.
         </EmptyState>

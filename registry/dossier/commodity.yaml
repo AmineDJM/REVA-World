@@ -66,7 +66,7 @@ sections:
     blocks:
       - id: cpc
         query: kg.edges
-        params: {ids: $kg, direction: both, limit: 10}
+        params: {ids: $kg, direction: out, limit: 10}
         list:
           title: "Classement dans la Classification centrale de produits (CPC 2.1, Nations unies)"
           item: "{property} : {name}"
@@ -97,7 +97,7 @@ sections:
           columns:
             - {header: "Rang", cell: "{rank}", numeric: true}
             - {header: "Pays", cell: "{country}"}
-            - {header: "Production", cell: "{value}", numeric: true}
+            - {header: "Production (milliers de barils par jour)", cell: "{value_n}", numeric: true}
         empty: {what: "Production par pays"}
   - id: consommation
     title: Consommation
@@ -114,7 +114,7 @@ sections:
           columns:
             - {header: "Rang", cell: "{rank}", numeric: true}
             - {header: "Pays", cell: "{country}"}
-            - {header: "Consommation", cell: "{value}", numeric: true}
+            - {header: "Consommation (milliers de barils par jour)", cell: "{value_n}", numeric: true}
         empty: {what: "Consommation par pays"}
   - id: echanges
     title: Échanges
@@ -132,7 +132,7 @@ sections:
           columns:
             - {header: "Rang", cell: "{rank}", numeric: true}
             - {header: "Pays", cell: "{country}"}
-            - {header: "Exportations", cell: "{value}", numeric: true}
+            - {header: "Exportations (milliers de barils par jour)", cell: "{value_n}", numeric: true}
         empty: {what: "Exportations par pays"}
       - id: imp
         query: atlas.ranking
@@ -146,7 +146,7 @@ sections:
           columns:
             - {header: "Rang", cell: "{rank}", numeric: true}
             - {header: "Pays", cell: "{country}"}
-            - {header: "Importations", cell: "{value}", numeric: true}
+            - {header: "Importations (milliers de barils par jour)", cell: "{value_n}", numeric: true}
         empty: {what: "Importations par pays"}
   - id: prix
     title: Prix

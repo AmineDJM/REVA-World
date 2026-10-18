@@ -190,7 +190,9 @@ def _latest_complete_year(cells: list[dict[str, Any]], share: float = 0.8) -> in
 
 
 @query("atlas.ranking")
-def atlas_ranking(ctx: Ctx, *, concept: str, top: int = 10, exclude: Iterable[str] = ()) -> Result:
+def atlas_ranking(
+    ctx: Ctx, *, concept: str, top: int = 10, exclude: Iterable[str] = (), latest_per_country_since: int | None = None
+) -> Result:
     """Countries ranked by a catalog concept in the latest year that most countries report (best source order)."""
     cat = ctx.catalog()
     if concept not in cat.concepts:
@@ -200,13 +202,25 @@ def atlas_ranking(ctx: Ctx, *, concept: str, top: int = 10, exclude: Iterable[st
     if cells is None:
         cells = ctx.atlas().best_cells(cat, [concept])
         ctx.memo[key] = cells
-    year = _latest_complete_year(cells)
+    ex = set(exclude)
     out = Result()
-    if year is None:
+    if latest_per_country_since is not None:
+        # sparse surveys: each country's latest value since the given year (years differ; stated per row)
+        last: dict[str, dict[str, Any]] = {}
+        for c in cells:
+            if (c.get("year") or 0) >= latest_per_country_since and _f(c.get("value")) is not None:
+                if c["iso3"] not in last or c["year"] > last[c["iso3"]]["year"]:
+                    last[c["iso3"]] = c
+        rows = [c for c in last.values() if c.get("iso3") not in ex]
+        year = max((c["year"] for c in rows), default=None)
+    else:
+        year = _latest_complete_year(cells)
+        rows = [
+            c for c in cells if c.get("year") == year and c.get("iso3") not in ex and _f(c.get("value")) is not None
+        ]
+    if year is None or not rows:
         out.empty_reason = "aucune valeur dans l'instantané de l'atlas"
         return out
-    ex = set(exclude)
-    rows = [c for c in cells if c.get("year") == year and c.get("iso3") not in ex and _f(c.get("value")) is not None]
     rows.sort(key=lambda c: -(_f(c["value"]) or 0.0))
     unit = cat.concepts[concept].unit
     first_src = atlas_cell_src(rows[0]) if rows else None
@@ -214,11 +228,16 @@ def atlas_ranking(ctx: Ctx, *, concept: str, top: int = 10, exclude: Iterable[st
         out.values["year"] = period_val(str(year), first_src)
         out.values["n_countries"] = num_val(len(rows), first_src.with_period(str(year)), kind="derived", digits=0)
     for i, c in enumerate(rows[:top], start=1):
+        v = cell_val(c, unit)
         out.rows.append(
             {
-                "rank": num_val(i, atlas_cell_src(c), kind="derived", digits=0),
+                "rank": num_val(i, atlas_cell_src(c), kind="label", digits=0),
                 "country": country_val(c["iso3"]),
-                "value": cell_val(c, unit),
+                "value": v,
+                "value_n": Val(text=_bare(v), src=v.src, kind=v.kind, exact=v.exact, unit=v.unit, num=v.num)
+                if isinstance(v, Val) and v.exact is not None
+                else v,
+                "year": period_val(str(c["year"]), atlas_cell_src(c)),
             }
         )
     out.more = max(0, len(rows) - top)
@@ -396,9 +415,10 @@ def table_ranking(
     for i, r in enumerate(rows[:top], start=1):
         out.rows.append(
             {
-                "rank": num_val(i, src, kind="derived", digits=0),
+                "rank": num_val(i, src, kind="label", digits=0),
                 "country": country_val(r["iso3"]),
                 "value": num_val(r["value"], src, unit=unit, kind=kind),
+                "value_n": num_val(r["value"], src, unit=unit, kind=kind, show_unit=False),
             }
         )
     for i, r in enumerate(out.rows[:3], start=1):
@@ -472,6 +492,7 @@ def table_views(ctx: Ctx, *, iso3: Iterable[str], months: int = 6) -> Result:
                     "country": country_val(code),
                     "period": period_val(p, src),
                     "value": num_val(r["value"], src, unit="deaths", kind="projection", digits=0),
+                    "value_n": num_val(r["value"], src, unit="deaths", kind="projection", digits=0, show_unit=False),
                 }
             )
         src0 = _table_src(pin, run, None, "VIEWS — décès prévus (violence étatique)")
@@ -641,6 +662,7 @@ def kg_edges(
     dedupe: bool = True,
     sort: str = "label",
     exclude_objects: Iterable[str] = (),
+    exclude_self: bool = True,
 ) -> Result:
     """Neighbours through the given properties: one row per neighbour (label linked, property, dates)."""
     edges = _edges(ctx, ids, properties, direction)
@@ -649,13 +671,14 @@ def kg_edges(
     rights = _kg_rights(ctx, edges)
     excl = set(exclude_objects)
     unlabelled = 0
+    seen_labels: set[str] = set()
     rows: list[tuple[str, dict[str, Item]]] = []
     seen: set[str] = set()
     for e in edges:
         other = e["object"] if e["direction"] == "out" else e["subject"]
         if other is None:
             continue
-        if other["qid"] in excl or other["qid"] in set(ids):
+        if other["qid"] in excl or (exclude_self and other["qid"] in set(ids)):
             continue
         if dedupe and other["qid"] in seen:
             continue
@@ -669,6 +692,9 @@ def kg_edges(
             unlabelled += 1
             continue
         name = nm.text
+        if dedupe and name.lower() in seen_labels:
+            continue
+        seen_labels.add(name.lower())
         row: dict[str, Item] = {
             "name": nm,
             "property": label_val(prop.get("label_fr") or prop.get("label_en") or prop["pid"], src),
@@ -902,7 +928,7 @@ def causal_claims(
 
     out = Result()
     claims: list[dict[str, Any]] = []
-    seen = set()
+    seen: set[Any] = set()
     for qid in ids:
         if side == "causes":
             res = cg.why(ctx.conn, qid, origin=ctx.origin, min_grade=min_grade)
@@ -914,8 +940,10 @@ def causal_claims(
             except Exception:
                 got = []
         for c in got:
-            if c["claim_key"] not in seen:
+            pair = (c["cause"]["id"], c["effect"]["id"])  # has_cause on one side + has_effect on the other: one row
+            if c["claim_key"] not in seen and pair not in seen:
                 seen.add(c["claim_key"])
+                seen.add(pair)
                 claims.append(c)
     order = {g: i for i, g in enumerate("ABCDE")}
     claims.sort(key=lambda c: (order.get((c.get("grade") or {}).get("grade") or "E", 9), c["claim_key"]))
@@ -1061,13 +1089,26 @@ def forecasts_family(
     out.values["n_pending"] = num_val(n_pend, fsrc, kind="derived", digits=0)
     out.values["n_resolved"] = num_val(n_res, fsrc, kind="derived", digits=0)
     out.values["label"] = label_val(first["label_fr"], fsrc)
-    shown = [q for q in qs if q["status"] == "pending"][:limit] or qs[:limit]
+    # one row per month: several cycles ask the same month; show the newest question that REVA forecast
+    by_period: dict[str, dict[str, Any]] = {}
+    for q in qs:
+        has = any(
+            f["model"] == want[0] and f.get("point") is not None for f in idx["forecasts"].get(q["question_id"], [])
+        )
+        k = (not has, q.get("order", 0))
+        cur = by_period.get(q["reference_period"])
+        if cur is None or k < cur["_k"]:
+            by_period[q["reference_period"]] = {**q, "_k": k}
+    uniq = sorted(by_period.values(), key=lambda q: q["reference_period"])
+    shown = [q for q in uniq if q["status"] == "pending"][:limit] or uniq[:limit]
     for q in shown:
         per = q["reference_period"]
         src = _registry_src(q["question_id"], f"Registre prospectif REVA — {q['label_fr']}", per)
         row: dict[str, Item] = {
             "period": period_val(per, src),
-            "status": label_val({"pending": "en attente", "resolved": "résolue", "void": "annulée"}.get(q["status"], q["status"]), src),
+            "status": label_val(
+                {"pending": "en attente", "resolved": "résolue", "void": "annulée"}.get(q["status"], q["status"]), src
+            ),
         }
         by = {f["model"]: f for f in idx["forecasts"].get(q["question_id"], [])}
         for i, m in enumerate(want):
@@ -1078,8 +1119,16 @@ def forecasts_family(
                 row[f"{key}_lo"] = row[f"{key}_hi"] = Miss("intervalle", "pas de prévision de ce modèle")
                 continue
             row[key] = num_val(f.get("point"), src, unit=q.get("unit"), kind="forecast")
-            row[f"{key}_lo"] = num_val(f["q05"], src, unit=q.get("unit"), kind="forecast") if f.get("q05") else Miss("intervalle", "non publié")
-            row[f"{key}_hi"] = num_val(f["q95"], src, unit=q.get("unit"), kind="forecast") if f.get("q95") else Miss("intervalle", "non publié")
+            row[f"{key}_lo"] = (
+                num_val(f["q05"], src, unit=q.get("unit"), kind="forecast")
+                if f.get("q05")
+                else Miss("intervalle", "non publié")
+            )
+            row[f"{key}_hi"] = (
+                num_val(f["q95"], src, unit=q.get("unit"), kind="forecast")
+                if f.get("q95")
+                else Miss("intervalle", "non publié")
+            )
         if reference:
             f = by.get(reference)
             row["ref"] = (
@@ -1088,16 +1137,24 @@ def forecasts_family(
                 else Miss(MODEL_FR.get(reference, reference), "pas de prévision de référence pour ce mois")
             )
         row["outcome"] = (
-            num_val(q["outcome"], src, unit=q.get("unit")) if q.get("outcome") is not None else Miss("résultat", "question non encore résolue")
+            num_val(q["outcome"], src, unit=q.get("unit"))
+            if q.get("outcome") is not None
+            else Miss("résultat", "question non encore résolue")
         )
         out.rows.append(row)
     last_obs = next((q.get("last_observed") for q in qs if q.get("last_observed")), None)
     if last_obs:
-        lsrc = _registry_src(first["question_id"], f"Registre prospectif REVA — dernière observation ({first['label_fr']})", last_obs.get("period"))
+        lsrc = _registry_src(
+            first["question_id"],
+            f"Registre prospectif REVA — dernière observation ({first['label_fr']})",
+            last_obs.get("period"),
+        )
         out.values["last_value"] = num_val(last_obs.get("value"), lsrc, unit=first.get("unit"))
         out.values["last_period"] = period_val(last_obs.get("period"), lsrc)
     out.values["judged"] = label_val(
-        "non jugée (aucune question résolue)" if n_res == 0 else f"jugée sur {n_res} question(s) résolue(s)", fsrc, kind="forecast"
+        "non jugée (aucune question résolue)" if n_res == 0 else f"jugée sur {n_res} question(s) résolue(s)",
+        fsrc,
+        kind="forecast",
     )
     return out
 
@@ -1124,12 +1181,16 @@ def forecasts_geo(ctx: Ctx, *, geo: str, limit: int = 8) -> Result:
     for _fam, lst in sorted(fams.items(), key=lambda t: (-len(t[1]), t[0])):
         lst.sort(key=lambda q: (q["reference_period"], q["question_id"]))
         nxt = next((q for q in lst if q["status"] == "pending"), lst[0])
-        src = _registry_src(nxt["question_id"], f"Registre prospectif REVA — {nxt['label_fr']}", nxt["reference_period"])
+        src = _registry_src(
+            nxt["question_id"], f"Registre prospectif REVA — {nxt['label_fr']}", nxt["reference_period"]
+        )
         row: dict[str, Item] = {
             "family": label_val(nxt["label_fr"], src),
             "n": num_val(len(lst), src, kind="derived", digits=0),
             "next_period": period_val(nxt["reference_period"], src),
-            "resolution": label_val(fr_period(nxt.get("expected_resolution")) or str(nxt.get("expected_resolution")), src),
+            "resolution": label_val(
+                fr_period(nxt.get("expected_resolution")) or str(nxt.get("expected_resolution")), src
+            ),
         }
         fcs = {f["model"]: f for f in idx["forecasts"].get(nxt["question_id"], [])}
         f = fcs.get("reva.ensemble") or fcs.get("forecast.registry_persistence")
@@ -1387,6 +1448,12 @@ def predict_references(ctx: Ctx, *, instruments: Iterable[str] = (), ids: Iterab
 
 
 # ============================================================================== small helpers
+def _bare(v: Val) -> str:
+    """The number of a formatted value without its unit words (tables carry the unit in their header)."""
+    t = fr_number(v.exact, None, v.unit) if v.exact is not None else None
+    return t or v.text
+
+
 def _f(v: Any) -> float | None:
     d = to_decimal(v)
     return float(d) if d is not None else None

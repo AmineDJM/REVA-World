@@ -73,7 +73,7 @@ sections:
         empty: {what: "Appartenances à des organisations"}
       - id: borders
         query: kg.edges
-        params: {ids: $ids, properties: [P47], limit: 20}
+        params: {ids: $ids, properties: [P47], limit: 20, current: true}
         list:
           title: "Frontières terrestres partagées avec"
           item: "{name}"

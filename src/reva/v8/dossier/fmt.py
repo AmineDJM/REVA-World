@@ -42,6 +42,9 @@ UNIT_FR: dict[str, str] = {
     "pp": "points de %",
     "fatalities": "décès",
     "probability": "probabilité",
+    "% of under-5 population": "% des enfants de moins de 5 ans",
+    "phase": "",
+    "thousand metric tons": "milliers de tonnes",
 }
 
 SCALE_UNITS = {"US dollars", "persons", "deaths", "DALYs"}
@@ -50,7 +53,14 @@ SCALE_UNITS = {"US dollars", "persons", "deaths", "DALYs"}
 def unit_fr(unit: str | None) -> str:
     if not unit:
         return ""
-    return UNIT_FR.get(unit, unit)
+    if unit in UNIT_FR:
+        return UNIT_FR[unit]
+    low = unit.lower()
+    if unit.startswith("%") or low.startswith(("percent", "% ")):
+        return "%"
+    if low.startswith("deaths"):
+        return "décès"
+    return unit
 
 
 def to_decimal(v: Any) -> Decimal | None:

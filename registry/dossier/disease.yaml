@@ -34,7 +34,7 @@ subjects:
       ids: ["mondo:0005136", "doid:12365"]
       onto: ["mondo:0005136", "doid:12365"]
       drug_targets: ["efo:0001068", "mesh:D008288", "icd11mms:1F4Z"]
-      ghe: who.ghe
+      ghe: atlas.who.ghe
       ghe_deaths: "ghe.deaths|sex=TOTAL|age=TOTAL|cause=220"
       ghe_dalys: "ghe.dalys|sex=TOTAL|age=TOTAL|cause=220"
       ghe_rate: "ghe.deaths_rate100k|sex=TOTAL|age=TOTAL|cause=220"
@@ -106,7 +106,7 @@ sections:
           columns:
             - {header: "Rang", cell: "{rank}", numeric: true}
             - {header: "Pays", cell: "{country}"}
-            - {header: "Décès", cell: "{value}", numeric: true}
+            - {header: "Décès estimés", cell: "{value_n}", numeric: true}
         empty: {what: "Décès estimés"}
       - id: dalys
         query: table.ranking
@@ -138,7 +138,8 @@ sections:
           caption: "Incidence du paludisme, huit pays les plus touchés"
           columns:
             - {header: "Pays", cell: "{country}"}
-            - {header: "Incidence", cell: "{value}", numeric: true}
+            - {header: "Incidence (pour 1 000 personnes exposées)", cell: "{value_n}", numeric: true}
+            - {header: "Année", cell: "{year}"}
         empty: {what: "Incidence"}
   - id: prevention
     title: Prévention
@@ -146,11 +147,11 @@ sections:
       - id: nets
         query: atlas.ranking
         when: nets
-        params: {concept: $nets, top: 5}
+        params: {concept: $nets, top: 5, latest_per_country_since: 2015}
         sentences:
           - id: nets
             what: "Moustiquaires imprégnées"
-            text: "Part des enfants de moins de cinq ans dormant sous moustiquaire imprégnée, valeurs les plus élevées en {year} : {top1} ({top1_value}), {top2} ({top2_value}), {top3} ({top3_value}) ; {n_countries} pays déclarent cette enquête."
+            text: "Enfants de moins de cinq ans dormant sous moustiquaire imprégnée (dernière enquête de chaque pays depuis la date indiquée dans les notes) : {top1} ({top1_value}), {top2} ({top2_value}), {top3} ({top3_value}) ; {n_countries} pays ont une enquête récente."
         empty: {what: "Moustiquaires imprégnées"}
   - id: traitements
     title: Médicaments

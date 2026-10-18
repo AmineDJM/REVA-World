@@ -32,7 +32,7 @@ def _md_parts(parts: Iterable[M.Part]) -> str:
         if p.t == "text":
             out.append(p.text.replace("*", "\\*"))
         elif p.t == "value":
-            badge = "" if p.kind in (None, "observed", "label") else f" _({KIND_FR.get(p.kind, p.kind)})_"
+            badge = f" _({KIND_FR[p.kind]})_" if p.kind in ("estimate", "projection", "forecast", "scenario") else ""
             out.append(f"**{p.text}**{badge}[^{p.fn}]")
         else:
             out.append(f"_⟨manquant : {p.reason}⟩_")

@@ -46,7 +46,7 @@ subjects:
       events: ["Q15860072", "Q110999040"]
 summary:
   - id: deaths
-    text: "Selon l'UCDP, {deaths.latest} décès liés aux combats en {deaths.latest_year} (bornes publiées : {deaths.latest_lo} – {deaths.latest_hi}), {deaths.total} sur {deaths.n_years} années renseignées (somme REVA)."
+    text: "Selon l'UCDP, {deaths.latest} liés aux combats en {deaths.latest_year} (bornes publiées : {deaths.latest_lo} – {deaths.latest_hi}), {deaths.total} sur {deaths.n_years} années renseignées (somme REVA)."
   - id: start
     text: "Début du conflit selon l'UCDP : {facts.start} ; intensité {facts.intensity} la dernière année codée ({facts.intensity_when})."
   - id: views
@@ -100,7 +100,7 @@ sections:
         sentences:
           - id: latest
             what: "Décès liés aux combats"
-            text: "En {latest_year}, l'UCDP estime {latest} décès liés aux combats (bornes : {latest_lo} – {latest_hi}) ; le pic de la série est {max} en {max_year}."
+            text: "En {latest_year}, l'UCDP estime {latest} liés aux combats (bornes : {latest_lo} – {latest_hi}) ; le pic de la série est {max} en {max_year}."
           - id: total
             what: "Total pluriannuel"
             text: "Sur les {n_years} années renseignées, la somme des meilleures estimations annuelles atteint {total} (calcul REVA)."
@@ -139,7 +139,7 @@ sections:
           columns:
             - {header: "Pays", cell: "{country}"}
             - {header: "Mois", cell: "{period}"}
-            - {header: "Décès prévus", cell: "{value}", numeric: true}
+            - {header: "Décès prévus", cell: "{value_n}", numeric: true}
         empty: {what: "Prévisions VIEWS"}
   - id: causes
     title: Causes et conséquences attribuées

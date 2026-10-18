@@ -363,7 +363,7 @@ tracks:
   label_fr: BEAT-NOWCAST — nowcasts US vs GDPNow, NY Fed, Cleveland Fed
   agent: BEAT-NOWCAST
   version: V7
-  report: null
+  report: docs/dev/v7_beat_nowcast.md
   protocol:
     file: registry/forecasts/beat_nowcast/protocol.yaml
     sha256: 36164461b41c67a2aae0cdf777ef8b21a4b39eb831c65acf1b449ef841ca3339
@@ -8389,7 +8389,6 @@ rows:
   - uses_official_forecast
   - timeliness_edge
   - small_n
-  - report_pending
   source:
     file: registry/forecasts/beat_nowcast/holdout.json
     pointer: /results/0
@@ -8398,7 +8397,7 @@ rows:
       p: p_better
       win: confirmed
     sha256: 2c28b5e1f1b7e3e534893d1c194fc3a636b06af04f1a331facf5c43867d4a79d
-  report: null
+  report: docs/dev/v7_beat_nowcast.md
   protocol:
     file: registry/forecasts/beat_nowcast/protocol.yaml
     sha256: 36164461b41c67a2aae0cdf777ef8b21a4b39eb831c65acf1b449ef841ca3339
@@ -8434,7 +8433,6 @@ rows:
   - uses_official_forecast
   - timeliness_edge
   - small_n
-  - report_pending
   source:
     file: registry/forecasts/beat_nowcast/holdout.json
     pointer: /results/1
@@ -8443,7 +8441,7 @@ rows:
       p: p_better
       win: confirmed
     sha256: 2c28b5e1f1b7e3e534893d1c194fc3a636b06af04f1a331facf5c43867d4a79d
-  report: null
+  report: docs/dev/v7_beat_nowcast.md
   protocol:
     file: registry/forecasts/beat_nowcast/protocol.yaml
     sha256: 36164461b41c67a2aae0cdf777ef8b21a4b39eb831c65acf1b449ef841ca3339
@@ -8478,7 +8476,6 @@ rows:
   - uses_official_forecast
   - timeliness_edge
   - small_n
-  - report_pending
   source:
     file: registry/forecasts/beat_nowcast/holdout.json
     pointer: /results/2
@@ -8487,7 +8484,7 @@ rows:
       p: p_better
       win: confirmed
     sha256: 2c28b5e1f1b7e3e534893d1c194fc3a636b06af04f1a331facf5c43867d4a79d
-  report: null
+  report: docs/dev/v7_beat_nowcast.md
   protocol:
     file: registry/forecasts/beat_nowcast/protocol.yaml
     sha256: 36164461b41c67a2aae0cdf777ef8b21a4b39eb831c65acf1b449ef841ca3339
@@ -8523,7 +8520,6 @@ rows:
   - uses_official_forecast
   - timeliness_edge
   - small_n
-  - report_pending
   source:
     file: registry/forecasts/beat_nowcast/holdout.json
     pointer: /results/3
@@ -8532,7 +8528,7 @@ rows:
       p: p_better
       win: confirmed
     sha256: 2c28b5e1f1b7e3e534893d1c194fc3a636b06af04f1a331facf5c43867d4a79d
-  report: null
+  report: docs/dev/v7_beat_nowcast.md
   protocol:
     file: registry/forecasts/beat_nowcast/protocol.yaml
     sha256: 36164461b41c67a2aae0cdf777ef8b21a4b39eb831c65acf1b449ef841ca3339
@@ -8566,7 +8562,6 @@ rows:
   caveats:
   - uses_official_forecast
   - timeliness_edge
-  - report_pending
   source:
     file: registry/forecasts/beat_nowcast/holdout.json
     pointer: /results/4
@@ -8575,7 +8570,7 @@ rows:
       p: p_better
       win: confirmed
     sha256: 2c28b5e1f1b7e3e534893d1c194fc3a636b06af04f1a331facf5c43867d4a79d
-  report: null
+  report: docs/dev/v7_beat_nowcast.md
   protocol:
     file: registry/forecasts/beat_nowcast/protocol.yaml
     sha256: 36164461b41c67a2aae0cdf777ef8b21a4b39eb831c65acf1b449ef841ca3339

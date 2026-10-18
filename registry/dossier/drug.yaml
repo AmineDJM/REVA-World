@@ -8,6 +8,14 @@ title: "{$subject}"
 subtitle: "Dossier médicament · identité, mécanisme, indications, liste OMS, essais"
 featured:
   - {id: "chembl:CHEMBL941", label: "Imatinib", sublabel: "ChEMBL 941 · ATC L01EA01"}
+vocab:
+  "Small molecule": "petite molécule"
+  "Antibody": "anticorps"
+  "Protein": "protéine"
+  "Oligonucleotide": "oligonucléotide"
+  "oral": "orale"
+  "parenteral": "parentérale"
+  "topical": "topique"
 honesty:
   - "Chaque affirmation est une déclaration de ChEMBL (EMBL-EBI), d'UniChem ou de la liste OMS des médicaments essentiels, citée avec sa version ; ce dossier n'est ni un avis médical ni une recommandation."
   - "Les indications de ChEMBL couvrent toutes les phases de développement : une indication n'est pas une autorisation de mise sur le marché."
@@ -23,7 +31,7 @@ not_covered:
     reason: "hors des sources chargées"
 summary:
   - id: ident
-    text: "{$subject} est une molécule de type {ident.type}, de phase maximale {ident.phase}, autorisée pour la première fois en {ident.first} (ChEMBL)."
+    text: "{$subject} : {ident.type|vocab}, phase de développement maximale {ident.phase}, première autorisation en {ident.first} (ChEMBL)."
   - id: targets
     text: "Cibles du mécanisme d'action déclarées : {targets.n} ; indications déclarées : {ind.n}."
   - id: eml
@@ -42,17 +50,17 @@ sections:
         sentences:
           - id: type
             what: "Type de molécule et phase"
-            text: "Type : {type} ; phase de développement maximale : {phase} ; première autorisation : {first}."
+            text: "Type : {type|vocab} ; phase de développement maximale : {phase} ; première autorisation : {first}."
           - id: route
             what: "Voie d'administration"
-            text: "Voie d'administration déclarée : {route}."
+            text: "Voie d'administration déclarée : {route|vocab}."
           - id: codes
             what: "Codes"
             text: "Code ATC (WHOCC, tel que listé par ChEMBL) : {atc} ; identifiant DrugBank (UniChem) : {drugbank}."
         empty: {what: "Identité de la molécule"}
       - id: forms
         query: kg.edges
-        params: {ids: $ids, properties: ["chembl:parent_molecule", "eml:chembl_molecule", "unichem:chebi", "unichem:fda_unii"], direction: both, limit: 10}
+        params: {ids: $ids, properties: ["chembl:parent_molecule", "eml:chembl_molecule", "unichem:chebi", "unichem:fda_unii"], direction: both, limit: 10, exclude_self: false}
         list:
           title: "Formes et identifiants équivalents"
           item: "{name} — {property}"

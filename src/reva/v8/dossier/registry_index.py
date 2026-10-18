@@ -35,11 +35,12 @@ def _compact_forecast(f: dict[str, Any]) -> dict[str, Any]:
 
 def build_index(conn: Any, store: Any, origin: str) -> dict[str, Any]:
     bs = R.batches(conn, origin)
-    key = hashlib.sha256(json.dumps(sorted(b["batch_sha256"] for b in bs) + [origin]).encode()).hexdigest()[:20]
+    key = hashlib.sha256(json.dumps([*sorted(b["batch_sha256"] for b in bs), origin]).encode()).hexdigest()[:20]
     with _LOCK:
         if key in _MEM:
             return _MEM[key]
     path = DISK / f"registry-index-{key}.json"
+    idx: dict[str, Any] | None
     try:
         idx = json.loads(path.read_text())
     except (OSError, ValueError):
@@ -47,7 +48,7 @@ def build_index(conn: Any, store: Any, origin: str) -> dict[str, Any]:
     if idx is None:
         questions: dict[str, dict[str, Any]] = {}
         forecasts: dict[str, list[dict[str, Any]]] = {}
-        for b in bs:
+        for order, b in enumerate(bs):  # newest batch first (registry read order)
             m = load_frozen_manifest(store, b["batch_sha256"])
             for q in m.get("questions", []):
                 if q["question_id"] not in questions and not m.get("supplement_of"):
@@ -55,6 +56,7 @@ def build_index(conn: Any, store: Any, origin: str) -> dict[str, Any]:
                         **{k: q.get(k) for k in Q_FIELDS},
                         "expected_resolution": (q.get("resolution") or {}).get("expected_date"),
                         "batch_sha256": b["batch_sha256"],
+                        "order": order,
                     }
             for f in m.get("forecasts", []):
                 if f.get("status") == "issued":

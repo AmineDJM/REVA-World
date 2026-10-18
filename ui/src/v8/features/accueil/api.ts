@@ -93,8 +93,8 @@ export const LiveState = z.looseObject({
     sealed_batches: Int.nullish(),
     questions: Int,
     forecasts: Int.nullish(),
-    pending: Int,
-    resolved: Int,
+    pending: Int.nullish(), // absent while the server computes the live state (refreshing)
+    resolved: Int.nullish(),
     void: Int.nullish(),
   }),
   next_resolution: z.string().nullish(),
@@ -122,7 +122,9 @@ export interface CalendarView {
   source: 'scores' | 'forecasts';
   upcoming: Upcoming[];
   events: ScoreEvent[];
-  totals: { questions: number; pending: number; resolved: number } | null;
+  totals: { questions: number; pending: number | null; resolved: number | null } | null;
+  /** The scores service is still computing its live state (cold cache): counts and dates come later. */
+  refreshing: boolean;
   nextResolution: string | null;
   computedAt: string | null;
   /** Fallback only: the view covers the first `sample` pending questions out of `total`. */
@@ -140,7 +142,8 @@ export async function fetchCalendar(signal?: AbortSignal): Promise<CalendarView>
       source: 'scores',
       upcoming: l.upcoming,
       events: cal?.data.scoreboard ?? [],
-      totals: { questions: l.totals.questions, pending: l.totals.pending, resolved: l.totals.resolved },
+      totals: { questions: l.totals.questions, pending: l.totals.pending ?? null, resolved: l.totals.resolved ?? null },
+      refreshing: !!l.refreshing || l.totals.pending == null,
       nextResolution: l.next_resolution ?? null,
       computedAt: l.computed_at ?? null,
       sample: null,
@@ -162,6 +165,7 @@ export async function fetchCalendar(signal?: AbortSignal): Promise<CalendarView>
       upcoming,
       events: [],
       totals: null,
+      refreshing: false,
       nextResolution: upcoming[0]?.date ?? null,
       computedAt: null,
       sample: { n: page.data.questions.length, total: page.data.total },
