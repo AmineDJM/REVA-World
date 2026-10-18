@@ -10,7 +10,7 @@
 import { useCallback, useState } from 'react';
 import type { PinItem } from './model';
 
-const clean = (s: string) => s.replace(/[[\]\n\r]+/g, ' ').trim();
+const clean = (s: string) => s.replace(/[[\]]/g, '').replace(/\s+/g, ' ').trim();
 
 export function linkNote(label: string, href: string, lines: string[] = []): PinItem {
   const l = clean(label).slice(0, 380) || 'Vue V8';

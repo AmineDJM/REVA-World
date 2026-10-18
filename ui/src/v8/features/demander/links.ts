@@ -1,4 +1,4 @@
-/** Deep links of an answer, built only with the contract's v8Links (plus the Comparer query of V8MONDE). */
+/** Deep links of an answer, built only with the contract's v8Links. */
 import { v8Links } from '../../contract';
 import type { Target } from './api';
 
@@ -23,8 +23,7 @@ export function targetHref(t: Target): string | null {
       return v8Links.series(t.table, p);
     }
     case 'comparer':
-      // V8MONDE's Comparer accepts ?s=<series key>&g=<ISO3> (no contract helper yet: requested in the report)
-      return t.series && t.iso3 ? `/v8/comparer?${new URLSearchParams({ s: t.series, g: t.iso3 }).toString()}` : null;
+      return t.series && t.iso3 ? v8Links.compare([t.series], t.iso3.split(',').filter(Boolean)) : null;
     case 'liens':
       return t.from && t.to ? v8Links.path(t.from, t.to) : null;
     case 'decision':

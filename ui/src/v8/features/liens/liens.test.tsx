@@ -198,6 +198,7 @@ describe('LiensPage', () => {
     expect((await screen.findByTestId('lien-answer')).textContent).toMatch(/reliés par 2 chemins/);
     expect(api.fetchPaths).toHaveBeenCalledWith(expect.objectContaining({ from: 'syn:gene', to: 'syn:drug', causal: true, hops: 4, families: [] }), expect.anything());
     expect(screen.getAllByTestId('lien-path')).toHaveLength(2);
+    expect(screen.getByRole('button', { name: 'Épingler' })).toBeInTheDocument();
     expect(screen.getAllByText(/affirmation causale · note B · T1/).length).toBe(1);
     expect(screen.getByText(/maillon le plus faible : B/)).toBeTruthy();
     expect(screen.getAllByText('licence inconnue').length).toBeGreaterThan(0);

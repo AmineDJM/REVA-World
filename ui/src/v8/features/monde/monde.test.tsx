@@ -260,6 +260,8 @@ describe('MondePage', () => {
     await waitFor(() => expect(within(panel).getByText(/dernière valeur observée · 2022/)).toBeInTheDocument());
     expect(within(panel).getByText(/à partir de 2023/)).toBeInTheDocument(); // projection named, not mixed
     expect(within(panel).getByRole('link', { name: /Fiche/ }).getAttribute('href')).toBe(v8Links.entity('country', 'FRA'));
+    expect(within(panel).getByRole('link', { name: /Comparer/ }).getAttribute('href')).toBe(v8Links.compare(['wb.wdi_econ.NY.GDP.PCAP.CD'], ['FRA']));
+    expect(screen.getByRole('button', { name: 'Épingler' })).toBeInTheDocument();
   });
 
   it('marks projection-only periods and offers the projection toggle', async () => {

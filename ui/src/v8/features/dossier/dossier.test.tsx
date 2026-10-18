@@ -174,6 +174,7 @@ describe('page and routing', () => {
     expect(pdf.getAttribute('href')).toContain('/v1/v8/dossier/country/FRA?format=html');
     expect(screen.getByRole('link', { name: 'Markdown' }).getAttribute('href')).toContain('format=md');
     expect(screen.getByRole('link', { name: 'JSON' }).getAttribute('href')).toContain('format=json');
+    expect(screen.getByRole('button', { name: 'Épingler' })).toBeInTheDocument();
     const toc = screen.getByText('Sommaire').closest('details')!;
     expect(within(toc).getByText('Ce que ce dossier ne couvre pas')).toBeTruthy();
   });

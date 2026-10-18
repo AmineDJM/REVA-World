@@ -6,6 +6,7 @@ import { AnswerBundle, BrainstormBundle } from './api';
 import { brainstormOf, feature, questionOf, search } from './index';
 import { clearHistory, loadHistory, remember } from './history';
 import { targetHref } from './links';
+import { v8Links } from '../../contract';
 
 const B = fixtures as Record<string, unknown>;
 const bundle = (k: string) => AnswerBundle.parse(B[k]);
@@ -86,6 +87,7 @@ describe('links and history', () => {
     expect(targetHref({ kind: 'fiche', entity_kind: 'country', id: 'FRA' } as never)).toBe('/v8/fiche/country/FRA');
     expect(targetHref({ kind: 'monde', table: 'who.gho', indicator: 'X|y=1', iso3: 'FRA', period: '2021' } as never)).toBe('/v8/monde?table=who.gho&indicator=X%7Cy%3D1&sel=FRA&period=2021');
     expect(targetHref({ kind: 'decision', ref: 'ecb_plus_50bp_2027q1' } as never)).toBe('/v8/decision?ref=ecb_plus_50bp_2027q1');
+    expect(targetHref({ kind: 'comparer', series: 'imf.weo.PCPIPCH', iso3: 'FRA' } as never)).toBe(v8Links.compare(['imf.weo.PCPIPCH'], ['FRA']));
   });
   it('history survives blocked storage', () => {
     const spy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {

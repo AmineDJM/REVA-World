@@ -197,6 +197,7 @@ describe('ComparerPage', () => {
     await renderPage('/v8/comparer?g=FRA,DEU&s=wb.wdi_econ.NY.GDP.MKTP.CD&s=imf.weo.PCPIPCH');
     await screen.findByRole('heading', { name: 'PIB' });
     expect(api.getMulti).toHaveBeenCalledWith(['wb.wdi_econ.NY.GDP.MKTP.CD', 'imf.weo.PCPIPCH'], ['FRA', 'DEU'], false);
+    expect(screen.getByRole('button', { name: 'Épingler' })).toBeInTheDocument();
     const base = screen.getByRole('button', { name: 'Base 100' });
     expect(base).not.toBeDisabled();
     fireEvent.click(base);

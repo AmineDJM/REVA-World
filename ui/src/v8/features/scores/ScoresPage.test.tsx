@@ -107,6 +107,7 @@ describe('ScoresPage', () => {
     expect(detail).toHaveTextContent('registry/forecasts/beat_macro/holdout.json');
     expect(detail).toHaveTextContent('#/results/1');
     expect(detail).toHaveTextContent('Utilise la prévision officielle en entrée.');
+    expect(within(drawer).getByRole('button', { name: 'Épingler' })).toBeInTheDocument();
     act(() => {
       window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     });
@@ -122,6 +123,7 @@ describe('ScoresPage', () => {
     expect(within(v).getAllByText('bat').length).toBeGreaterThan(0);
     expect(within(v).getByText('ne bat pas')).toBeInTheDocument();
     expect(screen.getByTestId('ratio-chart')).toBeInTheDocument();
+    expect(within(v).getByRole('button', { name: 'Épingler' })).toBeInTheDocument();
     fireEvent.click(within(v).getByRole('button', { name: /protocole/ }));
     expect(await screen.findByRole('dialog')).toHaveTextContent('schema: x');
   });
