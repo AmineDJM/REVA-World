@@ -214,7 +214,7 @@ export function FicheView({ b, kind, id, stale = false }: { b: Bundle; kind: str
             {ident?.definition && ident.definition_source && <SourceChip {...chip(ident.definition_source)!} />}
           </p>
         )}
-        {ident?.anchor_note && <p className="fiche-note">{ident.anchor_note}</p>}
+        {ident?.anchor_note && !ident.description && <p className="fiche-note">{ident.anchor_note}</p>}
         {b.notes.map((n) => (
           <p key={n} className="fiche-note">
             {n}

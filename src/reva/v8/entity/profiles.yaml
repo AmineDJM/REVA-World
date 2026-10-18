@@ -69,7 +69,7 @@ kinds:
       - {literal: "hgnc:cytogenetic_location", label_fr: Locus cytogénétique}
       - {literal: "hgnc:locus_type", label_fr: Type de locus}
       - {relation: "hgnc:encodes", label_fr: Protéine codée}
-      - {family_count: interacts_with, label_fr: Interactions}
+      - {relation: "hgnc:located_on_chromosome", label_fr: Chromosome}
     expected_facts:
       - {property: "hgnc:symbol", label_fr: Symbole approuvé}
       - {property: "hgnc:name", label_fr: Nom approuvé}

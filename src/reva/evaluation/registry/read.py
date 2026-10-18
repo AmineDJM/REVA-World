@@ -12,6 +12,7 @@ from sqlalchemy import text
 
 from reva.evaluation.ledger import load_frozen_manifest
 from reva.evaluation.registry.forecasts import all_models
+from reva.evaluation.registry.question_index import INDEX
 from reva.evaluation.registry.scores import aggregate, calibration, relative_to
 from reva.evaluation.registry.service import (
     BACKTEST_KIND,
@@ -111,7 +112,11 @@ def _score_rows(conn: Any, origin: str | None, batch_sha: str | None = None) -> 
 
 def outcomes(conn: Any, store: Any, origin: str | None, batch_sha: str | None = None) -> dict[str, dict[str, Any]]:
     """question_id -> outcome (status, value, source) from the resolution manifests."""
-    shas = sorted({r["metrics"].get("resolution_sha256") for r in _score_rows(conn, origin, batch_sha)} - {None})
+    return _outcomes_of(store, _score_rows(conn, origin, batch_sha))
+
+
+def _outcomes_of(store: Any, score_rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    shas = sorted({r["metrics"].get("resolution_sha256") for r in score_rows} - {None})
     out: dict[str, dict[str, Any]] = {}
     for sha in shas:
         doc = CACHE.get(store, sha)
@@ -198,32 +203,36 @@ def _display(f: dict[str, Any]) -> dict[str, Any]:
 
 
 def question(conn: Any, store: Any, question_id: str) -> dict[str, Any] | None:
-    for b in batches(conn, None):
-        m = CACHE.get(store, b["batch_sha256"])
-        if m.get("supplement_of"):  # merged below into the original batch's answer
+    """One sealed question. Batches, outcomes and scores are read from the database on every call; the batch
+    manifests through ``question_index.INDEX`` (verified once per sha256, then a per-question slice: V8 PERFQ)."""
+    bs = batches(conn, None)
+    rows_of: dict[Any, list[dict[str, Any]]] = defaultdict(list)  # score rows per task_scope batch_sha256
+    for r in _score_rows(conn, None):
+        rows_of[r["task_scope"].get("batch_sha256")].append(r)
+    for b in bs:
+        ix = INDEX.get(store, b["batch_sha256"])
+        if ix.supplement_of:  # merged below into the original batch's answer
             continue
-        q = next((x for x in m["questions"] if x["question_id"] == question_id), None)
+        q, fcs = ix.get(question_id)
         if q is None:
             continue
-        oc = outcomes(conn, store, None, b["batch_sha256"]).get(question_id)
+        oc = _outcomes_of(store, rows_of[b["batch_sha256"]]).get(question_id)
         # keyed by (model, model_version): reva.ensemble 1.0.0 and 2.0.0 both forecast the same question (V7)
         scores: dict[tuple[str, Any], dict[str, Any]] = {}
-        for r in _score_rows(conn, None, b["batch_sha256"]):
+        for r in rows_of[b["batch_sha256"]]:
             for s in r["metrics"].get("scores", []):
                 if s["question_id"] == question_id:
                     scores[(s["model"], s.get("model_version"))] = s
-        fcs = [f for f in m["forecasts"] if f["question_id"] == question_id]
-        for b2 in batches(conn, None):  # forecasts of supplementary batches (V6 PRED-MODELS) on the same question
+        for b2 in bs:  # forecasts of supplementary batches (V6 PRED-MODELS) on the same question
             if b2["batch_sha256"] == b["batch_sha256"]:
                 continue
-            m2 = CACHE.get(store, b2["batch_sha256"])
-            if m2.get("supplement_of") != b["batch_sha256"]:
+            ix2 = INDEX.get(store, b2["batch_sha256"])
+            if ix2.supplement_of != b["batch_sha256"]:
                 continue
-            sc2 = {(s["model"], s.get("model_version")): s for r in _score_rows(conn, None, b2["batch_sha256"])
+            sc2 = {(s["model"], s.get("model_version")): s for r in rows_of[b2["batch_sha256"]]
                    for s in r["metrics"].get("scores", []) if s["question_id"] == question_id}  # fmt: skip
             scores.update(sc2)
-            fcs += [{**f, "supplement_batch_sha256": b2["batch_sha256"]} for f in m2["forecasts"]
-                    if f["question_id"] == question_id]  # fmt: skip
+            fcs += [{**f, "supplement_batch_sha256": b2["batch_sha256"]} for f in ix2.get(question_id)[1]]
         return {
             "question": q,
             "forecasts": [{**_display(f), "score": scores.get((f["model"], f.get("model_version")))} for f in fcs],
@@ -236,9 +245,9 @@ def question(conn: Any, store: Any, question_id: str) -> dict[str, Any] | None:
                 "origin": b["origin"],
                 "context_id": b["context_id"],
                 "verified": True,
-                "label": m["label"],
-                "data_tables": m["data"]["tables"],
-                "code_digest": m.get("code_digest"),
+                "label": ix.meta["label"],
+                "data_tables": ix.meta["data_tables"],
+                "code_digest": ix.meta.get("code_digest"),
             },
         }
     return None
