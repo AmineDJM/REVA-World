@@ -302,7 +302,7 @@ export default function LiensPage() {
                 <p className="lien-answer">
                   Voisins de <strong>{egoData.center.label}</strong> : {plural(egoData.edges.length, 'lien affiché', 'liens affichés')} sur {Object.values(egoData.groups).reduce((a, b) => a + b, 0).toLocaleString('fr-FR')}. Choisissez l’autre bout pour chercher un chemin.
                 </p>
-                <EgoList data={egoData} onPick={pick} />
+                <EgoList data={egoData} onPick={pick} familyLabels={Object.fromEntries((families ?? []).map((f) => [f.id, f.label]))} />
               </>
             )}
           </section>

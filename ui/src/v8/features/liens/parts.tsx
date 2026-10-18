@@ -161,14 +161,21 @@ export function NodeCard({ node, onExpand, onFrom, onTo, expanded, busy }: { nod
   );
 }
 
-export function EgoList({ data, onPick }: { data: EgoData; onPick: (id: string) => void }) {
+const GROUP_FR: Record<string, string> = {
+  causal_claim: 'affirmations causales',
+  effect_estimate: 'estimations d’effet',
+  estimate_scope: 'périmètres d’estimation',
+  declared_bridge: 'liens déclarés',
+};
+
+export function EgoList({ data, onPick, familyLabels = {} }: { data: EgoData; onPick: (id: string) => void; familyLabels?: Record<string, string> }) {
   const groups = Object.entries(data.groups).sort((a, b) => b[1] - a[1]);
   return (
     <div className="lien-ego" data-testid="lien-ego">
       <p className="lien-ego-sum">
         {groups.map(([g, n]) => (
-          <span key={g} className="lien-chip is-static">
-            {g} <span className="v8-num">{n.toLocaleString('fr-FR')}</span>
+          <span key={g} className="lien-chip is-static" title={g}>
+            {familyLabels[g] ?? GROUP_FR[g] ?? g} <span className="v8-num">{n.toLocaleString('fr-FR')}</span>
           </span>
         ))}
       </p>
