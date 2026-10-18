@@ -258,3 +258,11 @@ def brief(body: BriefIn, request: Request) -> BriefResponse:
         fp = rn.data_fingerprint(conn)
         out = sv.brief(sc, fp, _factory(conn, request, sc), url=body.url, with_sensitivity=body.sensitivity)
     return BriefResponse(data=BriefData.model_validate(out), **_env(sc.origin, _warnings()))
+
+
+def warm(app: Any) -> str:
+    """Start-up warm-up (reva.api.warmup): the decision engine's own background warm-up (atlas, registry, IO)."""
+    from reva.api.warmup import request_for
+
+    started = rn.start_warmup(app.state.engine, _store(request_for(app)))
+    return "engine warm-up started" if started else "engine warm-up already running or done"

@@ -68,17 +68,32 @@ export function groupWins(wins: Win[]): WinGroup[] {
   return [...by.values()];
 }
 
+/**
+ * The verb of a win line, worded as registry/scoreboard/tracks.yaml requires: a candidate that uses the official
+ * forecast is « la combinaison qui utilise la prévision de X bat X seul », never « REVA bat X »; a timeliness edge says
+ * it is one (fresher data than the official forecast, not a better forecast in general).
+ */
+export function winVerb(g: Pick<WinGroup, 'wins'>, fc: string): string {
+  const n = g.wins.length;
+  const combo = g.wins.filter((w) => w.caveats.includes('uses_official_forecast')).length;
+  const fresh = g.wins.every((w) => w.caveats.includes('timeliness_edge'));
+  let out: string;
+  if (combo === n) out = n > 1 ? `${n} combinaisons qui utilisent la prévision ${fc} battent ${fc} seul` : `la combinaison qui utilise la prévision ${fc} bat ${fc} seul`;
+  else if (combo > 0) out = `${n} tests battent ${fc} (dont ${combo} combinaison${combo > 1 ? 's' : ''} qui utilise${combo > 1 ? 'nt' : ''} sa prévision)`;
+  else out = n > 1 ? `${n} tests battent ${fc}` : `bat ${fc}`;
+  return fresh ? `${out} — avantage de fraîcheur (données publiées après la prévision officielle), pas une meilleure prévision en général` : out;
+}
+
 function WinLine({ g, label, vocab, onOpenTrack }: { g: WinGroup; label: string; vocab: Vocab; onOpenTrack: (id: string, row?: string) => void }) {
   const cav = [...new Set(g.wins.flatMap((w) => w.caveats))].filter((c) => c in CAVEAT_SHORT);
   const ratios = g.wins.map((w) => w.ratio).filter((x): x is number => typeof x === 'number');
   const ps = g.wins.map((w) => w.p_holm).filter((x): x is number => typeof x === 'number');
-  const n = g.wins.length;
   return (
     <li className="sc-win">
       <span className="sc-win-ratio v8-num">{fmtRange(Math.min(...ratios), Math.max(...ratios))}</span>
       <div className="sc-win-body">
         <p className="sc-win-text">
-          <strong>{label}</strong>, {g.horizon} — {n > 1 ? `${n} tests battent` : 'bat'} {forecasterLabel(g.forecaster)} · {EVALUATION_SHORT[g.evaluation] ?? g.evaluation}
+          <strong>{label}</strong>, {g.horizon} — {winVerb(g, forecasterLabel(g.forecaster))} · {EVALUATION_SHORT[g.evaluation] ?? g.evaluation}
           {ps.length ? ` · p Holm ≤ ${fmtP(Math.max(...ps))}` : ''}
         </p>
         <ul className="sc-win-tests">
@@ -113,6 +128,17 @@ const CAVEAT_SHORT: Record<string, string> = {
   licence_restricted: 'licence à vérifier',
 };
 
+/** What the wins are made of (tracks.yaml caveats): combinations using the official forecast, timeliness edges. */
+export function winsReading(wins: Pick<Win, 'caveats'>[]): string {
+  if (!wins.length) return '';
+  const combo = wins.filter((w) => w.caveats.includes('uses_official_forecast')).length;
+  const fresh = wins.filter((w) => w.caveats.includes('timeliness_edge')).length;
+  const parts: string[] = [];
+  if (combo) parts.push(`${combo} par une combinaison qui utilise la prévision officielle (« la combinaison bat l’officiel seul »)`);
+  if (fresh) parts.push(`${fresh} grâce à un avantage de fraîcheur (période en cours, données publiées après la prévision officielle — pas une meilleure prévision en général)`);
+  return parts.length ? ` ${wins.length > 1 ? `Parmi les ${wins.length} victoires` : 'Victoire'} : ${parts.join(' ; ')}.` : '';
+}
+
 function Headline({ p, onOpenTrack, compact = false }: { p: Page; onOpenTrack: (id: string, row?: string) => void; compact?: boolean }) {
   const h = p.headline;
   const weakWins = p.weak_reference.bat;
@@ -125,6 +151,7 @@ function Headline({ p, onOpenTrack, compact = false }: { p: Page; onOpenTrack: (
       </h2>
       <p className="sc-headline-sub">
         {total(h).toLocaleString('fr-FR')} comparaisons jugées (chacune : une cible, un horizon, une métrique, une famille Holm). {p.headline_rule_fr}
+        {winsReading(p.wins)}
       </p>
       <CountsBar c={h} label={`Répartition : ${h.bat} bat, ${h.ne_bat_pas} ne bat pas, ${h.egalite} égalité, ${h.en_attente} en attente`} />
       {!compact && <div className="sc-headline-grid">

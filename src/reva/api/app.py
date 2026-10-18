@@ -25,6 +25,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from sqlalchemy import Engine
 from starlette.datastructures import MutableHeaders
+from starlette.middleware.gzip import GZipMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
@@ -118,6 +119,27 @@ class BodySizeLimit:
         await problem_response(Request(scope), problem, {"Connection": "close"})(scope, receive, send)
 
 
+#: Responses below this size are sent as is (gzip overhead > gain); V8 page bundles are 15-300 KB of JSON.
+GZIP_MIN_BYTES = 1024
+#: Never compressed: responses carrying the session's CSRF token (no compression oracle on a secret, BREACH).
+GZIP_EXCLUDED_PATHS = frozenset({"/v1/session"})
+
+
+class Compression(GZipMiddleware):
+    """``GZipMiddleware`` (clients sending ``Accept-Encoding: gzip``; Starlette already skips event streams),
+    except on the paths whose bodies carry a secret."""
+
+    def __init__(self, app: ASGIApp, minimum_size: int = GZIP_MIN_BYTES) -> None:
+        super().__init__(app, minimum_size=minimum_size)
+        self.raw = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] == "http" and scope.get("path") in GZIP_EXCLUDED_PATHS:
+            await self.raw(scope, receive, send)
+            return
+        await super().__call__(scope, receive, send)
+
+
 def _lazy_engine(settings: Settings) -> Callable[[], Engine]:
     lock = threading.Lock()
     holder: dict[str, Engine] = {}
@@ -186,6 +208,11 @@ def create_app(
         from reva.api.routes.ask import start_warm_up
 
         start_warm_up(_.state)
+        # V8QA: one background thread prefetches the V8 cold caches (forecast registry, scores, series index,
+        # path index, decision engine); readiness never waits for it (reva.api.warmup).
+        from reva.api.warmup import start as start_v8_warmup
+
+        start_v8_warmup(_)
         yield
         engine.dispose()  # type: ignore[attr-defined]
 
@@ -250,6 +277,9 @@ def create_app(
 
     # Added before the header middleware so that it runs inside it: its 413 responses get headers/metrics.
     app.add_middleware(BodySizeLimit, max_bytes=max_body_bytes)
+    # V8QA: gzip inside the header middleware too (it sees each response's single body, so the minimum size
+    # applies; the header middleware then adds the security headers to the compressed response).
+    app.add_middleware(Compression, minimum_size=GZIP_MIN_BYTES)
 
     @app.middleware("http")
     async def _headers(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:

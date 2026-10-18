@@ -646,3 +646,18 @@ def get_entity_relations(
         "cost": t.cost(len(page["items"])),
     }
     return V8FicheRelationPageResponse(data=V8FicheRelationPage.model_validate(page), **env)
+
+
+def warm(app: Any) -> str:
+    """Start-up warm-up (reva.api.warmup): start the Fiche's forecast-registry index in the background."""
+    from sqlalchemy import text
+
+    from reva.api.routes.atlas import _store
+    from reva.api.warmup import request_for
+    from reva.v8.entity import forecast_part as F
+
+    req = request_for(app)
+    with app.state.engine().connect() as conn, conn.begin():
+        conn.execute(text("SET TRANSACTION READ ONLY"))
+        F.warm(conn, _store(req), _origin(req, None))
+    return "fiche forecast index started"

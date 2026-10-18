@@ -508,3 +508,16 @@ def get_status(
                 pass
     meta: dict[str, Any] = {"context_mode": "operations", "origin": "none", "modality": "metadata", "warnings": []}
     return StatusResponse(data=HOLDER.status(), cost=t.cost(0), **meta)
+
+
+def warm(app: Any) -> str:
+    """Start-up warm-up (reva.api.warmup): load the path index from its cache or start its build (no wait)."""
+    from reva.api.warmup import request_for
+
+    req = request_for(app)
+    with app.state.engine().connect() as conn:
+        try:
+            HOLDER.get(conn, lambda: _connect(req), wait_s=0.0)
+        except IndexBuilding:
+            return "index building in the background"
+    return "index loaded"

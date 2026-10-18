@@ -225,8 +225,10 @@ export function BrainstormView({ b }: { b: BrainstormBundle }) {
             <ul className="v8b-examples">
               {v.examples.map((e, i) => (
                 <li key={i} className="v8-subtle">
-                  {String(e.candidate ?? '')} vs {String(e.benchmark ?? '')} : {String(e.verdict ?? '')}
+                  {String(e.candidate ?? '')} vs {String(e.benchmark ?? '')}
+                  {e.horizon ? `, ${String(e.horizon)}` : ''} : {String(e.verdict ?? '')}
                   {e.ratio !== null && e.ratio !== undefined ? ` (ratio ${frNumber(Number(e.ratio), 3)})` : ''} — {String(e.basis ?? '')}
+                  {Array.isArray(e.caveats) && e.caveats.length > 0 && <span className="v8b-caveats"> Réserves : {(e.caveats as unknown[]).map(String).join(' ')}</span>}
                 </li>
               ))}
             </ul>

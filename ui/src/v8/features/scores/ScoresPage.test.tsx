@@ -84,7 +84,8 @@ describe('ScoresPage', () => {
     renderAt('/v8/scores');
     const h = await screen.findByTestId('headline');
     expect(h).toHaveTextContent('REVA bat 1 · ne bat pas 1 · égalité 0 · en attente 1');
-    expect(h).toHaveTextContent('Chômage — G7, année en cours — bat FMI (WEO)');
+    expect(h).toHaveTextContent('Chômage — G7, année en cours — la combinaison qui utilise la prévision FMI (WEO) bat FMI (WEO) seul — avantage de fraîcheur');
+    expect(h).toHaveTextContent('Victoire : 1 par une combinaison qui utilise la prévision officielle');
     expect(h).toHaveTextContent('Combinaison officiel + nowcast REVA vs point WEO en vigueur à t');
     expect(within(h).getAllByText('×0,63').length).toBeGreaterThan(0);
     expect(within(h).getByText('utilise la prévision officielle')).toBeInTheDocument();

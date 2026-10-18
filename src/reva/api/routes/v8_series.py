@@ -452,3 +452,11 @@ def places(response: Response) -> PlacesResponse:
     """The country referential (ISO3, ISO2, labels, UN region) used by Monde and Comparer."""
     _cache(response)
     return PlacesResponse(data=svc.places())
+
+
+def warm(app: Any) -> str:
+    """Start-up warm-up (reva.api.warmup): resolve the live atlas snapshot and build the series index."""
+    from reva.api.warmup import request_for
+
+    _q, idx = _ctx(request_for(app), None, None)
+    return f"series index ready ({type(idx).__name__})"

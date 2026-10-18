@@ -444,7 +444,11 @@ class Brainstormer:
                     "examples": [
                         {
                             "id": r.get("id"),
-                            "verdict": verdicts.get(str(r.get("verdict")), r.get("verdict")),
+                            "verdict": _verdict_wording(r, verdicts),
+                            "horizon": r.get("horizon_label_fr"),
+                            "caveats": [
+                                str((sb.get("caveats") or {}).get(c) or c).strip() for c in r.get("caveats") or []
+                            ],
                             "candidate": r.get("candidate_label_fr"),
                             "benchmark": r.get("benchmark_label_fr"),
                             "evaluation": r.get("evaluation"),
@@ -577,3 +581,18 @@ class Brainstormer:
             ),
             "as_of": datetime.now(UTC).isoformat(timespec="seconds"),
         }
+
+
+def _verdict_wording(r: Mapping[str, Any], verdicts: Mapping[str, Any]) -> str:
+    """Scoreboard verdict worded as registry/scoreboard/tracks.yaml requires (caveats uses_official_forecast,
+    timeliness_edge): a combination « bat l'officiel seul », a timeliness edge is not a better forecast in general."""
+    v = str(r.get("verdict"))
+    text = str(verdicts.get(v, v))
+    if v != "bat":
+        return text
+    cav = set(r.get("caveats") or [])
+    if "uses_official_forecast" in cav:
+        text = "la combinaison qui utilise la prévision officielle bat l'officiel seul"
+    if "timeliness_edge" in cav:
+        text += " — avantage de fraîcheur (données publiées après la prévision officielle), pas une meilleure prévision en général"
+    return text

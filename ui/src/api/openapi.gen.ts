@@ -1701,6 +1701,861 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/v8/ask/answer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Answer
+         * @description Answer a question only from sourced data, as a page bundle (answer first, then evidence).
+         */
+        post: operations["answer_v1_v8_ask_answer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/ask/brainstorm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Brainstorm
+         * @description What REVA's registries say about forecasting a target: drivers, data, forecasts, verdicts, next steps.
+         */
+        get: operations["brainstorm_v1_v8_ask_brainstorm_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/ask/examples": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Examples
+         * @description Example questions and brainstorm targets (curated from the golden set; each answers on the dev data).
+         */
+        get: operations["examples_v1_v8_ask_examples_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/boards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Boards */
+        get: operations["list_boards_v1_v8_boards_get"];
+        put?: never;
+        /** Create Board */
+        post: operations["create_board_v1_v8_boards_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/boards/{board_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Board */
+        get: operations["get_board_v1_v8_boards__board_id__get"];
+        put?: never;
+        /**
+         * Update Board
+         * @description Full update: ``{title, items, rules, version}`` (version = the one read).
+         */
+        post: operations["update_board_v1_v8_boards__board_id__post"];
+        /** Delete Board */
+        delete: operations["delete_board_v1_v8_boards__board_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/boards/{board_id}/alerts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Board Alerts */
+        get: operations["board_alerts_v1_v8_boards__board_id__alerts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/boards/{board_id}/rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Rule */
+        post: operations["add_rule_v1_v8_boards__board_id__rules_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/boards/{board_id}/rules/{rule_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Rule */
+        delete: operations["delete_rule_v1_v8_boards__board_id__rules__rule_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/changes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Changes */
+        get: operations["changes_v1_v8_changes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/coverage/countries/{iso3}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One country: coverage profile per domain */
+        get: operations["coverage_country_v1_v8_coverage_countries__iso3__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/coverage/decisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Owner decisions (licences, keys, permissions, ...) */
+        get: operations["coverage_decisions_v1_v8_coverage_decisions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/coverage/domains/{domain}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One domain: tables, countries, KG kinds, gaps */
+        get: operations["coverage_domain_v1_v8_coverage_domains__domain__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/coverage/freshness": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Latest period and last load per table, by domain */
+        get: operations["coverage_freshness_v1_v8_coverage_freshness_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/coverage/matrix": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Domain x place coverage matrix (page bundle) */
+        get: operations["coverage_matrix_v1_v8_coverage_matrix_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/coverage/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Queued loads, with a live check against the database */
+        get: operations["coverage_pending_v1_v8_coverage_pending_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/decision/brief": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Brief
+         * @description Markdown brief of the scenario with every citation (for the Dossier or a download).
+         */
+        post: operations["brief_v1_v8_decision_brief_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/decision/compare": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Compare
+         * @description Two scenarios side by side; paired difference B − A when both use the same draws and seed.
+         */
+        post: operations["compare_v1_v8_decision_compare_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/decision/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Run
+         * @description One scenario's page bundle (read-only, cached by input hash). An unvalidated scenario, not a forecast.
+         */
+        post: operations["run_v1_v8_decision_run_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/decision/sensitivity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sensitivity
+         * @description One-at-a-time sensitivity of each result to each estimate's published uncertainty (tornado).
+         */
+        post: operations["sensitivity_v1_v8_decision_sensitivity_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/decision/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Templates
+         * @description Reference decisions, instruments and schema limits for the composer (and engine warm-up state).
+         */
+        get: operations["templates_v1_v8_decision_templates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/dossier/subjects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Dossier Subjects
+         * @description Featured briefs and subject lookups (countries, KG diseases / drugs / UCDP conflicts, reference decisions).
+         */
+        get: operations["dossier_subjects_v1_v8_dossier_subjects_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/dossier/{kind}/{sid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Dossier Document
+         * @description The brief of one subject (cached per template version and data snapshot).
+         */
+        get: operations["dossier_document_v1_v8_dossier__kind___sid__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/entity/{kind}/{ident}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Entity Bundle */
+        get: operations["get_entity_bundle_v1_v8_entity__kind___ident__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/entity/{kind}/{ident}/relations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Entity Relations */
+        get: operations["get_entity_relations_v1_v8_entity__kind___ident__relations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/neighbourhood": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Neighbourhood */
+        get: operations["get_neighbourhood_v1_v8_neighbourhood_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/paths": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Paths */
+        get: operations["get_paths_v1_v8_paths_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/paths/nodes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Nodes
+         * @description Node search for the pickers: an id / ISO3 typed as is, effect variables / atlas concepts / event types of
+         *     the index (accent-insensitive substring), then KG label search (``reva.kg.query.search``).
+         */
+        get: operations["get_nodes_v1_v8_paths_nodes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/paths/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Status */
+        get: operations["get_status_v1_v8_paths_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/scores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Scores
+         * @description Page bundle: headline counts, matrix (targets × official forecasters), tracks, pending calendar.
+         */
+        get: operations["get_scores_v1_v8_scores_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/scores/calendar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Calendar
+         * @description Pending resolutions: pre-registered/prospective scoreboard tests and dated events, plus (live) the next
+         *     expected resolution dates of sealed registry questions.
+         */
+        get: operations["get_calendar_v1_v8_scores_calendar_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/scores/cells/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Cell
+         * @description One matrix cell (target~forecaster, or target~naive): its rows.
+         */
+        get: operations["get_cell_v1_v8_scores_cells__key__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/scores/doc": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Doc
+         * @description Text of a report or protocol referenced by the scoreboard (whitelisted paths only).
+         */
+        get: operations["get_doc_v1_v8_scores_doc_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/scores/live": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Live
+         * @description Live registry statistics: sealed batches, questions, forecasts, resolved / void / pending, next
+         *     resolution dates per family (with the official forecasters sealed on them), ensemble cells by verdict.
+         */
+        get: operations["get_live_v1_v8_scores_live_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/scores/matrix": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Matrix
+         * @description Same bundle as ``/v1/v8/scores`` (alias kept for clients that address the matrix explicitly).
+         */
+        get: operations["get_matrix_v1_v8_scores_matrix_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/scores/tracks/{track_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Track
+         * @description One track: every row (wins and losses), Holm families, charts copied from its result files, calendar.
+         */
+        get: operations["get_track_v1_v8_scores_tracks__track_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search */
+        get: operations["search_v1_v8_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/search/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Status */
+        get: operations["status_v1_v8_search_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/series/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Catalog
+         * @description Atlas indicators matching a text: catalog concepts (labels, unit, theme, sources; the first source of each
+         *     concept present in the snapshot), tables and raw measure codes.
+         */
+        get: operations["catalog_v1_v8_series_catalog_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/series/map": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Map Slice
+         * @description One series, one period, every place: value cells (with source, period, flags, raw artifact, licence), the
+         *     reason of every country without a value, the periods of the series at its precision and a scale hint.
+         */
+        get: operations["map_slice_v1_v8_series_map_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/series/measure": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Measure
+         * @description Filter facets of one measure and the series the given filters resolve to.
+         */
+        get: operations["measure_v1_v8_series_measure_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/series/multi": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Multi
+         * @description N series x M countries aligned by period, with the transforms the inputs allow (index 100, year-on-year,
+         *     per capita) and, on request, the population series a per-capita computation divides by.
+         */
+        get: operations["multi_v1_v8_series_multi_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/series/place": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Place
+         * @description One place's cells of one series for every period (projections flagged).
+         */
+        get: operations["place_v1_v8_series_place_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/series/places": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Places
+         * @description The country referential (ISO3, ISO2, labels, UN region) used by Monde and Comparer.
+         */
+        get: operations["places_v1_v8_series_places_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/series/table": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Table
+         * @description Measures of one atlas table (labels from catalog concepts when a concept reads the series).
+         */
+        get: operations["table_v1_v8_series_table_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/v8/series/vintages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Vintages
+         * @description Published vintages of a series for some countries (as first published; each vintage as published).
+         */
+        get: operations["vintages_v1_v8_series_vintages_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1711,6 +2566,128 @@ export interface components {
             live: number;
             /** Test Fixture */
             test_fixture: number;
+        };
+        /** Alert */
+        Alert: {
+            /** At */
+            at: string | null;
+            /** Change */
+            change: {
+                [key: string]: unknown;
+            } | null;
+            /** Item Label */
+            item_label: string | null;
+            /** Item Uid */
+            item_uid: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "new_data" | "revision" | "resolution" | "threshold";
+            /** Message */
+            message: string;
+            /**
+             * Observed
+             * @description threshold: latest observed value, period, source
+             */
+            observed: {
+                [key: string]: unknown;
+            } | null;
+            /** Reason */
+            reason: string | null;
+            /** Rule Id */
+            rule_id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "fired" | "not_fired" | "not_evaluable";
+        };
+        /** Alerts */
+        Alerts: {
+            /** Alerts */
+            alerts: components["schemas"]["Alert"][];
+            /** Evaluated At */
+            evaluated_at: string;
+            /** N Rules */
+            n_rules: number;
+            /** Since */
+            since: string;
+        };
+        /** AlertsResponse */
+        AlertsResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["Alerts"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** Alias */
         Alias: {
@@ -1724,6 +2701,91 @@ export interface components {
             provider: string;
             /** Valid Range */
             valid_range: string | null;
+        };
+        /** AnswerBundle */
+        AnswerBundle: {
+            /** Answer Text */
+            answer_text: string | null;
+            /**
+             * Cached
+             * @default false
+             */
+            cached?: boolean;
+            /** Evidence */
+            evidence: {
+                [key: string]: unknown;
+            }[];
+            /** Followups */
+            followups: {
+                [key: string]: unknown;
+            }[];
+            headline: components["schemas"]["Headline"];
+            /**
+             * How
+             * @description Operations, tables, periods, as-of, planner, latency
+             */
+            how: {
+                [key: string]: unknown;
+            };
+            /** Language */
+            language: string | null;
+            /** Latency Ms */
+            latency_ms: number | null;
+            /**
+             * Missing
+             * @description What is missing when REVA does not know (cause classes)
+             */
+            missing: string[];
+            /** Pin */
+            pin: {
+                [key: string]: unknown;
+            };
+            /** Question */
+            question: string;
+            /** Sentences */
+            sentences: {
+                [key: string]: unknown;
+            }[];
+            /** Sources */
+            sources: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Status
+             * @description answered | partial | unknown (« REVA ne sait pas »)
+             */
+            status: string;
+            /**
+             * Targets
+             * @description Deep-link targets (fiche, monde, comparer, liens, decision, scores)
+             */
+            targets: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Viz
+             * @description Evidence view chosen from the evidence shape, or null
+             */
+            viz: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: string[];
+        } & {
+            [key: string]: unknown;
+        };
+        /** AnswerRequest */
+        AnswerRequest: {
+            /**
+             * Lang
+             * @description Answer language (default: the question's)
+             */
+            lang?: ("fr" | "en") | null;
+            /**
+             * Question
+             * @description Question (fr|en), treated as data
+             */
+            question: string;
         };
         /** ApiWarning */
         ApiWarning: {
@@ -3014,7 +4076,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["Backtest"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -3165,7 +4227,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["Batch"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -3317,7 +4379,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["BeliefEstimate"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -3439,7 +4501,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["BeliefRelease"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -3514,7 +4576,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["BeliefRelease"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -3591,6 +4653,486 @@ export interface components {
             /** Subject Ids */
             subject_ids?: string[];
         };
+        /** Board */
+        Board: {
+            /** Created At */
+            created_at: string;
+            /** Id */
+            id: string;
+            /** Items */
+            items: (components["schemas"]["EntityPin"] | components["schemas"]["SeriesPin"] | components["schemas"]["ForecastPin"] | components["schemas"]["DecisionPin"] | components["schemas"]["NotePin"])[];
+            /** Rules */
+            rules: components["schemas"]["WatchRule"][];
+            /** Title */
+            title: string;
+            /** Updated At */
+            updated_at: string;
+            /** Version */
+            version: number;
+        };
+        /** BoardCreate */
+        BoardCreate: {
+            /** Id */
+            id?: string | null;
+            /** Items */
+            items?: (components["schemas"]["EntityPin"] | components["schemas"]["SeriesPin"] | components["schemas"]["ForecastPin"] | components["schemas"]["DecisionPin"] | components["schemas"]["NotePin"])[];
+            /** Rules */
+            rules?: components["schemas"]["WatchRule"][];
+            /** Title */
+            title: string;
+        };
+        /** BoardList */
+        BoardList: {
+            /** Boards */
+            boards: components["schemas"]["BoardSummary"][];
+        };
+        /** BoardListResponse */
+        BoardListResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["BoardList"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** BoardResponse */
+        BoardResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["Board"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** BoardSummary */
+        BoardSummary: {
+            /** Id */
+            id: string;
+            /** N Items */
+            n_items: number;
+            /** N Rules */
+            n_rules: number;
+            /** Title */
+            title: string;
+            /** Updated At */
+            updated_at: string;
+            /** Version */
+            version: number;
+        };
+        /** BoardUpdate */
+        BoardUpdate: {
+            /** Items */
+            items?: (components["schemas"]["EntityPin"] | components["schemas"]["SeriesPin"] | components["schemas"]["ForecastPin"] | components["schemas"]["DecisionPin"] | components["schemas"]["NotePin"])[];
+            /** Rules */
+            rules?: components["schemas"]["WatchRule"][];
+            /** Title */
+            title: string;
+            /** Version */
+            version: number;
+        };
+        /** BrainstormBundle */
+        BrainstormBundle: {
+            /** Anchors */
+            anchors: {
+                [key: string]: unknown;
+            };
+            /** As Of */
+            as_of: string;
+            /** Claims */
+            claims: {
+                [key: string]: unknown;
+            }[];
+            /** Drivers */
+            drivers: {
+                [key: string]: unknown;
+            }[];
+            /** Forecasts */
+            forecasts: {
+                [key: string]: unknown;
+            }[];
+            /** Known */
+            known: boolean;
+            /** Latency Ms */
+            latency_ms?: number | null;
+            /** Method */
+            method: string;
+            /** Next Steps */
+            next_steps: {
+                [key: string]: unknown;
+            }[];
+            /** Target */
+            target: {
+                [key: string]: unknown;
+            };
+            /** Target Series */
+            target_series: {
+                [key: string]: unknown;
+            }[];
+            /** Verdicts */
+            verdicts: {
+                [key: string]: unknown;
+            }[];
+        } & {
+            [key: string]: unknown;
+        };
+        /** BriefData */
+        BriefData: {
+            /** Filename */
+            filename: string;
+            /** Label */
+            label: string;
+            /** Markdown */
+            markdown: string;
+            /** N Citations */
+            n_citations: number;
+            /** Scenario Hash */
+            scenario_hash: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** BriefIn */
+        BriefIn: {
+            /**
+             * As Of Max
+             * @description Only estimates knowable then
+             */
+            as_of_max?: string | null;
+            /** @description A composed decision (instead of reference_id) */
+            decision?: components["schemas"]["Decision"] | null;
+            /**
+             * Draws
+             * @description Monte-Carlo draws
+             * @default 2000
+             */
+            draws?: number;
+            /**
+             * Origin
+             * @default any
+             * @enum {string}
+             */
+            origin?: "live" | "test_fixture" | "any";
+            /**
+             * Reference Id
+             * @description A reference decision
+             */
+            reference_id?: string | null;
+            /**
+             * Seed
+             * @default 0
+             */
+            seed?: number;
+            /**
+             * Sensitivity
+             * @default true
+             */
+            sensitivity?: boolean;
+            /**
+             * Url
+             * @description Studio URL to cite
+             */
+            url?: string | null;
+        };
+        /** BriefResponse */
+        BriefResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["BriefData"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** Calendar */
+        Calendar: {
+            /**
+             * Registry
+             * @description Next expected resolutions of sealed questions (live)
+             */
+            registry: {
+                [key: string]: unknown;
+            }[] | null;
+            /**
+             * Scoreboard
+             * @description Pending pre-registered / prospective tests and dated events
+             */
+            scoreboard: {
+                [key: string]: unknown;
+            }[];
+        } & {
+            [key: string]: unknown;
+        };
+        /** CalendarResponse */
+        CalendarResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["Calendar"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
         /** Calibration */
         Calibration: {
             /** Family */
@@ -3631,7 +5173,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["Calibration"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -3704,6 +5246,64 @@ export interface components {
             source_key: string;
             /** Source Revision */
             source_revision: string;
+        };
+        /** CatalogHit */
+        CatalogHit: {
+            /** Concept */
+            concept?: string | null;
+            /**
+             * Filters
+             * @default []
+             */
+            filters?: {
+                [key: string]: string;
+            }[];
+            /** Id */
+            id: string;
+            /**
+             * In Snapshot
+             * @default true
+             */
+            in_snapshot?: boolean;
+            /**
+             * Kind
+             * @description concept | table | measure
+             */
+            kind: string;
+            /** Label */
+            label: string;
+            /** Measure */
+            measure?: string | null;
+            /** Series */
+            series?: string | null;
+            /** Sublabel */
+            sublabel?: string | null;
+            /** Table */
+            table?: string | null;
+            /** Theme */
+            theme?: string | null;
+            /** Unit */
+            unit?: string | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** CatalogResponse */
+        CatalogResponse: {
+            /** Concepts Total */
+            concepts_total: number;
+            /** Hits */
+            hits: components["schemas"]["CatalogHit"][];
+            /** Query */
+            query: string;
+            snapshot: components["schemas"]["SnapshotRef"];
+            /** Themes */
+            themes: {
+                [key: string]: unknown;
+            };
+            /** Took Ms */
+            took_ms: number;
+        } & {
+            [key: string]: unknown;
         };
         /** CausalCandidate */
         CausalCandidate: {
@@ -3783,7 +5383,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["CausalCandidates"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -3884,7 +5484,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["CausalChain"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -4059,7 +5659,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["CausalClaims"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -4147,7 +5747,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["CausalConsistency"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -4267,7 +5867,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["CausalEvent"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -4534,7 +6134,100 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["CausalWhy"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** Cell */
+        Cell: {
+            /** Parts */
+            parts: components["schemas"]["Part"][];
+        };
+        /** CellDetail */
+        CellDetail: {
+            /** Cell */
+            cell: {
+                [key: string]: unknown;
+            };
+            /** Key */
+            key: string;
+            /** Rows */
+            rows: components["schemas"]["ScoreRow"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** CellResponse */
+        CellResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["CellDetail"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -4721,6 +6414,220 @@ export interface components {
              */
             unloaded_nodes_skipped: number;
         };
+        /** ChangeItem */
+        ChangeItem: {
+            /**
+             * At
+             * @description Server recorded_at (UTC)
+             */
+            at: string;
+            /** Counts */
+            counts: {
+                [key: string]: number;
+            };
+            /** Detail */
+            detail: {
+                [key: string]: unknown;
+            };
+            /** Id */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "ingest" | "atlas_snapshot" | "kg_batch" | "causal_claims" | "effects" | "forecast_batch" | "question_resolved" | "evaluation" | "owner_decision";
+            /** Links */
+            links: components["schemas"]["ChangeLink"][];
+            /**
+             * Origin
+             * @default live
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture";
+            /** Refs */
+            refs: components["schemas"]["ChangeRef"][];
+            /**
+             * Severity
+             * @enum {string}
+             */
+            severity: "info" | "notable" | "action";
+            /** Source */
+            source: string | null;
+            /** Summary */
+            summary: string | null;
+            /**
+             * Title
+             * @description French, one line
+             */
+            title: string;
+        };
+        /** ChangeLink */
+        ChangeLink: {
+            /** Href */
+            href: string;
+            /** Label */
+            label: string;
+        };
+        /** ChangeRef */
+        ChangeRef: {
+            /** Id */
+            id: string;
+            /** Type */
+            type: string;
+        };
+        /** ChangesData */
+        ChangesData: {
+            /**
+             * Counts
+             * @description Items per kind in [since, until] (all pages)
+             */
+            counts: {
+                [key: string]: number;
+            };
+            /** Items */
+            items: components["schemas"]["ChangeItem"][];
+            /** Kind Labels */
+            kind_labels: {
+                [key: string]: string;
+            };
+            /** Since */
+            since: string;
+            /** Until */
+            until: string;
+        };
+        /** ChangesResponse */
+        ChangesResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["ChangesData"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** ChartBlock */
+        ChartBlock: {
+            /**
+             * Chart
+             * @enum {string}
+             */
+            chart: "line" | "bar" | "fan";
+            /** Id */
+            id: string;
+            /** Note */
+            note: string | null;
+            /** Series */
+            series: components["schemas"]["ChartSeries"][];
+            /** Template Id */
+            template_id: string;
+            /** Title */
+            title: string;
+            /**
+             * Type
+             * @default chart
+             * @constant
+             */
+            type: "chart";
+            /** Unit */
+            unit: string;
+            /**
+             * X Kind
+             * @enum {string}
+             */
+            x_kind: "year" | "month" | "quarter" | "category";
+        };
+        /** ChartPoint */
+        ChartPoint: {
+            /** Exact */
+            exact: string | null;
+            /** Hi */
+            hi: number | null;
+            /** Lo */
+            lo: number | null;
+            /** X */
+            x: string;
+            /** Y */
+            y: number | null;
+        };
+        /** ChartSeries */
+        ChartSeries: {
+            /** Fn */
+            fn: number;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "observed" | "estimate" | "projection" | "forecast" | "scenario" | "derived" | "claim" | "label";
+            /** Label */
+            label: string;
+            /** Points */
+            points: components["schemas"]["ChartPoint"][];
+        };
         /** ClaimSample */
         ClaimSample: {
             /** Count */
@@ -4776,6 +6683,109 @@ export interface components {
             value: {
                 [key: string]: unknown;
             } | null;
+        };
+        /** CompareData */
+        CompareData: {
+            /** A */
+            a: {
+                [key: string]: unknown;
+            };
+            /** B */
+            b: {
+                [key: string]: unknown;
+            };
+            /** Changed Fields */
+            changed_fields: string[];
+            /** Paired */
+            paired: boolean;
+            /** Paired Fr */
+            paired_fr: string;
+            /** Variables */
+            variables: {
+                [key: string]: unknown;
+            }[];
+        } & {
+            [key: string]: unknown;
+        };
+        /** CompareIn */
+        CompareIn: {
+            a: components["schemas"]["ScenarioIn"];
+            b: components["schemas"]["ScenarioIn"];
+        };
+        /** CompareResponse */
+        CompareResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["CompareData"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** ConceptInfo */
         ConceptInfo: {
@@ -4866,7 +6876,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["ConnectorOut"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -5022,6 +7032,34 @@ export interface components {
             /** Wall Time Ms */
             wall_time_ms: number;
         };
+        /** CountryDetail */
+        CountryDetail: {
+            /** Domains */
+            domains: {
+                [key: string]: unknown;
+            }[];
+            /** Domains Without Data */
+            domains_without_data: string[];
+            /** Iso3 */
+            iso3: string;
+            /** Kg Kinds */
+            kg_kinds: {
+                [key: string]: unknown;
+            }[];
+            /** Label */
+            label: string;
+            meta: components["schemas"]["CoverageMeta"];
+            /** Region */
+            region: string;
+            /** Subregion */
+            subregion: string;
+            /** Tables */
+            tables: {
+                [key: string]: unknown;
+            }[];
+        } & {
+            [key: string]: unknown;
+        };
         /** CountryLinksResponse */
         CountryLinksResponse: {
             applicability: components["schemas"]["Assessment"];
@@ -5044,7 +7082,7 @@ export interface components {
             data: {
                 [key: string]: unknown;
             };
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -5112,6 +7150,52 @@ export interface components {
             statement: string;
             totals: components["schemas"]["CoverageTotals"];
         };
+        /** CoverageMatrix */
+        CoverageMatrix: {
+            /** Columns */
+            columns: components["schemas"]["MatrixColumn"][];
+            /** Level */
+            level: string;
+            meta: components["schemas"]["CoverageMeta"];
+            /** Rows */
+            rows: components["schemas"]["MatrixRow"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** CoverageMeta */
+        CoverageMeta: {
+            /** Atlas Rows */
+            atlas_rows: number;
+            /** Atlas Tables */
+            atlas_tables: number;
+            /** Computed At */
+            computed_at: string;
+            /** Kg Computed */
+            kg_computed: boolean;
+            /** Kg Entities */
+            kg_entities: number;
+            /** Kg Statements */
+            kg_statements: number;
+            /** Note */
+            note: string;
+            /** Origin */
+            origin: string;
+            /** Places */
+            places: number;
+            /** Refresh Command */
+            refresh_command: string;
+            /**
+             * Stale
+             * @description Atlas tables registered since the aggregates were computed
+             */
+            stale?: {
+                [key: string]: unknown;
+            } | null;
+            /** Today */
+            today: string;
+        } & {
+            [key: string]: unknown;
+        };
         /** CoverageResponse */
         CoverageResponse: {
             applicability: components["schemas"]["Assessment"];
@@ -5131,7 +7215,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["Coverage"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -5307,6 +7391,24 @@ export interface components {
             start: string;
             target: components["schemas"]["Party"];
         };
+        /** DecisionPin */
+        DecisionPin: {
+            /** Added At */
+            added_at: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "decision";
+            /** Label */
+            label: string;
+            /** Ref */
+            ref: string;
+            /** Summary */
+            summary?: string | null;
+            /** Uid */
+            uid: string;
+        };
         /** DecisionsData */
         DecisionsData: {
             /**
@@ -5343,7 +7445,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["DecisionsData"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -5491,7 +7593,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["DiscoveryCandidate"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -5592,6 +7694,254 @@ export interface components {
              */
             requirement_id?: string;
         };
+        /** DocResponse */
+        DocResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["DocText"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** DocText */
+        DocText: {
+            /**
+             * Format
+             * @enum {string}
+             */
+            format: "markdown" | "yaml";
+            /** Path */
+            path: string;
+            /** Sha256 */
+            sha256: string | null;
+            /** Text */
+            text: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** Document */
+        Document: {
+            /** Footnotes */
+            footnotes: components["schemas"]["Footnote"][];
+            /**
+             * Honesty
+             * @description Reading rules of the brief (templated, per kind)
+             */
+            honesty: string[];
+            /** Kind */
+            kind: string;
+            /**
+             * Licences
+             * @description Distinct licences of the cited sources, restricted first
+             */
+            licences: {
+                [key: string]: unknown;
+            }[];
+            meta: components["schemas"]["DocumentMeta"];
+            /**
+             * Not Covered
+             * @description Ce que ce dossier ne couvre pas (with reasons)
+             */
+            not_covered: components["schemas"]["NotCovered"][];
+            /**
+             * Schema
+             * @default reva-dossier/1
+             */
+            schema: string;
+            /** Sections */
+            sections: components["schemas"]["Section"][];
+            subject: components["schemas"]["SubjectRef"];
+            /** Subtitle */
+            subtitle: string;
+            /**
+             * Summary
+             * @description Answer first: the key sentences of the brief
+             */
+            summary: components["schemas"]["Sentence"][];
+            /** Title */
+            title: string;
+        };
+        /** DocumentMeta */
+        DocumentMeta: {
+            /** Atlas Snapshot */
+            atlas_snapshot: string | null;
+            /**
+             * Cached
+             * @default false
+             */
+            cached: boolean;
+            /** Compute Ms */
+            compute_ms: number;
+            /** Generated At */
+            generated_at: string;
+            /** Missing */
+            missing: number;
+            /**
+             * Origin
+             * @default live
+             */
+            origin: string;
+            /** Sentences */
+            sentences: number;
+            /**
+             * Snapshot Id
+             * @description Data snapshot id the document was computed from (cache key)
+             */
+            snapshot_id: string;
+            /**
+             * Template
+             * @description registry/dossier/<kind>.yaml
+             */
+            template: string;
+            /**
+             * Template Version
+             * @description sha256 (12) of the template file
+             */
+            template_version: string;
+            /**
+             * Timings Ms
+             * @description Compute time per block query (uncached)
+             */
+            timings_ms: {
+                [key: string]: number;
+            };
+            /** Values */
+            values: number;
+        };
+        /** DomainDetail */
+        DomainDetail: {
+            /** Connectors */
+            connectors: {
+                [key: string]: unknown;
+            }[];
+            /** Countries */
+            countries: {
+                [key: string]: unknown;
+            }[];
+            /** Countries Without Data */
+            countries_without_data: {
+                [key: string]: unknown;
+            }[];
+            /** Hist */
+            hist: {
+                [key: string]: number;
+            };
+            /** Id */
+            id: string;
+            /** Kg Kinds */
+            kg_kinds: {
+                [key: string]: unknown;
+            }[];
+            /** Label */
+            label: string;
+            meta: components["schemas"]["CoverageMeta"];
+            /** Pending */
+            pending: {
+                [key: string]: unknown;
+            }[];
+            summary: components["schemas"]["DomainSummary"];
+            /** Tables */
+            tables: {
+                [key: string]: unknown;
+            }[];
+        } & {
+            [key: string]: unknown;
+        };
+        /** DomainSummary */
+        DomainSummary: {
+            /** Catalog */
+            catalog: {
+                [key: string]: number;
+            } | null;
+            /** Countries */
+            countries: number;
+            /** Kg Entities */
+            kg_entities: number;
+            /** Last Loaded At */
+            last_loaded_at: string | null;
+            /** Latest Year */
+            latest_year: number | null;
+            /** Licences */
+            licences: {
+                [key: string]: number;
+            };
+            /** Pending Decisions */
+            pending_decisions: number;
+            /** Pending Loads */
+            pending_loads: number;
+            /** Rows */
+            rows: number;
+            /** Tables */
+            tables: number;
+        } & {
+            [key: string]: unknown;
+        };
         /** DraftAssumption */
         DraftAssumption: {
             /** Source */
@@ -5673,7 +8023,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["EffectComparison"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -5845,7 +8195,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["EffectEstimate"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -5921,7 +8271,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["EffectEstimate"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -6169,7 +8519,109 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["EffectVariable"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** EgoData */
+        EgoData: {
+            center: components["schemas"]["NodeRef"];
+            /** Edges */
+            edges: components["schemas"]["EgoEdge"][];
+            /**
+             * Groups
+             * @description Total neighbours per group (family or edge kind) before the limit
+             */
+            groups: {
+                [key: string]: number;
+            };
+            /** Nodes */
+            nodes: {
+                [key: string]: components["schemas"]["NodeRef"];
+            };
+            /** Note */
+            note: {
+                [key: string]: string;
+            };
+        };
+        /** EgoEdge */
+        EgoEdge: {
+            /** Group */
+            group: string;
+            hop: components["schemas"]["HopOut"];
+        };
+        /** EgoResponse */
+        EgoResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["EgoData"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -6346,7 +8798,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["EnsembleBoard"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -6470,7 +8922,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["EntityDetail"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -6571,7 +9023,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["EntityFamilies"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -6647,7 +9099,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["EntitySummary"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -6703,6 +9155,26 @@ export interface components {
             /** Warnings */
             warnings: components["schemas"]["ApiWarning"][];
         };
+        /** EntityPin */
+        EntityPin: {
+            /** Added At */
+            added_at: string;
+            /** Entitykind */
+            entityKind: string;
+            /** Id */
+            id: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "entity";
+            /** Label */
+            label: string;
+            /** Sublabel */
+            sublabel?: string | null;
+            /** Uid */
+            uid: string;
+        };
         /** EntityPlaces */
         EntityPlaces: {
             /** Chain */
@@ -6742,7 +9214,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["EntityPlaces"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -6938,7 +9410,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["EventCard"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -7097,7 +9569,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["EventTypes"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -7210,7 +9682,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["EvidenceDetail"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -7309,7 +9781,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["EvidenceItem"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -7392,7 +9864,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["ForecastFamily"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -7617,7 +10089,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["FamilyPathResult"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -7748,7 +10220,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["FamilyRegistryOut"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -7856,6 +10328,75 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** Footnote */
+        Footnote: {
+            /** Dataset */
+            dataset: string | null;
+            /**
+             * Indicator
+             * @description Series / property / estimate key inside the source
+             */
+            indicator: string | null;
+            /**
+             * Licence
+             * @description Licence or terms as recorded with the artifact; null = unknown
+             */
+            licence: string | null;
+            /** Licence Url */
+            licence_url: string | null;
+            /**
+             * Method
+             * @description For derived values: how REVA computed them
+             */
+            method: string | null;
+            /**
+             * N
+             * @description Footnote number (order of first use in the document)
+             */
+            n: number;
+            /**
+             * Non Commercial
+             * @default false
+             */
+            non_commercial: boolean;
+            /**
+             * Period
+             * @description Period the value refers to (as published)
+             */
+            period: string | null;
+            /**
+             * Ref
+             * @description Raw artifact sha256, statement key, estimate key or question id
+             */
+            ref: string | null;
+            /** Required Notice */
+            required_notice: string | null;
+            /**
+             * Restricted
+             * @description Non-commercial, share-alike, no-derivatives or not-open terms
+             * @default false
+             */
+            restricted: boolean;
+            /** Retrieved */
+            retrieved: string | null;
+            /**
+             * Source
+             * @description Source key (atlas source, KG source key, registry, publication)
+             */
+            source: string;
+            /**
+             * Title
+             * @description Human label of the source / dataset (from the source's own metadata)
+             */
+            title: string;
+            /** Url */
+            url: string | null;
+            /**
+             * Verification
+             * @description e.g. community_edited_not_verified, derived, unvalidated
+             */
+            verification: string | null;
+        };
         /** ForecastFamily */
         ForecastFamily: {
             /** Concept Id */
@@ -7909,14 +10450,21 @@ export interface components {
             /** Value Rule */
             value_rule: string;
         };
-        /** Freshness */
-        Freshness: {
-            /** Latest Recorded At */
-            latest_recorded_at: string | null;
-            /** Latest Retrieved At */
-            latest_retrieved_at: string | null;
-            /** Note */
-            note: string | null;
+        /** ForecastPin */
+        ForecastPin: {
+            /** Added At */
+            added_at: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "forecast";
+            /** Label */
+            label: string;
+            /** Questionid */
+            questionId: string;
+            /** Uid */
+            uid: string;
         };
         /** Gap */
         Gap: {
@@ -7964,7 +10512,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["Gap"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -8100,6 +10648,23 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** Headline */
+        Headline: {
+            /**
+             * Citations
+             * @default []
+             */
+            citations?: string[];
+            /**
+             * Kind
+             * @description number | sentence | partial | unknown
+             */
+            kind: string;
+            /** Text */
+            text: string;
+        } & {
+            [key: string]: unknown;
+        };
         /** HealthCheck */
         HealthCheck: {
             /** Detail */
@@ -8126,6 +10691,92 @@ export interface components {
              * @enum {string}
              */
             status: "ready" | "not_ready";
+        };
+        /** HopOut */
+        HopOut: {
+            /**
+             * Alternatives
+             * @description Other allowed edges between the same two nodes
+             */
+            alternatives: number;
+            /** Cost */
+            cost: number;
+            /** Dated */
+            dated: {
+                [key: string]: unknown;
+            } | null;
+            /** Detail */
+            detail: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Direction
+             * @description forward: the hop follows the record's subject→object (claims: cause→effect) direction
+             * @enum {string}
+             */
+            direction: "forward" | "inverse";
+            /**
+             * Family
+             * @description Statement hops: V4 family read in path order (never causal)
+             */
+            family: {
+                [key: string]: unknown;
+            } | null;
+            /** From */
+            from: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "statement" | "causal_claim" | "effect_estimate" | "estimate_scope" | "declared_bridge";
+            /**
+             * Licence
+             * @description Licence of the hop's source; null = unknown, never open
+             */
+            licence: {
+                [key: string]: unknown;
+            } | null;
+            /** Node Penalty */
+            node_penalty: number;
+            /**
+             * Origin
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture";
+            /**
+             * Property
+             * @description Statement hops: the source's own property
+             */
+            property: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Relation
+             * @description Relation label in path order {fr, en}
+             */
+            relation: {
+                [key: string]: string;
+            } | null;
+            /**
+             * Sentence
+             * @description 'A — relation → B' {fr, en}
+             */
+            sentence: {
+                [key: string]: string;
+            };
+            /** Source */
+            source: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Strength
+             * @description Evidence strength: documented statement (verification), causal claim (grade, tier), estimate (method, uncertainty), declared scope / identifier link
+             */
+            strength: {
+                [key: string]: unknown;
+            } | null;
+            /** To */
+            to: string;
         };
         /** InstrumentOut */
         InstrumentOut: {
@@ -8289,7 +10940,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["Job"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -8430,7 +11081,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["KgEntityOut"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -8606,7 +11257,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["KgNeighbours"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -8692,7 +11343,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["KgPathResult"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -8972,7 +11623,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["KgSearch"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -9159,7 +11810,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["KgTimeline"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -9257,7 +11908,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["Leaderboard"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -9380,7 +12031,7 @@ export interface components {
             data: {
                 [key: string]: unknown;
             };
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -9436,6 +12087,29 @@ export interface components {
             /** Warnings */
             warnings: components["schemas"]["ApiWarning"][];
         };
+        /** ListBlock */
+        ListBlock: {
+            /** Id */
+            id: string;
+            /** Items */
+            items: components["schemas"]["Sentence"][];
+            /**
+             * More
+             * @description Items the source holds beyond those shown
+             * @default 0
+             */
+            more: number;
+            /** Template Id */
+            template_id: string;
+            /** Title */
+            title: string | null;
+            /**
+             * Type
+             * @default list
+             * @constant
+             */
+            type: "list";
+        };
         /** LiteralStatement */
         LiteralStatement: {
             /** Direction */
@@ -9476,6 +12150,125 @@ export interface components {
                 [key: string]: unknown;
             } | null;
         };
+        /** LiveResponse */
+        LiveResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["LiveState"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** LiveState */
+        LiveState: {
+            /** Compute Ms */
+            compute_ms: number;
+            /** Computed At */
+            computed_at: string;
+            /** Ensemble */
+            ensemble: {
+                [key: string]: unknown;
+            } | null;
+            /** Next Resolution */
+            next_resolution: string | null;
+            /** Origin */
+            origin: string | null;
+            /** Overdue Groups */
+            overdue_groups: number;
+            /**
+             * Partial
+             * @description True while a cold cache is computed: totals only (resolution statuses and calendar absent)
+             * @default false
+             */
+            partial: boolean;
+            /** Refreshing */
+            refreshing: boolean;
+            /** Registries */
+            registries: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Totals
+             * @description Counts; resolution statuses are absent when partial
+             */
+            totals: {
+                [key: string]: number;
+            };
+            /** Upcoming */
+            upcoming: {
+                [key: string]: unknown;
+            }[];
+            /** Upcoming Total */
+            upcoming_total: number;
+        } & {
+            [key: string]: unknown;
+        };
         /** LocationResponse */
         LocationResponse: {
             applicability: components["schemas"]["Assessment"];
@@ -9495,7 +12288,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["FeatureCollection"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -9568,6 +12361,25 @@ export interface components {
              */
             value: string;
         };
+        /** MapResponse */
+        MapResponse: {
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            };
+            /** Notes */
+            notes: string[];
+            snapshot: components["schemas"]["SnapshotRef"];
+            /** Took Ms */
+            took_ms: number;
+            /**
+             * Warnings
+             * @default []
+             */
+            warnings?: components["schemas"]["ApiWarning"][];
+        } & {
+            [key: string]: unknown;
+        };
         /** MappingOut */
         MappingOut: {
             /** Applicability */
@@ -9605,6 +12417,58 @@ export interface components {
             /** Version */
             version: string;
         };
+        /** MatrixColumn */
+        MatrixColumn: {
+            /** Countries */
+            countries: number;
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
+            /** Region */
+            region: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** MatrixRow */
+        MatrixRow: {
+            /**
+             * Cells
+             * @description column id -> counts; a column absent from `cells` has no stored row and no KG entity (not covered — which is not the same as 'zero')
+             */
+            cells: {
+                [key: string]: {
+                    [key: string]: unknown;
+                };
+            };
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
+            summary: components["schemas"]["DomainSummary"];
+        } & {
+            [key: string]: unknown;
+        };
+        /** MeasureResponse */
+        MeasureResponse: {
+            /** Facets */
+            facets: {
+                [key: string]: unknown;
+            }[];
+            /** Measure */
+            measure: string;
+            /** Resolved */
+            resolved: {
+                [key: string]: unknown;
+            };
+            snapshot: components["schemas"]["SnapshotRef"];
+            /** Table */
+            table: string;
+            /** Variants */
+            variants: number;
+        } & {
+            [key: string]: unknown;
+        };
         /** Mechanism */
         Mechanism: {
             /** Claim Key */
@@ -9613,6 +12477,23 @@ export interface components {
             mechanism: string;
             /** Source Key */
             source_key: string;
+        };
+        /** MissingBlock */
+        MissingBlock: {
+            /** Id */
+            id: string;
+            /** Reason */
+            reason: string;
+            /** Template Id */
+            template_id: string;
+            /**
+             * Type
+             * @default missing
+             * @constant
+             */
+            type: "missing";
+            /** What */
+            what: string;
         };
         /** MissingValue */
         MissingValue: {
@@ -9741,7 +12622,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["ModelBacktest"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -9881,7 +12762,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["ModelEvaluation"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -9957,7 +12838,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["ModelVersionOut"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -10058,6 +12939,183 @@ export interface components {
             model_key: string;
             /** Version */
             version: string;
+        };
+        /** MultiResponse */
+        MultiResponse: {
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            };
+            /** Notes */
+            notes: string[];
+            snapshot: components["schemas"]["SnapshotRef"];
+            /** Took Ms */
+            took_ms: number;
+            /**
+             * Warnings
+             * @default []
+             */
+            warnings?: components["schemas"]["ApiWarning"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** NodeHit */
+        NodeHit: {
+            /**
+             * Indexed
+             * @description False: the node has no indexed link (it cannot be a path end)
+             */
+            indexed: boolean;
+            /** Match */
+            match: string;
+            node: components["schemas"]["NodeRef"];
+        };
+        /** NodeRef */
+        NodeRef: {
+            /**
+             * Degree
+             * @description Indexed links of the node (all edge types)
+             */
+            degree: number | null;
+            /**
+             * Fiche
+             * @description {kind, id} for v8Links.entity (country: ISO3)
+             */
+            fiche: {
+                [key: string]: string;
+            } | null;
+            /** Id */
+            id: string;
+            /** Kind */
+            kind: string | null;
+            /** Kind Label */
+            kind_label: string | null;
+            /**
+             * Label
+             * @description French label, else English; '<id> (libellé non chargé)' when the KG has none
+             */
+            label: string;
+            /** Label En */
+            label_en: string;
+            /** Label Loaded */
+            label_loaded: boolean;
+            /**
+             * Scope Iso3
+             * @description Virtual node scoped to one country (an effect estimated for it)
+             */
+            scope_iso3: string | null;
+            /**
+             * Virtual
+             * @description Effect variable / atlas concept / event type node (not a KG entity)
+             */
+            virtual: boolean;
+        };
+        /** NodesData */
+        NodesData: {
+            /** Hits */
+            hits: components["schemas"]["NodeHit"][];
+            /** Query */
+            query: string;
+        };
+        /** NodesResponse */
+        NodesResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["NodesData"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** NotCovered */
+        NotCovered: {
+            /** Reason */
+            reason: string;
+            /** Section */
+            section: string | null;
+            /** What */
+            what: string;
+        };
+        /** NotePin */
+        NotePin: {
+            /** Added At */
+            added_at: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "note";
+            /** Label */
+            label?: string | null;
+            /** Markdown */
+            markdown: string;
+            /** Uid */
+            uid: string;
         };
         /** Observation */
         Observation: {
@@ -10160,7 +13218,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["Observation"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -10242,7 +13300,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["Ontology"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -10333,7 +13391,7 @@ export interface components {
             data: {
                 [key: string]: unknown;
             };
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -10388,6 +13446,59 @@ export interface components {
             } | null;
             /** Warnings */
             warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** ParagraphBlock */
+        ParagraphBlock: {
+            /** Id */
+            id: string;
+            /** Sentences */
+            sentences: components["schemas"]["Sentence"][];
+            /**
+             * Type
+             * @default paragraph
+             * @constant
+             */
+            type: "paragraph";
+        };
+        /**
+         * Part
+         * @description One run of a rendered sentence / cell.
+         */
+        Part: {
+            /**
+             * Exact
+             * @description Exact value as reported (decimal string), for values
+             */
+            exact: string | null;
+            /**
+             * Fn
+             * @description Footnote number (every value part has one)
+             */
+            fn: number | null;
+            /**
+             * Href
+             * @description V8 deep link of the entity this value names, if any
+             */
+            href: string | null;
+            /** Kind */
+            kind: ("observed" | "estimate" | "projection" | "forecast" | "scenario" | "derived" | "claim" | "label") | null;
+            /**
+             * Reason
+             * @description Why the value is missing (missing parts)
+             */
+            reason: string | null;
+            /**
+             * T
+             * @enum {string}
+             */
+            t: "text" | "value" | "missing";
+            /**
+             * Text
+             * @description Display text (for values: formatted in French)
+             */
+            text: string;
+            /** Unit */
+            unit: string | null;
         };
         /** ParticipantStatement */
         ParticipantStatement: {
@@ -10446,6 +13557,173 @@ export interface components {
             label_en?: string | null;
             /** Label Fr */
             label_fr: string;
+        };
+        /** PathOut */
+        PathOut: {
+            /** Cost */
+            cost: number;
+            /** Hops */
+            hops: components["schemas"]["HopOut"][];
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "documented" | "mixed" | "causal";
+            /** Length */
+            length: number;
+            /** Nodes */
+            nodes: string[];
+            /** Rank */
+            rank: number;
+            /** Restricted Licences */
+            restricted_licences: string[];
+            /** Unknown Licences */
+            unknown_licences: number;
+            /**
+             * Variants
+             * @description Paths identical but for one intermediate node: count (lower bound), position, examples
+             */
+            variants: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Weakest Grade
+             * @description Weakest grade among causal-claim hops (chain rule)
+             */
+            weakest_grade: string | null;
+        };
+        /** PathsData */
+        PathsData: {
+            /** Found */
+            found: boolean;
+            from: components["schemas"]["NodeRef"];
+            /** Index */
+            index: {
+                [key: string]: unknown;
+            };
+            /** Nodes */
+            nodes: {
+                [key: string]: components["schemas"]["NodeRef"];
+            };
+            /** Not Found Reason */
+            not_found_reason: string | null;
+            /** Note */
+            note: {
+                [key: string]: string;
+            };
+            /** Paths */
+            paths: components["schemas"]["PathOut"][];
+            search: components["schemas"]["SearchInfo"];
+            to: components["schemas"]["NodeRef"];
+        };
+        /** PathsResponse */
+        PathsResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["PathsData"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** PendingGroup */
+        PendingGroup: {
+            /** Items */
+            items: {
+                [key: string]: unknown;
+            }[];
+            /** Kind */
+            kind: string;
+            /** Label */
+            label: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** PendingView */
+        PendingView: {
+            /** Checked At */
+            checked_at: string | null;
+            /** Counts */
+            counts: {
+                [key: string]: number;
+            };
+            /** Disk Mb Open Loads */
+            disk_mb_open_loads: number;
+            /** Disk Mb Unknown */
+            disk_mb_unknown: number;
+            /** Groups */
+            groups: components["schemas"]["PendingGroup"][];
+            /** Type */
+            type: string;
+            /** Updated */
+            updated: string;
+        } & {
+            [key: string]: unknown;
         };
         /** PeriodValue */
         PeriodValue: {
@@ -10516,6 +13794,34 @@ export interface components {
             /** Via */
             via: string | null;
         };
+        /** PlaceResponse */
+        PlaceResponse: {
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            };
+            /** Notes */
+            notes: string[];
+            snapshot: components["schemas"]["SnapshotRef"];
+            /** Took Ms */
+            took_ms: number;
+            /**
+             * Warnings
+             * @default []
+             */
+            warnings?: components["schemas"]["ApiWarning"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** PlacesResponse */
+        PlacesResponse: {
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            }[];
+        } & {
+            [key: string]: unknown;
+        };
         /** PredictRequest */
         PredictRequest: {
             /**
@@ -10568,7 +13874,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["PredictionData"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -10764,7 +14070,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["Proposal"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -10942,7 +14248,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["ProvenanceGraph"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -11047,7 +14353,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["QuestionDetail"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -11194,7 +14500,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["QuestionsPage"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -11353,7 +14659,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["RelationGraph"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -11629,6 +14935,154 @@ export interface components {
             /** Label Fr */
             label_fr: string;
         };
+        /** RuleCreate */
+        RuleCreate: {
+            /** Item Uid */
+            item_uid: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "new_data" | "revision" | "resolution" | "threshold";
+            /** Op */
+            op?: (">" | ">=" | "<" | "<=") | null;
+            /** Value */
+            value?: string | null;
+        };
+        /** RunData */
+        RunData: {
+            /** Cache Key */
+            cache_key: string;
+            /** Cached */
+            cached: boolean;
+            /** Compute Ms */
+            compute_ms: number;
+            /**
+             * Conflicts
+             * @description Competing estimates of one edge, side by side
+             */
+            conflicts: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Diagnosis
+             * @description Pourquoi pas de résultat: where and why each chain stops
+             */
+            diagnosis: {
+                [key: string]: unknown;
+            };
+            /**
+             * Evidence
+             * @description Per estimate key: citation, locator, verbatim quote, …
+             */
+            evidence: {
+                [key: string]: {
+                    [key: string]: unknown;
+                };
+            };
+            /**
+             * Graph
+             * @description nodes / edges: decision → direct changes → variables; stops as nodes
+             */
+            graph: {
+                [key: string]: unknown;
+            };
+            /** Headline */
+            headline: {
+                [key: string]: unknown;
+            }[];
+            /** Honesty */
+            honesty: {
+                [key: string]: unknown;
+            };
+            /** Labels */
+            labels: {
+                [key: string]: string;
+            };
+            result: components["schemas"]["PredictionData"];
+            /**
+             * Scenario Hash
+             * @description sha256 of the scenario inputs (decision + draws, seed, as_of, origin)
+             */
+            scenario_hash: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** RunResponse */
+        RunResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["RunData"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
         /** SameAs */
         SameAs: {
             event: components["schemas"]["EventRef"] | null;
@@ -11825,6 +15279,38 @@ export interface components {
             /** Warnings */
             warnings: string[];
         };
+        /** ScenarioIn */
+        ScenarioIn: {
+            /**
+             * As Of Max
+             * @description Only estimates knowable then
+             */
+            as_of_max?: string | null;
+            /** @description A composed decision (instead of reference_id) */
+            decision?: components["schemas"]["Decision"] | null;
+            /**
+             * Draws
+             * @description Monte-Carlo draws
+             * @default 2000
+             */
+            draws?: number;
+            /**
+             * Origin
+             * @default any
+             * @enum {string}
+             */
+            origin?: "live" | "test_fixture" | "any";
+            /**
+             * Reference Id
+             * @description A reference decision
+             */
+            reference_id?: string | null;
+            /**
+             * Seed
+             * @default 0
+             */
+            seed?: number;
+        };
         /** ScenarioListResponse */
         ScenarioListResponse: {
             applicability: components["schemas"]["Assessment"];
@@ -11845,7 +15331,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["Scenario"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -11920,7 +15406,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["Scenario"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -11976,6 +15462,576 @@ export interface components {
             /** Warnings */
             warnings: components["schemas"]["ApiWarning"][];
         };
+        /** ScoreRow */
+        ScoreRow: {
+            /** Benchmark Kind */
+            benchmark_kind: string;
+            /** Candidate Kind */
+            candidate_kind: string;
+            /** Caveats */
+            caveats: string[];
+            /** Evaluation */
+            evaluation: string;
+            /** Forecaster */
+            forecaster: string | null;
+            /** Holm Family Size */
+            holm_family_size: number | null;
+            /** Id */
+            id: string;
+            /** Metric */
+            metric: string;
+            /** P Holm */
+            p_holm: number | null;
+            /** P Raw */
+            p_raw: number | null;
+            /** Ratio */
+            ratio: number | null;
+            /** Ratio Range */
+            ratio_range: number[] | null;
+            /** Source */
+            source: {
+                [key: string]: unknown;
+            };
+            /** Target */
+            target: string;
+            /** Track */
+            track: string;
+            /**
+             * Verdict
+             * @enum {string}
+             */
+            verdict: "bat" | "ne_bat_pas" | "egalite" | "en_attente";
+        } & {
+            [key: string]: unknown;
+        };
+        /** ScoresPage */
+        ScoresPage: {
+            /** By Evaluation */
+            by_evaluation: {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            /** Calendar */
+            calendar: {
+                [key: string]: unknown;
+            }[];
+            /** Forecasters */
+            forecasters: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Headline
+             * @description Judged comparisons vs official forecasters, by verdict
+             */
+            headline: {
+                [key: string]: number;
+            };
+            /** Headline Rule Fr */
+            headline_rule_fr: string;
+            /** Matrix */
+            matrix: {
+                [key: string]: unknown;
+            }[];
+            /** N Rows */
+            n_rows: number;
+            /** Naive */
+            naive: {
+                [key: string]: number;
+            };
+            /**
+             * Problems
+             * @description Validation problems of rows against their sources (rows quarantined)
+             */
+            problems: string[];
+            /** Quarantined */
+            quarantined: string[];
+            /** Schema */
+            schema: string;
+            /** Sealed Models */
+            sealed_models: {
+                [key: string]: number;
+            } | null;
+            /** Sources */
+            sources: {
+                [key: string]: unknown;
+            }[];
+            /** Stale Sources */
+            stale_sources: {
+                [key: string]: unknown;
+            }[];
+            /** Tracks */
+            tracks: {
+                [key: string]: unknown;
+            }[];
+            /** Vocab */
+            vocab: {
+                [key: string]: unknown;
+            };
+            /** Weak Reference */
+            weak_reference: {
+                [key: string]: number;
+            };
+            /** Wins */
+            wins: {
+                [key: string]: unknown;
+            }[];
+        } & {
+            [key: string]: unknown;
+        };
+        /** ScoresPageResponse */
+        ScoresPageResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["ScoresPage"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** SearchData */
+        SearchData: {
+            /** Groups */
+            groups: components["schemas"]["SearchGroup"][];
+            /** Hits */
+            hits: components["schemas"]["SearchHit"][];
+            index: components["schemas"]["SearchIndexInfo"];
+            /** Normalized */
+            normalized: string;
+            /** Query */
+            query: string;
+            /** Truncated */
+            truncated: boolean;
+        };
+        /** SearchGroup */
+        SearchGroup: {
+            /** Count */
+            count: number;
+            /** Group */
+            group: string;
+        };
+        /** SearchHit */
+        SearchHit: {
+            /**
+             * Entity Kind
+             * @description KG kind for KG records
+             */
+            entity_kind: string | null;
+            /** Extra */
+            extra: {
+                [key: string]: unknown;
+            };
+            /**
+             * Group
+             * @description French group label for the palette
+             */
+            group: string;
+            /**
+             * Href
+             * @description V8 deep link (v8Links scheme of ui/src/v8/contract.ts)
+             */
+            href: string;
+            /**
+             * Id
+             * @description The record's own id in its source (ISO3 for kind=country)
+             */
+            id: string;
+            /**
+             * Kind
+             * @description Search kind: country, region, indicator, table, entity, question, family, decision, effect, source
+             */
+            kind: string;
+            /** Label */
+            label: string;
+            /**
+             * Match
+             * @enum {string}
+             */
+            match: "id" | "exact" | "prefix" | "word" | "trigram";
+            /**
+             * Matched
+             * @description The label, alias or code that matched
+             */
+            matched: string;
+            /**
+             * Origin
+             * @default live
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture";
+            /**
+             * Score
+             * @description 0..1, comparable within one response only
+             */
+            score: number;
+            /** Source */
+            source: string | null;
+            /**
+             * Sublabel
+             * @description French: kind · codes · description / status
+             */
+            sublabel: string;
+        };
+        /** SearchIndexInfo */
+        SearchIndexInfo: {
+            /** Built At */
+            built_at: string | null;
+            /** Documents */
+            documents: number | null;
+            /** Version */
+            version: string | null;
+        };
+        /** SearchInfo */
+        SearchInfo: {
+            /** Candidates */
+            candidates: number;
+            /** Entries Scanned */
+            entries_scanned: number;
+            /** Families */
+            families: string[] | null;
+            /** Hub Limit */
+            hub_limit: number;
+            /** Hubs Not Expanded */
+            hubs_not_expanded: components["schemas"]["NodeRef"][];
+            /** Hubs Not Expanded Count */
+            hubs_not_expanded_count: number;
+            /** Include Causal */
+            include_causal: boolean;
+            /** K */
+            k: number;
+            /** Levels */
+            levels: number;
+            /** Max Hops */
+            max_hops: number;
+            /** Nodes Reached */
+            nodes_reached: number;
+            /** Search Ms */
+            search_ms: number;
+            /** Truncated */
+            truncated: boolean;
+            /** Truncation Reasons */
+            truncation_reasons: string[];
+        };
+        /** SearchResponse */
+        SearchResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["SearchData"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** SearchStatus */
+        SearchStatus: {
+            /** Built */
+            built: boolean;
+            /** Built At */
+            built_at: string | null;
+            /** Codes */
+            codes: number | null;
+            /** Documents */
+            documents: number | null;
+            /** Errors */
+            errors: {
+                [key: string]: string;
+            }[];
+            /** Kinds */
+            kinds: {
+                [key: string]: number;
+            };
+            /** Names */
+            names: number | null;
+            /** Origin */
+            origin: string | null;
+            /** Path Bytes */
+            path_bytes: number | null;
+            /** Popular Names In Memory */
+            popular_names_in_memory: number | null;
+            /** Version */
+            version: string | null;
+        };
+        /** SearchStatusResponse */
+        SearchStatusResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["SearchStatus"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** Section */
+        Section: {
+            /** Blocks */
+            blocks: (components["schemas"]["ParagraphBlock"] | components["schemas"]["TableBlock"] | components["schemas"]["ListBlock"] | components["schemas"]["ChartBlock"] | components["schemas"]["MissingBlock"])[];
+            /** Id */
+            id: string;
+            /** Lede */
+            lede: string | null;
+            /** Title */
+            title: string;
+        };
+        /** SensitivityData */
+        SensitivityData: {
+            /** Cached */
+            cached: boolean;
+            /** Compute Ms */
+            compute_ms: number;
+            /** Label */
+            label: string;
+            /**
+             * Method
+             * @constant
+             */
+            method: "one_at_a_time";
+            /** Method Fr */
+            method_fr: string;
+            /** Runs */
+            runs: number;
+            /** Scenario Hash */
+            scenario_hash: string;
+            /** Variables */
+            variables: {
+                [key: string]: unknown;
+            }[];
+            /** Z */
+            z: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** SensitivityIn */
+        SensitivityIn: {
+            /**
+             * As Of Max
+             * @description Only estimates knowable then
+             */
+            as_of_max?: string | null;
+            /** @description A composed decision (instead of reference_id) */
+            decision?: components["schemas"]["Decision"] | null;
+            /**
+             * Draws
+             * @description Monte-Carlo draws
+             * @default 2000
+             */
+            draws?: number;
+            /**
+             * Origin
+             * @default any
+             * @enum {string}
+             */
+            origin?: "live" | "test_fixture" | "any";
+            /**
+             * Reference Id
+             * @description A reference decision
+             */
+            reference_id?: string | null;
+            /**
+             * Seed
+             * @default 0
+             */
+            seed?: number;
+            /**
+             * Variable
+             * @description Limit to one variable id (kind:id@GEO)
+             */
+            variable?: string | null;
+        };
         /**
          * SensitivityRangeValue
          * @description An assumption-sensitivity range over a scenario grid (L2): never a point, never a confidence interval.
@@ -12013,6 +16069,120 @@ export interface components {
             upper: string;
         } & {
             [key: string]: unknown;
+        };
+        /** SensitivityResponse */
+        SensitivityResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["SensitivityData"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** Sentence */
+        Sentence: {
+            /** Parts */
+            parts: components["schemas"]["Part"][];
+            /**
+             * Template Id
+             * @description <section>.<block>.<sentence> id in the template file
+             */
+            template_id: string;
+            /**
+             * Text
+             * @description Plain text: concatenation of the parts
+             */
+            text: string;
+        };
+        /** SeriesPin */
+        SeriesPin: {
+            /** Added At */
+            added_at: string;
+            /** Concept */
+            concept: string;
+            /** Geo */
+            geo: string;
+            /** Headline */
+            headline?: boolean | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "series";
+            /** Label */
+            label: string;
+            /** Table */
+            table?: string | null;
+            /** Uid */
+            uid: string;
+            /** Unit */
+            unit?: string | null;
         };
         /** SessionInfo */
         SessionInfo: {
@@ -12161,7 +16331,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["SimulationStatus"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -12217,6 +16387,17 @@ export interface components {
             /** Warnings */
             warnings: components["schemas"]["ApiWarning"][];
         };
+        /** SnapshotRef */
+        SnapshotRef: {
+            /** Knowledge Cutoff */
+            knowledge_cutoff: string;
+            /** Origin */
+            origin: string;
+            /** Snapshot Sha256 */
+            snapshot_sha256: string;
+        } & {
+            [key: string]: unknown;
+        };
         /** SourceDisagreement */
         SourceDisagreement: {
             /** Alternatives */
@@ -12266,7 +16447,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["SourceOut"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -12363,6 +16544,84 @@ export interface components {
             /** Title */
             title: string;
         };
+        /** StatusResponse */
+        StatusResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            };
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
         /** StructureItem */
         StructureItem: {
             /**
@@ -12380,6 +16639,49 @@ export interface components {
             valid_from: string | null;
             /** Valid To */
             valid_to: string | null;
+        };
+        /** SubjectHit */
+        SubjectHit: {
+            /**
+             * Featured
+             * @default false
+             */
+            featured: boolean;
+            /** Id */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Label */
+            label: string;
+            /** Sublabel */
+            sublabel: string | null;
+        };
+        /** SubjectList */
+        SubjectList: {
+            /** Hits */
+            hits: components["schemas"]["SubjectHit"][];
+            /** Kinds */
+            kinds: {
+                [key: string]: string;
+            }[];
+            /** Query */
+            query: string | null;
+        };
+        /** SubjectRef */
+        SubjectRef: {
+            /**
+             * Entity Href
+             * @description V8 fiche link of the subject, when it is a KG entity/country
+             */
+            entity_href: string | null;
+            /** Id */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Label */
+            label: string;
+            /** Sublabel */
+            sublabel: string | null;
         };
         /** SupportSummary */
         SupportSummary: {
@@ -12425,6 +16727,163 @@ export interface components {
             origin: string | null;
             /** Release Id */
             release_id: string | null;
+        };
+        /** TableBlock */
+        TableBlock: {
+            /** Caption */
+            caption: string;
+            /** Columns */
+            columns: string[];
+            /** Id */
+            id: string;
+            /** Note */
+            note: string | null;
+            /** Numeric */
+            numeric: boolean[];
+            /** Rows */
+            rows: components["schemas"]["Cell"][][];
+            /** Template Id */
+            template_id: string;
+            /**
+             * Type
+             * @default table
+             * @constant
+             */
+            type: "table";
+        };
+        /** TableMeasure */
+        TableMeasure: {
+            /** Default Series */
+            default_series: string;
+            /** Label */
+            label?: string | null;
+            /** Measure */
+            measure: string;
+            /** Variants */
+            variants: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** TableResponse */
+        TableResponse: {
+            /** Measures */
+            measures: components["schemas"]["TableMeasure"][];
+            /** Measures Total */
+            measures_total: number;
+            snapshot: components["schemas"]["SnapshotRef"];
+            /** Table */
+            table: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** TemplatesData */
+        TemplatesData: {
+            /** Compare Presets */
+            compare_presets: {
+                [key: string]: unknown;
+            }[];
+            /** Disclaimers Fr */
+            disclaimers_fr: string[];
+            /**
+             * Engine
+             * @description Warm-up state of the engine in this process
+             */
+            engine: {
+                [key: string]: unknown;
+            };
+            /** Instruments */
+            instruments: {
+                [key: string]: unknown;
+            }[];
+            /** Label */
+            label: string;
+            /** Not Advice Fr */
+            not_advice_fr: string;
+            /** References */
+            references: {
+                [key: string]: unknown;
+            }[];
+            /** Schema */
+            schema: {
+                [key: string]: unknown;
+            };
+        } & {
+            [key: string]: unknown;
+        };
+        /** TemplatesResponse */
+        TemplatesResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["TemplatesData"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** TimeValue */
         TimeValue: {
@@ -12572,7 +17031,109 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["Timeseries"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** TrackDetail */
+        TrackDetail: {
+            /** Calendar */
+            calendar: {
+                [key: string]: unknown;
+            }[];
+            /** Charts */
+            charts: {
+                [key: string]: unknown;
+            }[];
+            /** Counts */
+            counts: {
+                [key: string]: number;
+            };
+            /** Holm Families */
+            holm_families: {
+                [key: string]: unknown;
+            }[];
+            /** Rows */
+            rows: components["schemas"]["ScoreRow"][];
+            /** Track */
+            track: {
+                [key: string]: unknown;
+            };
+        } & {
+            [key: string]: unknown;
+        };
+        /** TrackResponse */
+        TrackResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["TrackDetail"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -12733,6 +17294,916 @@ export interface components {
             /** Pid */
             pid: string;
         };
+        /** V8FicheBundle */
+        V8FicheBundle: {
+            canonical: components["schemas"]["V8FicheCanonical"];
+            claims: components["schemas"]["V8FicheClaims"];
+            effects: components["schemas"]["V8FicheEffects"];
+            /** Facts */
+            facts: components["schemas"]["V8FicheFact"][];
+            forecasts: components["schemas"]["V8FicheForecasts"];
+            /** Headline */
+            headline: components["schemas"]["V8FicheStat"][];
+            identity: components["schemas"]["V8FicheIdentity"] | null;
+            meta: components["schemas"]["V8FicheMeta"];
+            /** Missing */
+            missing: components["schemas"]["V8FicheMissingItem"][];
+            /** Notes */
+            notes: string[];
+            /** Related Forms */
+            related_forms: components["schemas"]["V8FicheRelatedForm"][];
+            /** Relations */
+            relations: components["schemas"]["V8FicheRelationGroup"][];
+            /** Resolved Via */
+            resolved_via: string;
+            /** Series */
+            series: components["schemas"]["V8FicheSeries"][];
+            /** Sources */
+            sources: components["schemas"]["V8FicheSourceSummary"][];
+            space: components["schemas"]["V8FicheSpace"];
+            /** Time */
+            time: components["schemas"]["V8FicheEvent"][];
+            /** Tops */
+            tops: components["schemas"]["V8FicheTop"][];
+        };
+        /** V8FicheBundleResponse */
+        V8FicheBundleResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["V8FicheBundle"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** V8FicheCanonical */
+        V8FicheCanonical: {
+            /** Id */
+            id: string;
+            /** Kind */
+            kind: string;
+        };
+        /** V8FicheClaim */
+        V8FicheClaim: {
+            /** Attribution Fr */
+            attribution_fr: string | null;
+            cause: components["schemas"]["V8FicheRef"];
+            /** Claim Key */
+            claim_key: string;
+            /** Contested */
+            contested: boolean;
+            effect: components["schemas"]["V8FicheRef"];
+            /** Grade */
+            grade: string | null;
+            /** Grade Reasons Fr */
+            grade_reasons_fr: string[];
+            /** Mechanism */
+            mechanism: string | null;
+            /** Polarity */
+            polarity: string | null;
+            /** Relation Fr */
+            relation_fr: string | null;
+            source: components["schemas"]["V8FicheSource"];
+            /** Stance */
+            stance: string | null;
+            /** Tier */
+            tier: string | null;
+            /** Tier Fr */
+            tier_fr: string | null;
+            /**
+             * Wording Fr
+             * @description Attributed wording ('Selon …'); REVA asserts no causation
+             */
+            wording_fr: string | null;
+        };
+        /** V8FicheClaims */
+        V8FicheClaims: {
+            /** Incoming */
+            incoming: components["schemas"]["V8FicheClaim"][];
+            /** N In */
+            n_in: number;
+            /** N Out */
+            n_out: number;
+            /** Note Fr */
+            note_fr: string;
+            /** Outgoing */
+            outgoing: components["schemas"]["V8FicheClaim"][];
+        };
+        /** V8FicheConsulted */
+        V8FicheConsulted: {
+            /** Series */
+            series: string;
+            /** Status */
+            status: string;
+        };
+        /** V8FicheDegree */
+        V8FicheDegree: {
+            /** Capped At */
+            capped_at: number;
+            /** Statements In */
+            statements_in: number;
+            /** Statements Out */
+            statements_out: number;
+        };
+        /** V8FicheEffect */
+        V8FicheEffect: {
+            /** Cause Fr */
+            cause_fr: string;
+            /** Cause Id */
+            cause_id: string | null;
+            /** Ci High */
+            ci_high: string | null;
+            /** Ci Low */
+            ci_low: string | null;
+            /** Countries */
+            countries: string[];
+            /** Effect Fr */
+            effect_fr: string;
+            /** Effect Id */
+            effect_id: string | null;
+            /** Estimate Key */
+            estimate_key: string;
+            /** Horizon */
+            horizon: {
+                [key: string]: unknown;
+            } | null;
+            /** Measure */
+            measure: string | null;
+            /** Method */
+            method: string | null;
+            /** Point */
+            point: string | null;
+            /** Role */
+            role: string;
+            source: components["schemas"]["V8FicheSource"];
+            /** Uncertainty Status */
+            uncertainty_status: string | null;
+            /** Unit */
+            unit: string | null;
+            /** Wording Fr */
+            wording_fr: string | null;
+        };
+        /** V8FicheEffects */
+        V8FicheEffects: {
+            /** Items */
+            items: components["schemas"]["V8FicheEffect"][];
+            /** N */
+            n: number;
+            /** N Country Scope */
+            n_country_scope: number | null;
+            /** Note Fr */
+            note_fr: string;
+        };
+        /** V8FicheEvent */
+        V8FicheEvent: {
+            /** Date */
+            date: string | null;
+            /** Label Fr */
+            label_fr: string;
+            /** Property */
+            property: string;
+            ref: components["schemas"]["V8FicheRef"] | null;
+            source: components["schemas"]["V8FicheSource"];
+            /** Value Text */
+            value_text: string | null;
+            /** X */
+            x: number | null;
+        };
+        /** V8FicheFact */
+        V8FicheFact: {
+            /** Count */
+            count: number;
+            /** Label Fr */
+            label_fr: string;
+            /** Long Text */
+            long_text: boolean;
+            /** Others */
+            others: components["schemas"]["V8FicheOther"][];
+            /** Period */
+            period: string | null;
+            /** Points */
+            points: components["schemas"]["V8FichePoint"][];
+            /** Property */
+            property: string;
+            source: components["schemas"]["V8FicheSource"];
+            /** Unit */
+            unit: string | null;
+            /** Url */
+            url: string | null;
+            /** Value */
+            value: string | null;
+            /** Value Hi */
+            value_hi: string | null;
+            /** Value Lo */
+            value_lo: string | null;
+            /** Value Text */
+            value_text: string;
+        };
+        /** V8FicheForecastRow */
+        V8FicheForecastRow: {
+            /** Batch Sha256 */
+            batch_sha256: string | null;
+            /** Description */
+            description: string | null;
+            /** Hi */
+            hi: string | null;
+            /** Issued At */
+            issued_at: string | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "official" | "ensemble" | "candidate" | "baseline";
+            /** Kind Fr */
+            kind_fr: string;
+            /** Label */
+            label: string;
+            /** Level */
+            level: string | null;
+            /** Lo */
+            lo: string | null;
+            /** Model */
+            model: string;
+            /** Point */
+            point: string | null;
+            /** Probability */
+            probability: string | null;
+            /** Score */
+            score: {
+                [key: string]: string | null;
+            } | null;
+            /** Status */
+            status: string | null;
+        };
+        /** V8FicheForecasts */
+        V8FicheForecasts: {
+            /** Families */
+            families: string[];
+            /** N Pending */
+            n_pending: number;
+            /** N Resolved */
+            n_resolved: number;
+            /** N Total */
+            n_total: number;
+            /** Note Fr */
+            note_fr: string;
+            /** Questions */
+            questions: components["schemas"]["V8FicheQuestion"][];
+        };
+        /** V8FicheGeometry */
+        V8FicheGeometry: {
+            /** Feature Key */
+            feature_key: string;
+            /** Geojson */
+            geojson: {
+                [key: string]: unknown;
+            };
+            /** Note Fr */
+            note_fr: string;
+        };
+        /** V8FicheId */
+        V8FicheId: {
+            /** Label Fr */
+            label_fr: string | null;
+            /** Property */
+            property: string | null;
+            ref: components["schemas"]["V8FicheRef"] | null;
+            /** Scheme */
+            scheme: string;
+            /** Source */
+            source: string | null;
+            /** Url */
+            url: string | null;
+            /** Value */
+            value: string;
+        };
+        /** V8FicheIdentity */
+        V8FicheIdentity: {
+            /** Aliases */
+            aliases: string[];
+            /**
+             * Anchor
+             * @description True: a REVA grouping page (anchor), not a record of a source
+             */
+            anchor: boolean;
+            /** Anchor Note */
+            anchor_note: string | null;
+            /** Community Edited */
+            community_edited: boolean;
+            /** Definition */
+            definition: string | null;
+            definition_source: components["schemas"]["V8FicheSource"] | null;
+            degree: components["schemas"]["V8FicheDegree"];
+            /** Description */
+            description: string | null;
+            /** Ids */
+            ids: components["schemas"]["V8FicheId"][];
+            /** Iso3 */
+            iso3: string | null;
+            /** Kg Kind */
+            kg_kind: string | null;
+            /** Kind */
+            kind: string;
+            /** Kind Label Fr */
+            kind_label_fr: string;
+            /** Label */
+            label: string;
+            /** Label En */
+            label_en: string | null;
+            /** Label Fr */
+            label_fr: string | null;
+            /** Qid */
+            qid: string | null;
+            /** Sitelinks */
+            sitelinks: number | null;
+            /** Snapshot Loaded */
+            snapshot_loaded: boolean;
+            source: components["schemas"]["V8FicheSource"] | null;
+        };
+        /** V8FicheLicence */
+        V8FicheLicence: {
+            /** Attribution */
+            attribution: string | null;
+            /** Licence */
+            licence: string | null;
+            /** Licence Url */
+            licence_url: string | null;
+            /**
+             * Non Commercial
+             * @default false
+             */
+            non_commercial: boolean;
+            /** Required Notice */
+            required_notice: string | null;
+            /**
+             * Restricted
+             * @default false
+             */
+            restricted: boolean;
+            /**
+             * Share Alike
+             * @default false
+             */
+            share_alike: boolean;
+        };
+        /** V8FicheLink */
+        V8FicheLink: {
+            /** Family */
+            family: string | null;
+            /** Params */
+            params: {
+                [key: string]: string;
+            } | null;
+            /** Section */
+            section: string | null;
+            /** Table */
+            table: string | null;
+            /** Url */
+            url: string | null;
+        };
+        /** V8FicheMeta */
+        V8FicheMeta: {
+            /** Atlas Cutoff */
+            atlas_cutoff: string | null;
+            /** Atlas Snapshot */
+            atlas_snapshot: string | null;
+            /** Cached */
+            cached: boolean;
+            /** Data Version */
+            data_version: string[] | null;
+            /** Errors */
+            errors: {
+                [key: string]: string;
+            }[];
+            /** Generated At */
+            generated_at: string | null;
+            /** Served Ms */
+            served_ms: number | null;
+            /** Timings Ms */
+            timings_ms: {
+                [key: string]: number;
+            };
+            /**
+             * Warming
+             * @description Sections still being indexed by this process (first access)
+             */
+            warming: string[];
+        };
+        /** V8FicheMissing */
+        V8FicheMissing: {
+            /** Code */
+            code: string;
+            /** Reason Fr */
+            reason_fr: string;
+        };
+        /** V8FicheMissingItem */
+        V8FicheMissingItem: {
+            /** Reason Code */
+            reason_code: string;
+            /** Reason Fr */
+            reason_fr: string;
+            /** Section */
+            section: string;
+            /** What Fr */
+            what_fr: string;
+        };
+        /** V8FicheOther */
+        V8FicheOther: {
+            /** Period */
+            period: string | null;
+            /** Value Text */
+            value_text: string;
+        };
+        /** V8FichePlace */
+        V8FichePlace: {
+            /** Basis */
+            basis: string;
+            /** Iso3 */
+            iso3: string | null;
+            /** Lat */
+            lat: number | null;
+            /** Level */
+            level: number | null;
+            /** Level Fr */
+            level_fr: string | null;
+            /** Lon */
+            lon: number | null;
+            ref: components["schemas"]["V8FicheRef"];
+            /** Via */
+            via: string | null;
+        };
+        /** V8FichePoint */
+        V8FichePoint: {
+            /**
+             * Projection
+             * @default false
+             */
+            projection: boolean;
+            /**
+             * T
+             * @description Period label (2024, 2024-03, 2024-T2, 2014-03-18)
+             */
+            t: string;
+            /**
+             * V
+             * @description Exact decimal string; null = gap (never 0)
+             */
+            v: string | null;
+            /**
+             * X
+             * @description Decimal year, for plotting only
+             */
+            x: number;
+        };
+        /** V8FichePoint2 */
+        V8FichePoint2: {
+            /** Lat */
+            lat: number;
+            /** Lon */
+            lon: number;
+            /** Source Key */
+            source_key: string | null;
+        };
+        /** V8FichePropertyCount */
+        V8FichePropertyCount: {
+            /** Count */
+            count: number;
+            /** Label */
+            label: string;
+            /** Pid */
+            pid: string;
+        };
+        /** V8FicheQuestion */
+        V8FicheQuestion: {
+            /** Expected Resolution */
+            expected_resolution: string | null;
+            /** Family */
+            family: string | null;
+            /** Forecasts */
+            forecasts: components["schemas"]["V8FicheForecastRow"][];
+            /** Geo */
+            geo: string | null;
+            /** Geo Label Fr */
+            geo_label_fr: string | null;
+            /** Judged Fr */
+            judged_fr: string;
+            /** Label Fr */
+            label_fr: string | null;
+            /** Last Observed */
+            last_observed: {
+                [key: string]: unknown;
+            } | null;
+            /** Official Present */
+            official_present: boolean;
+            /** Outcome */
+            outcome: string | null;
+            /** Question Id */
+            question_id: string;
+            /** Reference Period */
+            reference_period: string | null;
+            /** Resolution Source */
+            resolution_source: string | null;
+            /** Status */
+            status: string;
+            /** Text Fr */
+            text_fr: string | null;
+            /** Threshold */
+            threshold: string | null;
+            /** Type */
+            type: string | null;
+            /** Unit */
+            unit: string | null;
+        };
+        /** V8FicheRef */
+        V8FicheRef: {
+            /** Id */
+            id: string;
+            /**
+             * Kind
+             * @description Fiche kind; the UI links with v8Links.entity(kind, id)
+             */
+            kind: string;
+            /** Label */
+            label: string;
+            /**
+             * Loaded
+             * @description False: the KG names this record but has not loaded it (no label of its own)
+             * @default true
+             */
+            loaded: boolean;
+        };
+        /** V8FicheRelatedForm */
+        V8FicheRelatedForm: {
+            ref: components["schemas"]["V8FicheRef"];
+            /** Relation Fr */
+            relation_fr: string | null;
+            /** Relations */
+            relations: components["schemas"]["V8FicheRelationGroup"][];
+        };
+        /** V8FicheRelationGroup */
+        V8FicheRelationGroup: {
+            /** Count */
+            count: number;
+            /**
+             * Count Approx
+             * @description Hub mode: count read on the indexed statement table (all recorded versions), approximate
+             * @default false
+             */
+            count_approx: boolean;
+            /** Count Is Lower Bound */
+            count_is_lower_bound: boolean;
+            /** Family */
+            family: string;
+            /** Group */
+            group: string;
+            /** Items */
+            items: components["schemas"]["V8FicheRelationItem"][];
+            /** Label Fr */
+            label_fr: string;
+            /** More */
+            more: boolean;
+            /** Properties */
+            properties: components["schemas"]["V8FichePropertyCount"][];
+            via: components["schemas"]["V8FicheRef"] | null;
+        };
+        /** V8FicheRelationItem */
+        V8FicheRelationItem: {
+            /** Identity */
+            identity: boolean;
+            /** Period */
+            period: string | null;
+            /** Property */
+            property: string;
+            /** Property Label */
+            property_label: string | null;
+            /** Reading Fr */
+            reading_fr: string;
+            ref: components["schemas"]["V8FicheRef"];
+            /** Share */
+            share: string | null;
+            /** Share Unit */
+            share_unit: string | null;
+            source: components["schemas"]["V8FicheSource"];
+            via: components["schemas"]["V8FicheRef"] | null;
+        };
+        /** V8FicheRelationPage */
+        V8FicheRelationPage: {
+            /** Family */
+            family: string;
+            /** Items */
+            items: components["schemas"]["V8FicheRelationItem"][];
+            /** Label Fr */
+            label_fr: string;
+        };
+        /** V8FicheRelationPageResponse */
+        V8FicheRelationPageResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            data: components["schemas"]["V8FicheRelationPage"];
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /**
+             * Knowledge Cutoff
+             * @description Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.
+             */
+            knowledge_cutoff: string | null;
+            /**
+             * Knowledge Cutoff Basis
+             * @description How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered
+             */
+            knowledge_cutoff_basis: ("release_cutoff" | "as_of" | "scenario_cutoff" | "evaluation_context" | "read_time") | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** V8FicheSeries */
+        V8FicheSeries: {
+            /** Consulted */
+            consulted: components["schemas"]["V8FicheConsulted"][];
+            /** First */
+            first: string | null;
+            /** Key */
+            key: string;
+            /** Kind */
+            kind: string;
+            /** Label Fr */
+            label_fr: string;
+            /** Last */
+            last: string | null;
+            link: components["schemas"]["V8FicheLink"] | null;
+            missing: components["schemas"]["V8FicheMissing"] | null;
+            /** N Points */
+            n_points: number;
+            /**
+             * Out Of Snapshot
+             * @description Read from a published table the current atlas snapshot does not pin yet
+             */
+            out_of_snapshot: boolean;
+            /** Period */
+            period: string | null;
+            /** Points */
+            points: components["schemas"]["V8FichePoint"][];
+            source: components["schemas"]["V8FicheSource"] | null;
+            /** Source Breaks */
+            source_breaks: number;
+            /** Sources Used */
+            sources_used: string[];
+            /** Theme */
+            theme: string | null;
+            /** Theme Fr */
+            theme_fr: string | null;
+            /** Unit */
+            unit: string | null;
+            /** Value */
+            value: string | null;
+            /** Value Text */
+            value_text: string | null;
+        };
+        /** V8FicheSource */
+        V8FicheSource: {
+            /** Dataset */
+            dataset: string | null;
+            /** Href */
+            href: string | null;
+            /**
+             * Label
+             * @description Short display name
+             */
+            label: string;
+            licence: components["schemas"]["V8FicheLicence"] | null;
+            /** Origin */
+            origin: string | null;
+            /** Period */
+            period: string | null;
+            /** Property */
+            property: string | null;
+            /** Raw Sha256 */
+            raw_sha256: string | null;
+            /** Retrieved At */
+            retrieved_at: string | null;
+            /** Selector */
+            selector: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Series
+             * @description Atlas series key <source>.<dataset>.<indicator>
+             */
+            series: string | null;
+            /**
+             * Source
+             * @description Source key (KG load source, atlas table, causal/effect source)
+             */
+            source: string;
+            /** Statement Key */
+            statement_key: string | null;
+            /**
+             * Verification
+             * @description community_edited_not_verified | source_reported_not_verified | derived | outside_atlas_snapshot (read from a published table the current atlas snapshot does not pin yet) | reva_grouping | …
+             */
+            verification: string | null;
+        };
+        /** V8FicheSourceSummary */
+        V8FicheSourceSummary: {
+            /** Label */
+            label: string;
+            /** Licences */
+            licences: string[];
+            /** N Values */
+            n_values: number;
+            /** Non Commercial */
+            non_commercial: boolean;
+            /** Restricted */
+            restricted: boolean;
+            /** Source */
+            source: string;
+            /** Verification */
+            verification: string | null;
+        };
+        /** V8FicheSpace */
+        V8FicheSpace: {
+            /** Chain */
+            chain: components["schemas"]["V8FichePlace"][];
+            /** Country Iso3 */
+            country_iso3: string | null;
+            geometry: components["schemas"]["V8FicheGeometry"] | null;
+            point: components["schemas"]["V8FichePoint2"] | null;
+        };
+        /** V8FicheStat */
+        V8FicheStat: {
+            /** Key */
+            key: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "observed" | "projection" | "estimate" | "derived" | "literal" | "count" | "relation" | "judged";
+            /** Label Fr */
+            label_fr: string;
+            link: components["schemas"]["V8FicheLink"] | null;
+            missing: components["schemas"]["V8FicheMissing"] | null;
+            /** Period */
+            period: string | null;
+            /** Points */
+            points: components["schemas"]["V8FichePoint"][];
+            ref: components["schemas"]["V8FicheRef"] | null;
+            source: components["schemas"]["V8FicheSource"] | null;
+            /** Sub */
+            sub: string | null;
+            /** Unit */
+            unit: string | null;
+            /**
+             * Value
+             * @description Exact decimal string (null when the stat is text, a link or missing)
+             */
+            value: string | null;
+            /** Value Text */
+            value_text: string | null;
+        };
+        /** V8FicheTop */
+        V8FicheTop: {
+            /** Concept */
+            concept: string;
+            /** Items */
+            items: components["schemas"]["V8FicheTopItem"][];
+            /** Key */
+            key: string;
+            /** Label Fr */
+            label_fr: string;
+            /** N Countries */
+            n_countries: number | null;
+            /** Unit */
+            unit: string | null;
+            /** Year */
+            year: number | null;
+        };
+        /** V8FicheTopItem */
+        V8FicheTopItem: {
+            /** Iso3 */
+            iso3: string;
+            source: components["schemas"]["V8FicheSource"];
+            /** Value */
+            value: string | null;
+        };
         /** Validation */
         Validation: {
             /** Chain Signature */
@@ -12844,6 +18315,38 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** VintagesResponse */
+        VintagesResponse: {
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            };
+            /** Notes */
+            notes: string[];
+            snapshot: components["schemas"]["SnapshotRef"];
+            /** Took Ms */
+            took_ms: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** WatchRule */
+        WatchRule: {
+            /** Created At */
+            created_at: string;
+            /** Id */
+            id: string;
+            /** Item Uid */
+            item_uid: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "new_data" | "revision" | "resolution" | "threshold";
+            /** Op */
+            op?: (">" | ">=" | "<" | "<=") | null;
+            /** Value */
+            value?: string | null;
+        };
         /** WhyLane */
         WhyLane: {
             /** Claims */
@@ -12877,7 +18380,7 @@ export interface components {
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
             cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["EventList"];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -12964,6 +18467,20 @@ export interface components {
                 [key: string]: unknown;
             } | null;
         };
+        /** Freshness */
+        reva__api__routes__v8_coverage__Freshness: {
+            /** Domains */
+            domains: {
+                [key: string]: unknown;
+            }[];
+            meta: components["schemas"]["CoverageMeta"];
+            /** Never Loaded */
+            never_loaded: {
+                [key: string]: unknown;
+            }[];
+        } & {
+            [key: string]: unknown;
+        };
         /** EventListResponse */
         reva__api__schemas__EventListResponse: {
             applicability: components["schemas"]["Assessment"];
@@ -12984,7 +18501,7 @@ export interface components {
             cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["Event"][];
-            data_freshness: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["reva__api__schemas__Freshness"] | null;
             /** Estimand */
             estimand: {
                 [key: string]: unknown;
@@ -13039,6 +18556,15 @@ export interface components {
             } | null;
             /** Warnings */
             warnings: components["schemas"]["ApiWarning"][];
+        };
+        /** Freshness */
+        reva__api__schemas__Freshness: {
+            /** Latest Recorded At */
+            latest_recorded_at: string | null;
+            /** Latest Retrieved At */
+            latest_retrieved_at: string | null;
+            /** Note */
+            note: string | null;
         };
         /** Participant */
         reva__api__schemas__Participant: {
@@ -16768,6 +22294,1772 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    answer_v1_v8_ask_answer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnswerRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnswerBundle"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    brainstorm_v1_v8_ask_brainstorm_get: {
+        parameters: {
+            query: {
+                /** @description e.g. « prévoir le prix du Brent » */
+                target: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BrainstormBundle"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    examples_v1_v8_ask_examples_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    list_boards_v1_v8_boards_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardListResponse"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    create_board_v1_v8_boards_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BoardCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_board_v1_v8_boards__board_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_board_v1_v8_boards__board_id__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BoardUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    delete_board_v1_v8_boards__board_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    board_alerts_v1_v8_boards__board_id__alerts_get: {
+        parameters: {
+            query?: {
+                /** @description Changes recorded after this time (default: 30 days ago) */
+                since?: string | null;
+            };
+            header?: never;
+            path: {
+                board_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertsResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_rule_v1_v8_boards__board_id__rules_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RuleCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    delete_rule_v1_v8_boards__board_id__rules__rule_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                board_id: string;
+                rule_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoardResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    changes_v1_v8_changes_get: {
+        parameters: {
+            query?: {
+                /** @description Items recorded after this time (default: 7 days ago) */
+                since?: string | null;
+                /** @description Items recorded up to this time (default: now) */
+                until?: string | null;
+                kinds?: string | null;
+                limit?: number;
+                cursor?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangesResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    coverage_country_v1_v8_coverage_countries__iso3__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                iso3: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CountryDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    coverage_decisions_v1_v8_coverage_decisions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PendingView"];
+                };
+            };
+        };
+    };
+    coverage_domain_v1_v8_coverage_domains__domain__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                domain: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DomainDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    coverage_freshness_v1_v8_coverage_freshness_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["reva__api__routes__v8_coverage__Freshness"];
+                };
+            };
+        };
+    };
+    coverage_matrix_v1_v8_coverage_matrix_get: {
+        parameters: {
+            query?: {
+                level?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoverageMatrix"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    coverage_pending_v1_v8_coverage_pending_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PendingView"];
+                };
+            };
+        };
+    };
+    brief_v1_v8_decision_brief_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BriefIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BriefResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    compare_v1_v8_decision_compare_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompareIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompareResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_v1_v8_decision_run_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScenarioIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunResponse"];
+                };
+            };
+            /** @description Unknown reference id */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sensitivity_v1_v8_decision_sensitivity_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SensitivityIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SensitivityResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    templates_v1_v8_decision_templates_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplatesResponse"];
+                };
+            };
+        };
+    };
+    dossier_subjects_v1_v8_dossier_subjects_get: {
+        parameters: {
+            query?: {
+                /** @description Text to look up (name, ISO3, id) */
+                q?: string | null;
+                kind?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectList"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dossier_document_v1_v8_dossier__kind___sid__get: {
+        parameters: {
+            query?: {
+                /** @description json (document), md (Markdown), html (print) */
+                format?: "json" | "md" | "html";
+                /** @description Recompute even if a cached brief exists for this data snapshot */
+                refresh?: boolean;
+            };
+            header?: never;
+            path: {
+                kind: string;
+                sid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                    "text/html": unknown;
+                    "text/markdown": unknown;
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_entity_bundle_v1_v8_entity__kind___ident__get: {
+        parameters: {
+            query?: {
+                /** @description Rows of this origin only; 'any' = both. Default: live in production, any elsewhere */
+                origin?: ("live" | "test_fixture" | "any") | null;
+                /** @description Bypass the process cache (measurement, debugging) */
+                fresh?: boolean;
+            };
+            header?: never;
+            path: {
+                /** @description Fiche kind: country, compound, gene, disease, drug, legal_entity (company), facility, armed_conflict, taxon, commodity, question, effect, source, any KG kind */
+                kind: string;
+                /** @description ISO3 for countries, KG id (Q…, prefix:local), anchor id, question id, estimate key or source key */
+                ident: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V8FicheBundleResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_entity_relations_v1_v8_entity__kind___ident__relations_get: {
+        parameters: {
+            query: {
+                /** @description Relation family (registry/kg/relations_v4.yaml) */
+                family: string;
+                limit?: number;
+                cursor?: string | null;
+                /** @description Rows of this origin only; 'any' = both. Default: live in production, any elsewhere */
+                origin?: ("live" | "test_fixture" | "any") | null;
+            };
+            header?: never;
+            path: {
+                kind: string;
+                ident: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V8FicheRelationPageResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_neighbourhood_v1_v8_neighbourhood_get: {
+        parameters: {
+            query: {
+                id: string;
+                families?: string[] | null;
+                limit?: number;
+                include_causal?: boolean;
+                origin?: ("live" | "test_fixture" | "any") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EgoResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_paths_v1_v8_paths_get: {
+        parameters: {
+            query: {
+                /** @description KG id, ISO3 or node id */
+                from: string;
+                to: string;
+                /** @description Allowed relation families (comma-separated or repeated); default all */
+                families?: string[] | null;
+                max_hops?: number;
+                /** @description Also traverse attributed causal claims and effect estimates */
+                include_causal?: boolean;
+                /** @description Number of paths */
+                k?: number;
+                hub_limit?: number;
+                origin?: ("live" | "test_fixture" | "any") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PathsResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_nodes_v1_v8_paths_nodes_get: {
+        parameters: {
+            query: {
+                q: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NodesResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_status_v1_v8_paths_status_get: {
+        parameters: {
+            query?: {
+                /** @description Start loading/building the index */
+                warm?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_scores_v1_v8_scores_get: {
+        parameters: {
+            query?: {
+                /** @description Registry rows of this origin; 'any' = both. Default: live in production */
+                origin?: ("live" | "test_fixture" | "any") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoresPageResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_calendar_v1_v8_scores_calendar_get: {
+        parameters: {
+            query?: {
+                /** @description Include the registry's next expected resolutions (slower when cold) */
+                live?: boolean;
+                /** @description Registry rows of this origin; 'any' = both. Default: live in production */
+                origin?: ("live" | "test_fixture" | "any") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CalendarResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_cell_v1_v8_scores_cells__key__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CellResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_doc_v1_v8_scores_doc_get: {
+        parameters: {
+            query: {
+                path: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_live_v1_v8_scores_live_get: {
+        parameters: {
+            query?: {
+                /** @description Registry rows of this origin; 'any' = both. Default: live in production */
+                origin?: ("live" | "test_fixture" | "any") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LiveResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_matrix_v1_v8_scores_matrix_get: {
+        parameters: {
+            query?: {
+                /** @description Registry rows of this origin; 'any' = both. Default: live in production */
+                origin?: ("live" | "test_fixture" | "any") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoresPageResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_track_v1_v8_scores_tracks__track_id__get: {
+        parameters: {
+            query?: {
+                /** @description Registry rows of this origin; 'any' = both. Default: live in production */
+                origin?: ("live" | "test_fixture" | "any") | null;
+            };
+            header?: never;
+            path: {
+                track_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrackResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_v1_v8_search_get: {
+        parameters: {
+            query: {
+                /** @description Text, an id or a code */
+                q: string;
+                /** @description Comma list of search kinds */
+                kinds?: string | null;
+                limit?: number;
+                lang?: "fr" | "en";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    status_v1_v8_search_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchStatusResponse"];
+                };
+            };
+        };
+    };
+    catalog_v1_v8_series_catalog_get: {
+        parameters: {
+            query?: {
+                /** @description Search text (labels fr/en, concept id, unit, theme, source, code) */
+                q?: string;
+                theme?: string | null;
+                limit?: number;
+                /** @description Snapshot origin (default: live in production, else the latest snapshot of any origin) */
+                origin?: string | null;
+                /** @description A recorded atlas snapshot (manifest sha256). The latest snapshot is always readable; an older one only when its query file already exists (409 snapshot_not_materialised otherwise: query files are built by the worker, never inside a request) */
+                snapshot?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    map_slice_v1_v8_series_map_get: {
+        parameters: {
+            query?: {
+                /** @description Atlas series <source>.<dataset>.<indicator> */
+                series?: string | null;
+                /** @description <source>.<dataset> */
+                table?: string | null;
+                /** @description Measure (indicator before its key=value filters) */
+                measure?: string | null;
+                /** @description Filters key=value (repeatable); open keys take their default */
+                f?: string[] | null;
+                period?: string | null;
+                precision?: string | null;
+                level?: string;
+                projections?: string;
+                /** @description Snapshot origin (default: live in production, else the latest snapshot of any origin) */
+                origin?: string | null;
+                /** @description A recorded atlas snapshot (manifest sha256). The latest snapshot is always readable; an older one only when its query file already exists (409 snapshot_not_materialised otherwise: query files are built by the worker, never inside a request) */
+                snapshot?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MapResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    measure_v1_v8_series_measure_get: {
+        parameters: {
+            query: {
+                table: string;
+                measure: string;
+                /** @description Filters key=value (repeatable); open keys take their default */
+                f?: string[] | null;
+                /** @description Snapshot origin (default: live in production, else the latest snapshot of any origin) */
+                origin?: string | null;
+                /** @description A recorded atlas snapshot (manifest sha256). The latest snapshot is always readable; an older one only when its query file already exists (409 snapshot_not_materialised otherwise: query files are built by the worker, never inside a request) */
+                snapshot?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeasureResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    multi_v1_v8_series_multi_get: {
+        parameters: {
+            query: {
+                /** @description Series keys (1-6) */
+                s: string[];
+                /** @description ISO3 countries (1-12) */
+                g: string[];
+                /** @description Add the atlas headline population of the countries (per capita) */
+                population?: boolean;
+                /** @description Snapshot origin (default: live in production, else the latest snapshot of any origin) */
+                origin?: string | null;
+                /** @description A recorded atlas snapshot (manifest sha256). The latest snapshot is always readable; an older one only when its query file already exists (409 snapshot_not_materialised otherwise: query files are built by the worker, never inside a request) */
+                snapshot?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MultiResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    place_v1_v8_series_place_get: {
+        parameters: {
+            query: {
+                /** @description ISO3 or provider geography */
+                geo: string;
+                /** @description Atlas series <source>.<dataset>.<indicator> */
+                series?: string | null;
+                /** @description <source>.<dataset> */
+                table?: string | null;
+                /** @description Measure (indicator before its key=value filters) */
+                measure?: string | null;
+                /** @description Filters key=value (repeatable); open keys take their default */
+                f?: string[] | null;
+                precision?: string | null;
+                /** @description Snapshot origin (default: live in production, else the latest snapshot of any origin) */
+                origin?: string | null;
+                /** @description A recorded atlas snapshot (manifest sha256). The latest snapshot is always readable; an older one only when its query file already exists (409 snapshot_not_materialised otherwise: query files are built by the worker, never inside a request) */
+                snapshot?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlaceResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    places_v1_v8_series_places_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlacesResponse"];
+                };
+            };
+        };
+    };
+    table_v1_v8_series_table_get: {
+        parameters: {
+            query: {
+                table: string;
+                q?: string;
+                limit?: number;
+                /** @description Snapshot origin (default: live in production, else the latest snapshot of any origin) */
+                origin?: string | null;
+                /** @description A recorded atlas snapshot (manifest sha256). The latest snapshot is always readable; an older one only when its query file already exists (409 snapshot_not_materialised otherwise: query files are built by the worker, never inside a request) */
+                snapshot?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TableResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    vintages_v1_v8_series_vintages_get: {
+        parameters: {
+            query: {
+                series: string;
+                g: string[];
+                /** @description Snapshot origin (default: live in production, else the latest snapshot of any origin) */
+                origin?: string | null;
+                /** @description A recorded atlas snapshot (manifest sha256). The latest snapshot is always readable; an older one only when its query file already exists (409 snapshot_not_materialised otherwise: query files are built by the worker, never inside a request) */
+                snapshot?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VintagesResponse"];
                 };
             };
             /** @description Validation Error */

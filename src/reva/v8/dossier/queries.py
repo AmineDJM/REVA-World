@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 import polars as pl
+import yaml
 
 from reva.v8.dossier.context import Ctx, rights_src, source_title
 from reva.v8.dossier.fmt import fr_number, fr_period, to_decimal, wd_time
@@ -1251,18 +1252,64 @@ def beat_tests(ctx: Ctx, *, file: str, code: str, benchmark_fr: str, title: str,
         )
     out.rows = out.rows[:limit]
     wins = [t for t in d.get("wins", []) if t.get("code") == code]
+    win_tests = [t for t in tests if t.get("holm_win")]
     out.values["n_wins"] = num_val(len({(t.get("window"), t.get("h")) for t in wins}), src, kind="derived", digits=0)
     out.values["n_tests"] = num_val(len(tests), src, kind="derived", digits=0)
+    out.values["n_win_tests"] = num_val(len(win_tests), src, kind="derived", digits=0)
     if wins:
         best = min(wins, key=lambda t: t.get("ratio") or 9)
         out.values["best_ratio"] = num_val(f"{best['ratio']:.2f}", src, kind="derived", digits=2)
         out.values["best_h"] = num_val(best.get("h"), src, kind="derived", digits=0)
+        scope, reading = _beat_scope(wins)
+        out.values["scope"] = label_val(scope, src, kind="forecast")
+        out.values["reading"] = label_val(reading, src, kind="forecast")
+        cav = _scoreboard_caveats(code)
+        out.values["caveats"] = (
+            label_val(cav, src, kind="forecast")
+            if cav
+            else Miss("caveats", "aucune réserve trouvée au tableau des scores")
+        )
     else:
-        out.values["best_ratio"] = Miss("ratio", "aucun test gagné après Holm")
-        out.values["best_h"] = Miss("horizon", "aucun test gagné après Holm")
+        for name, what in (
+            ("best_ratio", "ratio"),
+            ("best_h", "horizon"),
+            ("scope", "horizon"),
+            ("reading", "lecture"),
+        ):
+            out.values[name] = Miss(what, "aucun test gagné après Holm")
+        out.values["caveats"] = Miss("caveats", "aucun test gagné après Holm")
     if not tests:
         out.empty_reason = f"aucun test pré-enregistré pour {code}"
     return out
+
+
+def _beat_scope(wins: list[dict[str, Any]]) -> tuple[str, str]:
+    """Which horizons the Holm wins cover, and how to read them (registry/scoreboard/tracks.yaml wording)."""
+    hs = sorted({int(t.get("h") or 0) for t in wins})
+    if hs == [0]:
+        return (
+            "le mois en cours seulement (h = 0)",
+            "un avantage de fraîcheur entre deux publications de la prévision officielle (REVA lit des prix "
+            "quotidiens publiés après elle), pas une meilleure prévision des mois suivants",
+        )
+    return (
+        "les horizons h = " + ", ".join(str(h) for h in hs) + " mois",
+        "victoires limitées à ces horizons ; les autres horizons ne battent pas la prévision officielle",
+    )
+
+
+def _scoreboard_caveats(code: str) -> str:
+    """French caveats of the scoreboard's « bat » rows for this series code (tracks.yaml, quoted as written)."""
+    try:
+        reg = yaml.safe_load((REPO / "registry/scoreboard/tracks.yaml").read_text())
+    except (OSError, yaml.YAMLError):
+        return ""
+    texts: dict[str, str] = reg.get("caveats") or {}
+    keys: list[str] = []
+    for r in reg.get("rows") or []:
+        if r.get("verdict") == "bat" and str(r.get("candidate_label_fr") or "").endswith(f"— {code}"):
+            keys += [k for k in r.get("caveats") or [] if k not in keys]
+    return " ".join(texts[k].strip() for k in keys if k in texts)
 
 
 # ============================================================================== decision engine

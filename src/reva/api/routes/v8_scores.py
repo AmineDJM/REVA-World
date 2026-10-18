@@ -269,3 +269,12 @@ def get_doc(path: str = Query(min_length=5, max_length=160, pattern=r"^[A-Za-z0-
     env = _env(t, 1)
     env["modality"] = "metadata"
     return DocResponse(data=DocText(**d), **env)
+
+
+def warm(app: Any) -> str:
+    """Start-up warm-up (reva.api.warmup): compute the live registry state in the background (cold ~25 s)."""
+    from reva.api.warmup import request_for
+
+    req = request_for(app)
+    L.SERVICE.get(app.state.engine(), _store(req), _origin(req, None), wait=False)
+    return "live state computing"

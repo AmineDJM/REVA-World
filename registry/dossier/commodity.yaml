@@ -57,7 +57,7 @@ summary:
   - id: fc
     text: "Prochaine prévision scellée du Brent par l'ensemble REVA : {fc.n_pending} questions en attente, statut : {fc.judged}."
   - id: beat
-    text: "En rétro-test pré-enregistré, REVA bat la prévision officielle de l'EIA sur {beat.n_wins} horizon(s) du Brent sur {beat.n_tests} tests (meilleur rapport d'erreur : {beat.best_ratio})."
+    text: "En rétro-test pré-enregistré contre l'EIA (STEO), REVA gagne {beat.n_win_tests} des {beat.n_tests} tests du Brent après correction de Holm, sur {beat.scope} : {beat.reading} (meilleur rapport d'erreur : {beat.best_ratio})."
     missing: "En rétro-test pré-enregistré, aucun test de REVA contre l'EIA sur le Brent ne survit à la correction de Holm."
 sections:
   - id: nature
@@ -194,7 +194,7 @@ sections:
         params: {file: $beat_file, code: $beat_code, benchmark_fr: "l'EIA STEO", title: "REVA BEAT-ENERGY — rétro-tests pré-enregistrés contre l'EIA STEO"}
         sentences:
           - id: verdict
-            text: "Sur {n_tests} tests pré-enregistrés du Brent, {n_wins} horizon(s) battent l'EIA après correction de Holm ; meilleur rapport d'erreur absolue moyenne : {best_ratio} (horizon {best_h} mois)."
+            text: "Sur {n_tests} tests pré-enregistrés du Brent (erreur absolue), {n_win_tests} battent l'EIA après correction de Holm, sur {scope} : {reading} ; meilleur rapport d'erreur absolue moyenne : {best_ratio} (horizon {best_h} mois). Réserves du tableau des scores : {caveats}"
             missing: "Sur {n_tests} tests pré-enregistrés du Brent, aucun ne bat l'EIA après correction de Holm."
         table:
           caption: "Rétro-tests contre l'EIA STEO (rapport des erreurs absolues moyennes REVA / EIA ; < 1 = REVA meilleur)"
