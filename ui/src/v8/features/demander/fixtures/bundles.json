@@ -1,0 +1,2029 @@
+{
+ "number": {
+  "question": "Causes de décès en France",
+  "language": "fr",
+  "status": "answered",
+  "headline": {
+   "kind": "number",
+   "value": "23.26",
+   "unit": "% of total deaths",
+   "period": "2021",
+   "iso3": "FRA",
+   "concept": "health.deaths_share.cardiovascular",
+   "honesty": "observed",
+   "text": "Part des décès dus aux maladies cardiovasculaires — France, 2021 : 23,26 % of total deaths (source : fixture_who/gho, indicateur CVD).",
+   "more": 1,
+   "citations": [
+    "E1"
+   ],
+   "concept_label": "Part des décès dus aux maladies cardiovasculaires"
+  },
+  "missing": [],
+  "viz": {
+   "type": "bars",
+   "unit": "% of total deaths",
+   "rows": [
+    {
+     "label": "Part des décès dus aux maladies cardiovasculaires",
+     "concept": "health.deaths_share.cardiovascular",
+     "iso3": "FRA",
+     "value": "23.26",
+     "unit": "% of total deaths",
+     "period": "2021",
+     "projection": false,
+     "eid": "E1",
+     "source": "fixture_who/gho"
+    },
+    {
+     "label": "Part des décès dus aux traumatismes",
+     "concept": "health.deaths_share.injuries",
+     "iso3": "FRA",
+     "value": "6.42",
+     "unit": "% of total deaths",
+     "period": "2021",
+     "projection": false,
+     "eid": "E2",
+     "source": "fixture_who/gho"
+    }
+   ]
+  },
+  "how": {
+   "planner": "keyword_fallback",
+   "prompt_version": "nlqa-plan-1.3.0",
+   "restatement": "Question interprétée comme : Part des décès dus aux maladies cardiovasculaires — France, dernière année disponible; Part des décès dus aux traumatismes — France, dernière année disponible. (plan par mots-clés, sans LLM)",
+   "operations": [
+    {
+     "op": "atlas_value",
+     "args": {
+      "concept": "health.deaths_share.cardiovascular",
+      "country": "FRA"
+     }
+    },
+    {
+     "op": "atlas_value",
+     "args": {
+      "concept": "health.deaths_share.injuries",
+      "country": "FRA"
+     }
+    }
+   ],
+   "rejected": [],
+   "tables": [
+    {
+     "table": "fixture_who.gho · CVD",
+     "n": 1
+    },
+    {
+     "table": "fixture_who.gho · INJ",
+     "n": 1
+    }
+   ],
+   "periods": {
+    "first": "2021-01-01",
+    "last": "2021-01-01"
+   },
+   "as_of": {
+    "atlas_snapshots": [],
+    "registered_tables": [],
+    "forecast_seals": [],
+    "kg_retrieved": null
+   },
+   "evidence_count": 2,
+   "latency_ms": 87.4,
+   "warnings": []
+  },
+  "sources": [
+   {
+    "source": "fixture_who/gho",
+    "licence": "CC-BY-4.0",
+    "n": 2,
+    "kinds": [
+     "atlas_cell"
+    ],
+    "non_commercial": false,
+    "restricted": false,
+    "community": false,
+    "tiers": [],
+    "outside_snapshot": false
+   }
+  ],
+  "targets": [
+   {
+    "kind": "monde",
+    "table": "fixture_who.gho",
+    "indicator": "CVD",
+    "series": "fixture_who.gho.CVD",
+    "iso3": "FRA",
+    "period": "2021",
+    "label": "Part des décès dus aux maladies cardiovasculaires"
+   },
+   {
+    "kind": "comparer",
+    "series": "fixture_who.gho.CVD",
+    "iso3": "FRA",
+    "label": "Part des décès dus aux maladies cardiovasculaires"
+   },
+   {
+    "kind": "fiche",
+    "entity_kind": "country",
+    "id": "FRA",
+    "label": "FRA"
+   },
+   {
+    "kind": "monde",
+    "table": "fixture_who.gho",
+    "indicator": "INJ",
+    "series": "fixture_who.gho.INJ",
+    "iso3": "FRA",
+    "period": "2021",
+    "label": "Part des décès dus aux traumatismes"
+   },
+   {
+    "kind": "comparer",
+    "series": "fixture_who.gho.INJ",
+    "iso3": "FRA",
+    "label": "Part des décès dus aux traumatismes"
+   }
+  ],
+  "followups": [],
+  "pin": {
+   "kind": "note",
+   "label": "Causes de décès en France",
+   "markdown": "**Causes de décès en France**\n\nPart des décès dus aux maladies cardiovasculaires — France, 2021 : 23,26 % of total deaths (source : fixture_who/gho, indicateur CVD).\n\n[Redemander](/v8/demander?q=Causes+de+d%C3%A9c%C3%A8s+en+France)",
+   "series": {
+    "kind": "series",
+    "concept": "health.deaths_share.cardiovascular",
+    "geo": "FRA",
+    "label": "Causes de décès en France",
+    "unit": "% of total deaths"
+   }
+  },
+  "sentences": [
+   {
+    "id": "S1",
+    "text": "Part des décès dus aux maladies cardiovasculaires — France, 2021 : 23,26 % of total deaths (source : fixture_who/gho, indicateur CVD).",
+    "kind": "fact",
+    "citations": [
+     "E1"
+    ],
+    "citation_refs": [
+     "E1: fixture_who/gho CVD FRA 2021-01-01 sha256:ffffffffffff {\"file\": \"fixture.csv\"}"
+    ]
+   },
+   {
+    "id": "S2",
+    "text": "Part des décès dus aux traumatismes — France, 2021 : 6,42 % of total deaths (source : fixture_who/gho, indicateur INJ).",
+    "kind": "fact",
+    "citations": [
+     "E2"
+    ],
+    "citation_refs": [
+     "E2: fixture_who/gho INJ FRA 2021-01-01 sha256:ffffffffffff {\"file\": \"fixture.csv\"}"
+    ]
+   },
+   {
+    "id": "S3",
+    "text": "Sources et licences : fixture_who/gho (CC-BY-4.0).",
+    "kind": "sources",
+    "citations": [
+     "E1",
+     "E2"
+    ],
+    "citation_refs": [
+     "E1: fixture_who/gho CVD FRA 2021-01-01 sha256:ffffffffffff {\"file\": \"fixture.csv\"}",
+     "E2: fixture_who/gho INJ FRA 2021-01-01 sha256:ffffffffffff {\"file\": \"fixture.csv\"}"
+    ]
+   }
+  ],
+  "evidence": [
+   {
+    "id": "E1",
+    "kind": "atlas_cell",
+    "concept_id": "health.deaths_share.cardiovascular",
+    "iso3": "FRA",
+    "entity_qid": null,
+    "period_start": "2021-01-01",
+    "period_end": "2022-01-01",
+    "value": "23.26",
+    "value_text": null,
+    "unit": "% of total deaths",
+    "flags": {},
+    "citation": {
+     "source": "fixture_who",
+     "dataset": "gho",
+     "indicator": "CVD",
+     "raw_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+     "selector": "{\"file\": \"fixture.csv\"}",
+     "rights": {
+      "licence": "CC-BY-4.0",
+      "open_licence": true,
+      "restricted": false
+     },
+     "status": "source_reported"
+    }
+   },
+   {
+    "id": "E2",
+    "kind": "atlas_cell",
+    "concept_id": "health.deaths_share.injuries",
+    "iso3": "FRA",
+    "entity_qid": null,
+    "period_start": "2021-01-01",
+    "period_end": "2022-01-01",
+    "value": "6.42",
+    "value_text": null,
+    "unit": "% of total deaths",
+    "flags": {},
+    "citation": {
+     "source": "fixture_who",
+     "dataset": "gho",
+     "indicator": "INJ",
+     "raw_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+     "selector": "{\"file\": \"fixture.csv\"}",
+     "rights": {
+      "licence": "CC-BY-4.0",
+      "open_licence": true,
+      "restricted": false
+     },
+     "status": "source_reported"
+    }
+   }
+  ],
+  "answer_text": "Part des décès dus aux maladies cardiovasculaires — France, 2021 : 23,26 % of total deaths (source : fixture_who/gho, indicateur CVD).\n\nPart des décès dus aux traumatismes — France, 2021 : 6,42 % of total deaths (source : fixture_who/gho, indicateur INJ).\n\nSources et licences : fixture_who/gho (CC-BY-4.0).",
+  "warnings": [],
+  "latency_ms": 87.7,
+  "cached": false
+ },
+ "series": {
+  "question": "Prix du Brent en 2020",
+  "language": "fr",
+  "status": "answered",
+  "headline": {
+   "kind": "number",
+   "value": "51.22",
+   "unit": "Dollars per Barrel",
+   "period": "2020-12-31",
+   "iso3": null,
+   "concept": "prices.daily.brent_spot",
+   "honesty": "observed",
+   "text": "Prix spot du pétrole brut Brent (quotidien), 2020 — 4 valeur(s) publiée(s) par fixture_eia.spot_d.RBRTE : première (2020-01-02) : 67,05 Dollars per Barrel ; dernière (2020-12-31) : 51,22 Dollars per Barrel ; plus basse (2020-04-21) : 9,12 Dollars per Barrel ; plus haute (2020-01-06) : 70,25 Dollars per Barrel (valeurs publiées sélectionnées, aucune moyenne calculée).",
+   "more": 0,
+   "citations": [
+    "E2"
+   ],
+   "concept_label": "Prix spot du pétrole brut Brent (quotidien)"
+  },
+  "missing": [],
+  "viz": {
+   "type": "timeseries",
+   "series": [
+    {
+     "label": "Prix spot du pétrole brut Brent (quotidien)",
+     "concept": "prices.daily.brent_spot",
+     "unit": "Dollars per Barrel",
+     "iso3": null,
+     "source": "fixture_eia/spot_d",
+     "indicator": "RBRTE",
+     "licence": "CC0-1.0",
+     "outside_snapshot": false,
+     "points": [
+      {
+       "t": "2020-01-02",
+       "t_end": "2020-01-03",
+       "v": "67.05",
+       "projection": false,
+       "source": "fixture_eia/spot_d",
+       "cited": true
+      },
+      {
+       "t": "2020-01-06",
+       "t_end": "2020-01-07",
+       "v": "70.25",
+       "projection": false,
+       "source": "fixture_eia/spot_d",
+       "cited": true
+      },
+      {
+       "t": "2020-04-21",
+       "t_end": "2020-04-22",
+       "v": "9.12",
+       "projection": false,
+       "source": "fixture_eia/spot_d",
+       "cited": true
+      },
+      {
+       "t": "2020-12-31",
+       "t_end": "2021-01-01",
+       "v": "51.22",
+       "projection": false,
+       "source": "fixture_eia/spot_d",
+       "cited": true
+      }
+     ],
+     "truncated": false
+    }
+   ],
+   "note": "série relue à la source citée ; points non interpolés"
+  },
+  "how": {
+   "planner": "keyword_fallback",
+   "prompt_version": "nlqa-plan-1.3.0",
+   "restatement": "Question interprétée comme : Prix spot du pétrole brut Brent (quotidien), 2020–2020. (plan par mots-clés, sans LLM)",
+   "operations": [
+    {
+     "op": "atlas_period",
+     "args": {
+      "concept": "prices.daily.brent_spot",
+      "from_year": 2020,
+      "to_year": 2020
+     }
+    }
+   ],
+   "rejected": [],
+   "tables": [
+    {
+     "table": "fixture_eia.spot_d · RBRTE",
+     "n": 4
+    }
+   ],
+   "periods": {
+    "first": "2020-01-02",
+    "last": "2020-12-31"
+   },
+   "as_of": {
+    "atlas_snapshots": [],
+    "registered_tables": [],
+    "forecast_seals": [],
+    "kg_retrieved": null
+   },
+   "evidence_count": 4,
+   "latency_ms": 155.9,
+   "warnings": []
+  },
+  "sources": [
+   {
+    "source": "fixture_eia/spot_d",
+    "licence": "CC0-1.0",
+    "n": 4,
+    "kinds": [
+     "atlas_cell"
+    ],
+    "non_commercial": false,
+    "restricted": false,
+    "community": false,
+    "tiers": [],
+    "outside_snapshot": false
+   }
+  ],
+  "targets": [
+   {
+    "kind": "monde",
+    "table": "fixture_eia.spot_d",
+    "indicator": "RBRTE",
+    "series": "fixture_eia.spot_d.RBRTE",
+    "iso3": null,
+    "period": "2020",
+    "label": "Prix spot du pétrole brut Brent (quotidien)"
+   }
+  ],
+  "followups": [
+   {
+    "label": "Prévisions scellées sur cette série",
+    "q": "Prévision prices.daily.brent_spot"
+   }
+  ],
+  "pin": {
+   "kind": "note",
+   "label": "Prix du Brent en 2020",
+   "markdown": "**Prix du Brent en 2020**\n\nPrix spot du pétrole brut Brent (quotidien), 2020 — 4 valeur(s) publiée(s) par fixture_eia.spot_d.RBRTE : première (2020-01-02) : 67,05 Dollars per Barrel ; dernière (2020-12-31) : 51,22 Dollars per Barrel ; plus basse (2020-04-21) : 9,12 Dollars per Barrel ; plus haute (2020-01-06) : 70,25 Dollars per Barrel (valeurs publiées sélectionnées, aucune moyenne calculée).\n\n[Redemander](/v8/demander?q=Prix+du+Brent+en+2020)"
+  },
+  "sentences": [
+   {
+    "id": "S1",
+    "text": "Prix spot du pétrole brut Brent (quotidien), 2020 — 4 valeur(s) publiée(s) par fixture_eia.spot_d.RBRTE : première (2020-01-02) : 67,05 Dollars per Barrel ; dernière (2020-12-31) : 51,22 Dollars per Barrel ; plus basse (2020-04-21) : 9,12 Dollars per Barrel ; plus haute (2020-01-06) : 70,25 Dollars per Barrel (valeurs publiées sélectionnées, aucune moyenne calculée).",
+    "kind": "fact",
+    "citations": [
+     "E1",
+     "E2",
+     "E3",
+     "E4"
+    ],
+    "citation_refs": [
+     "E1: fixture_eia/spot_d RBRTE  2020-01-02 sha256:ffffffffffff {\"file\": \"fixture.csv\"}",
+     "E2: fixture_eia/spot_d RBRTE  2020-12-31 sha256:ffffffffffff {\"file\": \"fixture.csv\"}",
+     "E3: fixture_eia/spot_d RBRTE  2020-04-21 sha256:ffffffffffff {\"file\": \"fixture.csv\"}",
+     "E4: fixture_eia/spot_d RBRTE  2020-01-06 sha256:ffffffffffff {\"file\": \"fixture.csv\"}"
+    ]
+   },
+   {
+    "id": "S2",
+    "text": "Sources et licences : fixture_eia/spot_d (CC0-1.0).",
+    "kind": "sources",
+    "citations": [
+     "E1",
+     "E2",
+     "E3",
+     "E4"
+    ],
+    "citation_refs": [
+     "E1: fixture_eia/spot_d RBRTE  2020-01-02 sha256:ffffffffffff {\"file\": \"fixture.csv\"}",
+     "E2: fixture_eia/spot_d RBRTE  2020-12-31 sha256:ffffffffffff {\"file\": \"fixture.csv\"}",
+     "E3: fixture_eia/spot_d RBRTE  2020-04-21 sha256:ffffffffffff {\"file\": \"fixture.csv\"}",
+     "E4: fixture_eia/spot_d RBRTE  2020-01-06 sha256:ffffffffffff {\"file\": \"fixture.csv\"}"
+    ]
+   }
+  ],
+  "evidence": [
+   {
+    "id": "E1",
+    "kind": "atlas_cell",
+    "concept_id": "prices.daily.brent_spot",
+    "iso3": "",
+    "entity_qid": null,
+    "period_start": "2020-01-02",
+    "period_end": "2020-01-03",
+    "value": "67.05",
+    "value_text": null,
+    "unit": "Dollars per Barrel",
+    "flags": {},
+    "citation": {
+     "source": "fixture_eia",
+     "dataset": "spot_d",
+     "indicator": "RBRTE",
+     "raw_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+     "selector": "{\"file\": \"fixture.csv\"}",
+     "rights": {
+      "licence": "CC0-1.0",
+      "open_licence": true,
+      "restricted": false
+     },
+     "status": "source_reported"
+    }
+   },
+   {
+    "id": "E2",
+    "kind": "atlas_cell",
+    "concept_id": "prices.daily.brent_spot",
+    "iso3": "",
+    "entity_qid": null,
+    "period_start": "2020-12-31",
+    "period_end": "2021-01-01",
+    "value": "51.22",
+    "value_text": null,
+    "unit": "Dollars per Barrel",
+    "flags": {},
+    "citation": {
+     "source": "fixture_eia",
+     "dataset": "spot_d",
+     "indicator": "RBRTE",
+     "raw_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+     "selector": "{\"file\": \"fixture.csv\"}",
+     "rights": {
+      "licence": "CC0-1.0",
+      "open_licence": true,
+      "restricted": false
+     },
+     "status": "source_reported"
+    }
+   },
+   {
+    "id": "E3",
+    "kind": "atlas_cell",
+    "concept_id": "prices.daily.brent_spot",
+    "iso3": "",
+    "entity_qid": null,
+    "period_start": "2020-04-21",
+    "period_end": "2020-04-22",
+    "value": "9.12",
+    "value_text": null,
+    "unit": "Dollars per Barrel",
+    "flags": {},
+    "citation": {
+     "source": "fixture_eia",
+     "dataset": "spot_d",
+     "indicator": "RBRTE",
+     "raw_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+     "selector": "{\"file\": \"fixture.csv\"}",
+     "rights": {
+      "licence": "CC0-1.0",
+      "open_licence": true,
+      "restricted": false
+     },
+     "status": "source_reported"
+    }
+   },
+   {
+    "id": "E4",
+    "kind": "atlas_cell",
+    "concept_id": "prices.daily.brent_spot",
+    "iso3": "",
+    "entity_qid": null,
+    "period_start": "2020-01-06",
+    "period_end": "2020-01-07",
+    "value": "70.25",
+    "value_text": null,
+    "unit": "Dollars per Barrel",
+    "flags": {},
+    "citation": {
+     "source": "fixture_eia",
+     "dataset": "spot_d",
+     "indicator": "RBRTE",
+     "raw_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+     "selector": "{\"file\": \"fixture.csv\"}",
+     "rights": {
+      "licence": "CC0-1.0",
+      "open_licence": true,
+      "restricted": false
+     },
+     "status": "source_reported"
+    }
+   }
+  ],
+  "answer_text": "Prix spot du pétrole brut Brent (quotidien), 2020 — 4 valeur(s) publiée(s) par fixture_eia.spot_d.RBRTE : première (2020-01-02) : 67,05 Dollars per Barrel ; dernière (2020-12-31) : 51,22 Dollars per Barrel ; plus basse (2020-04-21) : 9,12 Dollars per Barrel ; plus haute (2020-01-06) : 70,25 Dollars per Barrel (valeurs publiées sélectionnées, aucune moyenne calculée).\n\nSources et licences : fixture_eia/spot_d (CC0-1.0).",
+  "warnings": [],
+  "latency_ms": 156.1,
+  "cached": false
+ },
+ "forecast": {
+  "question": "Quelle est la prévision d'inflation pour la France ?",
+  "language": "fr",
+  "status": "answered",
+  "headline": {
+   "kind": "number",
+   "value": "1.9",
+   "unit": "% change (CPI, period average)",
+   "period": "2026",
+   "iso3": "FRA",
+   "honesty": "forecast",
+   "status": "pending",
+   "model": "forecast.registry_persistence",
+   "band": [
+    "-0.4",
+    "4.2"
+   ],
+   "text": "Prévisions scellées du registre REVA — Inflation (IPC, moyenne annuelle) (weo.cpi_inflation), France, 2026 (unité : % change (CPI, period average)) : forecast.registry_persistence : 1,9 [5 %–95 % : -0,4 à 4,2] (méthode : random walk / persistence with Gaussian h-step spread) ; forecast.registry_ar : 2,1 [5 %–95 % : 0,2 à 4] (méthode : AR(p) on levels, OLS fitted as of issue, p by AIC) ; forecast.reference_imf_weo : abstention (no WEO projection for this year). Statut : en attente de résolution (attendue vers 2027-04-30) — aucun score encore. Scellées le 2026-10-17T10:00:00+00:00 (lot 111111111111, sceau vérifié à la lecture) ; ce sont des prévisions statistiques de référence, pas un conseil.",
+   "more": 1,
+   "citations": [
+    "E2"
+   ]
+  },
+  "missing": [],
+  "viz": {
+   "type": "forecast",
+   "questions": [
+    {
+     "eid": "E2",
+     "question_id": "fq_aaaaaaaaaaaaaaaaaaaaaaaa",
+     "family": "weo.cpi_inflation",
+     "geo": "FRA",
+     "period": "2026",
+     "unit": "% change (CPI, period average)",
+     "status": "pending",
+     "outcome": null,
+     "issued_at": "2026-10-17T10:00:00+00:00",
+     "models": [
+      {
+       "model": "forecast.registry_persistence",
+       "method": "random walk / persistence with Gaussian h-step spread",
+       "status": "issued",
+       "reason": null,
+       "point": "1.9",
+       "lo": "-0.4",
+       "hi": "4.2",
+       "score": null
+      },
+      {
+       "model": "forecast.registry_ar",
+       "method": "AR(p) on levels, OLS fitted as of issue, p by AIC",
+       "status": "issued",
+       "reason": null,
+       "point": "2.1",
+       "lo": "0.2",
+       "hi": "4.0",
+       "score": null
+      },
+      {
+       "model": "forecast.reference_imf_weo",
+       "method": "IMF World Economic Outlook projection, attributed to the IMF; point only",
+       "status": "abstained",
+       "reason": "no WEO projection for this year",
+       "point": null,
+       "lo": null,
+       "hi": null,
+       "score": null
+      }
+     ]
+    },
+    {
+     "eid": "E3",
+     "question_id": "fq_bbbbbbbbbbbbbbbbbbbbbbbb",
+     "family": "weo.cpi_inflation",
+     "geo": "FRA",
+     "period": "2024",
+     "unit": "% change (CPI, period average)",
+     "status": "resolved",
+     "outcome": {
+      "status": "resolved",
+      "value": "2.3",
+      "source": "atlas.imf.weo (WEO 2025-04)"
+     },
+     "issued_at": "2026-10-17T10:00:00+00:00",
+     "models": [
+      {
+       "model": "forecast.registry_persistence",
+       "method": "random walk / persistence with Gaussian h-step spread",
+       "status": "issued",
+       "reason": null,
+       "point": "1.9",
+       "lo": "-0.4",
+       "hi": "4.2",
+       "score": {
+        "model": "forecast.registry_persistence",
+        "abs_error": 0.4,
+        "crps": 0.31
+       }
+      },
+      {
+       "model": "forecast.registry_ar",
+       "method": "AR(p) on levels, OLS fitted as of issue, p by AIC",
+       "status": "issued",
+       "reason": null,
+       "point": "2.1",
+       "lo": "0.2",
+       "hi": "4.0",
+       "score": {
+        "model": "forecast.registry_ar",
+        "abs_error": 0.2,
+        "crps": 0.22
+       }
+      },
+      {
+       "model": "forecast.reference_imf_weo",
+       "method": "IMF World Economic Outlook projection, attributed to the IMF; point only",
+       "status": "abstained",
+       "reason": "no WEO projection for this year",
+       "point": null,
+       "lo": null,
+       "hi": null,
+       "score": null
+      }
+     ]
+    }
+   ]
+  },
+  "how": {
+   "planner": "keyword_fallback",
+   "prompt_version": "nlqa-plan-1.3.0",
+   "restatement": "Question interprétée comme : les prévisions scellées du registre REVA pour « inflation », France. (plan par mots-clés, sans LLM)",
+   "operations": [
+    {
+     "op": "forecast",
+     "args": {
+      "text": "inflation",
+      "country": "FRA"
+     }
+    }
+   ],
+   "rejected": [],
+   "tables": [
+    {
+     "table": "registre de prévisions · weo.cpi_inflation",
+     "n": 2
+    }
+   ],
+   "periods": null,
+   "as_of": {
+    "atlas_snapshots": [],
+    "registered_tables": [],
+    "forecast_seals": [
+     "2026-10-17T10:00:00+00:00"
+    ],
+    "kg_retrieved": null
+   },
+   "evidence_count": 3,
+   "latency_ms": 63.9,
+   "warnings": []
+  },
+  "sources": [
+   {
+    "source": "reva.forecast_registry",
+    "licence": null,
+    "n": 2,
+    "kinds": [
+     "sealed_forecast"
+    ],
+    "non_commercial": false,
+    "restricted": false,
+    "community": false,
+    "tiers": [],
+    "outside_snapshot": false
+   }
+  ],
+  "targets": [
+   {
+    "kind": "scores",
+    "track": "weo.cpi_inflation",
+    "label": "weo.cpi_inflation"
+   }
+  ],
+  "followups": [
+   {
+    "label": "Brainstormer : prévoir « inflation »",
+    "brainstorm": "inflation"
+   },
+   {
+    "label": "Ces prévisions battent-elles les prévisionnistes officiels ?",
+    "target": {
+     "kind": "scores",
+     "track": "weo.cpi_inflation"
+    }
+   }
+  ],
+  "pin": {
+   "kind": "note",
+   "label": "Quelle est la prévision d'inflation pour la France ?",
+   "markdown": "**Quelle est la prévision d'inflation pour la France ?**\n\nPrévisions scellées du registre REVA — Inflation (IPC, moyenne annuelle) (weo.cpi_inflation), France, 2026 (unité : % change (CPI, period average)) : forecast.registry_persistence : 1,9 [5 %–95 % : -0,4 à 4,2] (méthode : random walk / persistence with Gaussian h-step spread) ; forecast.registry_ar : 2,1 [5 %–95 % : 0,2 à 4] (méthode : AR(p) on levels, OLS fitted as of issue, p by AIC) ; forecast.reference_imf_weo : abstention (no WEO projection for this year). Statut : en attente de résolution (attendue vers 2027-04-30) — aucun score encore. Scellées le 2026-10-17T10:00:00+00:00 (lot 111111111111, sceau vérifié à la lecture) ; ce sont des prévisions statistiques de référence, pas un conseil.\n\n[Redemander](/v8/demander?q=Quelle+est+la+pr%C3%A9vision+d%27inflation+pour+la+France+%3F)"
+  },
+  "sentences": [
+   {
+    "id": "S1",
+    "text": "Familles de questions retenues pour « inflation » (libellés du registre de prévisions) : Inflation (IPC, moyenne annuelle) (weo.cpi_inflation).",
+    "kind": "identification",
+    "citations": [
+     "E1"
+    ],
+    "citation_refs": [
+     "E1"
+    ]
+   },
+   {
+    "id": "S2",
+    "text": "Prévisions scellées du registre REVA — Inflation (IPC, moyenne annuelle) (weo.cpi_inflation), France, 2026 (unité : % change (CPI, period average)) : forecast.registry_persistence : 1,9 [5 %–95 % : -0,4 à 4,2] (méthode : random walk / persistence with Gaussian h-step spread) ; forecast.registry_ar : 2,1 [5 %–95 % : 0,2 à 4] (méthode : AR(p) on levels, OLS fitted as of issue, p by AIC) ; forecast.reference_imf_weo : abstention (no WEO projection for this year). Statut : en attente de résolution (attendue vers 2027-04-30) — aucun score encore. Scellées le 2026-10-17T10:00:00+00:00 (lot 111111111111, sceau vérifié à la lecture) ; ce sont des prévisions statistiques de référence, pas un conseil.",
+    "kind": "forecast",
+    "citations": [
+     "E2"
+    ],
+    "citation_refs": [
+     "E2"
+    ]
+   },
+   {
+    "id": "S3",
+    "text": "Prévisions scellées du registre REVA — Inflation (IPC, moyenne annuelle) (weo.cpi_inflation), France, 2024 (unité : % change (CPI, period average)) : forecast.registry_persistence : 1,9 [5 %–95 % : -0,4 à 4,2] (méthode : random walk / persistence with Gaussian h-step spread) ; forecast.registry_ar : 2,1 [5 %–95 % : 0,2 à 4] (méthode : AR(p) on levels, OLS fitted as of issue, p by AIC) ; forecast.reference_imf_weo : abstention (no WEO projection for this year). Statut : résolue — valeur publiée 2,3 (atlas.imf.weo (WEO 2025-04)) ; scores : forecast.registry_persistence : abs_error 0,4, crps 0,31 ; forecast.registry_ar : abs_error 0,2, crps 0,22. Scellées le 2026-10-17T10:00:00+00:00 (lot 111111111111, sceau vérifié à la lecture) ; ce sont des prévisions statistiques de référence, pas un conseil.",
+    "kind": "forecast",
+    "citations": [
+     "E3"
+    ],
+    "citation_refs": [
+     "E3"
+    ]
+   },
+   {
+    "id": "S4",
+    "text": "Sources et licences : reva.forecast_registry (REVA (calcul sur tables atlas déclarées)).",
+    "kind": "sources",
+    "citations": [
+     "E2",
+     "E3"
+    ],
+    "citation_refs": [
+     "E2",
+     "E3"
+    ]
+   }
+  ],
+  "evidence": [
+   {
+    "id": "E1",
+    "kind": "registry_term",
+    "registry": "registry/forecasts (question families)",
+    "term_id": "weo.cpi_inflation",
+    "term_kind": "forecast_family",
+    "labels": {
+     "fr": "Inflation (IPC, moyenne annuelle)",
+     "en": "Inflation (CPI, annual average)"
+    },
+    "query": "inflation",
+    "match": "label_words",
+    "citation": {
+     "source": "registry/forecasts (question families)",
+     "status": "reva_registry"
+    }
+   },
+   {
+    "id": "E2",
+    "kind": "sealed_forecast",
+    "question_id": "fq_aaaaaaaaaaaaaaaaaaaaaaaa",
+    "family": "weo.cpi_inflation",
+    "geo": "FRA",
+    "reference_period": "2026",
+    "type": "quantity",
+    "unit": "% change (CPI, period average)",
+    "text_fr": "Inflation en France en 2026 ?",
+    "text_en": "Inflation in France in 2026?",
+    "status": "pending",
+    "outcome": null,
+    "forecasts": [
+     {
+      "model": "forecast.registry_persistence",
+      "method": "random walk / persistence with Gaussian h-step spread",
+      "status": "issued",
+      "reason": null,
+      "point": "1.9",
+      "quantiles": {
+       "0.05": "-0.4",
+       "0.5": "1.9",
+       "0.95": "4.2"
+      },
+      "score": null
+     },
+     {
+      "model": "forecast.registry_ar",
+      "method": "AR(p) on levels, OLS fitted as of issue, p by AIC",
+      "status": "issued",
+      "reason": null,
+      "point": "2.1",
+      "quantiles": {
+       "0.05": "0.2",
+       "0.5": "2.1",
+       "0.95": "4.0"
+      },
+      "score": null
+     },
+     {
+      "model": "forecast.reference_imf_weo",
+      "method": "IMF World Economic Outlook projection, attributed to the IMF; point only",
+      "status": "abstained",
+      "reason": "no WEO projection for this year",
+      "score": null
+     }
+    ],
+    "citation": {
+     "source": "reva.forecast_registry",
+     "batch_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+     "issued_at": "2026-10-17T10:00:00+00:00",
+     "seal_verified": true,
+     "label": "BASELINE forecasts only (fixture)",
+     "resolution_source": "atlas.imf.weo",
+     "origin": "test_fixture",
+     "status": "sealed_forecast"
+    }
+   },
+   {
+    "id": "E3",
+    "kind": "sealed_forecast",
+    "question_id": "fq_bbbbbbbbbbbbbbbbbbbbbbbb",
+    "family": "weo.cpi_inflation",
+    "geo": "FRA",
+    "reference_period": "2024",
+    "type": "quantity",
+    "unit": "% change (CPI, period average)",
+    "text_fr": "Inflation en France en 2024 ?",
+    "text_en": "Inflation in France in 2024?",
+    "status": "resolved",
+    "outcome": {
+     "status": "resolved",
+     "value": "2.3",
+     "source": "atlas.imf.weo (WEO 2025-04)"
+    },
+    "forecasts": [
+     {
+      "model": "forecast.registry_persistence",
+      "method": "random walk / persistence with Gaussian h-step spread",
+      "status": "issued",
+      "reason": null,
+      "point": "1.9",
+      "quantiles": {
+       "0.05": "-0.4",
+       "0.5": "1.9",
+       "0.95": "4.2"
+      },
+      "score": {
+       "model": "forecast.registry_persistence",
+       "abs_error": 0.4,
+       "crps": 0.31
+      }
+     },
+     {
+      "model": "forecast.registry_ar",
+      "method": "AR(p) on levels, OLS fitted as of issue, p by AIC",
+      "status": "issued",
+      "reason": null,
+      "point": "2.1",
+      "quantiles": {
+       "0.05": "0.2",
+       "0.5": "2.1",
+       "0.95": "4.0"
+      },
+      "score": {
+       "model": "forecast.registry_ar",
+       "abs_error": 0.2,
+       "crps": 0.22
+      }
+     },
+     {
+      "model": "forecast.reference_imf_weo",
+      "method": "IMF World Economic Outlook projection, attributed to the IMF; point only",
+      "status": "abstained",
+      "reason": "no WEO projection for this year",
+      "score": null
+     }
+    ],
+    "citation": {
+     "source": "reva.forecast_registry",
+     "batch_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+     "issued_at": "2026-10-17T10:00:00+00:00",
+     "seal_verified": true,
+     "label": "BASELINE forecasts only (fixture)",
+     "resolution_source": "atlas.imf.weo",
+     "origin": "test_fixture",
+     "status": "sealed_forecast"
+    }
+   }
+  ],
+  "answer_text": "Familles de questions retenues pour « inflation » (libellés du registre de prévisions) : Inflation (IPC, moyenne annuelle) (weo.cpi_inflation). Prévisions scellées du registre REVA — Inflation (IPC, moyenne annuelle) (weo.cpi_inflation), France, 2026 (unité : % change (CPI, period average)) : forecast.registry_persistence : 1,9 [5 %–95 % : -0,4 à 4,2] (méthode : random walk / persistence with Gaussian h-step spread) ; forecast.registry_ar : 2,1 [5 %–95 % : 0,2 à 4] (méthode : AR(p) on levels, OLS fitted as of issue, p by AIC) ; forecast.reference_imf_weo : abstention (no WEO projection for this year). Statut : en attente de résolution (attendue vers 2027-04-30) — aucun score encore. Scellées le 2026-10-17T10:00:00+00:00 (lot 111111111111, sceau vérifié à la lecture) ; ce sont des prévisions statistiques de référence, pas un conseil. Prévisions scellées du registre REVA — Inflation (IPC, moyenne annuelle) (weo.cpi_inflation), France, 2024 (unité : % change (CPI, period average)) : forecast.registry_persistence : 1,9 [5 %–95 % : -0,4 à 4,2] (méthode : random walk / persistence with Gaussian h-step spread) ; forecast.registry_ar : 2,1 [5 %–95 % : 0,2 à 4] (méthode : AR(p) on levels, OLS fitted as of issue, p by AIC) ; forecast.reference_imf_weo : abstention (no WEO projection for this year). Statut : résolue — valeur publiée 2,3 (atlas.imf.weo (WEO 2025-04)) ; scores : forecast.registry_persistence : abs_error 0,4, crps 0,31 ; forecast.registry_ar : abs_error 0,2, crps 0,22. Scellées le 2026-10-17T10:00:00+00:00 (lot 111111111111, sceau vérifié à la lecture) ; ce sont des prévisions statistiques de référence, pas un conseil.\n\nSources et licences : reva.forecast_registry (REVA (calcul sur tables atlas déclarées)).",
+  "warnings": [],
+  "latency_ms": 64.2,
+  "cached": false
+ },
+ "unknown": {
+  "question": "Que mange le tigre ?",
+  "language": "fr",
+  "status": "unknown",
+  "headline": {
+   "kind": "unknown",
+   "text": "REVA ne sait pas",
+   "detail": "Aucune entité ne correspond à « tigre » (consulté : REVA KG (fake-kg (test fixture))).",
+   "missing": [
+    "answer",
+    "entité absente de l'index des libellés (fr/en) du graphe",
+    "unresolved_entity"
+   ],
+   "citations": [
+    "E1"
+   ]
+  },
+  "missing": [
+   "answer",
+   "entité absente de l'index des libellés (fr/en) du graphe",
+   "unresolved_entity"
+  ],
+  "viz": null,
+  "how": {
+   "planner": "keyword_fallback",
+   "prompt_version": "nlqa-plan-1.3.0",
+   "restatement": "Question interprétée comme : les relations « mange » de « tigre ». (plan par mots-clés, sans LLM)",
+   "operations": [
+    {
+     "op": "entity_lookup",
+     "args": {
+      "text": "tigre"
+     }
+    },
+    {
+     "op": "kg_families",
+     "args": {
+      "entity": "s1",
+      "families": [
+       "eats"
+      ],
+      "reading": "forward",
+      "count": false
+     }
+    }
+   ],
+   "rejected": [],
+   "tables": [],
+   "periods": null,
+   "as_of": {
+    "atlas_snapshots": [],
+    "registered_tables": [],
+    "forecast_seals": [],
+    "kg_retrieved": null
+   },
+   "evidence_count": 3,
+   "latency_ms": 64.1,
+   "warnings": []
+  },
+  "sources": [],
+  "targets": [],
+  "followups": [
+   {
+    "label": "Brainstormer : que manque-t-il pour répondre ?",
+    "brainstorm": "Que mange le tigre ?"
+   }
+  ],
+  "pin": {
+   "kind": "note",
+   "label": "Que mange le tigre ?",
+   "markdown": "**Que mange le tigre ?**\n\nREVA ne sait pas\n\n[Redemander](/v8/demander?q=Que+mange+le+tigre+%3F)"
+  },
+  "sentences": [
+   {
+    "id": "S1",
+    "text": "Aucune entité ne correspond à « tigre » (consulté : REVA KG (fake-kg (test fixture))).",
+    "kind": "missing",
+    "citations": [
+     "E1"
+    ],
+    "citation_refs": [
+     "E1: consulted REVA KG (fake-kg (test fixture))"
+    ]
+   },
+   {
+    "id": "S2",
+    "text": "L'opération kg_families n'a pas été exécutée : une entité ou un pays de la question n'a pas été identifié.",
+    "kind": "missing",
+    "citations": [
+     "E2"
+    ],
+    "citation_refs": [
+     "E2: consulted entity resolution"
+    ]
+   },
+   {
+    "id": "S3",
+    "text": "Aucune réponse sourcée n'a pu être construite à partir des données consultées.",
+    "kind": "missing",
+    "citations": [
+     "E3"
+    ],
+    "citation_refs": [
+     "E3: consulted no source"
+    ]
+   }
+  ],
+  "evidence": [
+   {
+    "id": "E1",
+    "kind": "absence",
+    "what": "entity",
+    "sources_consulted": [
+     "REVA KG (fake-kg (test fixture))"
+    ],
+    "query": "tigre",
+    "entity_kind": "any"
+   },
+   {
+    "id": "E2",
+    "kind": "absence",
+    "what": "unresolved_entity",
+    "sources_consulted": [
+     "entity resolution"
+    ],
+    "operation": "kg_families"
+   },
+   {
+    "id": "E3",
+    "kind": "absence",
+    "what": "answer",
+    "sources_consulted": [
+     "no source"
+    ]
+   }
+  ],
+  "answer_text": "Aucune entité ne correspond à « tigre » (consulté : REVA KG (fake-kg (test fixture))).\n\nL'opération kg_families n'a pas été exécutée : une entité ou un pays de la question n'a pas été identifié.\n\nAucune réponse sourcée n'a pu être construite à partir des données consultées.",
+  "warnings": [],
+  "latency_ms": 64.3,
+  "cached": false
+ },
+ "graph": {
+  "question": "Que mange le loup ?",
+  "language": "fr",
+  "status": "answered",
+  "headline": {
+   "kind": "sentence",
+   "text": "loup — « mange » : cerf (fixture:deer ; « mange (interaction enregistrée) ») ; lapin (fixture:rabbit ; « mange (interaction enregistrée) ») (source : fixture.globi).",
+   "honesty": "observed",
+   "count": null,
+   "citations": [
+    "E2",
+    "E3"
+   ]
+  },
+  "missing": [],
+  "viz": {
+   "type": "graph",
+   "center": {
+    "id": "fixture:wolf",
+    "label": "loup"
+   },
+   "nodes": [
+    {
+     "id": "fixture:wolf",
+     "label": "loup"
+    },
+    {
+     "id": "fixture:deer",
+     "label": "cerf"
+    },
+    {
+     "id": "fixture:rabbit",
+     "label": "lapin"
+    }
+   ],
+   "edges": [
+    {
+     "from": "fixture:wolf",
+     "to": "fixture:deer",
+     "label": "mange",
+     "inverse": false,
+     "eid": "E2",
+     "source": "fixture.globi"
+    },
+    {
+     "from": "fixture:wolf",
+     "to": "fixture:rabbit",
+     "label": "mange",
+     "inverse": false,
+     "eid": "E3",
+     "source": "fixture.globi"
+    }
+   ],
+   "total": 2,
+   "note": "relations publiées par les sources ; une relation n'est pas une cause"
+  },
+  "how": {
+   "planner": "keyword_fallback",
+   "prompt_version": "nlqa-plan-1.3.0",
+   "restatement": "Question interprétée comme : les relations « mange » de « loup ». (plan par mots-clés, sans LLM)",
+   "operations": [
+    {
+     "op": "entity_lookup",
+     "args": {
+      "text": "loup"
+     }
+    },
+    {
+     "op": "kg_families",
+     "args": {
+      "entity": "s1",
+      "families": [
+       "eats"
+      ],
+      "reading": "forward",
+      "count": false
+     }
+    }
+   ],
+   "rejected": [],
+   "tables": [
+    {
+     "table": "graphe · fixture.globi",
+     "n": 2
+    }
+   ],
+   "periods": null,
+   "as_of": {
+    "atlas_snapshots": [],
+    "registered_tables": [],
+    "forecast_seals": [],
+    "kg_retrieved": {
+     "first": "2026-10-17T00:00:00+00:00",
+     "last": "2026-10-17T00:00:00+00:00"
+    }
+   },
+   "evidence_count": 3,
+   "latency_ms": 63.9,
+   "warnings": []
+  },
+  "sources": [
+   {
+    "source": "fixture.globi",
+    "licence": "licence_unclear (fixture)",
+    "n": 2,
+    "kinds": [
+     "kg_statement"
+    ],
+    "non_commercial": false,
+    "restricted": false,
+    "community": false,
+    "tiers": [],
+    "outside_snapshot": false
+   }
+  ],
+  "targets": [
+   {
+    "kind": "fiche",
+    "entity_kind": "taxon",
+    "id": "fixture:wolf",
+    "label": "loup"
+   }
+  ],
+  "followups": [],
+  "pin": {
+   "kind": "note",
+   "label": "Que mange le loup ?",
+   "markdown": "**Que mange le loup ?**\n\nloup — « mange » : cerf (fixture:deer ; « mange (interaction enregistrée) ») ; lapin (fixture:rabbit ; « mange (interaction enregistrée) ») (source : fixture.globi).\n\n[Redemander](/v8/demander?q=Que+mange+le+loup+%3F)"
+  },
+  "sentences": [
+   {
+    "id": "S1",
+    "text": "Entité retenue pour « loup » : loup (fixture:wolf ; graphe REVA ; libellé exact).",
+    "kind": "identification",
+    "citations": [
+     "E1"
+    ],
+    "citation_refs": [
+     "E1: kg fixture:wolf None"
+    ]
+   },
+   {
+    "id": "S2",
+    "text": "loup — « mange » : cerf (fixture:deer ; « mange (interaction enregistrée) ») ; lapin (fixture:rabbit ; « mange (interaction enregistrée) ») (source : fixture.globi).",
+    "kind": "fact",
+    "citations": [
+     "E2",
+     "E3"
+    ],
+    "citation_refs": [
+     "E2: fixture.globi fixture-st-0010 rev fixture-1 None",
+     "E3: fixture.globi fixture-st-0011 rev fixture-1 None"
+    ]
+   },
+   {
+    "id": "S3",
+    "text": "Sources et licences : fixture.globi (licence_unclear (fixture)).",
+    "kind": "sources",
+    "citations": [
+     "E2",
+     "E3"
+    ],
+    "citation_refs": [
+     "E2: fixture.globi fixture-st-0010 rev fixture-1 None",
+     "E3: fixture.globi fixture-st-0011 rev fixture-1 None"
+    ]
+   }
+  ],
+  "evidence": [
+   {
+    "id": "E1",
+    "kind": "entity_identification",
+    "qid": "fixture:wolf",
+    "labels": {
+     "fr": "loup",
+     "en": "wolf"
+    },
+    "descriptions": {},
+    "entity_kind": "taxon",
+    "iso3": null,
+    "query": "loup",
+    "match": "label_exact",
+    "alternatives": [],
+    "citation": {
+     "source": "kg",
+     "revision": null,
+     "retrieved_at": null,
+     "status": "community_edited"
+    }
+   },
+   {
+    "id": "E2",
+    "kind": "kg_statement",
+    "statement_id": "fixture-st-0010",
+    "subject": {
+     "qid": "fixture:wolf",
+     "labels": {
+      "fr": "loup",
+      "en": "wolf"
+     }
+    },
+    "property": {
+     "id": "fixture:eats",
+     "labels": {
+      "fr": "mange (interaction enregistrée)",
+      "en": "eats (recorded interaction)"
+     }
+    },
+    "object": {
+     "qid": "fixture:deer",
+     "labels": {
+      "fr": "cerf",
+      "en": "deer"
+     }
+    },
+    "start": null,
+    "end": null,
+    "point_in_time": null,
+    "rank": "normal",
+    "causal_assertion": false,
+    "qualifiers": {},
+    "references": [],
+    "citation": {
+     "source": "fixture.globi",
+     "statement_id": "fixture-st-0010",
+     "revision": "fixture-1",
+     "retrieved_at": "2026-10-17T00:00:00+00:00",
+     "raw_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+     "origin": "test_fixture",
+     "status": "source_reported",
+     "rights": {
+      "licence": "licence_unclear (fixture)",
+      "open_licence": null,
+      "restricted": false
+     }
+    },
+    "family": {
+     "id": "eats",
+     "reading": {
+      "fr": "mange",
+      "en": "eats"
+     },
+     "inverse": false,
+     "causal": false,
+     "subtype": "eats"
+    }
+   },
+   {
+    "id": "E3",
+    "kind": "kg_statement",
+    "statement_id": "fixture-st-0011",
+    "subject": {
+     "qid": "fixture:wolf",
+     "labels": {
+      "fr": "loup",
+      "en": "wolf"
+     }
+    },
+    "property": {
+     "id": "fixture:eats",
+     "labels": {
+      "fr": "mange (interaction enregistrée)",
+      "en": "eats (recorded interaction)"
+     }
+    },
+    "object": {
+     "qid": "fixture:rabbit",
+     "labels": {
+      "fr": "lapin",
+      "en": "rabbit"
+     }
+    },
+    "start": null,
+    "end": null,
+    "point_in_time": null,
+    "rank": "normal",
+    "causal_assertion": false,
+    "qualifiers": {},
+    "references": [],
+    "citation": {
+     "source": "fixture.globi",
+     "statement_id": "fixture-st-0011",
+     "revision": "fixture-1",
+     "retrieved_at": "2026-10-17T00:00:00+00:00",
+     "raw_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+     "origin": "test_fixture",
+     "status": "source_reported",
+     "rights": {
+      "licence": "licence_unclear (fixture)",
+      "open_licence": null,
+      "restricted": false
+     }
+    },
+    "family": {
+     "id": "eats",
+     "reading": {
+      "fr": "mange",
+      "en": "eats"
+     },
+     "inverse": false,
+     "causal": false,
+     "subtype": "eats"
+    }
+   }
+  ],
+  "answer_text": "Entité retenue pour « loup » : loup (fixture:wolf ; graphe REVA ; libellé exact).\n\nloup — « mange » : cerf (fixture:deer ; « mange (interaction enregistrée) ») ; lapin (fixture:rabbit ; « mange (interaction enregistrée) ») (source : fixture.globi).\n\nSources et licences : fixture.globi (licence_unclear (fixture)).",
+  "warnings": [],
+  "latency_ms": 64.4,
+  "cached": false
+ },
+ "scenario": {
+  "question": "Que se passe-t-il si la BCE monte ses taux de 50 pb ?",
+  "language": "fr",
+  "status": "answered",
+  "headline": {
+   "kind": "sentence",
+   "text": "Scénario non validé — pas une probabilité : moteur de décision REVA, décision de référence « La BCE relève ses taux directeurs de 50 points de base au 1er trimestre 2027 » (ecb_plus_50bp_2027q1). Validation : unvalidated (no back-test and calibration record for this model chain).",
+   "honesty": "scenario",
+   "count": null,
+   "citations": [
+    "E2",
+    "E1"
+   ]
+  },
+  "missing": [],
+  "viz": {
+   "type": "scenario",
+   "decision": "ecb_plus_50bp_2027q1",
+   "label": "scénario non validé — pas une probabilité",
+   "validation": "unvalidated",
+   "rows": [
+    "PIB réel (niveau) — FRA : variation -0,14 % en 2027Q1 (5 %–95 % : -0,28 à -0,07 ; estimations : pub:fixture:rate_gdp)."
+   ],
+   "hops": [
+    {
+     "from": null,
+     "to": "atlas_concept:imf.policy_rate@FRA",
+     "label": "Changement direct décidé",
+     "estimate_key": null,
+     "source": "decision",
+     "eid": "E3"
+    },
+    {
+     "from": "atlas_concept:imf.policy_rate@FRA",
+     "to": "variable:output.real_gdp_level@FRA",
+     "label": null,
+     "estimate_key": "pub:fixture:rate_gdp",
+     "source": "fixture.effects_literature",
+     "eid": "E4"
+    }
+   ]
+  },
+  "how": {
+   "planner": "keyword_fallback",
+   "prompt_version": "nlqa-plan-1.3.0",
+   "restatement": "Question interprétée comme : un scénario du moteur de décision (non validé) pour la décision décrite (50 bp). (plan par mots-clés, sans LLM)",
+   "operations": [
+    {
+     "op": "decision",
+     "args": {
+      "text": "la BCE monte ses taux de 50 pb",
+      "magnitude": "50",
+      "unit": "bp"
+     }
+    }
+   ],
+   "rejected": [],
+   "tables": [
+    {
+     "table": "moteur de décision · reva.predict (decision engine)",
+     "n": 1
+    },
+    {
+     "table": "moteur de décision · decision",
+     "n": 1
+    },
+    {
+     "table": "moteur de décision · fixture.effects_literature",
+     "n": 1
+    }
+   ],
+   "periods": null,
+   "as_of": {
+    "atlas_snapshots": [],
+    "registered_tables": [],
+    "forecast_seals": [],
+    "kg_retrieved": null
+   },
+   "evidence_count": 4,
+   "latency_ms": 603.5,
+   "warnings": []
+  },
+  "sources": [
+   {
+    "source": "decision",
+    "licence": null,
+    "n": 1,
+    "kinds": [
+     "decision_hop"
+    ],
+    "non_commercial": false,
+    "restricted": false,
+    "community": false,
+    "tiers": [],
+    "outside_snapshot": false
+   },
+   {
+    "source": "fixture.effects_literature",
+    "licence": "all rights reserved (fixture)",
+    "n": 1,
+    "kinds": [
+     "decision_hop"
+    ],
+    "non_commercial": false,
+    "restricted": true,
+    "community": false,
+    "tiers": [],
+    "outside_snapshot": false
+   },
+   {
+    "source": "reva.predict (decision engine)",
+    "licence": null,
+    "n": 1,
+    "kinds": [
+     "decision_scenario"
+    ],
+    "non_commercial": false,
+    "restricted": false,
+    "community": false,
+    "tiers": [],
+    "outside_snapshot": false
+   }
+  ],
+  "targets": [
+   {
+    "kind": "decision",
+    "ref": "ecb_plus_50bp_2027q1",
+    "label": "ecb_plus_50bp_2027q1"
+   }
+  ],
+  "followups": [],
+  "pin": {
+   "kind": "note",
+   "label": "Que se passe-t-il si la BCE monte ses taux de 50 pb ?",
+   "markdown": "**Que se passe-t-il si la BCE monte ses taux de 50 pb ?**\n\nScénario non validé — pas une probabilité : moteur de décision REVA, décision de référence « La BCE relève ses taux directeurs de 50 points de base au 1er trimestre 2027 » (ecb_plus_50bp_2027q1). Validation : unvalidated (no back-test and calibration record for this model chain).\n\n[Redemander](/v8/demander?q=Que+se+passe-t-il+si+la+BCE+monte+ses+taux+de+50+pb+%3F)"
+  },
+  "sentences": [
+   {
+    "id": "S1",
+    "text": "Scénario non validé — pas une probabilité : moteur de décision REVA, décision de référence « La BCE relève ses taux directeurs de 50 points de base au 1er trimestre 2027 » (ecb_plus_50bp_2027q1). Validation : unvalidated (no back-test and calibration record for this model chain).",
+    "kind": "scenario",
+    "citations": [
+     "E2",
+     "E1"
+    ],
+    "citation_refs": [
+     "E2",
+     "E1"
+    ]
+   },
+   {
+    "id": "S2",
+    "text": "PIB réel (niveau) — FRA : variation -0,14 % en 2027Q1 (5 %–95 % : -0,28 à -0,07 ; estimations : pub:fixture:rate_gdp).",
+    "kind": "scenario",
+    "citations": [
+     "E2",
+     "E3",
+     "E4"
+    ],
+    "citation_refs": [
+     "E2",
+     "E3",
+     "E4"
+    ]
+   },
+   {
+    "id": "S3",
+    "text": "1 lien(s) causal(aux) sourcé(s) sans estimation chiffrée : listé(s) dans les preuves, sans nombre.",
+    "kind": "note",
+    "citations": [
+     "E2"
+    ],
+    "citation_refs": [
+     "E2"
+    ]
+   },
+   {
+    "id": "S4",
+    "text": "Scénario conditionnel à la décision et aux hypothèses énoncées : ni une prévision, ni une probabilité, tant que la chaîne de modèles n'a pas passé le juge (rétro-test en millésimes + calibration). Les intervalles ne reflètent que l'incertitude publiée par les estimations utilisées : ni l'incertitude de modèle, ni celle de la transposition à un autre pays ou à une autre époque, ni celle de la chaîne. REVA n'établit aucun effet : chaque nombre vient d'une estimation attribuée (publication citée, calcul REVA ou identité comptable) ou d'un modèle REVA sous hypothèses énoncées ; un lien causal sans estimation chiffrée reste sans nombre. Une seule estimation par lien et un seul chemin par variable : rien n'est additionné ni moyenné. Recherche, pas un conseil financier ni une recommandation.",
+    "kind": "note",
+    "citations": [
+     "E2"
+    ],
+    "citation_refs": [
+     "E2"
+    ]
+   },
+   {
+    "id": "S5",
+    "text": "Sources et licences : fixture.effects_literature (all rights reserved (fixture)) ; reva.predict (REVA (calcul)).",
+    "kind": "sources",
+    "citations": [
+     "E2",
+     "E4"
+    ],
+    "citation_refs": [
+     "E2",
+     "E4"
+    ]
+   }
+  ],
+  "evidence": [
+   {
+    "id": "E1",
+    "kind": "registry_term",
+    "registry": "registry/predict/reference_decisions.yaml",
+    "term_id": "ecb_plus_50bp_2027q1",
+    "term_kind": "reference_decision",
+    "labels": {
+     "fr": "La BCE relève ses taux directeurs de 50 points de base au 1er trimestre 2027",
+     "en": "The ECB raises its policy rates by 50 bp in 2027Q1"
+    },
+    "query": "la BCE monte ses taux de 50 pb",
+    "match": "label_words",
+    "citation": {
+     "source": "registry/predict/reference_decisions.yaml",
+     "status": "reva_registry"
+    }
+   },
+   {
+    "id": "E2",
+    "kind": "decision_scenario",
+    "engine": "reva.predict.engine/fixture",
+    "label": "scénario non validé — pas une probabilité",
+    "validation": {
+     "status": "unvalidated",
+     "label": "scénario non validé — pas une probabilité",
+     "chain_signature": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+     "reason": "no back-test and calibration record for this model chain"
+    },
+    "decision": {
+     "id": "ecb_plus_50bp_2027q1",
+     "label_fr": "La BCE relève ses taux directeurs de 50 points de base au 1er trimestre 2027",
+     "label_en": "The ECB raises its policy rates by 50 bp in 2027Q1",
+     "actor": {
+      "label_fr": "Banque centrale européenne",
+      "label_en": "European Central Bank",
+      "kg_id": null,
+      "geo": null
+     },
+     "instrument": "policy_rate_change",
+     "target": {
+      "label_fr": "Taux directeur de la zone euro",
+      "label_en": "Euro-area policy rate",
+      "kg_id": null,
+      "geo": null
+     },
+     "magnitude": {
+      "value": "50",
+      "unit": "bp"
+     },
+     "start": "2027Q1",
+     "duration_quarters": null,
+     "horizon_quarters": 8,
+     "countries": [
+      "DEU",
+      "FRA",
+      "ITA",
+      "ESP",
+      "NLD"
+     ],
+     "countries_note_fr": "Sélection de membres de la zone euro (pas toute la zone).",
+     "anchors": [],
+     "anchor_labels": {},
+     "plugin_options": {}
+    },
+    "settings": {
+     "draws": 1000,
+     "seed": 0
+    },
+    "effect_layer": {
+     "layer": "present"
+    },
+    "gaps": [],
+    "citation": {
+     "source": "reva.predict (decision engine)",
+     "chain_signature": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+     "status": "unvalidated_scenario"
+    }
+   },
+   {
+    "id": "E3",
+    "kind": "decision_hop",
+    "hop": {
+     "id": "h1",
+     "kind": "decision",
+     "to": "atlas_concept:imf.policy_rate@FRA",
+     "label_fr": "Changement direct décidé"
+    },
+    "estimate_key": null,
+    "citation": {
+     "source": "decision",
+     "estimate_key": null,
+     "reference": null,
+     "doi": null,
+     "locator": null,
+     "quote": null,
+     "raw_sha256": null,
+     "rights": null,
+     "status": "scenario_assumption"
+    }
+   },
+   {
+    "id": "E4",
+    "kind": "decision_hop",
+    "hop": {
+     "id": "h2",
+     "kind": "estimate",
+     "from": "atlas_concept:imf.policy_rate@FRA",
+     "to": "variable:output.real_gdp_level@FRA"
+    },
+    "estimate_key": "pub:fixture:rate_gdp",
+    "citation": {
+     "source": "fixture.effects_literature",
+     "estimate_key": "pub:fixture:rate_gdp",
+     "reference": "Rate Fixture (2018)",
+     "doi": null,
+     "locator": null,
+     "quote": null,
+     "raw_sha256": null,
+     "rights": {
+      "licence": "all rights reserved (fixture)",
+      "restricted": true
+     },
+     "status": "attributed_estimate"
+    }
+   }
+  ],
+  "answer_text": "Scénario non validé — pas une probabilité : moteur de décision REVA, décision de référence « La BCE relève ses taux directeurs de 50 points de base au 1er trimestre 2027 » (ecb_plus_50bp_2027q1). Validation : unvalidated (no back-test and calibration record for this model chain). PIB réel (niveau) — FRA : variation -0,14 % en 2027Q1 (5 %–95 % : -0,28 à -0,07 ; estimations : pub:fixture:rate_gdp). 1 lien(s) causal(aux) sourcé(s) sans estimation chiffrée : listé(s) dans les preuves, sans nombre. Scénario conditionnel à la décision et aux hypothèses énoncées : ni une prévision, ni une probabilité, tant que la chaîne de modèles n'a pas passé le juge (rétro-test en millésimes + calibration). Les intervalles ne reflètent que l'incertitude publiée par les estimations utilisées : ni l'incertitude de modèle, ni celle de la transposition à un autre pays ou à une autre époque, ni celle de la chaîne. REVA n'établit aucun effet : chaque nombre vient d'une estimation attribuée (publication citée, calcul REVA ou identité comptable) ou d'un modèle REVA sous hypothèses énoncées ; un lien causal sans estimation chiffrée reste sans nombre. Une seule estimation par lien et un seul chemin par variable : rien n'est additionné ni moyenné. Recherche, pas un conseil financier ni une recommandation.\n\nSources et licences : fixture.effects_literature (all rights reserved (fixture)) ; reva.predict (REVA (calcul)).",
+  "warnings": [],
+  "latency_ms": 604.0,
+  "cached": false
+ },
+ "brainstorm": {
+  "target": {
+   "target": "prévoir l'inflation française à 4 trimestres",
+   "text": "inflation",
+   "iso3": "FRA",
+   "horizon": {
+    "n": 4,
+    "unit": "trimestres"
+   }
+  },
+  "known": true,
+  "anchors": {
+   "families": [
+    {
+     "key": "weo.cpi_inflation",
+     "label": "Inflation (IPC, moyenne annuelle)"
+    }
+   ],
+   "concepts": [],
+   "scoreboard": [
+    {
+     "id": "macro.g7_cpi",
+     "label": "Inflation — G7"
+    },
+    {
+     "id": "macro.us_inflation",
+     "label": "Inflation — États-Unis"
+    },
+    {
+     "id": "macro.ea_hicp",
+     "label": "Inflation IPCH — zone euro"
+    },
+    {
+     "id": "macro.weo_cpi",
+     "label": "Inflation IPC — panel FMI"
+    },
+    {
+     "id": "nowcast.us_inflation",
+     "label": "Inflation américaine — mois en cours"
+    }
+   ],
+   "effect_variables": [
+    {
+     "id": "prices.inflation_rate",
+     "kind": "variable",
+     "labels": {
+      "fr": "Taux d'inflation des prix à la consommation",
+      "en": "Consumer price inflation rate"
+     },
+     "match": "libellé"
+    }
+   ]
+  },
+  "target_series": [],
+  "drivers": [
+   {
+    "id": "oil_price.global",
+    "kind": "variable",
+    "label": "Prix mondial du pétrole brut",
+    "effects": [
+     "Taux d'inflation des prix à la consommation"
+    ],
+    "n": 2,
+    "signs": {
+     "positive": 2
+    },
+    "methods": {
+     "svar": 2
+    },
+    "references": [
+     "Fixture & Author (2019)",
+     "Other Fixture (2021)"
+    ],
+    "countries": [
+     "WLD"
+    ],
+    "covers_country": false,
+    "example": {
+     "estimate_key": "pub:fixture:oil_infl_a",
+     "wording_fr": "Selon Fixture & Author (2019), la réponse estimée de Taux d'inflation des prix à la consommation à un choc de 10 percent sur Prix mondial du pétrole brut est de 0.2 point(s) de pourcentage, peak à 1.0 year (méthode : svar) ; REVA n'établit pas cet effet."
+    },
+    "data": {
+     "link": null,
+     "series": [],
+     "candidates": [
+      {
+       "concept": "prices.daily.brent_spot",
+       "label": "Prix spot du pétrole brut Brent (quotidien)",
+       "curated": false
+      }
+     ],
+     "queued": [
+      {
+       "file": "docs/dev/v5_pred_effect.md",
+       "line": 87,
+       "text": "`variable:oil_price.global` +10 % → `atlas_concept:imf.inflation_cpi_avg` +0.4 pp on impact (no SE: `basis: null`) — curated and validated, **not loaded live** (IMF HTTP 403)."
+      },
+      {
+       "file": "docs/dev/v6_digital.md",
+       "line": 13,
+       "text": "| ITU DataHub (ICT indicators, prices) | `datahub.itu.int` and `api.datahub.itu.int` answer **HTTP 403** (CloudFront) to a non-browser client. The www.itu.int statistics page offers only `ITU_regional_global_Key_ICT_indicator_aggregates_Nov_2025.xlsx` (regional/global aggregates, 110 kB). | ITU website terms: use is allowed \"for personal, educational, or non-commercial purposes\". \"You may not modi"
+      },
+      {
+       "file": "docs/dev/review_v3b.md",
+       "line": 180,
+       "text": "| 10 | OECD total tax revenue % GDP, DNK 2024 | not in the dev snapshot (`oecd.rs_global` not loaded); live response through `atlas_oecd_fiscal.oecd_build` → 45.177061 \"Percentage of GDP\" (2021-2023: 47.470033, 42.054919, 43.991573) | 45.177061 | parser faithful; n/a in DB | https://sdmx.oecd.org/public/rest/data/OECD.CTP.TPS,DSD_REV_COMP_GLOBAL@DF_RSGLOBAL,/DNK.TAX_REV.S13._T._T.PT_B1GQ.A?format="
+      }
+     ]
+    }
+   }
+  ],
+  "claims": [],
+  "forecasts": [
+   {
+    "family": "weo.cpi_inflation",
+    "label": "Inflation (IPC, moyenne annuelle)",
+    "covers": true,
+    "geo": "FRA",
+    "n_questions": 2,
+    "statuses": {
+     "pending": 1,
+     "resolved": 1
+    },
+    "periods": {
+     "first": "2024",
+     "last": "2026"
+    },
+    "models": [
+     {
+      "model": "forecast.registry_persistence",
+      "method": "random walk / persistence with Gaussian h-step spread"
+     },
+     {
+      "model": "forecast.registry_ar",
+      "method": "AR(p) on levels, OLS fitted as of issue, p by AIC"
+     },
+     {
+      "model": "forecast.reference_imf_weo",
+      "method": "IMF World Economic Outlook projection, attributed to the IMF; point only"
+     }
+    ]
+   }
+  ],
+  "verdicts": [
+   {
+    "target": "macro.g7_cpi",
+    "label": "Inflation — G7",
+    "verdicts": {
+     "ne bat pas": 5
+    },
+    "n_rows": 5,
+    "examples": [
+     {
+      "id": "beat_macro.holdout.g7rt.cpi_inflation.cy.bm_stack.imf_weo.ae",
+      "verdict": "ne bat pas",
+      "candidate": "Combinaison officiel + nowcast REVA",
+      "benchmark": "point WEO en vigueur à t",
+      "evaluation": "preregistered_holdout",
+      "ratio": 0.970321,
+      "basis": "non confirmé : Holm ✗ (p brut 0.387, famille 7)",
+      "track": "beat_macro"
+     },
+     {
+      "id": "beat_macro.dev.g7rt.cpi_inflation.cy.bm_stack_oil.imf_weo_errfan.crps",
+      "verdict": "ne bat pas",
+      "candidate": "Combinaison officiel + nowcast REVA (pétrole)",
+      "benchmark": "densité équitable autour du point WEO",
+      "evaluation": "development",
+      "ratio": 1.06647,
+      "basis": "aucune hypothèse retenue pour cette cellule (Holm ✗ en développement, famille 32)",
+      "track": "beat_macro"
+     },
+     {
+      "id": "beat_macro.dev.g7rt.cpi_inflation.cy.bm_bridge.imf_weo_errfan.crps",
+      "verdict": "ne bat pas",
+      "candidate": "Nowcast REVA (bridge mensuel)",
+      "benchmark": "densité équitable autour du point WEO",
+      "evaluation": "development",
+      "ratio": 1.13766,
+      "basis": "aucune hypothèse retenue pour cette cellule (Holm ✗ en développement, famille 32)",
+      "track": "beat_macro"
+     }
+    ]
+   },
+   {
+    "target": "macro.us_inflation",
+    "label": "Inflation — États-Unis",
+    "verdicts": {
+     "ne bat pas": 1
+    },
+    "n_rows": 1,
+    "examples": [
+     {
+      "id": "pred_models.holdout_points.us_spf.macro.us_inflation",
+      "verdict": "ne bat pas",
+      "candidate": "Modèles REVA (AR direct, BVAR, DFM, combinaisons) — inflation",
+      "benchmark": "point officiel (WEO / médiane SPF)",
+      "evaluation": "preregistered_holdout",
+      "ratio": null,
+      "basis": "QA-PRED : aucun ratio significativement < 1 sur le holdout verrouillé",
+      "track": "pred_models"
+     }
+    ]
+   },
+   {
+    "target": "macro.weo_cpi",
+    "label": "Inflation IPC — panel FMI",
+    "verdicts": {
+     "ne bat pas": 3
+    },
+    "n_rows": 9,
+    "examples": [
+     {
+      "id": "beat_macro.holdout.weo_cpi.cpi_inflation.cy.bm_stack.imf_weo_errfan.crps",
+      "verdict": "ne bat pas",
+      "candidate": "Combinaison officiel + nowcast REVA",
+      "benchmark": "densité équitable autour du point WEO",
+      "evaluation": "preregistered_holdout",
+      "ratio": 0.83155,
+      "basis": "Holm ✓ mais non confirmé (règle de couverture 80 % des densités)",
+      "track": "beat_macro"
+     },
+     {
+      "id": "beat_macro.holdout.weo_cpi.cpi_inflation.cy.bm_stack.imf_weo.ae",
+      "verdict": "ne bat pas",
+      "candidate": "Combinaison officiel + nowcast REVA",
+      "benchmark": "point WEO en vigueur à t",
+      "evaluation": "preregistered_holdout",
+      "ratio": 0.835807,
+      "basis": "non confirmé : Holm ✗ (p brut 0.0198, famille 7)",
+      "track": "beat_macro"
+     },
+     {
+      "id": "beat_macro.holdout.weo_cpi.cpi_inflation.cy.bm_bridge.imf_weo_errfan.crps",
+      "verdict": "ne bat pas",
+      "candidate": "Nowcast REVA (bridge mensuel)",
+      "benchmark": "densité équitable autour du point WEO",
+      "evaluation": "preregistered_holdout",
+      "ratio": 0.901601,
+      "basis": "non confirmé : Holm ✗ (p brut 0.169, famille 7)",
+      "track": "beat_macro"
+     }
+    ]
+   },
+   {
+    "target": "macro.ea_hicp",
+    "label": "Inflation IPCH — zone euro",
+    "verdicts": {
+     "ne bat pas": 8
+    },
+    "n_rows": 8,
+    "examples": [
+     {
+      "id": "beat_macro.dev.ecb_hicp.hicp_inflation.cy.bm_stack.ecb_spf.ae",
+      "verdict": "ne bat pas",
+      "candidate": "Combinaison officiel + nowcast REVA",
+      "benchmark": "point moyen du SPF BCE en vigueur à t",
+      "evaluation": "development",
+      "ratio": 0.806056,
+      "basis": "aucune hypothèse retenue pour cette cellule (Holm ✗ en développement, famille 32)",
+      "track": "beat_macro"
+     },
+     {
+      "id": "beat_macro.dev.ecb_hicp.hicp_inflation.cy.bm_bridge.ecb_spf.ae",
+      "verdict": "ne bat pas",
+      "candidate": "Nowcast REVA (bridge mensuel)",
+      "benchmark": "point moyen du SPF BCE en vigueur à t",
+      "evaluation": "development",
+      "ratio": 0.81107,
+      "basis": "aucune hypothèse retenue pour cette cellule (Holm ✗ en développement, famille 32)",
+      "track": "beat_macro"
+     },
+     {
+      "id": "beat_macro.dev.ecb_hicp.hicp_inflation.cy.bm_stack_oil.ecb_spf.ae",
+      "verdict": "ne bat pas",
+      "candidate": "Combinaison officiel + nowcast REVA (pétrole)",
+      "benchmark": "point moyen du SPF BCE en vigueur à t",
+      "evaluation": "development",
+      "ratio": 0.835014,
+      "basis": "aucune hypothèse retenue pour cette cellule (Holm ✗ en développement, famille 32)",
+      "track": "beat_macro"
+     }
+    ]
+   }
+  ],
+  "next_steps": [
+   {
+    "kind": "données",
+    "text": "Relier ou charger une série pour « Prix mondial du pétrole brut » (2 estimation(s) publiée(s) l'attribuent comme pilote) ; candidat du catalogue à vérifier : prices.daily.brent_spot.",
+    "driver": "oil_price.global",
+    "rank": 1
+   }
+  ],
+  "method": "Recherche dans les registres de REVA (familles de prévisions, catalogue atlas, couche d'effets, tableau des scores, affirmations causales) et règles explicites ; aucun modèle de langage, aucune donnée inventée. Les pilotes sont attribués à leurs sources ; les estimations ne sont jamais moyennées.",
+  "as_of": "2026-10-18T16:38:58+00:00"
+ }
+}
