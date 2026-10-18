@@ -80,7 +80,7 @@ def best_kind(conn: Connection, qid: str) -> str | None:
         ).scalars()
     ]
     specific = [k for k in kinds if k not in GENERIC_KINDS]
-    return (specific or kinds or [None])[0]
+    return (specific or kinds)[0] if kinds else None
 
 
 def resolve(conn: Connection, kind: str, ident: str) -> Resolved:

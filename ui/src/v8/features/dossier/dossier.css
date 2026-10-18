@@ -43,7 +43,7 @@
 .dos-back { display: inline-block; margin-bottom: var(--v8-space-4, 12px); color: var(--v8-fg-muted, #565d6a); text-decoration: none; }
 .dos-back:hover { color: var(--v8-accent, #3653d3); }
 .dos-toc summary { cursor: pointer; font-weight: 600; color: var(--v8-fg, #15171c); margin-bottom: 6px; }
-.dos-toc ol { margin: 0 0 var(--v8-space-5, 16px); padding-left: 1.3em; }
+.dos-toc ol { margin: 0 0 var(--v8-space-5, 16px); padding-left: 2em; }
 .dos-toc li { margin: 3px 0; }
 .dos-toc a { color: var(--v8-fg-muted, #565d6a); text-decoration: none; }
 .dos-toc a:hover { color: var(--v8-accent, #3653d3); }
@@ -61,7 +61,7 @@
   max-width: 780px; background: var(--dos-paper); color: var(--v8-fg, #15171c);
   border: 1px solid var(--v8-border, #e2e4e8); border-radius: var(--v8-radius-lg, 10px);
   padding: clamp(18px, 4vw, 52px) clamp(16px, 5vw, 60px);
-  font-family: var(--dos-serif); font-size: 17px; line-height: 1.65;
+  font-family: var(--dos-serif); font-size: 17px; line-height: 1.65; overflow-wrap: anywhere;
 }
 .dos-kicker { font-family: var(--v8-font-sans, system-ui); font-size: var(--v8-text-xs, 11.5px); text-transform: uppercase; letter-spacing: .08em; color: var(--v8-accent, #3653d3); font-weight: 600; }
 .dos-kicker a { color: inherit; text-transform: none; letter-spacing: 0; font-weight: 500; }
@@ -88,7 +88,8 @@
 /* values: honesty kinds */
 .dos-v-wrap { white-space: normal; }
 .dos-v { font-weight: 600; font-variant-numeric: tabular-nums; }
-.dos-v-label, .dos-v-claim { font-weight: inherit; }
+.dos-v-label, .dos-v-claim, .dos-v-text { font-weight: inherit; }
+.dos-v-text.dos-v-scenario, .dos-v-text.dos-v-projection, .dos-v-text.dos-v-forecast { text-decoration: none; }
 .dos-v-estimate { color: var(--v8-estimate, #0b7a70); }
 .dos-v-projection, .dos-v-forecast { color: var(--v8-projection, #7c3fc4); text-decoration: underline dashed 1px; text-underline-offset: 3px; }
 .dos-v-scenario { color: var(--v8-scenario, #b35400); text-decoration: underline dashed 1px; text-underline-offset: 3px; }
@@ -113,7 +114,8 @@
   border: 0; border-radius: 3px; background: var(--v8-accent-soft, #e9edfd); color: var(--v8-accent, #3653d3);
 }
 .dos-fn-chip.dos-fn-nc { background: var(--v8-licence-bg, #fdeee6); color: var(--v8-licence, #9a3412); }
-.dos-fn-chip.dos-fn-lic { box-shadow: inset 0 -1.5px 0 var(--v8-licence, #9a3412); }
+.dos-fn-chip.dos-fn-lic { background: var(--v8-licence-bg, #fdeee6); color: var(--v8-licence, #9a3412); }
+.dos-fn-chip.dos-fn-nc::after { content: ' NC'; font-size: 8px; }
 .dos-fn-chip:focus-visible { outline: 2px solid var(--v8-focus, #3653d3); outline-offset: 1px; }
 .dos-fn-pop {
   display: none; position: absolute; z-index: var(--v8-z-popover, 40); left: 50%; transform: translateX(-50%); top: 14px;
@@ -131,7 +133,7 @@
 .dos-table-box { overflow-x: auto; margin: 8px 0 16px; }
 .dos-table { border-collapse: collapse; width: 100%; font-family: var(--v8-font-sans, system-ui); font-size: var(--v8-text-sm, 12.5px); line-height: 1.45; }
 .dos-table caption { text-align: left; font-family: var(--dos-serif); font-style: italic; color: var(--v8-fg-muted, #565d6a); font-size: 14px; padding-bottom: 4px; }
-.dos-table th { text-align: left; font-weight: 600; border-bottom: 1.5px solid var(--v8-fg, #15171c); padding: 5px 8px; white-space: nowrap; }
+.dos-table th { text-align: left; font-weight: 600; border-bottom: 1.5px solid var(--v8-fg, #15171c); padding: 5px 8px; }
 .dos-table td { border-bottom: 1px solid var(--v8-border, #e2e4e8); padding: 5px 8px; vertical-align: top; }
 .dos-table .dos-num { text-align: right; font-variant-numeric: tabular-nums; }
 .dos-note { font-size: 14px; color: var(--v8-fg-muted, #565d6a); font-style: italic; }
@@ -152,8 +154,8 @@
 .dos-chart-tip i, .dos-legend-item i { display: inline-block; width: 10px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 3px; }
 .dos-legend-item i.dos-dashed { background-image: linear-gradient(90deg, transparent 50%, var(--v8-surface, #fff) 50%) !important; background-size: 4px 3px; }
 .dos-chart figcaption { font: 12.5px/1.5 var(--v8-font-sans, system-ui); color: var(--v8-fg, #15171c); margin-top: 4px; }
-.dos-legend { display: inline-flex; flex-wrap: wrap; gap: 4px 12px; margin-left: 8px; }
-.dos-legend-item { white-space: nowrap; }
+.dos-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 2px 0; }
+.dos-legend-item { min-width: 0; overflow-wrap: anywhere; }
 .dos-kind { margin-left: 4px; font-size: 10.5px; padding: 0 5px; border-radius: 8px; }
 .dos-kind-projection, .dos-kind-forecast { color: var(--v8-projection, #7c3fc4); background: var(--v8-projection-bg, #f2eafb); }
 .dos-kind-scenario { color: var(--v8-scenario, #b35400); background: var(--v8-scenario-bg, #fdf0e1); }

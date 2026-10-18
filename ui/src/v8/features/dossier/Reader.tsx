@@ -6,12 +6,23 @@ import { DossierChart } from './Chart';
 import { FnRef, footnoteLines } from './Footnote';
 
 /** One run of a sentence: template text, a sourced value (with its footnote chip) or a stated missing value. */
-export function PartView({ p, notes }: { p: Part; notes: Map<number, Footnote> }) {
+/** Hide a footnote chip when the next value of the same run cites the same note (one chip per run of values). */
+export function chipFlags(parts: Part[]): boolean[] {
+  return parts.map((p, i) => {
+    if (p.t !== 'value' || p.fn === null) return false;
+    const next = parts.slice(i + 1).find((q) => q.t === 'value');
+    return !(next && next.fn === p.fn);
+  });
+}
+
+const NUMERIC = /^-?\d+(\.\d+)?(e[+-]?\d+)?$/i;
+
+export function PartView({ p, notes, chip = true, compact = false }: { p: Part; notes: Map<number, Footnote>; chip?: boolean; compact?: boolean }) {
   if (p.t === 'text') return <>{p.text}</>;
   if (p.t === 'missing')
     return (
       <span className="dos-miss" data-testid="dos-missing" title={p.reason ?? undefined}>
-        manquant : {p.reason}
+        {compact ? 'manquant' : `manquant : ${p.reason}`}
       </span>
     );
   const kind = p.kind ?? 'observed';
@@ -25,19 +36,20 @@ export function PartView({ p, notes }: { p: Part; notes: Map<number, Footnote> }
   );
   return (
     <span className="dos-v-wrap" data-testid="dos-value">
-      <span className={`dos-v dos-v-${kind}`} title={title}>
+      <span className={`dos-v dos-v-${kind}${p.exact && NUMERIC.test(p.exact) ? ' dos-v-num' : ' dos-v-text'}`} title={title}>
         {inner}
       </span>
-      {p.fn !== null && <FnRef n={p.fn} f={notes.get(p.fn)} />}
+      {chip && p.fn !== null && <FnRef n={p.fn} f={notes.get(p.fn)} />}
     </span>
   );
 }
 
 export function SentenceView({ s, notes }: { s: Sentence; notes: Map<number, Footnote> }) {
+  const chips = chipFlags(s.parts);
   return (
     <span className="dos-sentence" data-template={s.template_id}>
       {s.parts.map((p, i) => (
-        <PartView key={i} p={p} notes={notes} />
+        <PartView key={i} p={p} notes={notes} chip={chips[i]} />
       ))}{' '}
     </span>
   );
@@ -67,7 +79,12 @@ function BlockView({ b, notes }: { b: Block; notes: Map<number, Footnote> }) {
           </ul>
         </div>
       );
-    case 'table':
+    case 'table': {
+      // a column whose values all cite one note shows that note once, in its header
+      const colFn = b.columns.map((_, ci) => {
+        const fns = new Set(b.rows.flatMap((r) => (r[ci]?.parts ?? []).filter((p) => p.t === 'value').map((p) => p.fn)));
+        return fns.size === 1 ? ([...fns][0] ?? null) : null;
+      });
       return (
         <div className="dos-table-box">
           <table className="dos-table">
@@ -77,6 +94,7 @@ function BlockView({ b, notes }: { b: Block; notes: Map<number, Footnote> }) {
                 {b.columns.map((c, i) => (
                   <th key={i} scope="col" className={b.numeric[i] ? 'dos-num' : undefined}>
                     {c}
+                    {colFn[i] !== null && colFn[i] !== undefined && <FnRef n={colFn[i]!} f={notes.get(colFn[i]!)} />}
                   </th>
                 ))}
               </tr>
@@ -87,7 +105,7 @@ function BlockView({ b, notes }: { b: Block; notes: Map<number, Footnote> }) {
                   {r.map((c, ci) => (
                     <td key={ci} className={b.numeric[ci] ? 'dos-num' : undefined}>
                       {c.parts.map((p, pi) => (
-                        <PartView key={pi} p={p} notes={notes} />
+                        <PartView key={pi} p={p} notes={notes} chip={colFn[ci] === null && chipFlags(c.parts)[pi]} compact />
                       ))}
                     </td>
                   ))}
@@ -98,6 +116,7 @@ function BlockView({ b, notes }: { b: Block; notes: Map<number, Footnote> }) {
           {b.note && <p className="dos-note">{b.note}</p>}
         </div>
       );
+    }
     case 'chart':
       return <DossierChart b={b} notes={notes} />;
     case 'missing':

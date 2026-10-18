@@ -44,6 +44,7 @@ UNIT_FR: dict[str, str] = {
     "probability": "probabilité",
     "% of under-5 population": "% des enfants de moins de 5 ans",
     "phase": "",
+    "mb/d": "mb/j",
     "thousand metric tons": "milliers de tonnes",
 }
 

@@ -26,6 +26,7 @@ from typing import Any
 
 from reva.v8.dossier import model as M
 from reva.v8.dossier.context import Ctx, _Lru, data_snapshot_id
+from reva.v8.dossier.fmt import unit_fr
 from reva.v8.dossier.queries import QUERIES, country_val
 from reva.v8.dossier.templates import PLACEHOLDER, BlockT, SentenceT, Template, load_template
 from reva.v8.dossier.values import Item, Miss, Result, Src, Val, label_val
@@ -349,7 +350,7 @@ def _render_block(
                 template_id=f"{base}.chart",
                 chart=b.chart.type,  # type: ignore[arg-type]
                 title=b.chart.title,
-                unit=res.series[0].unit,
+                unit=unit_fr(res.series[0].unit) or res.series[0].unit,
                 x_kind=xk if xk in ("year", "month", "quarter", "category") else "year",  # type: ignore[arg-type]
                 series=series,
                 note=b.chart.note,

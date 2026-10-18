@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import html
 import math
-from collections.abc import Iterable
 
 from reva.v8.dossier import model as M
 
@@ -26,14 +25,24 @@ KIND_FR = {
 
 
 # ============================================================================== Markdown
-def _md_parts(parts: Iterable[M.Part]) -> str:
+def _chips(parts: list[M.Part]) -> list[bool]:
+    """One footnote marker per run of values citing the same note (the last value of the run carries it)."""
     out = []
-    for p in parts:
+    for i, p in enumerate(parts):
+        nxt = next((q for q in parts[i + 1 :] if q.t == "value"), None)
+        out.append(p.t == "value" and not (nxt is not None and nxt.fn == p.fn))
+    return out
+
+
+def _md_parts(parts: list[M.Part]) -> str:
+    out = []
+    chips = _chips(parts)
+    for p, chip in zip(parts, chips, strict=True):
         if p.t == "text":
             out.append(p.text.replace("*", "\\*"))
         elif p.t == "value":
             badge = f" _({KIND_FR[p.kind]})_" if p.kind in ("estimate", "projection", "forecast", "scenario") else ""
-            out.append(f"**{p.text}**{badge}[^{p.fn}]")
+            out.append(f"**{p.text}**{badge}" + (f"[^{p.fn}]" if chip else ""))
         else:
             out.append(f"_⟨manquant : {p.reason}⟩_")
     return "".join(out)
@@ -185,9 +194,10 @@ def _e(s: str | None) -> str:
     return html.escape(s or "", quote=True)
 
 
-def _h_parts(parts: Iterable[M.Part]) -> str:
+def _h_parts(parts: list[M.Part]) -> str:
     out = []
-    for p in parts:
+    chips = _chips(parts)
+    for p, chip in zip(parts, chips, strict=True):
         if p.t == "text":
             out.append(_e(p.text))
         elif p.t == "value":
@@ -196,7 +206,7 @@ def _h_parts(parts: Iterable[M.Part]) -> str:
             exact = f" · valeur exacte {p.exact}" if p.exact and p.exact != p.text else ""
             out.append(
                 f'<span class="v {k}" title="{_e(title + exact)}">{_e(p.text)}</span>'
-                f'<sup class="fn"><a href="#fn{p.fn}" id="r{p.fn}">{p.fn}</a></sup>'
+                + (f'<sup class="fn"><a href="#fn{p.fn}">{p.fn}</a></sup>' if chip else "")
             )
         else:
             out.append(f'<span class="miss">manquant : {_e(p.reason)}</span>')

@@ -43,7 +43,7 @@ subjects:
       events: ["Q12156"]
 summary:
   - id: burden
-    text: "Selon les estimations de l'OMS, {deaths.sum} décès sont attribués au paludisme en {deaths.period} dans {deaths.n_countries} pays (somme REVA des estimations-pays), dont {deaths.top1_value} en {deaths.top1}."
+    text: "Selon les estimations de l'OMS, {deaths.sum} sont attribués au paludisme en {deaths.period} dans {deaths.n_countries} pays (somme REVA des estimations-pays), dont {deaths.top1_value} pour le pays le plus touché, {deaths.top1}."
   - id: incidence
     text: "Incidence la plus élevée déclarée : {inc.top1} ({inc.top1_value}, {inc.year})."
   - id: drugs
@@ -99,7 +99,7 @@ sections:
         sentences:
           - id: total
             what: "Décès estimés"
-            text: "En {period}, l'OMS estime {sum} décès dus au paludisme dans les {n_countries} pays qu'elle couvre (somme REVA) ; {top1} en compte {top1_value}, devant {top2} ({top2_value}) et {top3} ({top3_value})."
+            text: "En {period}, l'OMS estime {sum} dus au paludisme dans les {n_countries} pays qu'elle couvre (somme REVA) ; {top1} en compte {top1_value}, devant {top2} ({top2_value}) et {top3} ({top3_value})."
         chart: {type: bar, title: "Décès estimés dus au paludisme, dix premiers pays"}
         table:
           caption: "Décès estimés dus au paludisme (OMS, estimations modélisées)"

@@ -106,9 +106,14 @@ describe('Reader', () => {
     );
     const values = screen.getAllByTestId('dos-value');
     expect(values.length).toBe(5);
-    for (const v of values) expect(v.querySelector('[data-fn]')).not.toBeNull();
+    // one chip per run of values citing the same note; a table column citing one note shows it in its header
+    const chips = [...document.querySelectorAll('[data-fn]')].map((c) => Number(c.getAttribute('data-fn')));
+    expect(new Set(chips)).toEqual(new Set([1, 2]));
+    expect(screen.getByText('Son PIB atteint', { exact: false }).closest('.dos-sentence')!.querySelectorAll('[data-fn]')).toHaveLength(1);
+    expect(screen.getByRole('columnheader', { name: /Pays/ }).querySelector('[data-fn="2"]')).not.toBeNull();
     const miss = screen.getAllByTestId('dos-missing');
-    expect(miss.map((m) => m.textContent)).toEqual(['manquant : aucune source consultée', 'manquant : non publié']);
+    expect(miss.map((m) => m.textContent)).toEqual(['manquant : aucune source consultée', 'manquant']);
+    expect(miss[1]!.getAttribute('title')).toBe('non publié');
     expect(screen.getByTestId('dos-missing-block').textContent).toContain('Prévisions scellées');
     // never a zero for a missing value
     for (const m of miss) expect(m.textContent).not.toMatch(/\b0\b/);
