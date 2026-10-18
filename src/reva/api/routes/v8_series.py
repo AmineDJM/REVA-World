@@ -129,8 +129,23 @@ class PlacesResponse(_M):
 # --------------------------------------------------------------------------- helpers
 
 
+#: (app, origin, snapshot) -> (AtlasQuery, monotonic expiry). Resolving the snapshot reads the latest snapshot ref,
+#: re-verifies its manifest and the rights of every pinned table (~100 ms per request); a slider or an animation
+#: asks for dozens of slices a minute, so the resolution is reused for SNAPSHOT_TTL seconds (every answer still
+#: names its snapshot; a newer snapshot is picked up after the TTL).
+SNAPSHOT_TTL = 30.0
+_RESOLVED: dict[tuple[int, str | None, str | None], tuple[AtlasQuery, float]] = {}
+
+
 def _ctx(request: Request, origin: str | None, snapshot: str | None) -> tuple[AtlasQuery, SeriesIndex]:
-    q = _query(request, origin, snapshot)
+    key = (id(request.app), origin, snapshot)
+    hit = _RESOLVED.get(key)
+    now = time.monotonic()
+    if hit is not None and hit[1] > now:
+        q = hit[0]
+    else:
+        q = _query(request, origin, snapshot)
+        _RESOLVED[key] = (q, now + SNAPSHOT_TTL)
     return q, index_for(q, _catalog())
 
 
@@ -391,9 +406,8 @@ def multi(
             p = part.strip().upper()
             if len(p) == 3 and p.isalpha() and p not in geos:
                 geos.append(p)
-    data = svc.multi_series(aq, idx, sids, geos[:12], population=population, headlines=_headlines())
-    for ser in data["series"]:
-        ser["vintages_available"] = has_vintages(ser["meta"]["table"])
+    data = dict(svc.multi_series(aq, idx, sids, geos[:12], population=population, headlines=_headlines()))
+    data["series"] = [{**ser, "vintages_available": has_vintages(ser["meta"]["table"])} for ser in data["series"]]
     _cache(response)
     lic = list(data["licences"]) + list((data.get("population") or {}).get("licences") or [])
     return MultiResponse(

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getPlaces, type Place } from './api';
 
 let displayNames: Intl.DisplayNames | null | undefined;
@@ -40,6 +40,7 @@ export function usePlaceNames(): { nameOf: (iso3: string) => string; places: Pla
       live = false;
     };
   }, []);
-  const by = new Map(places.map((p) => [p.iso3, p]));
-  return { nameOf: (iso3: string) => frName(by.get(iso3), iso3), places };
+  const by = useMemo(() => new Map(places.map((p) => [p.iso3, p])), [places]);
+  const nameOf = useCallback((iso3: string) => frName(by.get(iso3), iso3), [by]);
+  return { nameOf, places };
 }

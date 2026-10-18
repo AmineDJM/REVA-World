@@ -106,7 +106,9 @@ def test_scale_hint() -> None:
 # --------------------------------------------------------------------------- synthetic snapshot
 
 
-def _row(ind: str, geo: str, iso3: str | None, start: date, end: date, value: str | None, **flags: object) -> dict[str, object]:
+def _row(
+    ind: str, geo: str, iso3: str | None, start: date, end: date, value: str | None, **flags: object
+) -> dict[str, object]:
     return {
         "source": "src",
         "dataset": "ds",
@@ -179,6 +181,7 @@ def env(tmp_path: Path) -> tuple[AtlasQuery, SeriesIndex]:
     svc._META.clear()
     svc._PERIODS.clear()
     svc._SLICES.clear()
+    svc._MULTI.clear()
     return q, SeriesIndex(q, cat)
 
 

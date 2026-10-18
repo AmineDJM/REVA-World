@@ -612,7 +612,28 @@ def _iso_date(text: str) -> date:
 # --------------------------------------------------------------------------- Comparer
 
 
+_MULTI: OrderedDict[tuple[Any, ...], dict[str, Any]] = OrderedDict()
+
+
 def multi_series(
+    q: AtlasQuery,
+    idx: SeriesIndex,
+    sids: list[int],
+    geos: list[str],
+    *,
+    population: bool = False,
+    headlines: Any = None,
+) -> dict[str, Any]:
+    """Cached per (snapshot, series, countries, population): a snapshot is immutable."""
+    key = (q.snapshot.sha256, tuple(sids), tuple(geos), population and headlines is not None)
+    hit = _cache_get(_MULTI, key)
+    if hit is None:
+        hit = _multi_series(q, idx, sids, geos, population=population, headlines=headlines)
+        _cache_put(_MULTI, key, hit)
+    return hit  # type: ignore[no-any-return]
+
+
+def _multi_series(
     q: AtlasQuery,
     idx: SeriesIndex,
     sids: list[int],
