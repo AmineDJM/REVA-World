@@ -1,0 +1,94 @@
+schema: reva-beat-agri-hypotheses/1
+written_at: '2026-10-18T17:57:01.880633+00:00'
+statement: Written by the development stage from protocol.yaml's selection rule; committed
+  before the holdout is opened. Only these hypotheses can be confirmed (one Holm over
+  all of them).
+protocol_sha256: dacaca098f2336d8935bdae4d7d5092db0ffd650ba64c14f3e1678b9ccc66c9a
+development_json_sha256: 5fae8af8acdb5edec8015cd1697449bb5b41cd28fdf2aa05ec20dfc09ec0b296
+code_sha256: 60b0257e79a85deb6dc853a783c30a5cecfa97aa9925259033f28d04c97a2f2d
+family_size: 12
+hypotheses:
+- key: us_ending_stocks|late|bc|ae
+  group: us_ending_stocks
+  window: late
+  candidate: bc
+  loss: ae
+  development_relative: 0.9323563201814753
+  development_p: 0.034577459908958615
+- key: us_ending_stocks|late|bc|crps
+  group: us_ending_stocks
+  window: late
+  candidate: bc
+  loss: crps
+  development_relative: 0.9054854108270888
+  development_p: 0.02467372256506746
+- key: world_ending_stocks|early|rev|crps
+  group: world_ending_stocks
+  window: early
+  candidate: rev
+  loss: crps
+  development_relative: 0.8480976815431143
+  development_p: 0.03933941320728953
+- key: world_ending_stocks|late|bc|crps
+  group: world_ending_stocks
+  window: late
+  candidate: bc
+  loss: crps
+  development_relative: 0.7575600350434409
+  development_p: 6.319621315721169e-05
+- key: world_ending_stocks|mid|rev|ae
+  group: world_ending_stocks
+  window: mid
+  candidate: rev
+  loss: ae
+  development_relative: 0.8589943968905794
+  development_p: 0.09688063081716398
+- key: world_ending_stocks|mid|bc|crps
+  group: world_ending_stocks
+  window: mid
+  candidate: bc
+  loss: crps
+  development_relative: 0.7860035829043013
+  development_p: 0.0006347870785255671
+- key: world_production|early|rev|ae
+  group: world_production
+  window: early
+  candidate: rev
+  loss: ae
+  development_relative: 0.9470957512046382
+  development_p: 0.07429115664076759
+- key: world_production|early|rev|crps
+  group: world_production
+  window: early
+  candidate: rev
+  loss: crps
+  development_relative: 0.9355911249760571
+  development_p: 0.04045782428040523
+- key: world_production|late|rev|ae
+  group: world_production
+  window: late
+  candidate: rev
+  loss: ae
+  development_relative: 0.7884182642597489
+  development_p: 0.0005380199277509427
+- key: world_production|late|rev|crps
+  group: world_production
+  window: late
+  candidate: rev
+  loss: crps
+  development_relative: 0.8066695611730207
+  development_p: 0.002206995933611305
+- key: world_production|mid|rev|ae
+  group: world_production
+  window: mid
+  candidate: rev
+  loss: ae
+  development_relative: 0.8603923134074144
+  development_p: 0.0117760495564443
+- key: world_production|mid|rev|crps
+  group: world_production
+  window: mid
+  candidate: rev
+  loss: crps
+  development_relative: 0.8930635071193374
+  development_p: 0.06165941189553352

@@ -1,0 +1,5645 @@
+{
+ "code_sha256": "60b0257e79a85deb6dc853a783c30a5cecfa97aa9925259033f28d04c97a2f2d",
+ "computed_at": "2026-10-18T17:57:01.865373+00:00",
+ "descriptive": {
+  "pure_reva_trend_vs_wasde_us_yield": [
+   {
+    "benchmark": "wasde_point",
+    "candidate": "trend",
+    "coverage80": null,
+    "dm_stat": 4.13599,
+    "group": "us_yield",
+    "loss": "ae",
+    "loss_benchmark": 4.71846,
+    "loss_candidate": 6.35293,
+    "n_cases": 108,
+    "n_years": 9,
+    "p_better": 0.998364,
+    "p_worse": 0.0016357,
+    "relative": 1.3464,
+    "tested": true,
+    "window": "early",
+    "years": [
+     2008,
+     2009,
+     2010,
+     2011,
+     2012,
+     2013,
+     2014,
+     2015,
+     2016
+    ]
+   },
+   {
+    "benchmark": "wasde_point",
+    "candidate": "trend",
+    "coverage80": null,
+    "dm_stat": 4.79693,
+    "group": "us_yield",
+    "loss": "ae",
+    "loss_benchmark": 2.14441,
+    "loss_candidate": 6.45344,
+    "n_cases": 96,
+    "n_years": 9,
+    "p_better": 0.99932,
+    "p_worse": 0.00068043,
+    "relative": 3.00943,
+    "tested": true,
+    "window": "mid",
+    "years": [
+     2008,
+     2009,
+     2010,
+     2011,
+     2012,
+     2013,
+     2014,
+     2015,
+     2016
+    ]
+   },
+   {
+    "benchmark": "wasde_point",
+    "candidate": "trend",
+    "coverage80": null,
+    "dm_stat": 4.97989,
+    "group": "us_yield",
+    "loss": "ae",
+    "loss_benchmark": 0.895077,
+    "loss_candidate": 6.30999,
+    "n_cases": 54,
+    "n_years": 9,
+    "p_better": 0.99946,
+    "p_worse": 0.000539821,
+    "relative": 7.04966,
+    "tested": true,
+    "window": "late",
+    "years": [
+     2008,
+     2009,
+     2010,
+     2011,
+     2012,
+     2013,
+     2014,
+     2015,
+     2016
+    ]
+   }
+  ],
+  "summaries": [
+   {
+    "coverage80": 0.925926,
+    "crps_pct": 32.7077,
+    "mae_pct": 36.6602,
+    "model": "bc",
+    "n": 36,
+    "series": "us.corn.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.925926,
+    "crps_pct": 32.5292,
+    "mae_pct": 36.7445,
+    "model": "rev",
+    "n": 36,
+    "series": "us.corn.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.888889,
+    "crps_pct": 23.9786,
+    "mae_pct": 31.738,
+    "model": "wasde",
+    "n": 36,
+    "series": "us.corn.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 23.132,
+    "mae_pct": 25.4643,
+    "model": "wx",
+    "n": 9,
+    "series": "us.corn.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.8,
+    "crps_pct": 13.4295,
+    "mae_pct": 18.8489,
+    "model": "bc",
+    "n": 71,
+    "series": "us.corn.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.8,
+    "crps_pct": 13.577,
+    "mae_pct": 19.0644,
+    "model": "rev",
+    "n": 71,
+    "series": "us.corn.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.704225,
+    "crps_pct": 13.3461,
+    "mae_pct": 16.8248,
+    "model": "wasde",
+    "n": 71,
+    "series": "us.corn.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.851064,
+    "crps_pct": 13.4643,
+    "mae_pct": 20.2268,
+    "model": "wx",
+    "n": 71,
+    "series": "us.corn.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.923077,
+    "crps_pct": 13.8953,
+    "mae_pct": 16.4156,
+    "model": "bc",
+    "n": 35,
+    "series": "us.corn.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.961538,
+    "crps_pct": 13.9112,
+    "mae_pct": 16.1711,
+    "model": "rev",
+    "n": 35,
+    "series": "us.corn.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.828571,
+    "crps_pct": 12.0745,
+    "mae_pct": 15.4172,
+    "model": "wasde",
+    "n": 35,
+    "series": "us.corn.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.882353,
+    "crps_pct": 14.1288,
+    "mae_pct": 21.3678,
+    "model": "wx",
+    "n": 35,
+    "series": "us.corn.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.787879,
+    "crps_pct": 5.3446,
+    "mae_pct": 6.17238,
+    "model": "bc",
+    "n": 36,
+    "series": "us.corn.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.787879,
+    "crps_pct": 5.15114,
+    "mae_pct": 6.04885,
+    "model": "rev",
+    "n": 36,
+    "series": "us.corn.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.777778,
+    "crps_pct": 4.87957,
+    "mae_pct": 5.92113,
+    "model": "wasde",
+    "n": 36,
+    "series": "us.corn.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.6,
+    "crps_pct": 5.96164,
+    "mae_pct": 5.89623,
+    "model": "wx",
+    "n": 9,
+    "series": "us.corn.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.818182,
+    "crps_pct": 0.584848,
+    "mae_pct": 0.834989,
+    "model": "bc",
+    "n": 24,
+    "series": "us.corn.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.772727,
+    "crps_pct": 0.588964,
+    "mae_pct": 0.833626,
+    "model": "rev",
+    "n": 24,
+    "series": "us.corn.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.75,
+    "crps_pct": 0.575235,
+    "mae_pct": 0.850342,
+    "model": "wasde",
+    "n": 24,
+    "series": "us.corn.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.875,
+    "crps_pct": 0.564498,
+    "mae_pct": 0.939618,
+    "model": "wx",
+    "n": 24,
+    "series": "us.corn.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.875,
+    "crps_pct": 1.53118,
+    "mae_pct": 2.09758,
+    "model": "bc",
+    "n": 35,
+    "series": "us.corn.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.875,
+    "crps_pct": 1.52631,
+    "mae_pct": 2.10258,
+    "model": "rev",
+    "n": 35,
+    "series": "us.corn.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.828571,
+    "crps_pct": 1.52459,
+    "mae_pct": 1.9703,
+    "model": "wasde",
+    "n": 35,
+    "series": "us.corn.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 1.27846,
+    "mae_pct": 2.02767,
+    "model": "wx",
+    "n": 35,
+    "series": "us.corn.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.666667,
+    "crps_pct": 4.9597,
+    "mae_pct": 5.70002,
+    "model": "bc",
+    "n": 36,
+    "series": "us.corn.yield",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.666667,
+    "crps_pct": 4.87344,
+    "mae_pct": 5.64733,
+    "model": "rev",
+    "n": 36,
+    "series": "us.corn.yield",
+    "window": "early"
+   },
+   {
+    "coverage80": null,
+    "crps_pct": null,
+    "mae_pct": 8.56997,
+    "model": "trend",
+    "n": 27,
+    "series": "us.corn.yield",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.666667,
+    "crps_pct": 4.45653,
+    "mae_pct": 5.28669,
+    "model": "wasde",
+    "n": 36,
+    "series": "us.corn.yield",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.6,
+    "crps_pct": 5.66299,
+    "mae_pct": 5.05421,
+    "model": "wx",
+    "n": 9,
+    "series": "us.corn.yield",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.727273,
+    "crps_pct": 0.59129,
+    "mae_pct": 0.851238,
+    "model": "bc",
+    "n": 24,
+    "series": "us.corn.yield",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.772727,
+    "crps_pct": 0.600657,
+    "mae_pct": 0.877495,
+    "model": "rev",
+    "n": 24,
+    "series": "us.corn.yield",
+    "window": "late"
+   },
+   {
+    "coverage80": null,
+    "crps_pct": null,
+    "mae_pct": 8.56997,
+    "model": "trend",
+    "n": 18,
+    "series": "us.corn.yield",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.666667,
+    "crps_pct": 0.564144,
+    "mae_pct": 0.835031,
+    "model": "wasde",
+    "n": 24,
+    "series": "us.corn.yield",
+    "window": "late"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 0.597739,
+    "mae_pct": 1.03464,
+    "model": "wx",
+    "n": 24,
+    "series": "us.corn.yield",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.84375,
+    "crps_pct": 1.60635,
+    "mae_pct": 2.13193,
+    "model": "bc",
+    "n": 35,
+    "series": "us.corn.yield",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.84375,
+    "crps_pct": 1.59448,
+    "mae_pct": 2.12173,
+    "model": "rev",
+    "n": 35,
+    "series": "us.corn.yield",
+    "window": "mid"
+   },
+   {
+    "coverage80": null,
+    "crps_pct": null,
+    "mae_pct": 8.73748,
+    "model": "trend",
+    "n": 26,
+    "series": "us.corn.yield",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.857143,
+    "crps_pct": 1.46233,
+    "mae_pct": 1.94549,
+    "model": "wasde",
+    "n": 35,
+    "series": "us.corn.yield",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.913043,
+    "crps_pct": 1.42884,
+    "mae_pct": 2.16021,
+    "model": "wx",
+    "n": 35,
+    "series": "us.corn.yield",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.925926,
+    "crps_pct": 14.9496,
+    "mae_pct": 21.8005,
+    "model": "bc",
+    "n": 36,
+    "series": "us.rice.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.925926,
+    "crps_pct": 15.2065,
+    "mae_pct": 22.0366,
+    "model": "rev",
+    "n": 36,
+    "series": "us.rice.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.805556,
+    "crps_pct": 15.9192,
+    "mae_pct": 20.6441,
+    "model": "wasde",
+    "n": 36,
+    "series": "us.rice.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.938462,
+    "crps_pct": 9.72125,
+    "mae_pct": 15.5258,
+    "model": "bc",
+    "n": 71,
+    "series": "us.rice.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.938462,
+    "crps_pct": 9.77357,
+    "mae_pct": 15.7218,
+    "model": "rev",
+    "n": 71,
+    "series": "us.rice.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.859155,
+    "crps_pct": 10.9789,
+    "mae_pct": 15.4735,
+    "model": "wasde",
+    "n": 71,
+    "series": "us.rice.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 11.8913,
+    "mae_pct": 19.409,
+    "model": "bc",
+    "n": 35,
+    "series": "us.rice.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 11.9149,
+    "mae_pct": 19.4981,
+    "model": "rev",
+    "n": 35,
+    "series": "us.rice.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.885714,
+    "crps_pct": 12.3486,
+    "mae_pct": 18.6221,
+    "model": "wasde",
+    "n": 35,
+    "series": "us.rice.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.818182,
+    "crps_pct": 3.71431,
+    "mae_pct": 5.02661,
+    "model": "bc",
+    "n": 36,
+    "series": "us.rice.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.757576,
+    "crps_pct": 3.80438,
+    "mae_pct": 5.06163,
+    "model": "rev",
+    "n": 36,
+    "series": "us.rice.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.694444,
+    "crps_pct": 3.3217,
+    "mae_pct": 4.52291,
+    "model": "wasde",
+    "n": 36,
+    "series": "us.rice.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.818182,
+    "crps_pct": 0.804407,
+    "mae_pct": 0.92752,
+    "model": "bc",
+    "n": 24,
+    "series": "us.rice.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.818182,
+    "crps_pct": 0.807813,
+    "mae_pct": 0.929616,
+    "model": "rev",
+    "n": 24,
+    "series": "us.rice.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.916667,
+    "crps_pct": 0.794433,
+    "mae_pct": 0.952181,
+    "model": "wasde",
+    "n": 24,
+    "series": "us.rice.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.71875,
+    "crps_pct": 1.86351,
+    "mae_pct": 2.59058,
+    "model": "bc",
+    "n": 35,
+    "series": "us.rice.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.75,
+    "crps_pct": 1.8621,
+    "mae_pct": 2.58537,
+    "model": "rev",
+    "n": 35,
+    "series": "us.rice.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.771429,
+    "crps_pct": 1.68946,
+    "mae_pct": 2.34325,
+    "model": "wasde",
+    "n": 35,
+    "series": "us.rice.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.727273,
+    "crps_pct": 2.23774,
+    "mae_pct": 3.07421,
+    "model": "bc",
+    "n": 36,
+    "series": "us.rice.yield",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.727273,
+    "crps_pct": 2.24297,
+    "mae_pct": 3.0887,
+    "model": "rev",
+    "n": 36,
+    "series": "us.rice.yield",
+    "window": "early"
+   },
+   {
+    "coverage80": null,
+    "crps_pct": null,
+    "mae_pct": 4.09313,
+    "model": "trend",
+    "n": 27,
+    "series": "us.rice.yield",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.75,
+    "crps_pct": 2.00494,
+    "mae_pct": 2.8138,
+    "model": "wasde",
+    "n": 36,
+    "series": "us.rice.yield",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.636364,
+    "crps_pct": 0.76689,
+    "mae_pct": 0.964551,
+    "model": "bc",
+    "n": 24,
+    "series": "us.rice.yield",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.636364,
+    "crps_pct": 0.773307,
+    "mae_pct": 0.96662,
+    "model": "rev",
+    "n": 24,
+    "series": "us.rice.yield",
+    "window": "late"
+   },
+   {
+    "coverage80": null,
+    "crps_pct": null,
+    "mae_pct": 4.09313,
+    "model": "trend",
+    "n": 18,
+    "series": "us.rice.yield",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.75,
+    "crps_pct": 0.702308,
+    "mae_pct": 0.966324,
+    "model": "wasde",
+    "n": 24,
+    "series": "us.rice.yield",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.71875,
+    "crps_pct": 1.50072,
+    "mae_pct": 2.12122,
+    "model": "bc",
+    "n": 35,
+    "series": "us.rice.yield",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.71875,
+    "crps_pct": 1.50003,
+    "mae_pct": 2.12772,
+    "model": "rev",
+    "n": 35,
+    "series": "us.rice.yield",
+    "window": "mid"
+   },
+   {
+    "coverage80": null,
+    "crps_pct": null,
+    "mae_pct": 4.11987,
+    "model": "trend",
+    "n": 26,
+    "series": "us.rice.yield",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.657143,
+    "crps_pct": 1.45197,
+    "mae_pct": 2.0206,
+    "model": "wasde",
+    "n": 35,
+    "series": "us.rice.yield",
+    "window": "mid"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 34.2134,
+    "mae_pct": 45.9951,
+    "model": "bc",
+    "n": 36,
+    "series": "us.soybeans.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 34.039,
+    "mae_pct": 46.0706,
+    "model": "rev",
+    "n": 36,
+    "series": "us.soybeans.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.805556,
+    "crps_pct": 39.0715,
+    "mae_pct": 56.5655,
+    "model": "wasde",
+    "n": 36,
+    "series": "us.soybeans.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 53.7461,
+    "mae_pct": 40.4299,
+    "model": "wx",
+    "n": 9,
+    "series": "us.soybeans.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.6,
+    "crps_pct": 28.6274,
+    "mae_pct": 40.4765,
+    "model": "bc",
+    "n": 71,
+    "series": "us.soybeans.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.6,
+    "crps_pct": 28.4703,
+    "mae_pct": 40.2707,
+    "model": "rev",
+    "n": 71,
+    "series": "us.soybeans.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.492958,
+    "crps_pct": 33.3222,
+    "mae_pct": 47.9682,
+    "model": "wasde",
+    "n": 71,
+    "series": "us.soybeans.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.574468,
+    "crps_pct": 33.5319,
+    "mae_pct": 39.0875,
+    "model": "wx",
+    "n": 71,
+    "series": "us.soybeans.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.923077,
+    "crps_pct": 36.959,
+    "mae_pct": 46.7565,
+    "model": "bc",
+    "n": 35,
+    "series": "us.soybeans.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.923077,
+    "crps_pct": 37.0108,
+    "mae_pct": 46.9235,
+    "model": "rev",
+    "n": 35,
+    "series": "us.soybeans.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.8,
+    "crps_pct": 34.1016,
+    "mae_pct": 47.9142,
+    "model": "wasde",
+    "n": 35,
+    "series": "us.soybeans.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.941176,
+    "crps_pct": 36.3806,
+    "mae_pct": 44.9709,
+    "model": "wx",
+    "n": 35,
+    "series": "us.soybeans.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.848485,
+    "crps_pct": 3.51181,
+    "mae_pct": 5.14994,
+    "model": "bc",
+    "n": 36,
+    "series": "us.soybeans.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.848485,
+    "crps_pct": 3.47945,
+    "mae_pct": 5.17373,
+    "model": "rev",
+    "n": 36,
+    "series": "us.soybeans.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.861111,
+    "crps_pct": 3.3445,
+    "mae_pct": 4.8595,
+    "model": "wasde",
+    "n": 36,
+    "series": "us.soybeans.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.8,
+    "crps_pct": 3.52529,
+    "mae_pct": 4.88923,
+    "model": "wx",
+    "n": 9,
+    "series": "us.soybeans.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.818182,
+    "crps_pct": 0.636648,
+    "mae_pct": 1.00286,
+    "model": "bc",
+    "n": 24,
+    "series": "us.soybeans.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.772727,
+    "crps_pct": 0.647562,
+    "mae_pct": 0.98329,
+    "model": "rev",
+    "n": 24,
+    "series": "us.soybeans.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.666667,
+    "crps_pct": 0.64307,
+    "mae_pct": 0.976403,
+    "model": "wasde",
+    "n": 24,
+    "series": "us.soybeans.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.875,
+    "crps_pct": 0.711811,
+    "mae_pct": 1.12339,
+    "model": "wx",
+    "n": 24,
+    "series": "us.soybeans.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.875,
+    "crps_pct": 2.35451,
+    "mae_pct": 3.15455,
+    "model": "bc",
+    "n": 35,
+    "series": "us.soybeans.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.875,
+    "crps_pct": 2.36699,
+    "mae_pct": 3.16739,
+    "model": "rev",
+    "n": 35,
+    "series": "us.soybeans.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.8,
+    "crps_pct": 2.48735,
+    "mae_pct": 3.17265,
+    "model": "wasde",
+    "n": 35,
+    "series": "us.soybeans.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.869565,
+    "crps_pct": 2.22803,
+    "mae_pct": 3.108,
+    "model": "wx",
+    "n": 35,
+    "series": "us.soybeans.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.909091,
+    "crps_pct": 3.43909,
+    "mae_pct": 5.28051,
+    "model": "bc",
+    "n": 36,
+    "series": "us.soybeans.yield",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.909091,
+    "crps_pct": 3.42208,
+    "mae_pct": 5.24364,
+    "model": "rev",
+    "n": 36,
+    "series": "us.soybeans.yield",
+    "window": "early"
+   },
+   {
+    "coverage80": null,
+    "crps_pct": null,
+    "mae_pct": 6.26685,
+    "model": "trend",
+    "n": 27,
+    "series": "us.soybeans.yield",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.861111,
+    "crps_pct": 3.35167,
+    "mae_pct": 4.91955,
+    "model": "wasde",
+    "n": 36,
+    "series": "us.soybeans.yield",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.8,
+    "crps_pct": 3.63382,
+    "mae_pct": 5.05037,
+    "model": "wx",
+    "n": 9,
+    "series": "us.soybeans.yield",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.909091,
+    "crps_pct": 0.478601,
+    "mae_pct": 0.794244,
+    "model": "bc",
+    "n": 24,
+    "series": "us.soybeans.yield",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.818182,
+    "crps_pct": 0.463429,
+    "mae_pct": 0.747586,
+    "model": "rev",
+    "n": 24,
+    "series": "us.soybeans.yield",
+    "window": "late"
+   },
+   {
+    "coverage80": null,
+    "crps_pct": null,
+    "mae_pct": 6.26685,
+    "model": "trend",
+    "n": 18,
+    "series": "us.soybeans.yield",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.833333,
+    "crps_pct": 0.517978,
+    "mae_pct": 0.795976,
+    "model": "wasde",
+    "n": 24,
+    "series": "us.soybeans.yield",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.75,
+    "crps_pct": 0.566973,
+    "mae_pct": 0.862641,
+    "model": "wx",
+    "n": 24,
+    "series": "us.soybeans.yield",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.90625,
+    "crps_pct": 2.15571,
+    "mae_pct": 3.07101,
+    "model": "bc",
+    "n": 35,
+    "series": "us.soybeans.yield",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.875,
+    "crps_pct": 2.16935,
+    "mae_pct": 3.07674,
+    "model": "rev",
+    "n": 35,
+    "series": "us.soybeans.yield",
+    "window": "mid"
+   },
+   {
+    "coverage80": null,
+    "crps_pct": null,
+    "mae_pct": 6.48335,
+    "model": "trend",
+    "n": 26,
+    "series": "us.soybeans.yield",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.8,
+    "crps_pct": 2.44673,
+    "mae_pct": 3.24291,
+    "model": "wasde",
+    "n": 35,
+    "series": "us.soybeans.yield",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.869565,
+    "crps_pct": 2.07888,
+    "mae_pct": 2.91546,
+    "model": "wx",
+    "n": 35,
+    "series": "us.soybeans.yield",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.740741,
+    "crps_pct": 11.2298,
+    "mae_pct": 17.2656,
+    "model": "bc",
+    "n": 36,
+    "series": "us.wheat.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.740741,
+    "crps_pct": 11.2172,
+    "mae_pct": 17.3392,
+    "model": "rev",
+    "n": 36,
+    "series": "us.wheat.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.694444,
+    "crps_pct": 12.5778,
+    "mae_pct": 17.5236,
+    "model": "wasde",
+    "n": 36,
+    "series": "us.wheat.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.923077,
+    "crps_pct": 4.53324,
+    "mae_pct": 5.35127,
+    "model": "bc",
+    "n": 71,
+    "series": "us.wheat.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.892308,
+    "crps_pct": 4.60721,
+    "mae_pct": 5.32319,
+    "model": "rev",
+    "n": 71,
+    "series": "us.wheat.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.887324,
+    "crps_pct": 4.41533,
+    "mae_pct": 5.75476,
+    "model": "wasde",
+    "n": 71,
+    "series": "us.wheat.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.923077,
+    "crps_pct": 6.02812,
+    "mae_pct": 8.83696,
+    "model": "bc",
+    "n": 35,
+    "series": "us.wheat.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.923077,
+    "crps_pct": 5.97556,
+    "mae_pct": 8.7597,
+    "model": "rev",
+    "n": 35,
+    "series": "us.wheat.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.914286,
+    "crps_pct": 6.76437,
+    "mae_pct": 9.76978,
+    "model": "wasde",
+    "n": 35,
+    "series": "us.wheat.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.878788,
+    "crps_pct": 2.73443,
+    "mae_pct": 3.86586,
+    "model": "bc",
+    "n": 36,
+    "series": "us.wheat.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.878788,
+    "crps_pct": 2.66305,
+    "mae_pct": 3.78474,
+    "model": "rev",
+    "n": 36,
+    "series": "us.wheat.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.777778,
+    "crps_pct": 2.72997,
+    "mae_pct": 3.85513,
+    "model": "wasde",
+    "n": 36,
+    "series": "us.wheat.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.818182,
+    "crps_pct": 1.1613,
+    "mae_pct": 1.77943,
+    "model": "bc",
+    "n": 24,
+    "series": "us.wheat.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.818182,
+    "crps_pct": 1.16056,
+    "mae_pct": 1.77369,
+    "model": "rev",
+    "n": 24,
+    "series": "us.wheat.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.791667,
+    "crps_pct": 1.25979,
+    "mae_pct": 1.73635,
+    "model": "wasde",
+    "n": 24,
+    "series": "us.wheat.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.909091,
+    "crps_pct": 2.13064,
+    "mae_pct": 3.00169,
+    "model": "bc",
+    "n": 36,
+    "series": "us.wheat.yield",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.909091,
+    "crps_pct": 2.074,
+    "mae_pct": 2.88693,
+    "model": "rev",
+    "n": 36,
+    "series": "us.wheat.yield",
+    "window": "early"
+   },
+   {
+    "coverage80": null,
+    "crps_pct": null,
+    "mae_pct": 6.48177,
+    "model": "trend",
+    "n": 27,
+    "series": "us.wheat.yield",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.861111,
+    "crps_pct": 2.38201,
+    "mae_pct": 3.36436,
+    "model": "wasde",
+    "n": 36,
+    "series": "us.wheat.yield",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.818182,
+    "crps_pct": 1.07453,
+    "mae_pct": 1.63134,
+    "model": "bc",
+    "n": 24,
+    "series": "us.wheat.yield",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.818182,
+    "crps_pct": 1.07836,
+    "mae_pct": 1.6366,
+    "model": "rev",
+    "n": 24,
+    "series": "us.wheat.yield",
+    "window": "mid"
+   },
+   {
+    "coverage80": null,
+    "crps_pct": null,
+    "mae_pct": 6.48177,
+    "model": "trend",
+    "n": 18,
+    "series": "us.wheat.yield",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.666667,
+    "crps_pct": 1.09963,
+    "mae_pct": 1.49351,
+    "model": "wasde",
+    "n": 24,
+    "series": "us.wheat.yield",
+    "window": "mid"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 9.51147,
+    "mae_pct": 9.48067,
+    "model": "bc",
+    "n": 36,
+    "series": "world.corn.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 9.27874,
+    "mae_pct": 9.68358,
+    "model": "rev",
+    "n": 36,
+    "series": "world.corn.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.944444,
+    "crps_pct": 9.66954,
+    "mae_pct": 12.9789,
+    "model": "wasde",
+    "n": 36,
+    "series": "world.corn.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 3.38456,
+    "mae_pct": 7.48653,
+    "model": "wx",
+    "n": 9,
+    "series": "world.corn.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.953846,
+    "crps_pct": 4.27872,
+    "mae_pct": 5.81434,
+    "model": "bc",
+    "n": 71,
+    "series": "world.corn.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.953846,
+    "crps_pct": 4.20849,
+    "mae_pct": 5.70948,
+    "model": "rev",
+    "n": 71,
+    "series": "world.corn.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.985915,
+    "crps_pct": 6.36646,
+    "mae_pct": 7.82976,
+    "model": "wasde",
+    "n": 71,
+    "series": "world.corn.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.957447,
+    "crps_pct": 4.80215,
+    "mae_pct": 8.16641,
+    "model": "wx",
+    "n": 71,
+    "series": "world.corn.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.923077,
+    "crps_pct": 5.58243,
+    "mae_pct": 6.22244,
+    "model": "bc",
+    "n": 35,
+    "series": "world.corn.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.961538,
+    "crps_pct": 5.69827,
+    "mae_pct": 6.20898,
+    "model": "rev",
+    "n": 35,
+    "series": "world.corn.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.914286,
+    "crps_pct": 7.5509,
+    "mae_pct": 10.8047,
+    "model": "wasde",
+    "n": 35,
+    "series": "world.corn.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 3.13228,
+    "mae_pct": 7.76151,
+    "model": "wx",
+    "n": 35,
+    "series": "world.corn.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.851852,
+    "crps_pct": 2.26643,
+    "mae_pct": 3.04532,
+    "model": "bc",
+    "n": 36,
+    "series": "world.corn.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.888889,
+    "crps_pct": 2.20563,
+    "mae_pct": 2.88658,
+    "model": "rev",
+    "n": 36,
+    "series": "world.corn.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.777778,
+    "crps_pct": 2.18134,
+    "mae_pct": 3.23623,
+    "model": "wasde",
+    "n": 36,
+    "series": "world.corn.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.666667,
+    "crps_pct": 2.31536,
+    "mae_pct": 3.00297,
+    "model": "wx",
+    "n": 9,
+    "series": "world.corn.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.723077,
+    "crps_pct": 0.792929,
+    "mae_pct": 1.10979,
+    "model": "bc",
+    "n": 71,
+    "series": "world.corn.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.661538,
+    "crps_pct": 0.808716,
+    "mae_pct": 1.12034,
+    "model": "rev",
+    "n": 71,
+    "series": "world.corn.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.661972,
+    "crps_pct": 1.21613,
+    "mae_pct": 1.846,
+    "model": "wasde",
+    "n": 71,
+    "series": "world.corn.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.617021,
+    "crps_pct": 0.783573,
+    "mae_pct": 1.05263,
+    "model": "wx",
+    "n": 71,
+    "series": "world.corn.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.846154,
+    "crps_pct": 1.12112,
+    "mae_pct": 1.62887,
+    "model": "bc",
+    "n": 35,
+    "series": "world.corn.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.846154,
+    "crps_pct": 1.12332,
+    "mae_pct": 1.63385,
+    "model": "rev",
+    "n": 35,
+    "series": "world.corn.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.828571,
+    "crps_pct": 1.6125,
+    "mae_pct": 2.40567,
+    "model": "wasde",
+    "n": 35,
+    "series": "world.corn.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.588235,
+    "crps_pct": 1.26815,
+    "mae_pct": 1.3999,
+    "model": "wx",
+    "n": 35,
+    "series": "world.corn.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.814815,
+    "crps_pct": 7.40981,
+    "mae_pct": 10.2698,
+    "model": "bc",
+    "n": 36,
+    "series": "world.rice.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.888889,
+    "crps_pct": 7.45787,
+    "mae_pct": 11.1619,
+    "model": "rev",
+    "n": 36,
+    "series": "world.rice.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 10.7924,
+    "mae_pct": 9.52817,
+    "model": "wasde",
+    "n": 36,
+    "series": "world.rice.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.907692,
+    "crps_pct": 5.45287,
+    "mae_pct": 8.16132,
+    "model": "bc",
+    "n": 71,
+    "series": "world.rice.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.907692,
+    "crps_pct": 5.46066,
+    "mae_pct": 8.17757,
+    "model": "rev",
+    "n": 71,
+    "series": "world.rice.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 9.72008,
+    "mae_pct": 7.71542,
+    "model": "wasde",
+    "n": 71,
+    "series": "world.rice.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.884615,
+    "crps_pct": 5.92769,
+    "mae_pct": 9.09589,
+    "model": "bc",
+    "n": 35,
+    "series": "world.rice.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.884615,
+    "crps_pct": 5.96285,
+    "mae_pct": 9.15802,
+    "model": "rev",
+    "n": 35,
+    "series": "world.rice.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 10.646,
+    "mae_pct": 8.95468,
+    "model": "wasde",
+    "n": 35,
+    "series": "world.rice.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.888889,
+    "crps_pct": 1.0201,
+    "mae_pct": 1.48436,
+    "model": "bc",
+    "n": 36,
+    "series": "world.rice.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.888889,
+    "crps_pct": 1.02749,
+    "mae_pct": 1.47651,
+    "model": "rev",
+    "n": 36,
+    "series": "world.rice.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.916667,
+    "crps_pct": 0.963942,
+    "mae_pct": 1.40826,
+    "model": "wasde",
+    "n": 36,
+    "series": "world.rice.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.846154,
+    "crps_pct": 0.425059,
+    "mae_pct": 0.610745,
+    "model": "bc",
+    "n": 71,
+    "series": "world.rice.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.784615,
+    "crps_pct": 0.466441,
+    "mae_pct": 0.67586,
+    "model": "rev",
+    "n": 71,
+    "series": "world.rice.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.873239,
+    "crps_pct": 0.667901,
+    "mae_pct": 0.946322,
+    "model": "wasde",
+    "n": 71,
+    "series": "world.rice.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.846154,
+    "crps_pct": 0.774185,
+    "mae_pct": 1.18658,
+    "model": "bc",
+    "n": 35,
+    "series": "world.rice.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.846154,
+    "crps_pct": 0.774155,
+    "mae_pct": 1.18613,
+    "model": "rev",
+    "n": 35,
+    "series": "world.rice.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.742857,
+    "crps_pct": 0.964899,
+    "mae_pct": 1.33482,
+    "model": "wasde",
+    "n": 35,
+    "series": "world.rice.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.666667,
+    "crps_pct": 11.1117,
+    "mae_pct": 13.4676,
+    "model": "bc",
+    "n": 25,
+    "series": "world.soybeans.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.75,
+    "crps_pct": 11.114,
+    "mae_pct": 13.8541,
+    "model": "rev",
+    "n": 25,
+    "series": "world.soybeans.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.714286,
+    "crps_pct": 9.75579,
+    "mae_pct": 11.5409,
+    "model": "wasde",
+    "n": 32,
+    "series": "world.soybeans.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.666667,
+    "crps_pct": 11.2484,
+    "mae_pct": 11.0899,
+    "model": "wx",
+    "n": 9,
+    "series": "world.soybeans.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.923077,
+    "crps_pct": 7.21788,
+    "mae_pct": 10.0517,
+    "model": "bc",
+    "n": 71,
+    "series": "world.soybeans.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.907692,
+    "crps_pct": 7.41661,
+    "mae_pct": 10.2069,
+    "model": "rev",
+    "n": 71,
+    "series": "world.soybeans.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.915493,
+    "crps_pct": 6.52463,
+    "mae_pct": 9.26896,
+    "model": "wasde",
+    "n": 71,
+    "series": "world.soybeans.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 7.04035,
+    "mae_pct": 10.5733,
+    "model": "wx",
+    "n": 71,
+    "series": "world.soybeans.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.923077,
+    "crps_pct": 10.228,
+    "mae_pct": 12.4773,
+    "model": "bc",
+    "n": 35,
+    "series": "world.soybeans.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.923077,
+    "crps_pct": 10.1401,
+    "mae_pct": 12.4868,
+    "model": "rev",
+    "n": 35,
+    "series": "world.soybeans.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.914286,
+    "crps_pct": 8.56091,
+    "mae_pct": 12.68,
+    "model": "wasde",
+    "n": 35,
+    "series": "world.soybeans.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.941176,
+    "crps_pct": 8.57732,
+    "mae_pct": 13.0694,
+    "model": "wx",
+    "n": 35,
+    "series": "world.soybeans.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.916667,
+    "crps_pct": 3.74093,
+    "mae_pct": 4.99593,
+    "model": "bc",
+    "n": 25,
+    "series": "world.soybeans.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.916667,
+    "crps_pct": 3.44741,
+    "mae_pct": 4.93637,
+    "model": "rev",
+    "n": 25,
+    "series": "world.soybeans.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.619048,
+    "crps_pct": 3.36459,
+    "mae_pct": 4.85829,
+    "model": "wasde",
+    "n": 32,
+    "series": "world.soybeans.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 2.81426,
+    "mae_pct": 5.16579,
+    "model": "wx",
+    "n": 9,
+    "series": "world.soybeans.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.846154,
+    "crps_pct": 2.07834,
+    "mae_pct": 2.76108,
+    "model": "bc",
+    "n": 71,
+    "series": "world.soybeans.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.861538,
+    "crps_pct": 1.82104,
+    "mae_pct": 2.44824,
+    "model": "rev",
+    "n": 71,
+    "series": "world.soybeans.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.830986,
+    "crps_pct": 1.95676,
+    "mae_pct": 2.65856,
+    "model": "wasde",
+    "n": 71,
+    "series": "world.soybeans.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.957447,
+    "crps_pct": 1.94072,
+    "mae_pct": 3.01277,
+    "model": "wx",
+    "n": 71,
+    "series": "world.soybeans.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.884615,
+    "crps_pct": 3.56789,
+    "mae_pct": 4.4404,
+    "model": "bc",
+    "n": 35,
+    "series": "world.soybeans.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.846154,
+    "crps_pct": 3.5597,
+    "mae_pct": 4.42071,
+    "model": "rev",
+    "n": 35,
+    "series": "world.soybeans.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.714286,
+    "crps_pct": 3.20718,
+    "mae_pct": 4.47067,
+    "model": "wasde",
+    "n": 35,
+    "series": "world.soybeans.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 2.45715,
+    "mae_pct": 4.5315,
+    "model": "wx",
+    "n": 35,
+    "series": "world.soybeans.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.851852,
+    "crps_pct": 5.04637,
+    "mae_pct": 7.56753,
+    "model": "bc",
+    "n": 36,
+    "series": "world.wheat.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.851852,
+    "crps_pct": 4.99754,
+    "mae_pct": 7.59592,
+    "model": "rev",
+    "n": 36,
+    "series": "world.wheat.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.972222,
+    "crps_pct": 6.61572,
+    "mae_pct": 6.92055,
+    "model": "wasde",
+    "n": 36,
+    "series": "world.wheat.ending_stocks",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.969231,
+    "crps_pct": 3.5265,
+    "mae_pct": 4.5259,
+    "model": "bc",
+    "n": 71,
+    "series": "world.wheat.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.969231,
+    "crps_pct": 3.65246,
+    "mae_pct": 4.54525,
+    "model": "rev",
+    "n": 71,
+    "series": "world.wheat.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 4.58428,
+    "mae_pct": 4.34708,
+    "model": "wasde",
+    "n": 71,
+    "series": "world.wheat.ending_stocks",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.961538,
+    "crps_pct": 3.43712,
+    "mae_pct": 5.21058,
+    "model": "bc",
+    "n": 35,
+    "series": "world.wheat.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 3.39262,
+    "mae_pct": 5.16779,
+    "model": "rev",
+    "n": 35,
+    "series": "world.wheat.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 1.0,
+    "crps_pct": 5.83447,
+    "mae_pct": 6.00275,
+    "model": "wasde",
+    "n": 35,
+    "series": "world.wheat.ending_stocks",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.888889,
+    "crps_pct": 1.73601,
+    "mae_pct": 2.37991,
+    "model": "bc",
+    "n": 36,
+    "series": "world.wheat.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.851852,
+    "crps_pct": 1.63817,
+    "mae_pct": 2.20779,
+    "model": "rev",
+    "n": 36,
+    "series": "world.wheat.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.833333,
+    "crps_pct": 1.63457,
+    "mae_pct": 2.49368,
+    "model": "wasde",
+    "n": 36,
+    "series": "world.wheat.production",
+    "window": "early"
+   },
+   {
+    "coverage80": 0.815385,
+    "crps_pct": 0.269209,
+    "mae_pct": 0.369539,
+    "model": "bc",
+    "n": 71,
+    "series": "world.wheat.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.8,
+    "crps_pct": 0.317002,
+    "mae_pct": 0.453084,
+    "model": "rev",
+    "n": 71,
+    "series": "world.wheat.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.732394,
+    "crps_pct": 0.364303,
+    "mae_pct": 0.507283,
+    "model": "wasde",
+    "n": 71,
+    "series": "world.wheat.production",
+    "window": "late"
+   },
+   {
+    "coverage80": 0.769231,
+    "crps_pct": 0.701309,
+    "mae_pct": 0.950145,
+    "model": "bc",
+    "n": 35,
+    "series": "world.wheat.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.846154,
+    "crps_pct": 0.665472,
+    "mae_pct": 0.909351,
+    "model": "rev",
+    "n": 35,
+    "series": "world.wheat.production",
+    "window": "mid"
+   },
+   {
+    "coverage80": 0.742857,
+    "crps_pct": 0.871652,
+    "mae_pct": 1.26131,
+    "model": "wasde",
+    "n": 35,
+    "series": "world.wheat.production",
+    "window": "mid"
+   }
+  ],
+  "wasde_revision_path": [
+   {
+    "k": 0,
+    "mae_pct": 35.5279,
+    "mean_error_pct": 9.63954,
+    "n": 12,
+    "series": "us.corn.ending_stocks"
+   },
+   {
+    "k": 1,
+    "mae_pct": 40.8265,
+    "mean_error_pct": 16.6047,
+    "n": 12,
+    "series": "us.corn.ending_stocks"
+   },
+   {
+    "k": 2,
+    "mae_pct": 22.8238,
+    "mean_error_pct": 5.99168,
+    "n": 12,
+    "series": "us.corn.ending_stocks"
+   },
+   {
+    "k": 3,
+    "mae_pct": 16.0131,
+    "mean_error_pct": 6.72446,
+    "n": 12,
+    "series": "us.corn.ending_stocks"
+   },
+   {
+    "k": 4,
+    "mae_pct": 17.0294,
+    "mean_error_pct": 7.21636,
+    "n": 12,
+    "series": "us.corn.ending_stocks"
+   },
+   {
+    "k": 5,
+    "mae_pct": 19.048,
+    "mean_error_pct": 10.3588,
+    "n": 11,
+    "series": "us.corn.ending_stocks"
+   },
+   {
+    "k": 6,
+    "mae_pct": 21.4913,
+    "mean_error_pct": 7.58528,
+    "n": 12,
+    "series": "us.corn.ending_stocks"
+   },
+   {
+    "k": 7,
+    "mae_pct": 17.8427,
+    "mean_error_pct": 4.56521,
+    "n": 12,
+    "series": "us.corn.ending_stocks"
+   },
+   {
+    "k": 8,
+    "mae_pct": 21.493,
+    "mean_error_pct": 10.4087,
+    "n": 12,
+    "series": "us.corn.ending_stocks"
+   },
+   {
+    "k": 9,
+    "mae_pct": 21.7058,
+    "mean_error_pct": 12.8235,
+    "n": 12,
+    "series": "us.corn.ending_stocks"
+   },
+   {
+    "k": 10,
+    "mae_pct": 21.8357,
+    "mean_error_pct": 15.8326,
+    "n": 11,
+    "series": "us.corn.ending_stocks"
+   },
+   {
+    "k": 11,
+    "mae_pct": 18.3861,
+    "mean_error_pct": 10.7097,
+    "n": 12,
+    "series": "us.corn.ending_stocks"
+   },
+   {
+    "k": 0,
+    "mae_pct": 5.53625,
+    "mean_error_pct": -1.89425,
+    "n": 12,
+    "series": "us.corn.production"
+   },
+   {
+    "k": 1,
+    "mae_pct": 5.64208,
+    "mean_error_pct": -1.24482,
+    "n": 12,
+    "series": "us.corn.production"
+   },
+   {
+    "k": 2,
+    "mae_pct": 4.64027,
+    "mean_error_pct": -0.901956,
+    "n": 12,
+    "series": "us.corn.production"
+   },
+   {
+    "k": 3,
+    "mae_pct": 2.53643,
+    "mean_error_pct": -0.358207,
+    "n": 12,
+    "series": "us.corn.production"
+   },
+   {
+    "k": 4,
+    "mae_pct": 1.87643,
+    "mean_error_pct": -0.580513,
+    "n": 12,
+    "series": "us.corn.production"
+   },
+   {
+    "k": 5,
+    "mae_pct": 1.37708,
+    "mean_error_pct": -0.467023,
+    "n": 11,
+    "series": "us.corn.production"
+   },
+   {
+    "k": 6,
+    "mae_pct": 0.84795,
+    "mean_error_pct": -0.167644,
+    "n": 12,
+    "series": "us.corn.production"
+   },
+   {
+    "k": 7,
+    "mae_pct": 0.84795,
+    "mean_error_pct": -0.167644,
+    "n": 12,
+    "series": "us.corn.production"
+   },
+   {
+    "k": 0,
+    "mae_pct": 4.60575,
+    "mean_error_pct": -1.98107,
+    "n": 12,
+    "series": "us.corn.yield"
+   },
+   {
+    "k": 1,
+    "mae_pct": 5.08136,
+    "mean_error_pct": -1.50546,
+    "n": 12,
+    "series": "us.corn.yield"
+   },
+   {
+    "k": 2,
+    "mae_pct": 4.42282,
+    "mean_error_pct": -0.455546,
+    "n": 12,
+    "series": "us.corn.yield"
+   },
+   {
+    "k": 3,
+    "mae_pct": 2.53252,
+    "mean_error_pct": -0.0618664,
+    "n": 12,
+    "series": "us.corn.yield"
+   },
+   {
+    "k": 4,
+    "mae_pct": 1.94887,
+    "mean_error_pct": -0.321329,
+    "n": 12,
+    "series": "us.corn.yield"
+   },
+   {
+    "k": 5,
+    "mae_pct": 1.23158,
+    "mean_error_pct": -0.519087,
+    "n": 11,
+    "series": "us.corn.yield"
+   },
+   {
+    "k": 6,
+    "mae_pct": 0.830789,
+    "mean_error_pct": -0.377925,
+    "n": 12,
+    "series": "us.corn.yield"
+   },
+   {
+    "k": 7,
+    "mae_pct": 0.830789,
+    "mean_error_pct": -0.377925,
+    "n": 12,
+    "series": "us.corn.yield"
+   },
+   {
+    "k": 0,
+    "mae_pct": 25.9421,
+    "mean_error_pct": 18.9408,
+    "n": 12,
+    "series": "us.rice.ending_stocks"
+   },
+   {
+    "k": 1,
+    "mae_pct": 24.0345,
+    "mean_error_pct": 20.7253,
+    "n": 12,
+    "series": "us.rice.ending_stocks"
+   },
+   {
+    "k": 2,
+    "mae_pct": 34.8266,
+    "mean_error_pct": 26.9603,
+    "n": 12,
+    "series": "us.rice.ending_stocks"
+   },
+   {
+    "k": 3,
+    "mae_pct": 27.9397,
+    "mean_error_pct": 22.8535,
+    "n": 12,
+    "series": "us.rice.ending_stocks"
+   },
+   {
+    "k": 4,
+    "mae_pct": 17.716,
+    "mean_error_pct": 6.74386,
+    "n": 12,
+    "series": "us.rice.ending_stocks"
+   },
+   {
+    "k": 5,
+    "mae_pct": 18.7185,
+    "mean_error_pct": 8.99959,
+    "n": 11,
+    "series": "us.rice.ending_stocks"
+   },
+   {
+    "k": 6,
+    "mae_pct": 18.0503,
+    "mean_error_pct": 10.9625,
+    "n": 12,
+    "series": "us.rice.ending_stocks"
+   },
+   {
+    "k": 7,
+    "mae_pct": 22.3945,
+    "mean_error_pct": 15.627,
+    "n": 12,
+    "series": "us.rice.ending_stocks"
+   },
+   {
+    "k": 8,
+    "mae_pct": 20.3251,
+    "mean_error_pct": 15.524,
+    "n": 12,
+    "series": "us.rice.ending_stocks"
+   },
+   {
+    "k": 9,
+    "mae_pct": 19.2933,
+    "mean_error_pct": 14.6864,
+    "n": 12,
+    "series": "us.rice.ending_stocks"
+   },
+   {
+    "k": 10,
+    "mae_pct": 14.2999,
+    "mean_error_pct": 8.86327,
+    "n": 11,
+    "series": "us.rice.ending_stocks"
+   },
+   {
+    "k": 11,
+    "mae_pct": 17.8607,
+    "mean_error_pct": 14.8924,
+    "n": 12,
+    "series": "us.rice.ending_stocks"
+   },
+   {
+    "k": 0,
+    "mae_pct": 5.02669,
+    "mean_error_pct": -0.975385,
+    "n": 12,
+    "series": "us.rice.production"
+   },
+   {
+    "k": 1,
+    "mae_pct": 4.45678,
+    "mean_error_pct": -0.405468,
+    "n": 12,
+    "series": "us.rice.production"
+   },
+   {
+    "k": 2,
+    "mae_pct": 3.73859,
+    "mean_error_pct": -0.504427,
+    "n": 12,
+    "series": "us.rice.production"
+   },
+   {
+    "k": 3,
+    "mae_pct": 3.51178,
+    "mean_error_pct": -0.589432,
+    "n": 12,
+    "series": "us.rice.production"
+   },
+   {
+    "k": 4,
+    "mae_pct": 2.32033,
+    "mean_error_pct": -0.535129,
+    "n": 12,
+    "series": "us.rice.production"
+   },
+   {
+    "k": 5,
+    "mae_pct": 0.969741,
+    "mean_error_pct": -0.225215,
+    "n": 11,
+    "series": "us.rice.production"
+   },
+   {
+    "k": 6,
+    "mae_pct": 0.934691,
+    "mean_error_pct": -0.140723,
+    "n": 12,
+    "series": "us.rice.production"
+   },
+   {
+    "k": 7,
+    "mae_pct": 0.934691,
+    "mean_error_pct": -0.140723,
+    "n": 12,
+    "series": "us.rice.production"
+   },
+   {
+    "k": 0,
+    "mae_pct": 2.76512,
+    "mean_error_pct": -0.545957,
+    "n": 12,
+    "series": "us.rice.yield"
+   },
+   {
+    "k": 1,
+    "mae_pct": 2.90903,
+    "mean_error_pct": -0.40205,
+    "n": 12,
+    "series": "us.rice.yield"
+   },
+   {
+    "k": 2,
+    "mae_pct": 2.64424,
+    "mean_error_pct": -0.437551,
+    "n": 12,
+    "series": "us.rice.yield"
+   },
+   {
+    "k": 3,
+    "mae_pct": 2.51156,
+    "mean_error_pct": -0.527881,
+    "n": 12,
+    "series": "us.rice.yield"
+   },
+   {
+    "k": 4,
+    "mae_pct": 2.26895,
+    "mean_error_pct": -0.710857,
+    "n": 12,
+    "series": "us.rice.yield"
+   },
+   {
+    "k": 5,
+    "mae_pct": 1.10853,
+    "mean_error_pct": -0.396062,
+    "n": 11,
+    "series": "us.rice.yield"
+   },
+   {
+    "k": 6,
+    "mae_pct": 0.953555,
+    "mean_error_pct": -0.316479,
+    "n": 12,
+    "series": "us.rice.yield"
+   },
+   {
+    "k": 7,
+    "mae_pct": 0.953555,
+    "mean_error_pct": -0.316479,
+    "n": 12,
+    "series": "us.rice.yield"
+   },
+   {
+    "k": 0,
+    "mae_pct": 31.7633,
+    "mean_error_pct": -21.6879,
+    "n": 12,
+    "series": "us.soybeans.ending_stocks"
+   },
+   {
+    "k": 1,
+    "mae_pct": 33.8856,
+    "mean_error_pct": -18.4586,
+    "n": 12,
+    "series": "us.soybeans.ending_stocks"
+   },
+   {
+    "k": 2,
+    "mae_pct": 33.8236,
+    "mean_error_pct": -12.426,
+    "n": 12,
+    "series": "us.soybeans.ending_stocks"
+   },
+   {
+    "k": 3,
+    "mae_pct": 38.8724,
+    "mean_error_pct": -3.76554,
+    "n": 12,
+    "series": "us.soybeans.ending_stocks"
+   },
+   {
+    "k": 4,
+    "mae_pct": 33.4326,
+    "mean_error_pct": -7.70051,
+    "n": 12,
+    "series": "us.soybeans.ending_stocks"
+   },
+   {
+    "k": 5,
+    "mae_pct": 29.1056,
+    "mean_error_pct": -12.738,
+    "n": 11,
+    "series": "us.soybeans.ending_stocks"
+   },
+   {
+    "k": 6,
+    "mae_pct": 28.1223,
+    "mean_error_pct": -20.3503,
+    "n": 12,
+    "series": "us.soybeans.ending_stocks"
+   },
+   {
+    "k": 7,
+    "mae_pct": 29.071,
+    "mean_error_pct": -18.7617,
+    "n": 12,
+    "series": "us.soybeans.ending_stocks"
+   },
+   {
+    "k": 8,
+    "mae_pct": 31.4848,
+    "mean_error_pct": -18.9583,
+    "n": 12,
+    "series": "us.soybeans.ending_stocks"
+   },
+   {
+    "k": 9,
+    "mae_pct": 32.6526,
+    "mean_error_pct": -16.9032,
+    "n": 12,
+    "series": "us.soybeans.ending_stocks"
+   },
+   {
+    "k": 10,
+    "mae_pct": 34.1722,
+    "mean_error_pct": -13.6631,
+    "n": 11,
+    "series": "us.soybeans.ending_stocks"
+   },
+   {
+    "k": 11,
+    "mae_pct": 29.9556,
+    "mean_error_pct": -14.2062,
+    "n": 12,
+    "series": "us.soybeans.ending_stocks"
+   },
+   {
+    "k": 0,
+    "mae_pct": 5.57431,
+    "mean_error_pct": 1.17272,
+    "n": 12,
+    "series": "us.soybeans.production"
+   },
+   {
+    "k": 1,
+    "mae_pct": 5.57431,
+    "mean_error_pct": 1.17272,
+    "n": 12,
+    "series": "us.soybeans.production"
+   },
+   {
+    "k": 2,
+    "mae_pct": 3.83264,
+    "mean_error_pct": 1.56813,
+    "n": 12,
+    "series": "us.soybeans.production"
+   },
+   {
+    "k": 3,
+    "mae_pct": 4.41929,
+    "mean_error_pct": 3.58193,
+    "n": 12,
+    "series": "us.soybeans.production"
+   },
+   {
+    "k": 4,
+    "mae_pct": 3.76693,
+    "mean_error_pct": 2.6358,
+    "n": 12,
+    "series": "us.soybeans.production"
+   },
+   {
+    "k": 5,
+    "mae_pct": 1.78825,
+    "mean_error_pct": 1.10005,
+    "n": 11,
+    "series": "us.soybeans.production"
+   },
+   {
+    "k": 6,
+    "mae_pct": 0.978898,
+    "mean_error_pct": 0.190794,
+    "n": 12,
+    "series": "us.soybeans.production"
+   },
+   {
+    "k": 7,
+    "mae_pct": 0.978898,
+    "mean_error_pct": 0.190794,
+    "n": 12,
+    "series": "us.soybeans.production"
+   },
+   {
+    "k": 0,
+    "mae_pct": 5.27618,
+    "mean_error_pct": 1.35441,
+    "n": 12,
+    "series": "us.soybeans.yield"
+   },
+   {
+    "k": 1,
+    "mae_pct": 5.27618,
+    "mean_error_pct": 1.35441,
+    "n": 12,
+    "series": "us.soybeans.yield"
+   },
+   {
+    "k": 2,
+    "mae_pct": 4.5509,
+    "mean_error_pct": 2.07968,
+    "n": 12,
+    "series": "us.soybeans.yield"
+   },
+   {
+    "k": 3,
+    "mae_pct": 4.58895,
+    "mean_error_pct": 3.9087,
+    "n": 12,
+    "series": "us.soybeans.yield"
+   },
+   {
+    "k": 4,
+    "mae_pct": 3.7608,
+    "mean_error_pct": 2.94657,
+    "n": 12,
+    "series": "us.soybeans.yield"
+   },
+   {
+    "k": 5,
+    "mae_pct": 1.8329,
+    "mean_error_pct": 1.33404,
+    "n": 11,
+    "series": "us.soybeans.yield"
+   },
+   {
+    "k": 6,
+    "mae_pct": 0.799667,
+    "mean_error_pct": 0.260669,
+    "n": 12,
+    "series": "us.soybeans.yield"
+   },
+   {
+    "k": 7,
+    "mae_pct": 0.799667,
+    "mean_error_pct": 0.260669,
+    "n": 12,
+    "series": "us.soybeans.yield"
+   },
+   {
+    "k": 0,
+    "mae_pct": 21.06,
+    "mean_error_pct": 8.00496,
+    "n": 12,
+    "series": "us.wheat.ending_stocks"
+   },
+   {
+    "k": 1,
+    "mae_pct": 19.3927,
+    "mean_error_pct": 9.03148,
+    "n": 12,
+    "series": "us.wheat.ending_stocks"
+   },
+   {
+    "k": 2,
+    "mae_pct": 15.7832,
+    "mean_error_pct": 4.72367,
+    "n": 12,
+    "series": "us.wheat.ending_stocks"
+   },
+   {
+    "k": 3,
+    "mae_pct": 12.581,
+    "mean_error_pct": 5.30631,
+    "n": 12,
+    "series": "us.wheat.ending_stocks"
+   },
+   {
+    "k": 4,
+    "mae_pct": 9.80808,
+    "mean_error_pct": 4.68089,
+    "n": 12,
+    "series": "us.wheat.ending_stocks"
+   },
+   {
+    "k": 5,
+    "mae_pct": 8.52524,
+    "mean_error_pct": 6.42409,
+    "n": 11,
+    "series": "us.wheat.ending_stocks"
+   },
+   {
+    "k": 6,
+    "mae_pct": 6.97522,
+    "mean_error_pct": 4.94376,
+    "n": 12,
+    "series": "us.wheat.ending_stocks"
+   },
+   {
+    "k": 7,
+    "mae_pct": 6.98796,
+    "mean_error_pct": 3.62957,
+    "n": 12,
+    "series": "us.wheat.ending_stocks"
+   },
+   {
+    "k": 8,
+    "mae_pct": 4.23373,
+    "mean_error_pct": 0.672126,
+    "n": 12,
+    "series": "us.wheat.ending_stocks"
+   },
+   {
+    "k": 9,
+    "mae_pct": 5.22377,
+    "mean_error_pct": 2.56201,
+    "n": 12,
+    "series": "us.wheat.ending_stocks"
+   },
+   {
+    "k": 10,
+    "mae_pct": 6.62538,
+    "mean_error_pct": 2.3433,
+    "n": 11,
+    "series": "us.wheat.ending_stocks"
+   },
+   {
+    "k": 11,
+    "mae_pct": 6.18215,
+    "mean_error_pct": 3.90098,
+    "n": 12,
+    "series": "us.wheat.ending_stocks"
+   },
+   {
+    "k": 0,
+    "mae_pct": 5.09026,
+    "mean_error_pct": 2.47848,
+    "n": 12,
+    "series": "us.wheat.production"
+   },
+   {
+    "k": 1,
+    "mae_pct": 4.29806,
+    "mean_error_pct": 2.21065,
+    "n": 12,
+    "series": "us.wheat.production"
+   },
+   {
+    "k": 2,
+    "mae_pct": 2.61601,
+    "mean_error_pct": -0.366773,
+    "n": 12,
+    "series": "us.wheat.production"
+   },
+   {
+    "k": 3,
+    "mae_pct": 1.69836,
+    "mean_error_pct": -0.961627,
+    "n": 12,
+    "series": "us.wheat.production"
+   },
+   {
+    "k": 4,
+    "mae_pct": 1.69836,
+    "mean_error_pct": -0.961627,
+    "n": 12,
+    "series": "us.wheat.production"
+   },
+   {
+    "k": 0,
+    "mae_pct": 4.61452,
+    "mean_error_pct": 3.08172,
+    "n": 12,
+    "series": "us.wheat.yield"
+   },
+   {
+    "k": 1,
+    "mae_pct": 3.65945,
+    "mean_error_pct": 2.77715,
+    "n": 12,
+    "series": "us.wheat.yield"
+   },
+   {
+    "k": 2,
+    "mae_pct": 2.26196,
+    "mean_error_pct": 0.895453,
+    "n": 12,
+    "series": "us.wheat.yield"
+   },
+   {
+    "k": 3,
+    "mae_pct": 1.49531,
+    "mean_error_pct": -0.000695759,
+    "n": 12,
+    "series": "us.wheat.yield"
+   },
+   {
+    "k": 4,
+    "mae_pct": 1.49531,
+    "mean_error_pct": -0.000695759,
+    "n": 12,
+    "series": "us.wheat.yield"
+   },
+   {
+    "k": 0,
+    "mae_pct": 16.1477,
+    "mean_error_pct": 11.515,
+    "n": 12,
+    "series": "world.corn.ending_stocks"
+   },
+   {
+    "k": 1,
+    "mae_pct": 16.9427,
+    "mean_error_pct": 12.6402,
+    "n": 12,
+    "series": "world.corn.ending_stocks"
+   },
+   {
+    "k": 2,
+    "mae_pct": 12.768,
+    "mean_error_pct": 11.3456,
+    "n": 12,
+    "series": "world.corn.ending_stocks"
+   },
+   {
+    "k": 3,
+    "mae_pct": 12.8665,
+    "mean_error_pct": 11.65,
+    "n": 12,
+    "series": "world.corn.ending_stocks"
+   },
+   {
+    "k": 4,
+    "mae_pct": 12.3206,
+    "mean_error_pct": 11.519,
+    "n": 12,
+    "series": "world.corn.ending_stocks"
+   },
+   {
+    "k": 5,
+    "mae_pct": 12.4689,
+    "mean_error_pct": 12.0129,
+    "n": 11,
+    "series": "world.corn.ending_stocks"
+   },
+   {
+    "k": 6,
+    "mae_pct": 10.55,
+    "mean_error_pct": 10.3371,
+    "n": 12,
+    "series": "world.corn.ending_stocks"
+   },
+   {
+    "k": 7,
+    "mae_pct": 8.4074,
+    "mean_error_pct": 8.09157,
+    "n": 12,
+    "series": "world.corn.ending_stocks"
+   },
+   {
+    "k": 8,
+    "mae_pct": 8.90189,
+    "mean_error_pct": 8.4198,
+    "n": 12,
+    "series": "world.corn.ending_stocks"
+   },
+   {
+    "k": 9,
+    "mae_pct": 9.3863,
+    "mean_error_pct": 8.91683,
+    "n": 12,
+    "series": "world.corn.ending_stocks"
+   },
+   {
+    "k": 10,
+    "mae_pct": 8.97008,
+    "mean_error_pct": 8.97008,
+    "n": 11,
+    "series": "world.corn.ending_stocks"
+   },
+   {
+    "k": 11,
+    "mae_pct": 7.29162,
+    "mean_error_pct": 6.72043,
+    "n": 12,
+    "series": "world.corn.ending_stocks"
+   },
+   {
+    "k": 0,
+    "mae_pct": 3.4003,
+    "mean_error_pct": 1.30576,
+    "n": 12,
+    "series": "world.corn.production"
+   },
+   {
+    "k": 1,
+    "mae_pct": 3.49538,
+    "mean_error_pct": 1.32844,
+    "n": 12,
+    "series": "world.corn.production"
+   },
+   {
+    "k": 2,
+    "mae_pct": 2.86841,
+    "mean_error_pct": 1.55208,
+    "n": 12,
+    "series": "world.corn.production"
+   },
+   {
+    "k": 3,
+    "mae_pct": 2.47882,
+    "mean_error_pct": 1.98578,
+    "n": 12,
+    "series": "world.corn.production"
+   },
+   {
+    "k": 4,
+    "mae_pct": 2.5217,
+    "mean_error_pct": 2.21141,
+    "n": 12,
+    "series": "world.corn.production"
+   },
+   {
+    "k": 5,
+    "mae_pct": 2.41383,
+    "mean_error_pct": 2.17623,
+    "n": 11,
+    "series": "world.corn.production"
+   },
+   {
+    "k": 6,
+    "mae_pct": 2.47586,
+    "mean_error_pct": 2.21976,
+    "n": 12,
+    "series": "world.corn.production"
+   },
+   {
+    "k": 7,
+    "mae_pct": 1.97562,
+    "mean_error_pct": 1.73637,
+    "n": 12,
+    "series": "world.corn.production"
+   },
+   {
+    "k": 8,
+    "mae_pct": 1.86187,
+    "mean_error_pct": 1.72343,
+    "n": 12,
+    "series": "world.corn.production"
+   },
+   {
+    "k": 9,
+    "mae_pct": 1.84443,
+    "mean_error_pct": 1.66936,
+    "n": 12,
+    "series": "world.corn.production"
+   },
+   {
+    "k": 10,
+    "mae_pct": 1.67413,
+    "mean_error_pct": 1.4913,
+    "n": 11,
+    "series": "world.corn.production"
+   },
+   {
+    "k": 11,
+    "mae_pct": 1.4602,
+    "mean_error_pct": 1.25036,
+    "n": 12,
+    "series": "world.corn.production"
+   },
+   {
+    "k": 0,
+    "mae_pct": 11.4911,
+    "mean_error_pct": 10.3623,
+    "n": 12,
+    "series": "world.rice.ending_stocks"
+   },
+   {
+    "k": 1,
+    "mae_pct": 12.4366,
+    "mean_error_pct": 11.0615,
+    "n": 12,
+    "series": "world.rice.ending_stocks"
+   },
+   {
+    "k": 2,
+    "mae_pct": 10.1341,
+    "mean_error_pct": 8.75863,
+    "n": 12,
+    "series": "world.rice.ending_stocks"
+   },
+   {
+    "k": 3,
+    "mae_pct": 10.0384,
+    "mean_error_pct": 9.24512,
+    "n": 12,
+    "series": "world.rice.ending_stocks"
+   },
+   {
+    "k": 4,
+    "mae_pct": 10.5655,
+    "mean_error_pct": 9.73892,
+    "n": 12,
+    "series": "world.rice.ending_stocks"
+   },
+   {
+    "k": 5,
+    "mae_pct": 10.979,
+    "mean_error_pct": 10.5112,
+    "n": 11,
+    "series": "world.rice.ending_stocks"
+   },
+   {
+    "k": 6,
+    "mae_pct": 9.64468,
+    "mean_error_pct": 9.28649,
+    "n": 12,
+    "series": "world.rice.ending_stocks"
+   },
+   {
+    "k": 7,
+    "mae_pct": 9.85619,
+    "mean_error_pct": 9.55721,
+    "n": 12,
+    "series": "world.rice.ending_stocks"
+   },
+   {
+    "k": 8,
+    "mae_pct": 9.24557,
+    "mean_error_pct": 9.12978,
+    "n": 12,
+    "series": "world.rice.ending_stocks"
+   },
+   {
+    "k": 9,
+    "mae_pct": 9.23792,
+    "mean_error_pct": 8.88704,
+    "n": 12,
+    "series": "world.rice.ending_stocks"
+   },
+   {
+    "k": 10,
+    "mae_pct": 7.55123,
+    "mean_error_pct": 6.10983,
+    "n": 11,
+    "series": "world.rice.ending_stocks"
+   },
+   {
+    "k": 11,
+    "mae_pct": 7.97695,
+    "mean_error_pct": 6.90467,
+    "n": 12,
+    "series": "world.rice.ending_stocks"
+   },
+   {
+    "k": 0,
+    "mae_pct": 1.41629,
+    "mean_error_pct": 0.312875,
+    "n": 12,
+    "series": "world.rice.production"
+   },
+   {
+    "k": 1,
+    "mae_pct": 1.43396,
+    "mean_error_pct": 0.343354,
+    "n": 12,
+    "series": "world.rice.production"
+   },
+   {
+    "k": 2,
+    "mae_pct": 1.40429,
+    "mean_error_pct": 0.40116,
+    "n": 12,
+    "series": "world.rice.production"
+   },
+   {
+    "k": 3,
+    "mae_pct": 1.49921,
+    "mean_error_pct": 0.928525,
+    "n": 12,
+    "series": "world.rice.production"
+   },
+   {
+    "k": 4,
+    "mae_pct": 1.30931,
+    "mean_error_pct": 1.04354,
+    "n": 12,
+    "series": "world.rice.production"
+   },
+   {
+    "k": 5,
+    "mae_pct": 1.26106,
+    "mean_error_pct": 1.13477,
+    "n": 11,
+    "series": "world.rice.production"
+   },
+   {
+    "k": 6,
+    "mae_pct": 1.15184,
+    "mean_error_pct": 1.0948,
+    "n": 12,
+    "series": "world.rice.production"
+   },
+   {
+    "k": 7,
+    "mae_pct": 1.22072,
+    "mean_error_pct": 1.17688,
+    "n": 12,
+    "series": "world.rice.production"
+   },
+   {
+    "k": 8,
+    "mae_pct": 1.12221,
+    "mean_error_pct": 1.07984,
+    "n": 12,
+    "series": "world.rice.production"
+   },
+   {
+    "k": 9,
+    "mae_pct": 1.00738,
+    "mean_error_pct": 0.991517,
+    "n": 12,
+    "series": "world.rice.production"
+   },
+   {
+    "k": 10,
+    "mae_pct": 0.624078,
+    "mean_error_pct": 0.588167,
+    "n": 11,
+    "series": "world.rice.production"
+   },
+   {
+    "k": 11,
+    "mae_pct": 0.60739,
+    "mean_error_pct": 0.60739,
+    "n": 12,
+    "series": "world.rice.production"
+   },
+   {
+    "k": 0,
+    "mae_pct": 13.7965,
+    "mean_error_pct": 2.33788,
+    "n": 8,
+    "series": "world.soybeans.ending_stocks"
+   },
+   {
+    "k": 1,
+    "mae_pct": 11.3603,
+    "mean_error_pct": 1.39951,
+    "n": 12,
+    "series": "world.soybeans.ending_stocks"
+   },
+   {
+    "k": 2,
+    "mae_pct": 12.4076,
+    "mean_error_pct": 2.77279,
+    "n": 12,
+    "series": "world.soybeans.ending_stocks"
+   },
+   {
+    "k": 3,
+    "mae_pct": 13.225,
+    "mean_error_pct": 4.84426,
+    "n": 12,
+    "series": "world.soybeans.ending_stocks"
+   },
+   {
+    "k": 4,
+    "mae_pct": 14.2405,
+    "mean_error_pct": 4.64828,
+    "n": 12,
+    "series": "world.soybeans.ending_stocks"
+   },
+   {
+    "k": 5,
+    "mae_pct": 12.3641,
+    "mean_error_pct": 1.76354,
+    "n": 11,
+    "series": "world.soybeans.ending_stocks"
+   },
+   {
+    "k": 6,
+    "mae_pct": 10.4683,
+    "mean_error_pct": 0.576814,
+    "n": 12,
+    "series": "world.soybeans.ending_stocks"
+   },
+   {
+    "k": 7,
+    "mae_pct": 10.7186,
+    "mean_error_pct": 0.603078,
+    "n": 12,
+    "series": "world.soybeans.ending_stocks"
+   },
+   {
+    "k": 8,
+    "mae_pct": 10.1289,
+    "mean_error_pct": 0.143509,
+    "n": 12,
+    "series": "world.soybeans.ending_stocks"
+   },
+   {
+    "k": 9,
+    "mae_pct": 9.42799,
+    "mean_error_pct": 0.940497,
+    "n": 12,
+    "series": "world.soybeans.ending_stocks"
+   },
+   {
+    "k": 10,
+    "mae_pct": 8.38583,
+    "mean_error_pct": 1.29311,
+    "n": 11,
+    "series": "world.soybeans.ending_stocks"
+   },
+   {
+    "k": 11,
+    "mae_pct": 5.88627,
+    "mean_error_pct": -0.46861,
+    "n": 12,
+    "series": "world.soybeans.ending_stocks"
+   },
+   {
+    "k": 0,
+    "mae_pct": 4.97114,
+    "mean_error_pct": 1.99363,
+    "n": 8,
+    "series": "world.soybeans.production"
+   },
+   {
+    "k": 1,
+    "mae_pct": 5.08284,
+    "mean_error_pct": 0.626593,
+    "n": 12,
+    "series": "world.soybeans.production"
+   },
+   {
+    "k": 2,
+    "mae_pct": 4.56192,
+    "mean_error_pct": 0.691301,
+    "n": 12,
+    "series": "world.soybeans.production"
+   },
+   {
+    "k": 3,
+    "mae_pct": 4.67462,
+    "mean_error_pct": 1.21948,
+    "n": 12,
+    "series": "world.soybeans.production"
+   },
+   {
+    "k": 4,
+    "mae_pct": 4.33756,
+    "mean_error_pct": 0.801086,
+    "n": 12,
+    "series": "world.soybeans.production"
+   },
+   {
+    "k": 5,
+    "mae_pct": 4.21736,
+    "mean_error_pct": 0.0289556,
+    "n": 11,
+    "series": "world.soybeans.production"
+   },
+   {
+    "k": 6,
+    "mae_pct": 3.40651,
+    "mean_error_pct": -0.291445,
+    "n": 12,
+    "series": "world.soybeans.production"
+   },
+   {
+    "k": 7,
+    "mae_pct": 3.18874,
+    "mean_error_pct": -0.476647,
+    "n": 12,
+    "series": "world.soybeans.production"
+   },
+   {
+    "k": 8,
+    "mae_pct": 3.11029,
+    "mean_error_pct": -0.516925,
+    "n": 12,
+    "series": "world.soybeans.production"
+   },
+   {
+    "k": 9,
+    "mae_pct": 2.58226,
+    "mean_error_pct": -0.208013,
+    "n": 12,
+    "series": "world.soybeans.production"
+   },
+   {
+    "k": 10,
+    "mae_pct": 1.97106,
+    "mean_error_pct": 0.0918905,
+    "n": 11,
+    "series": "world.soybeans.production"
+   },
+   {
+    "k": 11,
+    "mae_pct": 1.27133,
+    "mean_error_pct": -0.18304,
+    "n": 12,
+    "series": "world.soybeans.production"
+   },
+   {
+    "k": 0,
+    "mae_pct": 8.19889,
+    "mean_error_pct": 6.18075,
+    "n": 12,
+    "series": "world.wheat.ending_stocks"
+   },
+   {
+    "k": 1,
+    "mae_pct": 7.68095,
+    "mean_error_pct": 6.08108,
+    "n": 12,
+    "series": "world.wheat.ending_stocks"
+   },
+   {
+    "k": 2,
+    "mae_pct": 7.54638,
+    "mean_error_pct": 5.77696,
+    "n": 12,
+    "series": "world.wheat.ending_stocks"
+   },
+   {
+    "k": 3,
+    "mae_pct": 6.9768,
+    "mean_error_pct": 6.26231,
+    "n": 12,
+    "series": "world.wheat.ending_stocks"
+   },
+   {
+    "k": 4,
+    "mae_pct": 5.89013,
+    "mean_error_pct": 5.47854,
+    "n": 12,
+    "series": "world.wheat.ending_stocks"
+   },
+   {
+    "k": 5,
+    "mae_pct": 6.8782,
+    "mean_error_pct": 6.47569,
+    "n": 11,
+    "series": "world.wheat.ending_stocks"
+   },
+   {
+    "k": 6,
+    "mae_pct": 6.24691,
+    "mean_error_pct": 5.85944,
+    "n": 12,
+    "series": "world.wheat.ending_stocks"
+   },
+   {
+    "k": 7,
+    "mae_pct": 5.10704,
+    "mean_error_pct": 4.1293,
+    "n": 12,
+    "series": "world.wheat.ending_stocks"
+   },
+   {
+    "k": 8,
+    "mae_pct": 4.31394,
+    "mean_error_pct": 3.23522,
+    "n": 12,
+    "series": "world.wheat.ending_stocks"
+   },
+   {
+    "k": 9,
+    "mae_pct": 4.59425,
+    "mean_error_pct": 3.25802,
+    "n": 12,
+    "series": "world.wheat.ending_stocks"
+   },
+   {
+    "k": 10,
+    "mae_pct": 3.96241,
+    "mean_error_pct": 2.55235,
+    "n": 11,
+    "series": "world.wheat.ending_stocks"
+   },
+   {
+    "k": 11,
+    "mae_pct": 3.38131,
+    "mean_error_pct": 1.97282,
+    "n": 12,
+    "series": "world.wheat.ending_stocks"
+   },
+   {
+    "k": 0,
+    "mae_pct": 2.77828,
+    "mean_error_pct": 1.29314,
+    "n": 12,
+    "series": "world.wheat.production"
+   },
+   {
+    "k": 1,
+    "mae_pct": 2.54824,
+    "mean_error_pct": 1.47036,
+    "n": 12,
+    "series": "world.wheat.production"
+   },
+   {
+    "k": 2,
+    "mae_pct": 2.30421,
+    "mean_error_pct": 1.38067,
+    "n": 12,
+    "series": "world.wheat.production"
+   },
+   {
+    "k": 3,
+    "mae_pct": 1.48895,
+    "mean_error_pct": 1.18204,
+    "n": 12,
+    "series": "world.wheat.production"
+   },
+   {
+    "k": 4,
+    "mae_pct": 1.13991,
+    "mean_error_pct": 0.988317,
+    "n": 12,
+    "series": "world.wheat.production"
+   },
+   {
+    "k": 5,
+    "mae_pct": 1.21553,
+    "mean_error_pct": 1.21553,
+    "n": 11,
+    "series": "world.wheat.production"
+   },
+   {
+    "k": 6,
+    "mae_pct": 1.02322,
+    "mean_error_pct": 1.02322,
+    "n": 12,
+    "series": "world.wheat.production"
+   },
+   {
+    "k": 7,
+    "mae_pct": 0.586029,
+    "mean_error_pct": 0.556057,
+    "n": 12,
+    "series": "world.wheat.production"
+   },
+   {
+    "k": 8,
+    "mae_pct": 0.427032,
+    "mean_error_pct": 0.424347,
+    "n": 12,
+    "series": "world.wheat.production"
+   },
+   {
+    "k": 9,
+    "mae_pct": 0.426448,
+    "mean_error_pct": 0.419146,
+    "n": 12,
+    "series": "world.wheat.production"
+   },
+   {
+    "k": 10,
+    "mae_pct": 0.323411,
+    "mean_error_pct": 0.278782,
+    "n": 11,
+    "series": "world.wheat.production"
+   },
+   {
+    "k": 11,
+    "mae_pct": 0.268709,
+    "mean_error_pct": 0.204363,
+    "n": 12,
+    "series": "world.wheat.production"
+   }
+  ]
+ },
+ "dropped_cases": [],
+ "family_size": 68,
+ "marketing_years": [
+  2005,
+  2016
+ ],
+ "n_cases": 2386,
+ "n_years": 12,
+ "pins": {
+  "atlas.ncei_cag.agbelt_monthly": {
+   "artifact_sha256": "b00838e2807109181b264fef6ddb5d9e8dbadd0fd3f169b54a9315589beb3980",
+   "dataset_key": "atlas.ncei_cag.agbelt_monthly",
+   "recorded_at": "2026-10-18T16:42:22.189566+00:00",
+   "row_count": 2646
+  },
+  "atlas.usda_wasde_esmis.headline": {
+   "artifact_sha256": "a853d4df2c48846b25649704aefa42519e5d18ae280f64787d54ad1348a86bbf",
+   "dataset_key": "atlas.usda_wasde_esmis.headline",
+   "recorded_at": "2026-10-18T17:56:38.648257+00:00",
+   "row_count": 20640
+  }
+ },
+ "schema": "reva-beat-agri/1",
+ "stage": "development",
+ "tests": [
+  {
+   "benchmark": "wasde_point",
+   "candidate": "bc",
+   "coverage80": null,
+   "dm_stat": 0.888919,
+   "group": "us_yield",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 4.0961,
+   "loss_candidate": 4.26411,
+   "n_cases": 144,
+   "n_years": 12,
+   "p_better": 0.803465,
+   "p_worse": 0.196535,
+   "relative": 1.04102,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "bc",
+   "coverage80": 0.80303,
+   "dm_stat": 0.898018,
+   "group": "us_yield",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 3.1135,
+   "loss_candidate": 3.19179,
+   "n_cases": 132,
+   "n_years": 11,
+   "p_better": 0.804857,
+   "p_worse": 0.195143,
+   "relative": 1.02515,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "bc",
+   "coverage80": null,
+   "dm_stat": 0.522831,
+   "group": "us_yield",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 2.23379,
+   "loss_candidate": 2.29068,
+   "n_cases": 129,
+   "n_years": 12,
+   "p_better": 0.69427,
+   "p_worse": 0.30573,
+   "relative": 1.02547,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "bc",
+   "coverage80": 0.822034,
+   "dm_stat": 1.14836,
+   "group": "us_yield",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 1.55324,
+   "loss_candidate": 1.62753,
+   "n_cases": 118,
+   "n_years": 11,
+   "p_better": 0.861227,
+   "p_worse": 0.138773,
+   "relative": 1.04783,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "bc",
+   "coverage80": null,
+   "dm_stat": 0.277146,
+   "group": "us_yield",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 0.865777,
+   "loss_candidate": 0.870011,
+   "n_cases": 72,
+   "n_years": 12,
+   "p_better": 0.606597,
+   "p_worse": 0.393403,
+   "relative": 1.00489,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "bc",
+   "coverage80": 0.757576,
+   "dm_stat": 1.08427,
+   "group": "us_yield",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 0.601234,
+   "loss_candidate": 0.61226,
+   "n_cases": 66,
+   "n_years": 11,
+   "p_better": 0.848152,
+   "p_worse": 0.151848,
+   "relative": 1.01834,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "bc",
+   "coverage80": null,
+   "dm_stat": 1.26992,
+   "group": "us_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 4.78967,
+   "loss_candidate": 5.0537,
+   "n_cases": 144,
+   "n_years": 12,
+   "p_better": 0.884841,
+   "p_worse": 0.115159,
+   "relative": 1.05512,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "bc",
+   "coverage80": 0.833333,
+   "dm_stat": 1.32508,
+   "group": "us_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 3.68596,
+   "loss_candidate": 3.82629,
+   "n_cases": 132,
+   "n_years": 11,
+   "p_better": 0.892689,
+   "p_worse": 0.107311,
+   "relative": 1.03807,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "bc",
+   "coverage80": null,
+   "dm_stat": 1.48643,
+   "group": "us_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 2.35418,
+   "loss_candidate": 2.45892,
+   "n_cases": 129,
+   "n_years": 12,
+   "p_better": 0.917373,
+   "p_worse": 0.082627,
+   "relative": 1.04449,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "bc",
+   "coverage80": 0.822034,
+   "dm_stat": 1.95796,
+   "group": "us_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 1.69387,
+   "loss_candidate": 1.77562,
+   "n_cases": 118,
+   "n_years": 11,
+   "p_better": 0.960649,
+   "p_worse": 0.0393512,
+   "relative": 1.04826,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "bc",
+   "coverage80": null,
+   "dm_stat": -0.0989052,
+   "group": "us_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 0.926309,
+   "loss_candidate": 0.921788,
+   "n_cases": 72,
+   "n_years": 12,
+   "p_better": 0.461496,
+   "p_worse": 0.538504,
+   "relative": 0.99512,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "bc",
+   "coverage80": 0.818182,
+   "dm_stat": 0.121061,
+   "group": "us_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 0.670311,
+   "loss_candidate": 0.675301,
+   "n_cases": 66,
+   "n_years": 11,
+   "p_better": 0.54698,
+   "p_worse": 0.45302,
+   "relative": 1.00744,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "bc",
+   "coverage80": null,
+   "dm_stat": -0.765896,
+   "group": "us_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 31.6178,
+   "loss_candidate": 30.4304,
+   "n_cases": 144,
+   "n_years": 12,
+   "p_better": 0.229929,
+   "p_worse": 0.770071,
+   "relative": 0.962444,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "bc",
+   "coverage80": 0.898148,
+   "dm_stat": -0.755806,
+   "group": "us_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 24.3086,
+   "loss_candidate": 23.2751,
+   "n_cases": 108,
+   "n_years": 9,
+   "p_better": 0.235716,
+   "p_worse": 0.764284,
+   "relative": 0.957485,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "bc",
+   "coverage80": null,
+   "dm_stat": 0.010182,
+   "group": "us_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 22.9308,
+   "loss_candidate": 22.8545,
+   "n_cases": 140,
+   "n_years": 12,
+   "p_better": 0.503971,
+   "p_worse": 0.496029,
+   "relative": 0.996673,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "bc",
+   "coverage80": 0.942308,
+   "dm_stat": -0.333441,
+   "group": "us_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 17.4416,
+   "loss_candidate": 17.1934,
+   "n_cases": 104,
+   "n_years": 9,
+   "p_better": 0.373686,
+   "p_worse": 0.626314,
+   "relative": 0.985774,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "bc",
+   "coverage80": null,
+   "dm_stat": -2.01374,
+   "group": "us_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 21.5053,
+   "loss_candidate": 20.0506,
+   "n_cases": 284,
+   "n_years": 12,
+   "p_better": 0.0345775,
+   "p_worse": 0.965423,
+   "relative": 0.932356,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "bc",
+   "coverage80": 0.815385,
+   "dm_stat": -2.23589,
+   "group": "us_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 15.5473,
+   "loss_candidate": 14.0778,
+   "n_cases": 260,
+   "n_years": 11,
+   "p_better": 0.0246737,
+   "p_worse": 0.975326,
+   "relative": 0.905485,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "bc",
+   "coverage80": null,
+   "dm_stat": -0.443945,
+   "group": "world_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 2.85765,
+   "loss_candidate": 2.80935,
+   "n_cases": 133,
+   "n_years": 12,
+   "p_better": 0.332844,
+   "p_worse": 0.667156,
+   "relative": 0.983096,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "bc",
+   "coverage80": 0.88172,
+   "dm_stat": -0.612491,
+   "group": "world_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 1.98705,
+   "loss_candidate": 1.94086,
+   "n_cases": 93,
+   "n_years": 9,
+   "p_better": 0.278609,
+   "p_worse": 0.721391,
+   "relative": 0.976752,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "bc",
+   "coverage80": null,
+   "dm_stat": -2.59601,
+   "group": "world_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 2.36812,
+   "loss_candidate": 2.0515,
+   "n_cases": 140,
+   "n_years": 12,
+   "p_better": 0.0124352,
+   "p_worse": 0.987565,
+   "relative": 0.8663,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "bc",
+   "coverage80": 0.836538,
+   "dm_stat": -1.6707,
+   "group": "world_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 1.71394,
+   "loss_candidate": 1.54113,
+   "n_cases": 104,
+   "n_years": 9,
+   "p_better": 0.0666634,
+   "p_worse": 0.933337,
+   "relative": 0.89917,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "bc",
+   "coverage80": null,
+   "dm_stat": -4.74677,
+   "group": "world_production",
+   "holm_m": 68,
+   "holm_rejected": true,
+   "loss": "ae",
+   "loss_benchmark": 1.48954,
+   "loss_candidate": 1.21279,
+   "n_cases": 284,
+   "n_years": 12,
+   "p_better": 0.000301413,
+   "p_worse": 0.999699,
+   "relative": 0.814202,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "bc",
+   "coverage80": 0.807692,
+   "dm_stat": -3.82261,
+   "group": "world_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 1.05781,
+   "loss_candidate": 0.891384,
+   "n_cases": 260,
+   "n_years": 11,
+   "p_better": 0.00167959,
+   "p_worse": 0.99832,
+   "relative": 0.842672,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "bc",
+   "coverage80": null,
+   "dm_stat": -0.374157,
+   "group": "world_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 10.4358,
+   "loss_candidate": 9.92585,
+   "n_cases": 133,
+   "n_years": 12,
+   "p_better": 0.3577,
+   "p_worse": 0.6423,
+   "relative": 0.951136,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "bc",
+   "coverage80": 0.860215,
+   "dm_stat": -1.88974,
+   "group": "world_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 9.131,
+   "loss_candidate": 7.81148,
+   "n_cases": 93,
+   "n_years": 9,
+   "p_better": 0.0477323,
+   "p_worse": 0.952268,
+   "relative": 0.85549,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "bc",
+   "coverage80": null,
+   "dm_stat": -1.35838,
+   "group": "world_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 9.61053,
+   "loss_candidate": 8.25156,
+   "n_cases": 140,
+   "n_years": 12,
+   "p_better": 0.100774,
+   "p_worse": 0.899226,
+   "relative": 0.858596,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "bc",
+   "coverage80": 0.923077,
+   "dm_stat": -4.85141,
+   "group": "world_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": true,
+   "loss": "crps",
+   "loss_benchmark": 8.00737,
+   "loss_candidate": 6.29382,
+   "n_cases": 104,
+   "n_years": 9,
+   "p_better": 0.000634787,
+   "p_worse": 0.999365,
+   "relative": 0.786004,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "bc",
+   "coverage80": null,
+   "dm_stat": -0.283894,
+   "group": "world_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 7.2903,
+   "loss_candidate": 7.1383,
+   "n_cases": 284,
+   "n_years": 12,
+   "p_better": 0.390882,
+   "p_worse": 0.609118,
+   "relative": 0.97915,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "bc",
+   "coverage80": 0.938462,
+   "dm_stat": -6.03323,
+   "group": "world_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": true,
+   "loss": "crps",
+   "loss_benchmark": 6.75721,
+   "loss_candidate": 5.11899,
+   "n_cases": 260,
+   "n_years": 11,
+   "p_better": 6.31962e-05,
+   "p_worse": 0.999937,
+   "relative": 0.75756,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "rev",
+   "coverage80": null,
+   "dm_stat": 0.58323,
+   "group": "us_yield",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 4.0961,
+   "loss_candidate": 4.21665,
+   "n_cases": 144,
+   "n_years": 12,
+   "p_better": 0.714249,
+   "p_worse": 0.285751,
+   "relative": 1.02943,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "rev",
+   "coverage80": 0.80303,
+   "dm_stat": 0.39764,
+   "group": "us_yield",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 3.1135,
+   "loss_candidate": 3.15312,
+   "n_cases": 132,
+   "n_years": 11,
+   "p_better": 0.650374,
+   "p_worse": 0.349626,
+   "relative": 1.01273,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "rev",
+   "coverage80": null,
+   "dm_stat": 0.528385,
+   "group": "us_yield",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 2.23379,
+   "loss_candidate": 2.29221,
+   "n_cases": 129,
+   "n_years": 12,
+   "p_better": 0.696136,
+   "p_worse": 0.303864,
+   "relative": 1.02615,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "rev",
+   "coverage80": 0.813559,
+   "dm_stat": 1.16124,
+   "group": "us_yield",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 1.55324,
+   "loss_candidate": 1.62854,
+   "n_cases": 118,
+   "n_years": 11,
+   "p_better": 0.863744,
+   "p_worse": 0.136256,
+   "relative": 1.04848,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "rev",
+   "coverage80": null,
+   "dm_stat": -0.0852393,
+   "group": "us_yield",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 0.865777,
+   "loss_candidate": 0.8639,
+   "n_cases": 72,
+   "n_years": 12,
+   "p_better": 0.466801,
+   "p_worse": 0.533199,
+   "relative": 0.997832,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "rev",
+   "coverage80": 0.742424,
+   "dm_stat": 0.755812,
+   "group": "us_yield",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 0.601234,
+   "loss_candidate": 0.612464,
+   "n_cases": 66,
+   "n_years": 11,
+   "p_better": 0.766404,
+   "p_worse": 0.233596,
+   "relative": 1.01868,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "rev",
+   "coverage80": null,
+   "dm_stat": 1.04018,
+   "group": "us_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 4.78967,
+   "loss_candidate": 5.01724,
+   "n_cases": 144,
+   "n_years": 12,
+   "p_better": 0.839711,
+   "p_worse": 0.160289,
+   "relative": 1.04751,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "rev",
+   "coverage80": 0.818182,
+   "dm_stat": 0.67762,
+   "group": "us_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 3.68596,
+   "loss_candidate": 3.77451,
+   "n_cases": 132,
+   "n_years": 11,
+   "p_better": 0.743308,
+   "p_worse": 0.256692,
+   "relative": 1.02402,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "rev",
+   "coverage80": null,
+   "dm_stat": 1.52413,
+   "group": "us_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 2.35418,
+   "loss_candidate": 2.46128,
+   "n_cases": 129,
+   "n_years": 12,
+   "p_better": 0.922152,
+   "p_worse": 0.0778485,
+   "relative": 1.04549,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "rev",
+   "coverage80": 0.830508,
+   "dm_stat": 1.95258,
+   "group": "us_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 1.69387,
+   "loss_candidate": 1.77716,
+   "n_cases": 118,
+   "n_years": 11,
+   "p_better": 0.960296,
+   "p_worse": 0.039704,
+   "relative": 1.04917,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "rev",
+   "coverage80": null,
+   "dm_stat": -0.176199,
+   "group": "us_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 0.926309,
+   "loss_candidate": 0.915511,
+   "n_cases": 72,
+   "n_years": 12,
+   "p_better": 0.43167,
+   "p_worse": 0.56833,
+   "relative": 0.988343,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "rev",
+   "coverage80": 0.787879,
+   "dm_stat": 0.216436,
+   "group": "us_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 0.670311,
+   "loss_candidate": 0.681446,
+   "n_cases": 66,
+   "n_years": 11,
+   "p_better": 0.5835,
+   "p_worse": 0.4165,
+   "relative": 1.01661,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "rev",
+   "coverage80": null,
+   "dm_stat": -0.671697,
+   "group": "us_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 31.6178,
+   "loss_candidate": 30.5477,
+   "n_cases": 144,
+   "n_years": 12,
+   "p_better": 0.257818,
+   "p_worse": 0.742182,
+   "relative": 0.966156,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "rev",
+   "coverage80": 0.898148,
+   "dm_stat": -0.768361,
+   "group": "us_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 24.3086,
+   "loss_candidate": 23.248,
+   "n_cases": 108,
+   "n_years": 9,
+   "p_better": 0.232174,
+   "p_worse": 0.767826,
+   "relative": 0.956369,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "rev",
+   "coverage80": null,
+   "dm_stat": -0.00531976,
+   "group": "us_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 22.9308,
+   "loss_candidate": 22.8381,
+   "n_cases": 140,
+   "n_years": 12,
+   "p_better": 0.497925,
+   "p_worse": 0.502075,
+   "relative": 0.995957,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "rev",
+   "coverage80": 0.951923,
+   "dm_stat": -0.282037,
+   "group": "us_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 17.4416,
+   "loss_candidate": 17.2031,
+   "n_cases": 104,
+   "n_years": 9,
+   "p_better": 0.392537,
+   "p_worse": 0.607463,
+   "relative": 0.986329,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "rev",
+   "coverage80": null,
+   "dm_stat": -1.88374,
+   "group": "us_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 21.5053,
+   "loss_candidate": 20.095,
+   "n_cases": 284,
+   "n_years": 12,
+   "p_better": 0.0431454,
+   "p_worse": 0.956855,
+   "relative": 0.934421,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "rev",
+   "coverage80": 0.807692,
+   "dm_stat": -2.16719,
+   "group": "us_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 15.5473,
+   "loss_candidate": 14.107,
+   "n_cases": 260,
+   "n_years": 11,
+   "p_better": 0.0277164,
+   "p_worse": 0.972284,
+   "relative": 0.907361,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "rev",
+   "coverage80": null,
+   "dm_stat": -1.55351,
+   "group": "world_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 2.85765,
+   "loss_candidate": 2.70647,
+   "n_cases": 133,
+   "n_years": 12,
+   "p_better": 0.0742912,
+   "p_worse": 0.925709,
+   "relative": 0.947096,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "rev",
+   "coverage80": 0.88172,
+   "dm_stat": -1.99681,
+   "group": "world_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 1.98705,
+   "loss_candidate": 1.85907,
+   "n_cases": 93,
+   "n_years": 9,
+   "p_better": 0.0404578,
+   "p_worse": 0.959542,
+   "relative": 0.935591,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "rev",
+   "coverage80": null,
+   "dm_stat": -2.62654,
+   "group": "world_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 2.36812,
+   "loss_candidate": 2.03751,
+   "n_cases": 140,
+   "n_years": 12,
+   "p_better": 0.011776,
+   "p_worse": 0.988224,
+   "relative": 0.860392,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "rev",
+   "coverage80": 0.846154,
+   "dm_stat": -1.72228,
+   "group": "world_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 1.71394,
+   "loss_candidate": 1.53066,
+   "n_cases": 104,
+   "n_years": 9,
+   "p_better": 0.0616594,
+   "p_worse": 0.938341,
+   "relative": 0.893064,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "rev",
+   "coverage80": null,
+   "dm_stat": -4.39277,
+   "group": "world_production",
+   "holm_m": 68,
+   "holm_rejected": true,
+   "loss": "ae",
+   "loss_benchmark": 1.48954,
+   "loss_candidate": 1.17438,
+   "n_cases": 284,
+   "n_years": 12,
+   "p_better": 0.00053802,
+   "p_worse": 0.999462,
+   "relative": 0.788418,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "rev",
+   "coverage80": 0.776923,
+   "dm_stat": -3.65658,
+   "group": "world_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 1.05781,
+   "loss_candidate": 0.8533,
+   "n_cases": 260,
+   "n_years": 11,
+   "p_better": 0.002207,
+   "p_worse": 0.997793,
+   "relative": 0.80667,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "rev",
+   "coverage80": null,
+   "dm_stat": -0.0707021,
+   "group": "world_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 10.4358,
+   "loss_candidate": 10.3026,
+   "n_cases": 133,
+   "n_years": 12,
+   "p_better": 0.472452,
+   "p_worse": 0.527548,
+   "relative": 0.987234,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "rev",
+   "coverage80": 0.892473,
+   "dm_stat": -2.0149,
+   "group": "world_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 9.131,
+   "loss_candidate": 7.74398,
+   "n_cases": 93,
+   "n_years": 9,
+   "p_better": 0.0393394,
+   "p_worse": 0.960661,
+   "relative": 0.848098,
+   "tested": true,
+   "window": "early",
+   "years": [
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "rev",
+   "coverage80": null,
+   "dm_stat": -1.38411,
+   "group": "world_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 9.61053,
+   "loss_candidate": 8.25539,
+   "n_cases": 140,
+   "n_years": 12,
+   "p_better": 0.0968806,
+   "p_worse": 0.903119,
+   "relative": 0.858994,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "rev",
+   "coverage80": 0.942308,
+   "dm_stat": -4.93547,
+   "group": "world_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": true,
+   "loss": "crps",
+   "loss_benchmark": 8.00737,
+   "loss_candidate": 6.29847,
+   "n_cases": 104,
+   "n_years": 9,
+   "p_better": 0.000570775,
+   "p_worse": 0.999429,
+   "relative": 0.786585,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "rev",
+   "coverage80": null,
+   "dm_stat": -0.246507,
+   "group": "world_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 7.2903,
+   "loss_candidate": 7.15979,
+   "n_cases": 284,
+   "n_years": 12,
+   "p_better": 0.404915,
+   "p_worse": 0.595085,
+   "relative": 0.982097,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "rev",
+   "coverage80": 0.934615,
+   "dm_stat": -5.69182,
+   "group": "world_ending_stocks",
+   "holm_m": 68,
+   "holm_rejected": true,
+   "loss": "crps",
+   "loss_benchmark": 6.75721,
+   "loss_candidate": 5.18456,
+   "n_cases": 260,
+   "n_years": 11,
+   "p_better": 0.000100276,
+   "p_worse": 0.9999,
+   "relative": 0.767263,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "wx",
+   "coverage80": null,
+   "dm_stat": -0.249949,
+   "group": "us_cornsoy_yield",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 2.5942,
+   "loss_candidate": 2.53784,
+   "n_cases": 70,
+   "n_years": 12,
+   "p_better": 0.403616,
+   "p_worse": 0.596384,
+   "relative": 0.978273,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "wx",
+   "coverage80": 0.891304,
+   "dm_stat": -1.17245,
+   "group": "us_cornsoy_yield",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 1.89356,
+   "loss_candidate": 1.75386,
+   "n_cases": 46,
+   "n_years": 8,
+   "p_better": 0.139684,
+   "p_worse": 0.860316,
+   "relative": 0.926223,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "wx",
+   "coverage80": null,
+   "dm_stat": 1.60542,
+   "group": "us_cornsoy_yield",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 0.815504,
+   "loss_candidate": 0.94864,
+   "n_cases": 48,
+   "n_years": 12,
+   "p_better": 0.931649,
+   "p_worse": 0.0683514,
+   "relative": 1.16326,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "wx",
+   "coverage80": 0.875,
+   "dm_stat": 0.903626,
+   "group": "us_cornsoy_yield",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 0.538796,
+   "loss_candidate": 0.582356,
+   "n_cases": 32,
+   "n_years": 8,
+   "p_better": 0.801888,
+   "p_worse": 0.198112,
+   "relative": 1.08085,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "wx",
+   "coverage80": null,
+   "dm_stat": -0.0163286,
+   "group": "us_cornsoy_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 2.57147,
+   "loss_candidate": 2.56784,
+   "n_cases": 70,
+   "n_years": 12,
+   "p_better": 0.493632,
+   "p_worse": 0.506368,
+   "relative": 0.998586,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "wx",
+   "coverage80": 0.934783,
+   "dm_stat": -0.912481,
+   "group": "us_cornsoy_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 1.88943,
+   "loss_candidate": 1.75324,
+   "n_cases": 46,
+   "n_years": 8,
+   "p_better": 0.195929,
+   "p_worse": 0.804071,
+   "relative": 0.92792,
+   "tested": true,
+   "window": "mid",
+   "years": [
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_point",
+   "candidate": "wx",
+   "coverage80": null,
+   "dm_stat": 2.00135,
+   "group": "us_cornsoy_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "ae",
+   "loss_benchmark": 0.913373,
+   "loss_candidate": 1.0315,
+   "n_cases": 48,
+   "n_years": 12,
+   "p_better": 0.96468,
+   "p_worse": 0.0353201,
+   "relative": 1.12934,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  },
+  {
+   "benchmark": "wasde_fair_fan",
+   "candidate": "wx",
+   "coverage80": 0.875,
+   "dm_stat": 1.01778,
+   "group": "us_cornsoy_production",
+   "holm_m": 68,
+   "holm_rejected": false,
+   "loss": "crps",
+   "loss_benchmark": 0.592869,
+   "loss_candidate": 0.638154,
+   "n_cases": 32,
+   "n_years": 8,
+   "p_better": 0.82867,
+   "p_worse": 0.17133,
+   "relative": 1.07638,
+   "tested": true,
+   "window": "late",
+   "years": [
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+   ]
+  }
+ ]
+}
