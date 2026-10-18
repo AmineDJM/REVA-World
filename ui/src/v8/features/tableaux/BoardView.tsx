@@ -178,6 +178,7 @@ function fmtWhen(iso: string | null | undefined): string {
 
 export function AlertList({ alerts, board, note }: { alerts: Alert[]; board: StoredBoard; note?: string | null }) {
   const byUid = new Map(board.items.map((i) => [i.uid, i] as const));
+  const quiet = board.rules.filter((r) => !alerts.some((a) => a.rule_id === r.id)).length;
   if (alerts.length === 0)
     return (
       <p className="v8b-soft" role="status">
@@ -215,6 +216,14 @@ export function AlertList({ alerts, board, note }: { alerts: Alert[]; board: Sto
           </li>
         );
       })}
+      {quiet > 0 && (
+        <li className="v8b-alert v8b-alert-quiet">
+          <span className="v8b-alert-kind">·</span>
+          <span className="v8b-alert-msg muted">
+            {quiet} règle{quiet > 1 ? 's' : ''} évaluée{quiet > 1 ? 's' : ''} sans déclenchement{note ? ` (${note})` : ''}.
+          </span>
+        </li>
+      )}
     </ul>
   );
 }
@@ -304,6 +313,9 @@ export function BoardView({ initial, origin: initialOrigin }: { initial: StoredB
   useEffect(() => {
     if (origin !== 'shared') rememberBoard(board.id);
   }, [board.id, origin]);
+  useEffect(() => {
+    document.title = `${board.title} · Tableaux · REVA`; // the shell shows the first part as the last breadcrumb
+  }, [board.title]);
 
   useEffect(() => {
     if (origin !== 'local') return;

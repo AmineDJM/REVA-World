@@ -567,3 +567,23 @@
   font-size: var(--v8-text-2xs, 10.5px);
   color: var(--v8-fg-subtle, #94a3b8);
 }
+@media (max-width: 640px) {
+  /* one scrollable row of chips inside the query box instead of eight wrapped lines */
+  .lien-fams {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+  .lien-chip {
+    flex: 0 0 auto;
+  }
+}
+.lien-nodecard-actions kbd {
+  background: transparent;
+  color: inherit;
+  border: 1px solid var(--v8-border, #e2e8f0);
+  border-radius: 3px;
+  padding: 0 3px;
+  font-family: var(--v8-font-mono, monospace);
+}

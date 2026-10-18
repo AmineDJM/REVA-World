@@ -212,6 +212,9 @@ class V8FicheRelationGroup(s.ApiModel):
     group: str
     count: int
     count_is_lower_bound: bool
+    count_approx: bool = Field(
+        False, description="Hub mode: count read on the indexed statement table (all recorded versions), approximate"
+    )
     items: list[V8FicheRelationItem]
     more: bool
     via: V8FicheRef | None

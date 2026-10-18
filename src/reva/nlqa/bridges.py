@@ -29,6 +29,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 
 from reva.nlqa.ports import Entity, EntityMatch
 
@@ -95,7 +96,16 @@ SELECT DISTINCT e.qid, e.kind, e.sitelinks, l.label
 
 
 def bridge_matches(conn: Any, kq: Any, term: str, *, iso_of: Any = None, limit: int = 10) -> list[EntityMatch]:
-    """Matches by the three label rules, in that order; the first rule that finds something wins."""
+    """Matches by the three label rules, in that order; the first rule that finds something wins. A failing
+    bridge query (timeout) only means no bridge: the exact lookup's own result stands."""
+    try:
+        with conn.begin_nested():
+            return _bridge_matches(conn, kq, term, iso_of=iso_of, limit=limit)
+    except SQLAlchemyError:
+        return []
+
+
+def _bridge_matches(conn: Any, kq: Any, term: str, *, iso_of: Any = None, limit: int = 10) -> list[EntityMatch]:
     t = term.strip()
     if not t or len(t) > 200:
         return []
@@ -104,11 +114,10 @@ def bridge_matches(conn: Any, kq: Any, term: str, *, iso_of: Any = None, limit: 
     folded = fold_accents(t)
     found: list[tuple[str, str | None, int, str, str]] = []  # qid, kind, sitelinks, label, match
     # 1. accents / case only
-    pat = "".join(c if c.isascii() else "_" for c in low)
-    rows = conn.execute(
-        text(_LABEL_ROWS.format(cond="(lower(l.label) = :f OR lower(l.label) LIKE :p)")),
-        {"langs": langs, "f": folded, "p": pat},
-    ).all()
+    rows = list(conn.execute(text(_LABEL_ROWS.format(cond="lower(l.label) = :f")), {"langs": langs, "f": folded}).all())
+    pat = "".join(c if c.isascii() and c.isalnum() else "_" for c in folded)
+    if sum(c.isalnum() for c in pat) >= 4:  # labels with accents the question omits (trigram index)
+        rows += conn.execute(text(_LABEL_ROWS.format(cond="lower(l.label) LIKE :p")), {"langs": langs, "p": pat}).all()
     for q, kind, sl, label in rows:
         if fold_accents(label) == folded and label.casefold() != low:
             found.append((q, kind, int(sl or 0), label, "label_folded"))

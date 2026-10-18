@@ -86,17 +86,26 @@ def _resolve_cached(conn: Connection, kind: str, ident: str) -> Resolved:
 
 
 class Section:
-    """Times a section and turns an exception into a reported error (the page still renders)."""
+    """Times a section and turns an exception into a reported error (the page still renders). With ``conn``, the
+    section runs in a SAVEPOINT so a failed query (e.g. a statement timeout) does not abort the next sections."""
 
-    def __init__(self, meta: dict[str, Any], name: str) -> None:
-        self.meta, self.name = meta, name
+    def __init__(self, meta: dict[str, Any], name: str, conn: Connection | None = None) -> None:
+        self.meta, self.name, self.conn = meta, name, conn
+        self.sp: Any = None
 
     def __enter__(self) -> Section:
         self.t0 = time.perf_counter()
+        if self.conn is not None:
+            self.sp = self.conn.begin_nested()
         return self
 
     def __exit__(self, et: Any, ev: Any, tb: Any) -> bool:
         self.meta["timings_ms"][self.name] = round((time.perf_counter() - self.t0) * 1000, 1)
+        if self.sp is not None:
+            try:
+                (self.sp.rollback if ev is not None else self.sp.commit)()
+            except Exception:  # pragma: no cover - the outer transaction is gone too
+                log.warning("v8 fiche savepoint of %s could not be closed", self.name)
         if ev is not None:
             log.warning("v8 fiche section %s failed: %s", self.name, ev, exc_info=(et, ev, tb))
             self.meta["errors"].append({"section": self.name, "error": f"{type(ev).__name__}: {str(ev)[:300]}"})
@@ -223,12 +232,14 @@ def _fill_entity(
     fam: dict[str, Any] = {"families": [], "literals": [], "unmapped": []}
     with conn_factory() as conn:
         if res.qid:
-            with Section(meta, "identity"):
+            with Section(meta, "identity", conn):
                 ident = K.identity(conn, res.qid, origin)
                 b["identity"] = _identity_out(res, ident, prof)
-            with Section(meta, "families"):
+            with Section(meta, "families", conn):
                 fam = K.families(conn, res.qid, origin)
-                b["relations"] = [g for g in K.relation_groups(fam) if g["family"] != K.IDENTITY_FAMILY]
+                b["relations"] = [
+                    g for g in K.relation_groups(fam) + fam.get("extra_groups", []) if g["family"] != K.IDENTITY_FAMILY
+                ]
                 facts, ids, coords = K.facts(fam)
                 b["facts"] = facts
                 if b["identity"] is not None:
@@ -243,7 +254,7 @@ def _fill_entity(
                         "lon": coords["lon"],
                         "source_key": coords["source"]["source"],
                     }
-            with Section(meta, "related_forms"):
+            with Section(meta, "related_forms", conn):
                 forms = K.related_forms(conn, res.qid, prof.get("related_forms"), origin)
                 for f in forms:
                     ffam = K.families(conn, f["qid"], origin, per_family=8)
@@ -253,33 +264,33 @@ def _fill_entity(
                     b["related_forms"].append(
                         {"ref": C.kg_ref(f), "relation_fr": f.get("relation_fr"), "relations": groups}
                     )
-            with Section(meta, "space"):
+            with Section(meta, "space", conn):
                 pl = K.places(conn, res.qid, origin)
                 b["space"]["chain"] = pl["chain"]
                 b["space"]["country_iso3"] = res.iso3 or pl["country_iso3"]
                 if pl["point"] and not b["space"]["point"]:
                     b["space"]["point"] = pl["point"]
-            with Section(meta, "geometry"):
+            with Section(meta, "geometry", conn):
                 iso = res.iso3 or b["space"]["country_iso3"]
                 if iso:
                     b["space"]["geometry"] = K.country_geometry(conn, iso)
-            with Section(meta, "time"):
+            with Section(meta, "time", conn):
                 skip = {f["property"] for f in b["facts"] if f["points"]}
                 b["time"] = K.dated_statements(conn, res.qid, origin, skip)
-            with Section(meta, "causal"):
+            with Section(meta, "causal", conn):
                 b["claims"] = CL.causal(conn, res.qid, origin)
         elif anchor:
             b["identity"] = _anchor_identity(res, anchor)
-            with Section(meta, "anchor_kg"):
+            with Section(meta, "anchor_kg", conn):
                 b["relations"] = _anchor_relations(conn, anchor, origin)
         else:  # a country the KG does not hold: atlas only
             b["identity"] = _identity_out(res, None, prof)
-        with Section(meta, "effects"):
+        with Section(meta, "effects", conn):
             eff_ids = [str(x) for x in anchor.get("effect_variables") or []] if anchor else []
             country = res.iso3 if prof.get("effects") == "country" else None
             if eff_ids or country:
                 b["effects"] = CL.effects(conn, origin=origin, ids=eff_ids, country=country)
-        with Section(meta, "forecasts"):
+        with Section(meta, "forecasts", conn):
             try:
                 if store is not None and res.iso3:
                     b["forecasts"] = F.forecasts(conn, store, origin, geo=res.iso3)
@@ -292,11 +303,11 @@ def _fill_entity(
                 b["missing"].append({"section": "forecasts", "what_fr": "prévisions du registre", "reason_code": "warming",
                                      "reason_fr": f"index du registre des prévisions en construction (premier accès de ce processus : {w}) ; rechargez dans une minute"})  # fmt: skip
         if res.qid and q is not None:
-            with Section(meta, "measured_by"):
+            with Section(meta, "measured_by", conn):
                 if any(g["family"] == "measured_by" for g in fam.get("families") or []):
                     rec = A.recorded_tables(conn)
                     b["series"] += A.measured_by(q, b["relations"], fam, rec)
-        with Section(meta, "missing_facts"):
+        with Section(meta, "missing_facts", conn):
             b["missing"] += _missing_facts(conn, b, prof)
     if fut is not None:
         with Section(meta, "atlas"):
@@ -472,7 +483,7 @@ def _anchor_relations(conn: Connection, anchor: Mapping[str, Any], origin: str |
     if not items:
         return []
     return [{"family": "context", "label_fr": "Codes de nomenclature et enregistrements liés", "group": "classification",
-             "count": len(items), "count_is_lower_bound": False, "items": items, "more": False, "via": None,
+             "count": len(items), "count_is_lower_bound": False, "count_approx": False, "items": items, "more": False, "via": None,
              "properties": []}]  # fmt: skip
 
 

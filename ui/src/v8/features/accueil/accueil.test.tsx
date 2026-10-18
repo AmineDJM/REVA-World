@@ -146,7 +146,7 @@ describe('AccueilPage', () => {
     const dec = screen.getByRole('region', { name: 'Décisions qui vous attendent' });
     expect(await within(dec).findByText('Clé API openFDA')).toBeInTheDocument();
     expect(within(dec).getByText(/Débloque : Comptes FAERS/)).toBeInTheDocument();
-    expect(within(dec).getByRole('link', { name: /\+ 9 autres/ })).toBeInTheDocument(); // 15 open in the fixture, 6 shown
+    expect(within(dec).getByRole('link', { name: /\+ 10 autres/ })).toBeInTheDocument(); // 15 open in the fixture, 5 shown
     // calendar panel: next resolution group with its official forecaster
     const cal = screen.getByRole('region', { name: 'Prochaines résolutions' });
     expect((await within(cal).findAllByText(/Hospitalisations COVID-19/))[0]).toBeInTheDocument();

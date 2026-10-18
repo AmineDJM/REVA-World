@@ -76,6 +76,10 @@
   min-width: 0;
 }
 .v8a-tile-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  align-items: center;
   font-size: var(--v8-text-xs);
   color: var(--v8-fg-muted);
   text-transform: uppercase;
@@ -371,6 +375,18 @@
 }
 .v8a-dec-title {
   font-weight: var(--v8-weight-medium);
+}
+.v8a-dec-title,
+.v8a-dec-why {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+.v8a-dec-why {
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
 }
 .v8a-dec-why,
 .v8a-dec-act {

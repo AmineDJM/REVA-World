@@ -216,8 +216,8 @@ function RelationGroup({ g, kind, id }: { g: RelGroup; kind: string; id: string 
     <section className="fiche-relgroup" data-testid={`fiche-family-${g.family}`} aria-label={g.label_fr}>
       <header className="fiche-relhead">
         <span className="fiche-relname">{g.label_fr}</span>
-        <span className="fiche-relcount v8-num" title={g.count_is_lower_bound ? 'Entité très connectée : compte minimal' : undefined}>
-          {g.count_is_lower_bound ? '≥ ' : ''}
+        <span className="fiche-relcount v8-num" title={g.count_approx ? 'Entité très connectée : compte approximatif (toutes versions enregistrées)' : g.count_is_lower_bound ? 'Entité très connectée : compte minimal' : undefined}>
+          {g.count_approx ? '≈ ' : g.count_is_lower_bound ? '≥ ' : ''}
           {g.count.toLocaleString('fr-FR')}
         </span>
       </header>

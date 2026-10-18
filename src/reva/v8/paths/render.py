@@ -272,7 +272,10 @@ def _estimate_value(est: Mapping[str, Any]) -> str:
         return f"signe {est.get('sign')}, valeur non chiffrée"
     unit = UNIT_WORDS.get(est.get("unit") or "", ("", ""))[1]
     shock = est.get("shock") or None
-    tail = f" pour un choc de {_fr_num(shock['size'])} {shock['unit']}" if shock else ""
+    sunit = {"percent": "%", "percentage_points": "point(s) de %", "log_points": "point(s) log"}.get(
+        str((shock or {}).get("unit")), str((shock or {}).get("unit"))
+    )
+    tail = f" pour un choc de {_fr_num(shock['size'])} {sunit}" if shock else ""
     return f"{_fr_num(v)}{unit}{tail}"
 
 

@@ -3,7 +3,7 @@
  * coverage at a glance, today's changes (window and kinds in the URL), owner decisions waiting, the next
  * resolutions, pinned boards. Each panel loads and fails on its own; empty states say what is missing and why.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { v8Links } from '../../contract';
 import { Badge, EmptyState, ErrorState, KeyHint, Panel, Skeleton, SourceChip, useUrlParam } from '../../shell/ui';
@@ -104,9 +104,20 @@ function Glance() {
   const m = cov.status === 'ok' ? cov.data.meta : null;
   const totals = cal.status === 'ok' ? cal.data.totals : null;
   const openDecisions = dec.status === 'ok' ? (dec.data.counts?.open ?? dec.data.groups.reduce((n, g) => n + g.items.filter((i) => i.status !== 'done' && i.status !== 'dropped').length, 0)) : null;
-  const tile = (label: string, value: string | null, sub: string, state: 'loading' | 'ok' | 'error' | 'idle', href?: string, why?: string) => (
+  const covChip = m ? (
+    <SourceChip
+      source="REVA · agrégats de couverture"
+      label="source"
+      vintage={dateFr(m.computed_at, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+      details={[`calculés le ${m.computed_at}`, ...(m.stale ? ['des tables ont été chargées depuis le calcul : chiffres en retard'] : [])]}
+    />
+  ) : null;
+  const tile = (label: string, value: string | null, sub: string, state: 'loading' | 'ok' | 'error' | 'idle', href?: string, why?: string, chip?: ReactNode) => (
     <div className="v8a-tile" data-state={state}>
-      <div className="v8a-tile-label">{label}</div>
+      <div className="v8a-tile-label">
+        {label}
+        {chip}
+      </div>
       <div className="v8a-tile-value v8-num">
         {state === 'loading' ? <span className="v8a-tile-skel" aria-label="chargement" /> : value !== null ? value : <span className="v8a-tile-na" title={why}>indisponible</span>}
       </div>
@@ -116,7 +127,7 @@ function Glance() {
   const covWhy = cov.status === 'error' ? `${classifyV3Error(cov.error).title} : agrégats de couverture (/v1/v8/coverage)` : undefined;
   return (
     <section className="v8a-glance" aria-label="Couverture en bref">
-      {tile('Atlas', m ? compactFr(m.atlas_rows) : null, m ? `${m.atlas_tables.toLocaleString('fr-FR')} tables · ${m.places} lieux` : 'tables · lignes', cov.status, '/v8/couverture', covWhy)}
+      {tile('Atlas', m ? compactFr(m.atlas_rows) : null, m ? `${m.atlas_tables.toLocaleString('fr-FR')} tables · ${m.places} lieux` : 'tables · lignes', cov.status, '/v8/couverture', covWhy, covChip)}
       {tile('Graphe', m ? (m.kg_computed ? compactFr(m.kg_statements) : null) : null, m ? `${compactFr(m.kg_entities)} entités · déclarations` : 'entités · déclarations', cov.status, '/v8/couverture', covWhy ?? (m && !m.kg_computed ? 'non calculé' : undefined))}
       {tile(
         'Prévisions scellées',
@@ -138,11 +149,6 @@ function Glance() {
         v8Links.scoreboard(),
       )}
       {tile('Décisions en attente', openDecisions !== null ? String(openDecisions) : null, 'du propriétaire', dec.status, '/v8/couverture?vue=decisions', dec.status === 'error' ? classifyV3Error(dec.error).title : undefined)}
-      {m && (
-        <p className="v8a-glance-src">
-          <SourceChip source="REVA · agrégats de couverture" label="couverture" vintage={dateFr(m.computed_at, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} details={[`calculés le ${m.computed_at}`, ...(m.stale ? ['des tables ont été chargées depuis le calcul'] : [])]} />
-        </p>
-      )}
     </section>
   );
 }
@@ -361,17 +367,16 @@ function Decisions() {
       )}
       {open.length > 0 && (
         <ul className="v8a-dec-list">
-          {open.slice(0, 6).map((d) => (
-            <li key={d.id} className="v8a-dec">
+          {open.slice(0, 5).map((d) => (
+            <li key={d.id} className="v8a-dec" title={d.action ? `À faire : ${d.action}` : undefined}>
               <span className="v8a-dec-kind">{d.kind_label}</span>
               <span className="v8a-dec-title">{d.title}</span>
               {d.unlocks?.text && <span className="v8a-dec-why">Débloque : {d.unlocks.text}</span>}
-              {d.action && <span className="v8a-dec-act">{d.action}</span>}
             </li>
           ))}
-          {open.length > 6 && (
+          {open.length > 5 && (
             <li className="v8a-dec-more">
-              <Link to="/v8/couverture?vue=decisions">+ {open.length - 6} autres</Link>
+              <Link to="/v8/couverture?vue=decisions">+ {open.length - 5} autres</Link>
             </li>
           )}
         </ul>

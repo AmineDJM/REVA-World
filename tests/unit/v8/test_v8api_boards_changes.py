@@ -65,8 +65,11 @@ def test_alerts_against_the_feed(monkeypatch: pytest.MonkeyPatch) -> None:
     }
     changes = [
         _change("ingest", [{"type": "table", "id": "imf.weo"}], {"revised_tables": []}),
-        _change("ingest", [{"type": "table", "id": "imf.weo"}, {"type": "geo", "id": "FRA"}],
-                {"revised_tables": ["imf.weo"]}),  # fmt: skip
+        _change(
+            "ingest",
+            [{"type": "table", "id": "imf.weo"}, {"type": "geo", "id": "FRA"}],
+            {"revised_tables": ["imf.weo"]},
+        ),
         _change("question_resolved", [{"type": "question", "id": "fq_0123456789abcdef01234567"}]),
         _change("ingest", [{"type": "table", "id": "wb.wdi"}]),
     ]

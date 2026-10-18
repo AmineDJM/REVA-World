@@ -127,8 +127,60 @@ def own_id(qid: str, kg_kind: str | None, source_key: str | None) -> dict[str, A
 
 
 # ------------------------------------------------------------------------------------------------ families
+#: Incoming statements of one property above which its family is read in "hub mode" (a country is the object of
+#: thousands of "country" / "located in" statements; scanning them all for a page costs seconds).
+HUB_PROPERTY_IN = 500
+
+
 def families(conn: Connection, qid: str, origin: str | None, per_family: int = PER_FAMILY) -> dict[str, Any]:
-    return fq.entity_families(conn, qid, per_family=per_family, origin=origin, include_literals=True)
+    """Relations by family. Hub mode: families with a heavily used incoming property are left out of the full scan
+    and read as one page of statements plus an approximate count (``extra_groups``, ``count_approx``)."""
+    reg = fq.registry()
+    rows = conn.execute(
+        text("SELECT property_pid, count(*) FROM kg.statement WHERE object_qid = :q GROUP BY property_pid"), {"q": qid}
+    ).all()
+    heavy: dict[str, int] = {}
+    for pid, n in rows:
+        ef = reg.edge_family(pid, "in")
+        if ef is not None and int(n) > HUB_PROPERTY_IN:
+            heavy[ef.family] = heavy.get(ef.family, 0) + int(n)
+    if not heavy:
+        res = fq.entity_families(conn, qid, per_family=per_family, origin=origin, include_literals=True)
+        res["extra_groups"] = []
+        return res
+    keep = [f for f in reg.families if f not in heavy]
+    res = fq.entity_families(conn, qid, families=keep, per_family=per_family, origin=origin, include_literals=True)
+    out_counts: dict[str, int] = dict(
+        conn.execute(
+            text("SELECT property_pid, count(*) FROM kg.statement WHERE subject_qid = :q GROUP BY property_pid"),
+            {"q": qid},
+        ).all()
+    )
+    extra: list[dict[str, Any]] = []
+    for fam, n_in in heavy.items():
+        page = relation_page(conn, qid, fam, origin, limit=per_family)
+        n_out = 0
+        for p, c in out_counts.items():
+            efo = reg.edge_family(p, "out")
+            if efo is not None and efo.family == fam:
+                n_out += int(c)
+        f = reg.families[fam]
+        extra.append(
+            {
+                "family": fam,
+                "label_fr": page["label_fr"],
+                "group": f.group,
+                "count": n_in + n_out,
+                "count_is_lower_bound": False,
+                "count_approx": True,
+                "items": page["items"],
+                "more": True,
+                "via": None,
+                "properties": [],
+            }
+        )
+    res["extra_groups"] = extra
+    return res
 
 
 def relation_groups(fam: Mapping[str, Any], *, via: Mapping[str, Any] | None = None) -> list[dict[str, Any]]:
@@ -161,6 +213,7 @@ def relation_groups(fam: Mapping[str, Any], *, via: Mapping[str, Any] | None = N
                 "group": g["group"],
                 "count": int(g["count"]),
                 "count_is_lower_bound": bool(g["count_is_lower_bound"]),
+                "count_approx": False,
                 "items": items,
                 "more": bool(g["truncated"]),
                 "via": C.kg_ref({"qid": via["qid"], "label": via["label"], "kind": via.get("kind")}) if via else None,

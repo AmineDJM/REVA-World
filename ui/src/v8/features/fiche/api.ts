@@ -147,6 +147,7 @@ export const RelGroup = z.looseObject({
   group: S,
   count: z.number(),
   count_is_lower_bound: z.boolean(),
+  count_approx: z.boolean().default(false),
   items: z.array(RelItem),
   more: z.boolean(),
   via: Ref.nullish().transform((v) => v ?? null),
