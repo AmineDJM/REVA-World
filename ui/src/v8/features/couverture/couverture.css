@@ -252,7 +252,8 @@ tr.is-sel .cv-rowlabel {
   background: color-mix(in srgb, var(--cv-heat) calc(var(--k, 10) * 0.9%), var(--v8-surface));
 }
 .cv-cell.is-data .cv-cellbtn.is-hi {
-  color: var(--v8-fg-on-accent);
+  /* surface colour: white on the dark-blue heat in light mode, dark on the light-blue heat in dark mode */
+  color: var(--v8-surface);
 }
 .cv-cell.is-none .cv-cellbtn {
   background: var(--v8-missing-hatch), var(--v8-missing-bg);
@@ -840,4 +841,10 @@ tr.is-sel .cv-rowlabel {
 }
 .cv-cards-1 {
   grid-template-columns: minmax(0, 1fr);
+}
+/* narrow screens: an opened detail comes first (no scrolling past the matrix to find it) */
+@media (max-width: 1179px) {
+  .cv-side {
+    order: -1;
+  }
 }
