@@ -261,9 +261,6 @@
   .lien-results {
     grid-template-columns: minmax(0, 1fr);
   }
-  .lien-col-graph {
-    order: -1;
-  }
 }
 .lien-col-list,
 .lien-col-graph {
