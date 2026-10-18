@@ -134,14 +134,21 @@ with ~10 agents (numbers are upper bounds):
 | multi 3 series × 4 countries (12) | 474 ms | 635 ms |
 
 Those were measured **before** the 30 s snapshot-resolution reuse and the slice/multi caches; ~100 ms of every
-call was the snapshot re-resolution, so warm calls now cost the query alone (in-process: map slice 15–25 ms, place
-≈ 50 ms, catalog search ≈ 20–25 ms). Cold costs: first open of the live query file 60–180 s (its ATLAS-1 hash
+call was the snapshot re-resolution, so warm calls now cost the query alone. After the change, in-process on the
+live snapshot (`tests/integration/v8/test_v8_series_devdb.py`, a new uncached period each call, ~190–205 countries):
+**map slice p50 10.0 ms, p95 13.2 ms** over 29 periods; repeated slices and multi answers are served from cache;
+catalog search ≈ 20–25 ms, place series ≈ 50 ms in-process. Cold costs: first open of the live query file 60–180 s (its ATLAS-1 hash
 verification; the API warms it at startup), index build 5–15 s once, first slice of a new series 0.4–5 s (series
 meta + periods, then cached). Map slice payload 30–90 KB.
 
 ## Screenshots (described)
 
-Taken against the live snapshot (light 1440 px, dark, projection map, Comparer) and through the e2e stack spec.
+Taken first against the live snapshot (light 1440 px, dark, projection map, Comparer), then through the e2e stack
+(`scripts/e2e_stack.py --v3-fixtures --run -- e2e/v8_monde.spec.ts`, 2/2 passed; test_fixture data, labelled):
+IMF WEO GDP map light/dark/phone (8 fixture countries coloured, 242 hatched "jamais rapporté", 1 "seule une
+projection", USA panel with 2026–2031 projections violet and dashed), bivariate GDP × inflation (8 labelled
+dots, small map beside), Comparer Brazil/Egypt/France (GDP and inflation lines aligned, dashed after 2025), table
+view and phone (no horizontal scroll at 375 px, wide tables scroll inside their box).
 - Monde light, GDP per capita 2025, log classes: blue ramp from Burundi to Luxembourg, Greenland / Western Sahara /
   Afghanistan… hatched; legend "37 jamais rapporté par cette série", "28 pas de cellule pour cette période";
   France selected with its 1960–2025 sparkline and the per-year table with WB source chips.
@@ -154,7 +161,10 @@ Taken against the live snapshot (light 1440 px, dark, projection map, Comparer) 
   capita), Millésime select present (WEO).
 - Critique applied: map first opened too zoomed (fixed: fit to the inhabited world), auto scale picked "linear" for
   GDP per capita (fixed hint: log for right-skewed positive spans), a duplicate Fiche link (removed), legend said
-  "observées" for projection-only maps (fixed), WEO default year had 5 observations (fixed default period).
+  "observées" for projection-only maps (fixed), WEO default year had 5 observations (fixed default period),
+  Comparer drew dots instead of lines when a country reports fiscal years (Egypt, July–June: points sat half a
+  year off and broke every line; fixed: annual points sit on their year code), scatter labelled one point out of 8
+  (now every point when ≤ 20).
 
 ## Honesty choices
 
