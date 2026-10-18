@@ -53,9 +53,15 @@ def _ops(ans: Mapping[str, Any]) -> list[dict[str, Any]]:
     return list((ans.get("plan") or {}).get("operations") or [])
 
 
+def _status(cell: Mapping[str, Any]) -> str | None:
+    """``projection`` / ``estimate`` / ``None`` by the atlas's own rules (:func:`reva.nlqa.ports.estimate_status`)."""
+    from reva.nlqa.ports import estimate_status
+
+    return estimate_status(cell.get("flags") or {}, period_start=cell.get("period_start"))
+
+
 def _is_projection(cell: Mapping[str, Any]) -> bool:
-    f = cell.get("flags") or {}
-    return bool(f.get("projection") or f.get("is_projection") or f.get("projection_kind") or f.get("estimate_kind"))
+    return _status(cell) == "projection"
 
 
 def _rights_text(c: Mapping[str, Any]) -> str | None:
@@ -148,7 +154,7 @@ def headline(ans: Mapping[str, Any], status: str, missing: Sequence[str]) -> dic
             "period": _period_label(c),
             "iso3": c.get("iso3") or None,
             "concept": c.get("concept_id"),
-            "honesty": "projection" if _is_projection(c) else "observed",
+            "honesty": _status(c) or "observed",
             "text": s0["text"],
             "more": max(0, len(same_kind) - 1),
             "citations": [c["id"]],
@@ -271,16 +277,16 @@ def _timeseries_from_cells(cells: Sequence[Mapping[str, Any]]) -> dict[str, Any]
 
 
 def _bars_viz(cells: Sequence[Mapping[str, Any]]) -> dict[str, Any] | None:
-    units = {c.get("unit") for c in cells}
-    if len(units) != 1:
-        return {
-            "type": "table",
-            "rows": [_bar_row(c) for c in cells][:MAX_BARS],
-            "note": "unités différentes : pas de barres",
-        }
-    rows = [_bar_row(c) for c in cells if _dec(c.get("value")) is not None]
+    """Ranked bars of the cells in the most common unit; cells in another unit are listed apart (never on the same
+    axis)."""
+    units = Counter(c.get("unit") for c in cells)
+    unit = units.most_common(1)[0][0]
+    rows = [_bar_row(c) for c in cells if c.get("unit") == unit and _dec(c.get("value")) is not None]
     rows.sort(key=lambda r: _dec(r["value"]) or Decimal(0), reverse=True)
-    return {"type": "bars", "unit": next(iter(units)), "rows": rows[:MAX_BARS]}
+    others = [_bar_row(c) for c in cells if c.get("unit") != unit]
+    if len(rows) < 2:
+        return {"type": "table", "rows": [_bar_row(c) for c in cells][:MAX_BARS], "note": "unités différentes"}
+    return {"type": "bars", "unit": unit, "rows": rows[:MAX_BARS], "others": others[:MAX_BARS]}
 
 
 def _bar_row(c: Mapping[str, Any]) -> dict[str, Any]:
@@ -519,8 +525,8 @@ def targets(ans: Mapping[str, Any]) -> list[dict[str, Any]]:
     seen: set[tuple[str, str]] = set()
 
     def add(t: dict[str, Any]) -> None:
-        k = (t["kind"], str(t.get("id") or t.get("series") or t.get("ref") or t.get("track") or t.get("from")))
-        if k not in seen and len(out) < 10:
+        k = (t["kind"], str(t.get("id") or "") if t["kind"] == "fiche" else "")
+        if k not in seen and len(out) < 6:
             seen.add(k)
             out.append(t)
 

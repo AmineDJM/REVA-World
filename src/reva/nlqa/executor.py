@@ -564,7 +564,7 @@ class Executor(DomainOps):
                 break
         if not claims and not dissent:
             # V8ASK: the other records carrying one of the chosen record's own labels (reva.nlqa.bridges)
-            for other, via_lang, via_label in _label_bridges(self.b, r):
+            for other, via_lang, via_label in _label_bridges(self.b, r, self.catalog):
                 more = port.explain(other.qid, direction=a["direction"], limit=MAX_CAUSAL_CLAIMS)
                 mc = [c for c in more.claims if _is_claim(c)]
                 if mc:

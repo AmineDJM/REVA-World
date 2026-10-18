@@ -18,7 +18,7 @@ from decimal import Decimal, InvalidOperation
 from typing import TYPE_CHECKING, Any
 
 from reva.kernel.errors import RevaError
-from reva.nlqa.bridges import STRICT_BRIDGE_MATCHES
+from reva.nlqa.bridges import STRICT_BRIDGE_MATCHES, catalog_names
 from reva.nlqa.domains import match_terms
 from reva.nlqa.ports import AtlasCell, CapabilityUnavailable, FamilyNeighbour, FamilyView
 
@@ -43,6 +43,7 @@ LITERAL_HINTS: dict[str, tuple[str, ...]] = {
     "located_in": ("location", "localisation", "adm1", "address", "adresse", "coordinates", "coordonnées"),
     "produces": ("commodity", "produces", "product"),
     "made_of": ("formula", "formule"),
+    "is_a": ("species_count", "species count", "nombre d'espèces"),  # V8ASK: published species counts of a taxon
 }
 #: Effect-term sources named in the "consulted" list.
 EFFECT_VOCAB = "effects vocabulary (registry/effects/variables.yaml, atlas catalog labels, event taxonomy)"
@@ -283,13 +284,18 @@ class DomainOps:
         bridge = None
         if not any(g[3] for g in groups) and not via and not _literals(view, a["families"]):
             # V8ASK: the other records carrying one of the chosen record's own labels (reva.nlqa.bridges)
-            for other, via_lang, via_label in _label_bridges(self.b, r):
+            found: list[tuple[int, Any, Any, Any, dict[str, str]]] = []
+            for other, via_lang, via_label in _label_bridges(self.b, r, getattr(self, "catalog", None)):
                 more_view = port.families(other.qid, families=a["families"], per_family=MAX_FAMILY_NEIGHBOURS)
                 more = _kept_groups(more_view, a["reading"])
-                if any(g[3] for g in more):
-                    view, groups, answered_by = more_view, more, other
-                    bridge = {"lang": via_lang, "label": via_label}
-                    break
+                lits = _literals(more_view, a["families"])
+                if any(g[3] for g in more) or lits:
+                    # a record publishing the asked value as text (a species count) is preferred to one with links
+                    found.append((0 if lits else 1, more_view, more, other, {"lang": via_lang, "label": via_label}))
+                    if lits:
+                        break
+            if found:
+                _, view, groups, answered_by, bridge = min(found, key=lambda x: x[0])
         literals = _literals(view, a["families"])
         data: dict[str, Any] = {
             "entity": answered_by or r.entity,
@@ -557,16 +563,32 @@ class DomainOps:
         return OpResult(op, "ok", data=data, consulted=consulted)
 
 
-def _label_bridges(b: Any, r: Any) -> list[tuple[Any, str, str]]:
-    """Records carrying one of the chosen record's own labels (only after an exact or strict match)."""
+def _label_bridges(b: Any, r: Any, catalog: Any = None) -> list[tuple[Any, str, str]]:
+    """Records carrying one of the chosen record's own labels (only after an exact or strict match), then the
+    records labelled with the scientific name the atlas catalog gives in parentheses for the term (« mammifères
+    (Mammalia) »: :func:`reva.nlqa.bridges.catalog_names`)."""
     kg = getattr(b, "kg", None)
     fn = getattr(kg, "label_bridges", None)
-    if not callable(fn) or r.entity is None or r.match not in STRICT_MATCHES:
+    if r.entity is None or r.match not in STRICT_MATCHES:
         return []
-    try:
-        return list(fn(r.entity.qid, exclude=[x.qid for x in r.alternatives]))
-    except CapabilityUnavailable:
-        return []
+    out: list[tuple[Any, str, str]] = []
+    if callable(fn):
+        try:
+            out = list(fn(r.entity.qid, exclude=[x.qid for x in r.alternatives]))
+        except CapabilityUnavailable:
+            out = []
+    if catalog is not None and kg is not None:
+        seen = {r.entity.qid, *(x.qid for x in r.alternatives), *(o.qid for o, _, _ in out)}
+        for name in catalog_names(catalog, [r.text, *r.entity.labels.values()]):
+            try:
+                ms = kg.search_entities(name, kind=None, lang="en", limit=10)
+            except CapabilityUnavailable:
+                continue
+            for m in ms:
+                if m.match == "label_exact" and m.entity.qid not in seen:
+                    seen.add(m.entity.qid)
+                    out.append((m.entity, "catalog", name))
+    return out[:12]
 
 
 def _same(a: Any, b: Any) -> bool:

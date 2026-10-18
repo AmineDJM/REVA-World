@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { v8Links } from '../../contract';
-import { EmptyState, ErrorState, KeyHint, Skeleton } from '../../shell/ui';
-import { AnswerCard } from './AnswerCard';
+import { displayValue, EmptyState, ErrorState, KeyHint, Skeleton } from '../../shell/ui';
+import { AnswerCard, headDigits } from './AnswerCard';
 import { askAnswer, brainstorm, examples, type AnswerBundle, type BrainstormBundle, type Examples } from './api';
 import { BrainstormView } from './BrainstormView';
 import { clearHistory, loadHistory, remember, type HistoryEntry } from './history';
@@ -69,7 +69,7 @@ export default function DemanderPage() {
   useEffect(() => {
     if (answer.state === 'ok') {
       const b = answer.data;
-      const summary = b.headline.kind === 'number' && b.headline.value ? `${b.headline.value}${b.headline.unit ? ` ${b.headline.unit}` : ''}` : b.headline.text.slice(0, 120);
+      const summary = b.headline.kind === 'number' && b.headline.value ? `${displayValue(b.headline.value, headDigits(b.headline.value))}${b.headline.unit ? ` ${b.headline.unit}` : ''}` : b.headline.text.slice(0, 120);
       setHistory(remember({ q: b.question, mode: 'question', status: b.status, summary }));
     }
   }, [answer]);

@@ -99,6 +99,16 @@ function BarsView({ viz, onCite, table }: { viz: Rec; onCite?: (eid: string) => 
           );
         })}
       </ol>
+      {arr(viz.others).length > 0 && (
+        <ul className="v8d-others">
+          {arr(viz.others).map((r, i) => (
+            <li key={`${s(r.eid) ?? i}`} className="v8-subtle">
+              Autre unité, hors du classement : {s(r.label)} — <span className="v8-num">{s(r.value) ? frDecimal(s(r.value) as string, 2) : 'manquant'}</span> {s(r.unit)}{' '}
+              {s(r.period)} {s(r.eid) && <span className="v8d-eid-static">{s(r.eid)}</span>}
+            </li>
+          ))}
+        </ul>
+      )}
     </figure>
   );
 }

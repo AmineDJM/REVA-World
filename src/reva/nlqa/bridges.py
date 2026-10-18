@@ -204,6 +204,21 @@ def label_bridges(
 
 
 LANG_NAME = {"fr": ("français", "French"), "en": ("anglais", "English")}
+_PAREN = re.compile(r"(?P<name>[^():;,]+?)\s*\((?P<sci>[A-Z][a-z]+(?: [a-z]+)?)\)")
+
+
+def catalog_names(catalog: Any, terms: Sequence[str]) -> list[str]:
+    """Scientific names the atlas catalog gives in parentheses after one of ``terms`` in its own concept labels
+    (« Observations enregistrées dans GBIF : mammifères (Mammalia) » → "Mammalia" for « mammifères »)."""
+    want = {fold_accents(t) for t in terms if t and len(t) >= 3}
+    out: list[str] = []
+    for c in getattr(catalog, "concepts", {}).values():
+        for v in (getattr(c, "labels", None) or {}).values():
+            for m in _PAREN.finditer(str(v)):
+                name = fold_accents(m.group("name").split(":")[-1].strip())
+                if name in want and m.group("sci") not in out:
+                    out.append(m.group("sci"))
+    return out[:3]
 
 
 def bridge_sentence(lang: str, chosen: Entity, other: Entity, via_lang: str, via_label: str, what: str) -> str:
@@ -211,6 +226,18 @@ def bridge_sentence(lang: str, chosen: Entity, other: Entity, via_lang: str, via
     fr = lang == "fr"
     ln = LANG_NAME.get(via_lang, (via_lang, via_lang))[0 if fr else 1]
     c, o = chosen.label(lang), other.label(lang)
+    if via_lang == "catalog":
+        if fr:
+            return (
+                f"Rien de chargé sur {c} ({chosen.qid}) pour cette {what} ; réponse lue sur {o} ({other.qid}), fiche "
+                f"portant le nom « {via_label} » que le catalogue atlas de REVA donne entre parenthèses pour « {c} » "
+                f"— rapprochement par le libellé, pas une identité affirmée par une source (fiches non fusionnées)."
+            )
+        return (
+            f"Nothing loaded on {c} ({chosen.qid}) for this {what}; answer read on {o} ({other.qid}), a record "
+            f"carrying the name “{via_label}” that REVA's atlas catalog gives in parentheses for “{c}” — matched by "
+            f"label, not an identity asserted by a source (records not merged)."
+        )
     if fr:
         return (
             f"Rien de chargé sur {c} ({chosen.qid}) pour cette {what} ; réponse lue sur {o} ({other.qid}), fiche "

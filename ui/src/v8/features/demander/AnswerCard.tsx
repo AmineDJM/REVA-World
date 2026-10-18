@@ -38,6 +38,15 @@ const SENTENCE_KIND: Record<string, string> = {
   forecast: 'prévision',
 };
 
+const FIRST_SENTENCES = 4;
+
+/** Display digits for a headline number: about four significant figures, the exact string stays in the evidence. */
+export function headDigits(v: string): number {
+  const a = Math.abs(Number(v));
+  if (!Number.isFinite(a)) return 3;
+  return a >= 1000 ? 0 : a >= 100 ? 1 : a >= 1 ? 2 : 3;
+}
+
 export interface AnswerCardProps {
   bundle: AnswerBundle;
   onAsk: (q: string) => void;
@@ -49,6 +58,7 @@ export function AnswerCard({ bundle, onAsk, onPin }: AnswerCardProps) {
   const [focus, setFocus] = useState<string | null>(null);
   const [pinMsg, setPinMsg] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [allSentences, setAllSentences] = useState(false);
   const st = STATUS[bundle.status];
   const h = bundle.headline;
   const cite = (id: string) => {
@@ -88,7 +98,7 @@ export function AnswerCard({ bundle, onAsk, onPin }: AnswerCardProps) {
           <div className="v8d-big">
             <div className="v8d-big-label">{h.concept_label ?? h.concept ?? ''}{h.iso3 ? ` — ${h.iso3}` : ''}{h.period ? `, ${h.period}` : ''}</div>
             <div className="v8d-big-row">
-              <span className={`v8-num v8d-big-num${h.honesty === 'forecast' || h.honesty === 'projection' ? ' is-proj' : ''}`}>{displayValue(h.value, 3)}</span>
+              <span className={`v8-num v8d-big-num${h.honesty === 'forecast' || h.honesty === 'projection' ? ' is-proj' : ''}`}>{displayValue(h.value, headDigits(h.value))}</span>
               {h.unit && <span className="v8d-big-unit">{h.unit}</span>}
               {headSource && <SourceChip {...evidenceSource(headSource)} />}
             </div>
@@ -170,10 +180,15 @@ export function AnswerCard({ bundle, onAsk, onPin }: AnswerCardProps) {
       </div>
 
       <ol className="v8d-sentences">
-        {body.map((s, i) => (
+        {(allSentences ? body : body.slice(0, FIRST_SENTENCES)).map((s, i) => (
           <SentenceRow key={s.id} s={s} i={i + 1} onCite={cite} />
         ))}
       </ol>
+      {body.length > FIRST_SENTENCES && (
+        <button type="button" className="v8-btn v8-btn-sm v8-btn-ghost v8d-more" aria-expanded={allSentences} onClick={() => setAllSentences((v) => !v)}>
+          {allSentences ? 'Réduire la réponse' : `Afficher les ${body.length} phrases de la réponse`}
+        </button>
+      )}
 
       {bundle.viz && (
         <section className="v8d-section v8d-reveal" style={{ ['--i' as string]: 3 }} aria-label="Preuves">

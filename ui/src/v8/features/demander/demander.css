@@ -165,3 +165,5 @@ summary.v8d-h3 { cursor: pointer; }
 .v8b-examples { margin: 4px 0 0; padding-left: 1.1em; font-size: var(--v8-text-xs, 11.5px); }
 .v8b-claims { margin: 8px 0 0; padding-left: 1.1em; font-size: var(--v8-text-xs, 11.5px); }
 .v8b-target-series { margin-top: 8px; display: grid; gap: 4px; font-size: var(--v8-text-sm, 12.5px); }
+.v8d-others { margin: 6px 0 0; padding-left: 1.1em; font-size: var(--v8-text-xs, 11.5px); overflow-wrap: anywhere; }
+.v8d-more { margin: -4px 0 8px; }
