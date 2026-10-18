@@ -10,8 +10,9 @@ function Glyph({ v, lo, hi }: { v: Value; lo: number; hi: number }) {
   const span = hi - lo || 1;
   const x = (t: number) => 2 + ((t - lo) * (W - 4)) / span;
   return (
-    <svg className="v8d-glyph" viewBox={`0 0 ${W} 12`} aria-hidden="true">
-      <line x1={x(0)} x2={x(0)} y1={0} y2={12} className="v8d-zero" />
+    <svg className="v8d-glyph" viewBox={`0 0 ${W} 12`} preserveAspectRatio="none" aria-hidden="true">
+      <line x1={2} x2={W - 2} y1={6} y2={6} className="v8d-glyph-track" />
+      <line x1={x(0)} x2={x(0)} y1={1} y2={11} className="v8d-glyph-zero" />
       <rect x={Math.min(x(v.p05), x(v.p95))} width={Math.max(1.5, Math.abs(x(v.p95) - x(v.p05)))} y={3} height={6} className="v8d-glyph-band" />
       <line x1={x(v.p50)} x2={x(v.p50)} y1={1} y2={11} className="v8d-glyph-med" />
     </svg>
@@ -23,7 +24,7 @@ export function Effects({ bundle, selected, onSelect }: { bundle: RunBundle; sel
   const m = matrix(rows);
   const sel = rows.find((r) => r.id === selected) ?? rows[0] ?? null;
   return (
-    <div className="v8d-effects">
+    <div className={`v8d-effects${m.geos.length > 2 ? ' is-wide' : ''}`}>
       <div className="v8d-matrix-box">
         <table className="v8d-matrix" aria-label="Effets chiffrés par variable et par pays (médiane, 5–95 %)">
           <thead>

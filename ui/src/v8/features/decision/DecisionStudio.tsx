@@ -15,9 +15,10 @@ import { Why } from './Why';
 import './decision.css';
 
 let templatesPromise: Promise<Templates> | null = null;
-export function loadTemplates(signal?: AbortSignal): Promise<Templates> {
+/** Shared, not abortable (React strict mode mounts twice; an aborted shared request would never settle). */
+export function loadTemplates(): Promise<Templates> {
   if (!templatesPromise) {
-    templatesPromise = fetchTemplates(signal);
+    templatesPromise = fetchTemplates();
     templatesPromise.catch(() => {
       templatesPromise = null;
     });
@@ -58,7 +59,7 @@ function typing(t: EventTarget | null): boolean {
 
 export default function DecisionStudio() {
   const [params, setParams] = useSearchParams();
-  const [tpl] = useAsync('templates', (s) => loadTemplates(s));
+  const [tpl] = useAsync('templates', () => loadTemplates());
   const st = useMemo(() => parseState(params), [params]);
   const t = tpl.status === 'ok' ? tpl.data : null;
   const ra = useMemo(() => (t ? resolveScenario(st.a, t) : null), [st.a, t]);
@@ -259,7 +260,7 @@ export default function DecisionStudio() {
                 size="sm"
               />
               <div role="tabpanel" id={`v8d-panel-${tab}`} aria-labelledby={`v8d-tab-${tab}`} className="v8d-panel">
-                {tab === 'effets' && (bundle.headline.length ? <Effects bundle={bundle} selected={params.get('v')} onSelect={(id) => setView({ v: id })} /> : <Why bundle={bundle} />)}
+                {tab === 'effets' && (bundle.headline.length ? <Effects bundle={bundle} selected={params.get('v')} onSelect={(id) => setView({ v: id })} /> : <Why bundle={bundle} embedded />)}
                 {tab === 'propagation' && <Propagation bundle={bundle} geo={params.get('g') ?? ''} onGeo={(g) => setView({ g })} edgeId={params.get('e')} onEdge={(id) => setView({ e: id })} />}
                 {tab === 'sensibilite' &&
                   (sens.status === 'ok' ? (

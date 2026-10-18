@@ -290,7 +290,7 @@ def published_size_fr(ev: Mapping[str, Any]) -> str | None:
     if ev.get("point") is None:
         return None
     measure = MEASURE_FR.get(str(ev.get("measure")), str(ev.get("measure") or ""))
-    s = f"{measure} {ev.get('as_printed') or fmt_num(ev['point'])} {unit_fr(ev.get('unit'))}".strip()
+    s = f"{measure} {fmt_num(ev['point'])} {unit_fr(ev.get('unit'))}".strip()
     shock = ev.get("shock") or None
     if isinstance(shock, Mapping) and shock.get("size") is not None:
         s += f" pour un choc de {fmt_num(shock['size'])} {unit_fr(shock.get('unit'))}"
@@ -302,6 +302,9 @@ def published_size_fr(ev: Mapping[str, Any]) -> str | None:
             s += f" ({kind}, {fmt_num(hz['value']).lstrip('+')} {unit})"
         elif hz.get("kind") != "unspecified":
             s += f" ({kind})"
+    printed = ev.get("as_printed")
+    if printed and str(printed).strip() not in (fmt_num(ev["point"]).replace("+", ""), str(ev["point"])):
+        s += f" ; imprimé : « {printed} »"
     return s
 
 

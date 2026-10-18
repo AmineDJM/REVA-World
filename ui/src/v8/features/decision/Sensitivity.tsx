@@ -9,11 +9,12 @@ export function Sensitivity({ data, variable, period, onVariable, onPeriod }: { 
   const v = vars.find((x) => x.id === variable) ?? vars.find((x) => x.bars.length > 0) ?? vars[0]!;
   const p = period && v.periods.includes(period) ? period : (v.headline_period ?? v.periods[0] ?? 'undated');
   const t = tornado(v, p);
-  const W = 560;
-  const rowH = 30;
-  const left = 190;
+  const W = 720;
+  const rowH = 28;
+  const left = 230;
+  const right = 170;
   const all = [...t.bars.flatMap((b) => [b.lo, b.hi]), ...(t.center != null ? [t.center] : [])];
-  const sc = scale(all, W - left - 8);
+  const sc = scale(all, W - left - right);
   const H = Math.max(1, t.bars.length) * rowH + 26;
   return (
     <div className="v8d-sens">
@@ -62,12 +63,9 @@ export function Sensitivity({ data, variable, period, onVariable, onPeriod }: { 
                 {b.label.length > 30 ? `${b.label.slice(0, 29)}…` : b.label}
               </text>
               <rect x={left + sc.x(b.lo)} width={Math.max(2, sc.x(b.hi) - sc.x(b.lo))} y={2} height={16} className="v8d-tor-bar" />
-              <text x={left + sc.x(b.lo) - 3} y={14} textAnchor="end" className="v8d-tor-val">
-                {num(b.lo, true)}
-              </text>
-              <text x={left + sc.x(b.hi) + 3} y={14} className="v8d-tor-val">
-                {num(b.hi, true)}
-                {b.r2 != null ? `  r² ${num(b.r2)}` : ''}
+              <text x={W - right + 12} y={14} className="v8d-tor-val">
+                {num(b.lo, true)} → {num(b.hi, true)}
+                {b.r2 != null ? ` · r² ${num(b.r2)}` : ''}
               </text>
             </g>
           ))}

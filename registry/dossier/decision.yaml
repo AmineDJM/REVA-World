@@ -29,7 +29,7 @@ summary:
   - id: what
     text: "Décision étudiée : {dec.label}, par {dec.actor}, à partir de {dec.start} ; statut du résultat : {dec.validation}."
   - id: assumption
-    text: "Hypothèse de scénario : {dec.direct_0} — {dec.direct_0_basis}"
+    text: "Changement direct imposé au modèle : {dec.direct_0}. {dec.direct_0_basis}"
   - id: hops
     text: "La propagation passe par {dec.n_hops} estimations publiées et citées."
 sections:

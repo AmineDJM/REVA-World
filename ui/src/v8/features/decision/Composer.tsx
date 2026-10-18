@@ -68,7 +68,8 @@ export function Composer({
       </div>
       <details className="v8d-compose" open={touched || undefined}>
         <summary>
-          Composer ou modifier la décision{from ? <span className="v8-muted"> — variante de « {from.label_fr} »</span> : null}
+          Composer ou modifier la décision
+          {from ? <span className="v8-muted">{from.id === current?.id ? ' — point de départ : la décision de référence affichée' : ` — variante de « ${from.label_fr} »`}</span> : null}
         </summary>
         <form onSubmit={submit} noValidate aria-label="Composer une décision">
           <div className="v8d-form-grid">

@@ -13,7 +13,7 @@ function Pair({ a, b, lo, hi }: { a: Q; b: Q; lo: number; hi: number }) {
     q && q.p50 != null && q.p05 != null && q.p95 != null ? (
       <g className={cls}>
         <rect x={Math.min(x(q.p05), x(q.p95))} width={Math.max(1.5, Math.abs(x(q.p95) - x(q.p05)))} y={y} height={5} />
-        <line x1={x(q.p50)} x2={x(q.p50)} y1={y - 2} y2={y + 7} />
+        <circle cx={x(q.p50)} cy={y + 2.5} r={3.2} />
       </g>
     ) : null;
   return (
@@ -55,7 +55,9 @@ export function Compare({ data }: { data: Comparison }) {
               <th scope="col" className="v8-num">A médiane</th>
               <th scope="col" className="v8-num">B médiane</th>
               <th scope="col" className="v8-num">B − A (5–95 %)</th>
-              <th scope="col">A / B</th>
+              <th scope="col">
+                <span className="v8d-key-a">● A</span> <span className="v8d-key-b">● B</span>
+              </th>
             </tr>
           </thead>
           <tbody>

@@ -182,12 +182,12 @@ export function EdgeEvidence({ edge, bundle }: { edge: GraphEdge; bundle: RunBun
               ))}
             </ul>
           )}
-          {ev && <Citation ev={ev} />}
         </>
       )}
       {conflicts.map((c, i) => (
         <ConflictTable key={i} c={c} evidence={bundle.evidence} />
       ))}
+      {edge.kind === 'estimate' && ev && <Citation ev={ev} />}
     </div>
   );
 }

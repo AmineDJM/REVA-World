@@ -45,12 +45,13 @@ export const Alert = z.looseObject({
   observed: z
     .looseObject({ value: z.string().nullish(), period: z.string().nullish(), source: z.string().nullish(), unit: z.string().nullish() })
     .nullish(),
-  status: z.enum(['fired', 'not_evaluable']).default('fired'),
+  status: z.enum(['fired', 'not_fired', 'not_evaluable']).default('fired'),
+  item_label: z.string().nullish(),
   reason: z.string().nullish(),
 });
 export type Alert = z.output<typeof Alert>;
 
-export const AlertsData = z.looseObject({ since: z.string().nullish(), alerts: z.array(Alert), evaluated_at: z.string().nullish() });
+export const AlertsData = z.looseObject({ since: z.string().nullish(), alerts: z.array(Alert), evaluated_at: z.string().nullish(), n_rules: z.number().int().nullish() });
 export type AlertsData = z.output<typeof AlertsData>;
 
 const B = '/v1/v8/boards';
@@ -115,6 +116,7 @@ export function conflictBoard(err: unknown): ServerBoard | null {
 export function serviceAbsent(err: unknown): boolean {
   if (!(err instanceof ApiError)) return false;
   if (err.kind === 'invalid_response' || err.status === 501 || err.status === 405) return true;
+  if (err.status === 503 && err.code === 'boards_store_missing') return true; // route deployed, table not migrated
   if (err.status !== 404) return false;
   const d = typeof err.problem.detail === 'string' ? err.problem.detail : '';
   return d === '' || d === 'Not Found' || d === 'no such endpoint';

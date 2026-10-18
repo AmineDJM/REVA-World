@@ -824,3 +824,6 @@
 .v8b-alert-quiet {
   font-size: var(--v8-text-xs, 11.5px);
 }
+.v8b-alert-not_fired {
+  color: var(--v8-fg-muted, #565d6a);
+}

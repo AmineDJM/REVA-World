@@ -4,6 +4,7 @@ statements grouped by property, dated values as a series), relations by family (
 
 from __future__ import annotations
 
+import re
 from collections import defaultdict
 from collections.abc import Mapping
 from typing import Any, Literal
@@ -512,3 +513,36 @@ def relation_page(
         "items": items,
         "next_after_id": res["next_after_id"],
     }
+
+
+_UNIT_RE = re.compile(r"(?:https?://www\.wikidata\.org/entity/)?(Q[1-9][0-9]*)$")
+
+
+def label_units(conn: Connection, facts: list[dict[str, Any]]) -> None:
+    """Wikidata quantity units are item ids (Q712226 = square kilometre): show their KG label when loaded."""
+    ids = {m.group(1) for f in facts if f.get("unit") and (m := _UNIT_RE.match(str(f["unit"])))}
+    if not ids:
+        return
+    labels = kq.labels_for(conn, ids, langs=("fr", "en"))
+    for f in facts:
+        m = _UNIT_RE.match(str(f.get("unit") or ""))
+        if not m:
+            continue
+        lab = labels.get(m.group(1)) or {}
+        f["unit"] = lab.get("fr") or lab.get("en") or WIKIDATA_UNITS_FR.get(m.group(1)) or f["unit"]
+
+
+#: Common Wikidata unit items (symbol only; used when the KG has not loaded the unit item itself).
+WIKIDATA_UNITS_FR = {
+    "Q712226": "km²",
+    "Q25343": "m²",
+    "Q35852": "ha",
+    "Q11573": "m",
+    "Q828224": "km",
+    "Q174728": "cm",
+    "Q11570": "kg",
+    "Q11229": "%",
+    "Q577": "an(s)",
+    "Q24564698": "ans (âge)",
+    "Q4917": "US$",
+}

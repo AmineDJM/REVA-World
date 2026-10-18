@@ -178,8 +178,9 @@ function fmtWhen(iso: string | null | undefined): string {
 
 export function AlertList({ alerts, board, note }: { alerts: Alert[]; board: StoredBoard; note?: string | null }) {
   const byUid = new Map(board.items.map((i) => [i.uid, i] as const));
-  const quiet = board.rules.filter((r) => !alerts.some((a) => a.rule_id === r.id)).length;
-  if (alerts.length === 0)
+  const quiet = board.rules.filter((r) => !alerts.some((a) => a.rule_id === r.id && (a.status !== 'not_fired' || a.observed?.value))).length;
+  alerts = alerts.filter((a) => a.status !== 'not_fired' || a.observed?.value);
+  if (alerts.length === 0 && quiet === 0)
     return (
       <p className="v8b-soft" role="status">
         Aucune alerte : aucune règle ne s’est déclenchée{note ? ` (${note})` : ''}.
@@ -192,7 +193,7 @@ export function AlertList({ alerts, board, note }: { alerts: Alert[]; board: Sto
         const link = a.change?.links[0];
         return (
           <li key={`${a.rule_id}-${a.change?.id ?? i}`} className={`v8b-alert v8b-alert-${a.status}`}>
-            <span className="v8b-alert-kind">{a.status === 'fired' ? '●' : '○'}</span>
+            <span className="v8b-alert-kind">{a.status === 'fired' ? '●' : a.status === 'not_fired' ? '·' : '○'}</span>
             <span className="v8b-alert-msg">
               <strong>{it ? itemTitle(it) : 'élément retiré'}</strong> — {a.message}
               {a.observed?.value && (

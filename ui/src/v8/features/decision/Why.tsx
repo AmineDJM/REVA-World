@@ -32,7 +32,7 @@ function Item({ it }: { it: DiagItem }) {
         </p>
       )}
       {it.near && it.near.length > 0 && (
-        <details>
+        <details open>
           <summary>{it.near.length} estimation(s) voisine(s), non applicables telles quelles</summary>
           <ul>
             {it.near.map((n) => (
@@ -49,14 +49,15 @@ function Item({ it }: { it: DiagItem }) {
 }
 
 /** « Pourquoi pas de résultat » : exactly which link or data is missing, where each chain stops. */
-export function Why({ bundle }: { bundle: RunBundle }) {
+export function Why({ bundle, embedded = false }: { bundle: RunBundle; embedded?: boolean }) {
   const d = bundle.diagnosis;
   const r = bundle.result;
   const blocking = [...d.blocking, ...d.plugins, ...d.ties, ...d.other];
   const excludedByCode = r.excluded_links.reduce<Record<string, number>>((acc, e) => ({ ...acc, [e.code]: (acc[e.code] ?? 0) + 1 }), {});
   return (
     <div className="v8d-why">
-      <p className="v8d-answer">{d.headline_fr}</p>
+      {!embedded && <p className="v8d-answer">{d.headline_fr}</p>}
+      {embedded && <h3 className="v8d-why-h">Pourquoi pas de résultat</h3>}
       {blocking.length > 0 ? (
         <ol className="v8d-why-list">
           {blocking.map((it, i) => (

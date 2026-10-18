@@ -241,6 +241,7 @@ def _fill_entity(
                     g for g in K.relation_groups(fam) + fam.get("extra_groups", []) if g["family"] != K.IDENTITY_FAMILY
                 ]
                 facts, ids, coords = K.facts(fam)
+                K.label_units(conn, facts)
                 b["facts"] = facts
                 if b["identity"] is not None:
                     b["identity"]["ids"] += ids + K.identity_ids(K.relation_groups(fam))
@@ -388,7 +389,7 @@ def _identity_out(res: Resolved, ident: Mapping[str, Any] | None, prof: Mapping[
         "qid": res.qid,
         "kind": res.kind,
         "kg_kind": kg_kind,
-        "kind_label_fr": P.kind_label_fr(kg_kind or res.kind),
+        "kind_label_fr": str(prof.get("label_fr")) if prof.get("label_fr") else P.kind_label_fr(kg_kind or res.kind),
         "label": label,
         "label_fr": (ident or {}).get("label_fr"),
         "label_en": (ident or {}).get("label_en"),

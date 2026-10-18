@@ -6,17 +6,22 @@
  * effect estimates are attributed; forecasts carry their judged status.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { useApi } from '../../../lib/useApi';
 import { v8Links } from '../../contract';
 import { Badge, ErrorState, KeyHint, Skeleton, SourceChip } from '../../shell/ui';
 import { getBundle, type Bundle } from './api';
-import { chip, citation, sections, shortId } from './model';
+import { chip, citation, sections, shortId, uniqueIds } from './model';
 import { Causes, Facts, Forecasts, Headline, Missing, Relations, SeriesSection, Sources, SpaceTime } from './sections';
 import './fiche.css';
 
 export default function FichePage() {
-  const { kind = '', id = '' } = useParams();
+  const params = useParams();
+  const loc = useLocation();
+  // params, else the path itself (a static route registered for the same URL carries no params)
+  const m = /\/fiche\/([^/]+)\/([^/]+)/.exec(loc.pathname);
+  const kind = params.kind ?? (m ? decodeURIComponent(m[1]!) : '');
+  const id = params.id ?? (m ? decodeURIComponent(m[2]!) : '');
   const nav = useNavigate();
   const st = useApi((s) => getBundle(kind, id, s), [kind, id], !!kind && !!id);
   const b = st.data?.data ?? null;
@@ -64,7 +69,7 @@ export function FicheView({ b, kind, id, stale = false }: { b: Bundle; kind: str
   const [active, setActive] = useState(secs[0]?.id ?? 'faits');
   const [toast, setToast] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
-  const ident = b.identity;
+  const ident = b.identity ? { ...b.identity, ids: uniqueIds(b.identity.ids) } : null;
 
   const flash = useCallback((m: string) => {
     setToast(m);

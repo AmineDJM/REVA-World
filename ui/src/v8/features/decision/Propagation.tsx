@@ -101,7 +101,7 @@ function GraphCanvas({ nodes, edges, selected, onSelect }: { nodes: GraphNode[];
   }, [selected]);
   useEffect(() => () => cyRef.current?.destroy(), []);
   if (failed) return <p className="v8-muted">Graphe indisponible dans ce navigateur : la liste des liens ci-dessous donne la même information.</p>;
-  const h = Math.min(560, Math.max(220, 70 * Math.max(...layout(nodes, edges).map((p) => p.y / 76 + 1), 3)));
+  const h = Math.min(560, Math.max(300, 70 * Math.max(...layout(nodes, edges).map((p) => p.y / 76 + 1), 3)));
   return <div ref={box} className="v8d-canvas" style={{ height: h }} role="img" aria-label="Graphe de propagation : décision, changements directs, variables atteintes, liens manquants" />;
 }
 

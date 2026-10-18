@@ -171,9 +171,9 @@ export function resolveScenario(f: ScenarioFields, t: Templates): Resolved {
   const doc: DecisionDoc = {
     id: '',
     label_fr: '',
-    actor: { label_fr: (merged.al || 'Acteur').trim(), geo: merged.ag?.trim().toUpperCase() || null },
+    actor: { ...(base && !over.al && !over.ag ? base.actor : {}), label_fr: (merged.al || 'Acteur').trim(), geo: merged.ag?.trim().toUpperCase() || null },
     instrument: merged.i!,
-    target: { label_fr: (merged.tl || 'Cible').trim(), geo: merged.tg?.trim().toUpperCase() || null },
+    target: { ...(base && !over.tl && !over.tg ? base.target : {}), label_fr: (merged.tl || 'Cible').trim(), geo: merged.tg?.trim().toUpperCase() || null },
     magnitude: { value: merged.m!.trim(), unit: merged.u! },
     start: merged.s!.trim(),
     duration_quarters: merged.d ? Number(merged.d) : null,

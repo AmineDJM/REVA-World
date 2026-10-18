@@ -30,7 +30,7 @@
 }
 .dos-hits li.is-active .dos-hit, .dos-hit:hover, .dos-hit:focus-visible { border-color: var(--v8-accent, #3653d3); box-shadow: var(--v8-shadow-sm, 0 1px 2px rgba(0,0,0,.06)); }
 .dos-hit-kind { font-size: var(--v8-text-2xs, 10.5px); text-transform: uppercase; letter-spacing: .07em; color: var(--v8-accent, #3653d3); font-weight: 600; }
-.dos-hit-label { font-family: var(--dos-serif); font-size: 18px; line-height: 1.25; font-weight: 600; }
+.dos-hit-label { color: var(--v8-fg, #15171c); font-family: var(--dos-serif); font-size: 18px; line-height: 1.25; font-weight: 600; }
 .dos-hit-sub { font-size: var(--v8-text-xs, 11.5px); color: var(--v8-fg-muted, #565d6a); }
 
 /* ---------------------------------------------------------------- layout */

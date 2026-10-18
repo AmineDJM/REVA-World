@@ -24,6 +24,7 @@ import {
   shareHref,
   type Board,
   type BoardItem,
+  type WatchRule,
 } from './model';
 import { pinItem, validatePin } from './pin';
 import { evaluateLocal, hitToPin, urlToPin } from './rules';
@@ -312,13 +313,42 @@ describe('BoardView', () => {
     const current = { ...server, title: 'Renommé ailleurs', version: 3 };
     mockFetch({
       'GET /v1/v8/boards': { body: envelope({ boards: [] }) },
-      'POST /v1/v8/boards/b_srv': { status: 409, body: { title: 'conflict', status: 409, code: 'version_conflict', detail: current } },
+      'POST /v1/v8/boards/b_srv': { status: 409, body: { title: 'version conflict', status: 409, code: 'version_conflict', detail: 'the board changed since this version was read', details: { current } } },
     });
     renderBoard(server, 'server');
     await userEvent.click(screen.getByRole('button', { name: /^Note/ }));
     expect(await screen.findByText(/Modification non enregistrée/)).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Recharger la version du serveur' }));
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Renommé ailleurs');
+  });
+});
+
+describe('server alerts', () => {
+  it('lists fired, not-evaluable and observed-but-not-fired alerts with links to the change', async () => {
+    let b = { ...boardWith([SERIES_PIN, FORECAST_PIN]), id: 'b_srv', version: 1 };
+    const [s1, f1] = b.items as [BoardItem, BoardItem];
+    b = { ...addRule(addRule(b, { kind: 'threshold', item_uid: s1.uid, op: '>', value: '2.5' }), { kind: 'resolution', item_uid: f1.uid }), version: 1 };
+    const [rt, rr] = b.rules as [WatchRule, WatchRule];
+    mockFetch({
+      'GET /v1/v8/boards/b_srv/alerts': {
+        body: envelope({
+          since: '2026-09-17T00:00:00Z',
+          evaluated_at: '2026-10-17T00:00:00Z',
+          n_rules: 2,
+          alerts: [
+            { rule_id: rt.id, item_uid: s1.uid, kind: 'threshold', at: null, message: 'Seuil non franchi', status: 'not_fired', observed: { value: '0.926027', period: '2025', source: 'imf.weo', unit: '%' } },
+            { rule_id: rr.id, item_uid: f1.uid, kind: 'resolution', at: '2026-10-17T09:00:00Z', message: 'Question résolue', status: 'fired', change: { id: 'question_resolved:x', kind: 'question_resolved', at: '2026-10-17T09:00:00Z', title: 'Question résolue', links: [{ label: 'Question', href: '/v8/fiche/question/fq_x' }] } },
+          ],
+        }),
+      },
+      'GET /v1/atlas/headline/series': { body: SERIES },
+      'GET /v1/forecasts/questions/': { body: FORECAST },
+    });
+    renderBoard(b, 'server');
+    const list = await screen.findByTestId('alerts');
+    expect(within(list).getByRole('link', { name: /Question →/ })).toHaveAttribute('href', '/v8/fiche/question/fq_x');
+    expect(within(list).getByText(/observé 0,926027 % en 2025, imf.weo/)).toBeInTheDocument();
+    expect(screen.getByText('1 alerte')).toBeInTheDocument();
   });
 });
 

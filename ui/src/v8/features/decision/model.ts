@@ -59,7 +59,7 @@ export interface Placed {
 }
 
 /** Column of a node: decision 0, direct changes 1, then by path length; stops / plugins / ties after their source. */
-export function layout(nodes: GraphNode[], edges: GraphEdge[], colW = 240, rowH = 76): Placed[] {
+export function layout(nodes: GraphNode[], edges: GraphEdge[], colW = 300, rowH = 80): Placed[] {
   const col = new Map<string, number>();
   col.set('decision', 0);
   const incoming = new Map<string, string[]>();

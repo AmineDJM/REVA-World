@@ -9,7 +9,7 @@ import { v8Links } from '../../contract';
 import { Badge, EmptyState, MiniLine, MissingValue, SourceChip, Stat, frValue } from '../../shell/ui';
 import { getRelations, type Bundle, type Claim, type Effect, type Fact, type MissingItem, type Question, type RelGroup, type RelItem, type Series, type Stat as StatT, type Top } from './api';
 import { MiniMap } from './MiniMap';
-import { byTheme, chip, gradeTone, linePoints, projectionSplit, SECTION_FR, STATUS_FR } from './model';
+import { bigFr, byTheme, chip, gradeTone, linePoints, projectionSplit, SECTION_FR, STATUS_FR, unitFr } from './model';
 
 // ------------------------------------------------------------------------------------------------ links
 export function EntityLink({ kind, id, label, loaded = true }: { kind: string; id: string; label: string; loaded?: boolean }) {
@@ -72,7 +72,7 @@ function HeadlineStat({ s }: { s: StatT }) {
       </div>
     );
   }
-  const unit = s.kind === 'count' ? (s.unit ? 'au moins' : null) : s.unit;
+  const unit = s.kind === 'count' ? (s.unit ? 'au moins' : null) : unitFr(s.unit);
   return (
     <div className="fiche-stat" data-key={s.key}>
       <Stat
@@ -92,7 +92,7 @@ function HeadlineStat({ s }: { s: StatT }) {
         source={src}
         sub={sub}
         maxFractionDigits={unitDigits(s.unit, s.value)}
-        format={s.kind === 'count' ? (v) => Number(v).toLocaleString('fr-FR') : undefined}
+        format={s.kind === 'count' ? (v) => Number(v).toLocaleString('fr-FR') : Math.abs(Number(s.value)) >= 1e7 ? bigFr : undefined}
       />
       {s.ref && s.kind !== 'count' && (
         <div className="fiche-stat-ref">
@@ -295,8 +295,8 @@ function SeriesCard({ s }: { s: Series }) {
       ) : (
         <>
           <div className="fiche-scard-val">
-            {s.value !== null ? <span className={`v8-num fiche-big${s.kind === 'projection' ? ' fiche-proj' : ''}`}>{frValue(s.value, s.unit)}</span> : <span>{s.value_text}</span>}
-            {s.unit && <span className="fiche-unit">{s.unit}</span>}
+            {s.value !== null ? <span className={`v8-num fiche-big${s.kind === 'projection' ? ' fiche-proj' : ''}`} title={s.value}>{Math.abs(Number(s.value)) >= 1e9 ? bigFr(s.value) : frValue(s.value, s.unit)}</span> : <span>{s.value_text}</span>}
+            {s.unit && <span className="fiche-unit">{unitFr(s.unit)}</span>}
           </div>
           <div className="fiche-scard-line">
             <MiniLine points={linePoints(s.points)} width={220} height={34} split={projectionSplit(s.points)} label={`${s.label_fr}, ${s.first ?? ''}–${s.last ?? ''}`} />
@@ -329,7 +329,7 @@ function TopTable({ t }: { t: Top }) {
         <ol className="fiche-toplist">
           {t.items.map((i) => (
             <li key={i.iso3}>
-              <Link to={countryHref(i.iso3)}>{i.iso3}</Link> <span className="v8-num">{i.value ? frValue(i.value, t.unit) : '—'}</span> <span className="fiche-unit">{t.unit}</span> <SourceChip {...chip(i.source)!} />
+              <Link to={countryHref(i.iso3)}>{i.iso3}</Link> <span className="v8-num">{i.value ? frValue(i.value, t.unit) : '—'}</span> <span className="fiche-unit">{unitFr(t.unit)}</span> <SourceChip {...chip(i.source)!} />
             </li>
           ))}
         </ol>

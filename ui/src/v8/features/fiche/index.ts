@@ -38,7 +38,6 @@ export const feature: V8Feature = {
   id: 'fiche',
   title: 'Fiche',
   path: 'fiche/:kind/:id',
-  navPath: v8Links.entity('country', 'FRA'),
   order: 15,
   navHidden: true,
   icon: '◧',

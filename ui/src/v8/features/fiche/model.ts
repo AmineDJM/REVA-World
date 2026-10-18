@@ -126,3 +126,52 @@ export function gradeTone(g: string | null): 'win' | 'neutral' | 'loss' | 'info'
 export function shortId(id: string): string {
   return id.includes(':') ? id.slice(id.indexOf(':') + 1) : id;
 }
+
+/** Identifiers without repeats (the same scheme + value from two sources is listed once). */
+export function uniqueIds<T extends { scheme: string; value: string }>(ids: T[]): T[] {
+  const seen = new Set<string>();
+  return ids.filter((i) => {
+    const k = `${i.scheme.toUpperCase()}|${i.value}`;
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+}
+
+const UNIT_FR: Record<string, string> = {
+  persons: 'personnes',
+  person: 'personne',
+  years: 'ans',
+  year: 'an',
+  '% change': '% (variation)',
+  'US dollars': 'US$',
+  'US dollars per person': 'US$ par habitant',
+  'international dollars per person': '$ int. par habitant',
+  'tonnes per person': 't par habitant',
+  'persons per km2 of land area': 'hab./km²',
+  'per 100,000 population': 'pour 100 000 hab.',
+  'index (0-100)': 'indice (0–100)',
+  'index (0-1)': 'indice (0–1)',
+  '% of GDP': '% du PIB',
+  km2: 'km²',
+  'thousand barrels per day': 'kb/j',
+  'national currency per month (named per cell)': 'monnaie nationale / mois',
+};
+
+/** French display of the common atlas unit labels (the source's unit is kept in the source chip). */
+export function unitFr(u: string | null | undefined): string | null {
+  if (!u) return null;
+  return UNIT_FR[u] ?? u;
+}
+
+/** Big magnitudes in headline numbers: « 3 366 Md » (display rounding; the exact value is in the source chip). */
+export function bigFr(v: string | number): string {
+  const n = typeof v === 'number' ? v : Number(v);
+  if (!Number.isFinite(n)) return String(v);
+  const a = Math.abs(n);
+  const f = (x: number, u: string) => `${(n < 0 ? -x : x).toLocaleString('fr-FR', { maximumFractionDigits: x < 10 ? 2 : x < 100 ? 1 : 0 }).replace('-', '−')} ${u}`;
+  if (a >= 1e12) return f(a / 1e12, 'T');
+  if (a >= 1e9) return f(a / 1e9, 'Md');
+  if (a >= 1e7) return f(a / 1e6, 'M');
+  return n.toLocaleString('fr-FR', { maximumFractionDigits: a >= 1000 ? 0 : a >= 10 ? 1 : 2 }).replace('-', '−');
+}

@@ -1329,7 +1329,9 @@ def predict_decision(ctx: Ctx, *, reference_id: str, limit: int = 8) -> Result:
         unit = {"percent": "%", "log_points": "points log", "pp": "points de %"}.get(v.get("unit"), v.get("unit"))
         row: dict[str, Item] = {"variable": label_val(lab, vsrc)}
         if per is None:
-            reason = next((p.get("missing_reason") for p in v["periods"] if p.get("missing_reason")), "non quantifié")
+            reason = _reason_fr(
+                next((p.get("missing_reason") for p in v["periods"] if p.get("missing_reason")), "non quantifié")
+            )
             row.update(
                 {
                     "period": Miss("période", str(reason)),
@@ -1344,6 +1346,9 @@ def predict_decision(ctx: Ctx, *, reference_id: str, limit: int = 8) -> Result:
             row["period"] = period_val(per["period"], psrc)
             for q in ("p05", "p50", "p95"):
                 row[q] = num_val(f"{per[q]:.3f}", psrc, unit=unit, kind="scenario", digits=2)
+            if per.get("degenerate"):
+                for q in ("p05", "p95"):
+                    row[q] = Miss("bande", "estimation ponctuelle : aucune incertitude publiée sur ce lien")
             n_miss = sum(1 for p in v["periods"] if p.get("p50") is None)
             row["n_missing"] = num_val(n_miss, psrc, kind="derived", digits=0)
         out.rows.append(row)
@@ -1352,10 +1357,10 @@ def predict_decision(ctx: Ctx, *, reference_id: str, limit: int = 8) -> Result:
         if h.get("kind") != "estimate":
             continue
         key = h.get("estimate_key") or ""
-        cit = key.split(":")[2] if key.count(":") >= 3 else key
+        cit = _citation_short(ctx, key)
         hsrc = Src(
             source="effects.literature",
-            title=cit.replace("_", " "),
+            title=cit,
             dataset="kg.effect_estimate_current",
             indicator=key,
             licence="citation (valeur publiée, citée)",
@@ -1368,17 +1373,50 @@ def predict_decision(ctx: Ctx, *, reference_id: str, limit: int = 8) -> Result:
                 "cause": label_val(h.get("cause_definition"), hsrc),
                 "effect": label_val(h.get("effect_definition"), hsrc),
                 "coef": num_val(coef.get("point"), hsrc, kind="estimate"),
-                "citation": label_val(cit.replace("_", " "), hsrc),
+                "citation": label_val(cit, hsrc),
                 "applicability": label_val("; ".join((h.get("applicability") or {}).get("notes") or []) or "—", hsrc),
             }
         )
     out.values["n_hops"] = num_val(len(hops), vsrc, kind="derived", digits=0)
     ctx.memo[("decision_hops", reference_id)] = hops
     ctx.memo[("decision_unq", reference_id)] = res.get("unquantified_links") or []
+    labels = {v["id"]: (v.get("variable") or {}).get("label_fr") or v["id"] for v in res.get("variables") or []}
+    seen_gaps: set[tuple[str, str]] = set()
     for g in res.get("gaps") or []:
-        msg = g.get("message_fr") or "; ".join(g.get("message") or []) or g.get("code")
-        out.missing.append(Miss(str(g.get("node") or g.get("plugin") or g.get("code")), str(msg)))
+        msg = _reason_fr(str(g.get("message_fr") or "; ".join(g.get("message") or []) or g.get("code")))
+        node = str(g.get("node") or g.get("plugin") or g.get("code"))
+        what = labels.get(node, node)
+        if (what, msg) not in seen_gaps:
+            seen_gaps.add((what, msg))
+            out.missing.append(Miss(what, msg))
     return out
+
+
+_REASONS_FR = {
+    "lag_not_published": "délai de réponse non publié par l'estimation",
+    "upstream path missing in the first year": "chemin amont non chiffré la première année",
+}
+
+
+def _reason_fr(r: str) -> str:
+    for k, v in _REASONS_FR.items():
+        if r.startswith(k):
+            return v + r[len(k) :].replace("(lag", "(décalage").replace("quarters)", "trimestres)")
+    return r
+
+
+def _citation_short(ctx: Ctx, key: str) -> str:
+    """Citation of a published estimate (its short form), else the key's publication slug."""
+    try:
+        from reva.effects import query as eq
+
+        e = eq.get_estimate(ctx.conn, key, origin=ctx.origin)
+    except Exception:
+        e = None
+    cit = ((e or {}).get("source") or {}).get("citation") or {}
+    if cit.get("short"):
+        return str(cit["short"])
+    return key.split(":")[2].replace("_", " ") if key.count(":") >= 3 else key
 
 
 @query("predict.hops")
@@ -1394,7 +1432,15 @@ def predict_unquantified(ctx: Ctx, *, reference_id: str, limit: int = 6) -> Resu
     if ("decision_unq", reference_id) not in ctx.memo:
         predict_decision(ctx, reference_id=reference_id)
     out = Result()
-    for c in (ctx.memo.get(("decision_unq", reference_id)) or [])[:limit]:
+    pairs: set[tuple[str, str]] = set()
+    for c in ctx.memo.get(("decision_unq", reference_id)) or []:
+        pair = (str((c.get("from") or {}).get("id")), str((c.get("to") or {}).get("id")))
+        if pair in pairs:
+            continue
+        pairs.add(pair)
+        if len(out.rows) >= limit:
+            out.more += 1
+            continue
         s = c.get("source") or {}
         src = Src(
             source=s.get("source_key") or "kg",
