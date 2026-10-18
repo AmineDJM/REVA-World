@@ -1,0 +1,351 @@
+{
+ "as_of": "2026-10-17",
+ "canonical_sha256": "c7370673deba5e7caf0a19b970c5cd39c04b890e1011965fdf56a5858c1c6715",
+ "claims": "only holdout-confirmed scopes (holdout.json) may be scored as claims; other records are kept sealed for the prospective scoreboard",
+ "code_sha256": "11ad0b60acd40b41f79e8537183ba34d8fe578ae69286a5c3b98280a69536896",
+ "model_version": "1.0.0",
+ "pins": {
+  "atlas.eia.spot_d": {
+   "artifact_sha256": "cc75e5b1af9248d23464526681a59f9c972b9e44d10a1ace03954ee8f6f248ca",
+   "dataset_key": "atlas.eia.spot_d",
+   "recorded_at": "2026-10-17T15:42:35.016934+00:00",
+   "row_count": "90255"
+  },
+  "atlas.vintage_us.rtdsm": {
+   "artifact_sha256": "10b93838a62a69370cf4fed003d57a8ec5c48f00e77e977a9512c2ff262bcfb3",
+   "dataset_key": "atlas.vintage_us.rtdsm",
+   "recorded_at": "2026-10-17T15:06:59.885912+00:00",
+   "row_count": "333823"
+  },
+  "fed_nowcasts": {
+   "files": {
+    "clev_month.json": {
+     "bytes": 7649711,
+     "sha256": "096ca033781c1fe03c39ec6056744c147f3ebb9015edd674553053523e9501d5",
+     "url": "https://www.clevelandfed.org/-/media/files/webcharts/inflationnowcasting/nowcast_month.json?sc_lang=en"
+    },
+    "clev_quarter.json": {
+     "bytes": 5001772,
+     "sha256": "fcfc4a4b0068b3785774110e84a03d43ce29928996ca467afb563e87bfd98074",
+     "url": "https://www.clevelandfed.org/-/media/files/webcharts/inflationnowcasting/nowcast_quarter.json?sc_lang=en"
+    },
+    "employMvMd.xlsx": {
+     "bytes": 2233651,
+     "sha256": "a5cab543e1dcd135a2339b10ce0d6d920d23ad5a43c35cc97eca678914dd4fef",
+     "url": "https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/employMvMd.xlsx"
+    },
+    "gdpnow.xlsx": {
+     "bytes": 10902279,
+     "sha256": "dbe57ba14c6bf3057622a03bdc7fce3dbf8119d10463305565b29d83014ff134",
+     "url": "https://www.atlantafed.org/-/media/Project/Atlanta/FRBA/Documents/research-and-data/data/gdpnow/GDPTrackingModelDataAndForecasts.xlsx"
+    },
+    "hMvMd.xlsx": {
+     "bytes": 1707301,
+     "sha256": "3249636394de9c451bb5f64275484eec524425a660c549e98e39ec71524140fe",
+     "url": "https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/hMvMd.xlsx"
+    },
+    "hstartsMvMd.xlsx": {
+     "bytes": 1757713,
+     "sha256": "73ea7cbbb00a763f42d80a587c3786ab4f7e564274d8ba0d3dcc90f9a9148a8a",
+     "url": "https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/hstartsMvMd.xlsx"
+    },
+    "iptMvMd.xlsx": {
+     "bytes": 2863459,
+     "sha256": "89ac73de4144749bf8ef2ce47314da8448ecb235f7f369c32465be1588ea5a97",
+     "url": "https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/iptMvMd.xlsx"
+    },
+    "nyfed_2016.xlsx": {
+     "bytes": 210018,
+     "sha256": "b0ce3db1592672375e3bd43d827da6cf512fbbb602252abb927e6b6d577c234f",
+     "url": "https://www.newyorkfed.org/medialibrary/media/research/policy/nowcast/new-york-fed-staff-nowcast_data_2002-present.xlsx"
+    },
+    "nyfed_2023.xlsx": {
+     "bytes": 77736,
+     "sha256": "c2b56ee33528155bca3c6e42f92645f303267f1ec1b3b13200b83b72f5a91db9",
+     "url": "https://www.newyorkfed.org/medialibrary/Research/Interactives/Data/NowCast/downloads/New-York-Fed-Staff-Nowcast_download_data.xlsx"
+    },
+    "rconmMvMd.xlsx": {
+     "bytes": 851441,
+     "sha256": "cd72205227572417c2ef257224be45412f53f410df53173430131bd1d7d14403",
+     "url": "https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/rconmMvMd.xlsx"
+    },
+    "routput_first_second_third.xlsx": {
+     "bytes": 16435,
+     "sha256": "2bffa7a68ad43a950a04cb378a368b5e59192b1febcfe22d2a0e110132bfc9c5",
+     "url": "https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/routput_first_second_third.xlsx"
+    }
+   },
+   "source": "raw files parsed by atlas_fed_nowcasts 1.0.0"
+  }
+ },
+ "records": [
+  {
+   "candidates": {
+    "forecast.nc_bridge": {
+     "family": "point",
+     "point": 2.265784
+    },
+    "forecast.nc_dfm": {
+     "family": "point",
+     "point": 2.547276
+    }
+   },
+   "cell": "gdp_gdpnow",
+   "note": "no official nowcast of this target published yet: pure REVA points only",
+   "official_publication_date": null,
+   "reva_cutoff": "2026-10-17T00:00:00+00:00",
+   "target": "2026Q4",
+   "variable": "real_gdp_growth_q_ann"
+  },
+  {
+   "candidates": {
+    "forecast.nc_bridge": {
+     "family": "point",
+     "point": 2.281871
+    }
+   },
+   "cell": "gdp_gdpnow",
+   "note": "no official nowcast of this target published yet: pure REVA points only",
+   "official_publication_date": null,
+   "reva_cutoff": "2026-10-17T00:00:00+00:00",
+   "target": "2027Q1",
+   "variable": "real_gdp_growth_q_ann"
+  },
+  {
+   "candidates": {
+    "forecast.nc_bridge": {
+     "family": "point",
+     "point": 2.265784
+    },
+    "forecast.nc_dfm": {
+     "family": "point",
+     "point": 2.547276
+    }
+   },
+   "cell": "gdp_nyfed",
+   "note": "no official nowcast of this target published yet: pure REVA points only",
+   "official_publication_date": null,
+   "reva_cutoff": "2026-10-17T00:00:00+00:00",
+   "target": "2026Q4",
+   "variable": "real_gdp_growth_q_ann"
+  },
+  {
+   "candidates": {
+    "forecast.nc_bridge": {
+     "family": "point",
+     "point": 2.281871
+    }
+   },
+   "cell": "gdp_nyfed",
+   "note": "no official nowcast of this target published yet: pure REVA points only",
+   "official_publication_date": null,
+   "reva_cutoff": "2026-10-17T00:00:00+00:00",
+   "target": "2027Q1",
+   "variable": "real_gdp_growth_q_ann"
+  },
+  {
+   "bucket": "m0",
+   "candidates": {
+    "forecast.nc_biascorr": {
+     "family": "empirical",
+     "interval80": [
+      0.214152,
+      0.535869
+     ],
+     "point": 0.295941
+    },
+    "forecast.nc_cpi_bridge": {
+     "family": "empirical",
+     "interval80": [
+      -0.058949,
+      0.482529
+     ],
+     "point": 0.192034
+    },
+    "forecast.nc_stack_reva": {
+     "family": "empirical",
+     "interval80": [
+      0.172458,
+      0.477831
+     ],
+     "point": 0.260153
+    }
+   },
+   "cell": "cpi_clev",
+   "fair_benchmark": {
+    "family": "normal",
+    "interval80": [
+     0.04703,
+     0.490603
+    ],
+    "point": 0.268817
+   },
+   "official": {
+    "attribution": "Federal Reserve Bank of Cleveland, Inflation Nowcasting (noncommercial use with credit)",
+    "family": "point",
+    "model": "benchmark.clev_nowcast",
+    "point": 0.268817,
+    "ref": "CLEV_MONTH_CPI|v=2026-10-16@2026-10-01"
+   },
+   "official_publication_date": "2026-10-16",
+   "reva_cutoff": "2026-10-16T00:00:00+00:00",
+   "target": "2026-10",
+   "uses_official_forecast": {
+    "forecast.nc_biascorr": true,
+    "forecast.nc_cpi_bridge": false,
+    "forecast.nc_stack_reva": true
+   },
+   "variable": "cpi_inflation_m"
+  },
+  {
+   "candidates": {},
+   "cell": "cpi_clev",
+   "note": "no official nowcast of this target published yet: pure REVA points only",
+   "official_publication_date": null,
+   "reva_cutoff": "2026-10-17T00:00:00+00:00",
+   "target": "2026-11",
+   "variable": "cpi_inflation_m"
+  },
+  {
+   "candidates": {},
+   "cell": "cpi_clev",
+   "note": "no official nowcast of this target published yet: pure REVA points only",
+   "official_publication_date": null,
+   "reva_cutoff": "2026-10-17T00:00:00+00:00",
+   "target": "2026-12",
+   "variable": "cpi_inflation_m"
+  },
+  {
+   "candidates": {},
+   "cell": "cpi_clev",
+   "note": "no official nowcast of this target published yet: pure REVA points only",
+   "official_publication_date": null,
+   "reva_cutoff": "2026-10-17T00:00:00+00:00",
+   "target": "2027-01",
+   "variable": "cpi_inflation_m"
+  },
+  {
+   "candidates": {},
+   "cell": "cpi_clev",
+   "note": "no official nowcast of this target published yet: pure REVA points only",
+   "official_publication_date": null,
+   "reva_cutoff": "2026-10-17T00:00:00+00:00",
+   "target": "2027-02",
+   "variable": "cpi_inflation_m"
+  },
+  {
+   "candidates": {},
+   "cell": "cpi_clev",
+   "note": "no official nowcast of this target published yet: pure REVA points only",
+   "official_publication_date": null,
+   "reva_cutoff": "2026-10-17T00:00:00+00:00",
+   "target": "2027-03",
+   "variable": "cpi_inflation_m"
+  },
+  {
+   "bucket": "m0",
+   "candidates": {
+    "forecast.nc_biascorr": {
+     "family": "empirical",
+     "interval80": [
+      0.044724,
+      0.356144
+     ],
+     "point": 0.210261
+    },
+    "forecast.nc_cpi_bridge": {
+     "family": "empirical",
+     "interval80": [
+      0.013754,
+      0.357027
+     ],
+     "point": 0.224051
+    },
+    "forecast.nc_stack_reva": {
+     "family": "empirical",
+     "interval80": [
+      0.003253,
+      0.346495
+     ],
+     "point": 0.212699
+    }
+   },
+   "cell": "core_clev",
+   "fair_benchmark": {
+    "family": "normal",
+    "interval80": [
+     0.061266,
+     0.361609
+    ],
+    "point": 0.211437
+   },
+   "official": {
+    "attribution": "Federal Reserve Bank of Cleveland, Inflation Nowcasting (noncommercial use with credit)",
+    "family": "point",
+    "model": "benchmark.clev_nowcast",
+    "point": 0.211437,
+    "ref": "CLEV_MONTH_CORE_CPI|v=2026-10-16@2026-10-01"
+   },
+   "official_publication_date": "2026-10-16",
+   "reva_cutoff": "2026-10-16T00:00:00+00:00",
+   "target": "2026-10",
+   "uses_official_forecast": {
+    "forecast.nc_biascorr": true,
+    "forecast.nc_cpi_bridge": false,
+    "forecast.nc_stack_reva": true
+   },
+   "variable": "core_cpi_inflation_m"
+  },
+  {
+   "candidates": {},
+   "cell": "core_clev",
+   "note": "no official nowcast of this target published yet: pure REVA points only",
+   "official_publication_date": null,
+   "reva_cutoff": "2026-10-17T00:00:00+00:00",
+   "target": "2026-11",
+   "variable": "core_cpi_inflation_m"
+  },
+  {
+   "candidates": {},
+   "cell": "core_clev",
+   "note": "no official nowcast of this target published yet: pure REVA points only",
+   "official_publication_date": null,
+   "reva_cutoff": "2026-10-17T00:00:00+00:00",
+   "target": "2026-12",
+   "variable": "core_cpi_inflation_m"
+  },
+  {
+   "candidates": {},
+   "cell": "core_clev",
+   "note": "no official nowcast of this target published yet: pure REVA points only",
+   "official_publication_date": null,
+   "reva_cutoff": "2026-10-17T00:00:00+00:00",
+   "target": "2027-01",
+   "variable": "core_cpi_inflation_m"
+  },
+  {
+   "candidates": {},
+   "cell": "core_clev",
+   "note": "no official nowcast of this target published yet: pure REVA points only",
+   "official_publication_date": null,
+   "reva_cutoff": "2026-10-17T00:00:00+00:00",
+   "target": "2027-02",
+   "variable": "core_cpi_inflation_m"
+  },
+  {
+   "candidates": {},
+   "cell": "core_clev",
+   "note": "no official nowcast of this target published yet: pure REVA points only",
+   "official_publication_date": null,
+   "reva_cutoff": "2026-10-17T00:00:00+00:00",
+   "target": "2027-03",
+   "variable": "core_cpi_inflation_m"
+  }
+ ],
+ "resolution": {
+  "cpi": "first-release month-over-month CPI (BLS) as recorded by the Cleveland Fed on the release day",
+  "gdp": "Philadelphia Fed first release (BEA advance/initial estimate) of the quarter"
+ },
+ "schema": "reva-beat-nowcast-sealed/1",
+ "sealed_at": "2026-10-18T16:40:03.017032+00:00"
+}

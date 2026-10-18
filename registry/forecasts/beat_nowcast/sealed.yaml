@@ -1,0 +1,9 @@
+schema: reva-beat-nowcast-sealed-index/1
+statement: Append-only index of sealed prospective records (canonical sha256 of the
+  record without this field).
+records:
+- as_of: '2026-10-17'
+  file: sealed/2026-10-17.json
+  canonical_sha256: c7370673deba5e7caf0a19b970c5cd39c04b890e1011965fdf56a5858c1c6715
+  sealed_at: '2026-10-18T16:40:03.017032+00:00'
+  n_records: 16
