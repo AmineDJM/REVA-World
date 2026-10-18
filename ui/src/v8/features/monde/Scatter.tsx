@@ -77,7 +77,7 @@ export function Scatter({ points, xLabel, yLabel, logx, logy, selected, onSelect
     const cx = points.reduce((s, p) => s + X(p.x), 0) / Math.max(1, points.length);
     const cy = points.reduce((s, p) => s + Y(p.y), 0) / Math.max(1, points.length);
     const ranked = [...points].sort((a, b) => Math.hypot(X(b.x) - cx, Y(b.y) - cy) - Math.hypot(X(a.x) - cx, Y(a.y) - cy));
-    const labelled = new Set(ranked.slice(0, Math.min(12, Math.ceil(points.length / 8))).map((p) => p.iso3));
+    const labelled = new Set((points.length <= 20 ? ranked : ranked.slice(0, Math.min(12, Math.ceil(points.length / 8)))).map((p) => p.iso3));
     return { X, Y, xt, yt, labelled };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [points, lx, ly, H]);

@@ -229,3 +229,11 @@ describe('ComparerPage', () => {
     expect(api.getCatalog).toHaveBeenCalledWith('inflation', null);
   });
 });
+
+describe('alignment', () => {
+  it('annual points sit on their year code, whatever the fiscal start', async () => {
+    const { xOfPoint } = await import('./transforms');
+    expect(xOfPoint({ p: '2020', ps: '2020-07-01' })).toBe(2020);
+    expect(xOfPoint({ p: '2020-Q3', ps: '2020-07-01' })).toBeCloseTo(2020.5);
+  });
+});

@@ -48,6 +48,14 @@ export function xOf(ps: string): number {
   return (neg ? -y : y) + ((m || 1) - 1) / 12 + ((d || 1) - 1) / 365;
 }
 
+/**
+ * x of a point on the shared axis: its period code when annual (a fiscal year July–June coded "2020" sits on 2020,
+ * like every other place's 2020, so the lines of all places align), else its start date as a fractional year.
+ */
+export function xOfPoint(p: { p: string; ps: string }): number {
+  return /^-?\d+$/.test(p.p) ? Number(p.p) : xOf(p.ps);
+}
+
 /** The same sub-period one year earlier ("2020-Q3" → "2019-Q3", "2020-03" → "2019-03", "2020" → "2019"). */
 export function previousYearCode(p: string): string | null {
   const m = /^(-?\d+)(.*)$/.exec(p);
@@ -78,7 +86,7 @@ export function transformPlace(
   const by = new Map(sorted.map((p) => [p.p, p]));
   const pop = new Map((ctx.pop ?? []).map((p) => [p.year, p]));
   return sorted.map((p) => {
-    const base: Shown = { p: p.p, x: xOf(p.ps), y: null, proj: p.proj, miss: p.miss ?? null, src: p };
+    const base: Shown = { p: p.p, x: xOfPoint(p), y: null, proj: p.proj, miss: p.miss ?? null, src: p };
     const v = p.v !== null ? Number(p.v) : null;
     if (v === null || !Number.isFinite(v)) return { ...base, miss: p.miss ?? (p.t ? 'valeur textuelle' : 'non rapporté') };
     if (t === 'none') return { ...base, y: v };

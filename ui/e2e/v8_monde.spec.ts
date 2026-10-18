@@ -54,7 +54,8 @@ test('Monde: map, ranking, missing reasons, place panel, light/dark/phone', asyn
   await page.goto(`/v8/monde?series=${encodeURIComponent(x!)}`);
   await expect(page.getByTestId('monde-answer')).toBeVisible({ timeout: 60_000 });
   await expect(page.getByTestId('monde-legend')).toContainText(/jamais rapporté|pas de cellule|non rapporté/);
-  await page.waitForTimeout(2500); // map tiles
+  await expect(page.locator('.v8m-map canvas')).toBeVisible({ timeout: 30_000 });
+  await page.waitForTimeout(5000); // map render
   await shot(page, 'monde-light');
   // first ranking row → place panel
   await page.locator('[aria-label="Classement"] tr.v8-vt-link').first().locator('td').first().click();
