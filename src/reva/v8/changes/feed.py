@@ -504,7 +504,7 @@ def _score_values(s: Mapping[str, Any]) -> dict[str, str]:
 def resolutions(
     conn: Connection, since: datetime, until: datetime, origin: str | None, store: Any
 ) -> list[dict[str, Any]]:
-    from reva.evaluation.registry import read as R
+    from reva.evaluation.registry.manifest_index import INDEX
 
     oc = " AND e.task_scope->>'origin' = :origin" if origin else ""
     rows = conn.execute(
@@ -539,11 +539,10 @@ def resolutions(
         questions: dict[str, Any] = {}
         if store is not None and sha:
             try:
-                doc = R.CACHE.get(store, sha)
+                doc = INDEX.get(store, sha).manifest()  # verified once per sha, shared (V8 PERFQ)
                 outcomes = {o["question_id"]: o for o in doc.get("outcomes", [])}
                 if g["batch"]:
-                    man = R.CACHE.get(store, g["batch"])
-                    questions = {q["question_id"]: q for q in man.get("questions", [])}
+                    questions = {q["question_id"]: q for q in INDEX.get(store, g["batch"]).questions()}
             except Exception:  # noqa: S110 - manifests unreadable: the item still says what was recorded
                 pass
         for qid in g["qids"]:

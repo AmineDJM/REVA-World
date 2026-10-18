@@ -71,7 +71,7 @@ class ManifestIndex:
             h = _unpack(self._header)
             qs = [x for x in h.get("questions") or [] if isinstance(x, Mapping) and x.get("question_id") == question_id]
             fs = [x for x in h.get("forecasts") or [] if isinstance(x, Mapping) and x.get("question_id") == question_id]
-            return (qs[0] if qs else None), fs
+            return (dict(qs[0]) if qs else None), [dict(x) for x in fs]
         raw = self.slices.get(question_id)
         if raw is None:
             return None, []
@@ -118,7 +118,8 @@ class ManifestIndex:
 
 def build(manifest: Mapping[str, Any], sha: str) -> ManifestIndex:
     """Pure: index an already verified manifest."""
-    qs, fcs = manifest.get("questions"), manifest.get("forecasts")
+    qs: Any = manifest.get("questions")
+    fcs: Any = manifest.get("forecasts")
     ok = "questions" in manifest and "forecasts" in manifest and _indexable(qs) and _indexable(fcs)
     first: dict[str, Any] = {}
     by_q: dict[str, list[Any]] = {}

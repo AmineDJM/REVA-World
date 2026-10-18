@@ -217,13 +217,14 @@ def registry_paths(conn: Connection, store: Any) -> dict[tuple[str, str], dict[s
     ``registry.read.question`` call per question: that call scans every batch manifest and, with more batches
     than the registry's manifest cache holds, re-verifies all of them each time (minutes per scenario)."""
     from reva.evaluation.registry import read as R
+    from reva.evaluation.registry.manifest_index import INDEX
 
     preferred = pdb.RegistryBaseline.PREFERRED
     qinfo: dict[str, dict[str, Any]] = {}
     orig: dict[str, dict[str, dict[str, Any]]] = {}
     supp: dict[tuple[str, str], dict[str, dict[str, Any]]] = {}
     for b in R.batches(conn, None):
-        m = R.CACHE.get(store, b["batch_sha256"])
+        m = INDEX.get(store, b["batch_sha256"]).manifest()  # verified once per sha, shared (V8 PERFQ)
         if m.get("supplement_of"):
             for f in m.get("forecasts") or []:
                 if f.get("status") == "issued":

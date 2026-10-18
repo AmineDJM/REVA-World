@@ -129,11 +129,7 @@ def classify(ans: Mapping[str, Any]) -> dict[str, Any]:
             what = str(e.get("what") or "")
             if what in ("answer", ""):  # the generic "no sourced answer" record is not a cause
                 continue
-            key = "entity_approximate" if what == "kg_families" and "candidates" in e else what
-            causes.append(key)
-        for s in sentences:
-            if s.get("kind") == "missing" and "correspondances approchées" in s.get("text", ""):
-                causes.append("entity_approximate")
+            causes.append("exact_entity" if what == "kg_families" and "candidates" in e else what)
     return {
         "status": status,
         "causes": sorted(set(causes)),

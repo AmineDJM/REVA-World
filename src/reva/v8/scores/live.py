@@ -79,9 +79,9 @@ def _manifest_summary(store: Any, sha: str) -> dict[str, Any]:
         hit = _SUMMARIES.get(sha)
     if hit is not None:
         return hit
-    from reva.evaluation.ledger import load_frozen_manifest
+    from reva.evaluation.registry.manifest_index import INDEX
 
-    m = load_frozen_manifest(store, sha)
+    m = INDEX.get(store, sha).manifest()  # verified once per sha, shared with the registry read side (V8 PERFQ)
     refs: dict[str, set[str]] = defaultdict(set)
     n = 0
     for f in m.get("forecasts", []):

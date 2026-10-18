@@ -16,8 +16,8 @@ import threading
 from pathlib import Path
 from typing import Any
 
-from reva.evaluation.ledger import load_frozen_manifest
 from reva.evaluation.registry import read as R
+from reva.evaluation.registry.manifest_index import INDEX
 
 _LOCK = threading.Lock()
 _MEM: dict[str, dict[str, Any]] = {}
@@ -49,7 +49,7 @@ def build_index(conn: Any, store: Any, origin: str) -> dict[str, Any]:
         questions: dict[str, dict[str, Any]] = {}
         forecasts: dict[str, list[dict[str, Any]]] = {}
         for order, b in enumerate(bs):  # newest batch first (registry read order)
-            m = load_frozen_manifest(store, b["batch_sha256"])
+            m = INDEX.get(store, b["batch_sha256"]).manifest()  # verified once per sha, shared (V8 PERFQ)
             for q in m.get("questions", []):
                 if q["question_id"] not in questions and not m.get("supplement_of"):
                     questions[q["question_id"]] = {

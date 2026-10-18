@@ -649,7 +649,8 @@ def _cells(
 def scoreboard(conn: Any, store: Any, origin: str | None) -> dict[str, Any]:
     """ "REVA ensemble vs best single forecaster" per family, from resolved prospective scores only."""
     from reva.evaluation.conflict.stats import holm
-    from reva.evaluation.registry.read import CACHE, _origin_clause
+    from reva.evaluation.registry.manifest_index import INDEX
+    from reva.evaluation.registry.read import _origin_clause
     from reva.evaluation.registry.service import ISSUE_KIND, SCOPE_KIND, SCORE_KIND
 
     oc, op = _origin_clause(origin)
@@ -667,7 +668,7 @@ def scoreboard(conn: Any, store: Any, origin: str | None) -> dict[str, Any]:
     ens: dict[str, dict[str, dict[str, Any]]] = defaultdict(dict)  # version -> question id -> meta
     weight_status: dict[str, dict[str, dict[str, int]]] = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
     for sha in sorted(shas):
-        m = CACHE.get(store, sha)
+        m = INDEX.get(store, sha).manifest()  # verified once per sha, shared (V8 PERFQ)
         ver = str((m.get("ensemble") or {}).get("model_version") or V1)
         qmeta = {q["question_id"]: q for q in m["questions"]}
         for f in m["forecasts"]:
