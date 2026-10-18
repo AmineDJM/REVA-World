@@ -127,7 +127,7 @@ Option (a) is the smaller change. No revert is needed: no closure file was edite
 | `flock … reva seed` | rc 0. 1.1.0 is registered and has its eligibility rows. |
 | budget for `eurostat.demography` on 2026-10-17 | 282 of 300 used (82 + 100 + 100), all by 1.0.0. |
 | budget on 2026-10-18 | 0 used: 300 available. |
-| `df -h /` before the ingest (2026-10-18 16:47 UTC) | **3.9 GB free, below the 5 GB floor: live ingest NOT run** (it read 4.7-4.9 GB on 10-17 and 4.9 GB at 16:36). |
+| `df -h /` before the ingest (2026-10-18 16:47 and 16:48 UTC) | **3.9 GB, then 4.8 GB free, below the 5 GB floor: live ingest NOT run** (it read 4.7-4.9 GB on 10-17 and 4.9 GB at 16:36). |
 | saved cursor `ops.connector_cursor['eurostat.demography']` | none (1.0.0 never saved one): the first 1.1.0 run starts at AT. |
 
 The pending load is small: about 2.8 MB of raw data per 100 requests, observed on 10-17.
