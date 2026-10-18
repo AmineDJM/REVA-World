@@ -207,21 +207,45 @@ not for this family.
 
 ## 5. Prospective (sealed) forecasts — winners only
 
-Winners issue only for W1 h0 Brent/WTI (`forecast.beat_energy_daily_nowcast`, `…_combo_steo_daily`,
-`…_daily_nowcast_ln`) with the two pre-registered benchmarks (`forecast.reference_eia_steo`,
-`forecast.eia_steo_fair_ln`); 4 new models in `registry/models/methods.yaml` (seeded). The sealing code
-(`src/reva/evaluation/beat_energy_seal.py` pure, DB part `reva.cli.beat_energy --seal`) writes a **supplementary
-registry batch** on existing sealed questions (resolved unchanged by `resolve_due`), and refuses outside the
-validated window (issue month of the STEO in force, ≥ 7 days after its availability).
+Winners are issued only for W1 h0 Brent/WTI (`forecast.beat_energy_daily_nowcast`, `…_combo_steo_daily`,
+`…_daily_nowcast_ln`), always with the two pre-registered benchmarks (`forecast.reference_eia_steo`,
+`forecast.eia_steo_fair_ln`). The four new models are in `registry/models/methods.yaml` (seeded).
 
-**Today nothing could be sealed in the registry:** the registry asks monthly questions from h = 1 of a quarterly cycle,
-so no question asks October 2026 (the issue month of the STEO in force). The nowcast computed at 2026-10-17 22:10 UTC
-is committed as a git-timestamped record instead (`docs/dev/v7_beat_energy_prospective_2026-10.json`, inputs
-pinned by sha256): October 2026 mean **Brent: REVA 129.11 (combination 117.45) vs EIA STEO 111.0 $/bbl; WTI: REVA
-97.98 (combination 99.22) vs STEO 100.0** (resolves with the November STEO). First registry seal possible: between
-~7 days after the January 2027 STEO and the February release, on the 2026-Q4 questions for 2027-01 (Brent
-`fq_b11ea96c…` in batch `179421ef…`, WTI `fq_55f3efb8…` in `6d76937c…`; build verified on the live manifests).
-The STEO archive table holds quarterly issues only, so seals are possible in January/April/July/October windows.
+**Nowcast question families (lead decision, 2026-10-17).** `eia.brent_monthly_nowcast` and `eia.wti_monthly_nowcast`
+are in `registry/forecasts/question_specs.yaml`. They are declared nowcasts (`nowcast: true`, FIX7 rule) with one
+quantity question at h = 0 (`specs.py` allows h = 0 only for declared nowcasts). They are `issued_by` the W1 sealer
+only, and the weekly job skips them (`service.build_batch`). Resolution is on EIA's monthly average
+(`STEO.<code>.M` in `atlas.eia_steo.steo_observed`), as first published as history in a later STEO.
+`reva.cli.beat_energy --seal` (worker role, under flock) writes an original sealed batch. It refuses in three cases:
+
+* outside the registered window (issue month of the STEO in force, at least 7 days after its availability);
+* a duplicate of an existing seal;
+* free disk below 5 GiB, measured just before the write (the write is then queued).
+
+Every daily-price-derived forecast carries `redistribution: "internal only: redistribution pending licence review
+(owner decision, Refinitiv/LSEG via EIA)"` and a `licence_review` flag.
+
+**Sealed:** batch **`9ffa54df5555566d9b0c377d4c0fb5adbd2963e04133b7100c4a009edc8d703d`**, issued 2026-10-18 16:41 UTC,
+cycle 2026-Q4. Questions `fq_a01be26ec4f7ed83e2da44f0` (Brent, 2026-10) and `fq_b15645656fca5fc983926ffc` (WTI,
+2026-10); 10 forecasts; the reference month was 55 % elapsed at issue (`near_nowcast`).
+
+| Oct 2026 mean ($/bbl) | REVA daily nowcast | REVA combination with STEO | EIA STEO 2026-10 (attributed) |
+|---|---|---|---|
+| Brent | 129.00 | 117.41 | 111.0 |
+| WTI | 98.32 | 99.35 | 100.0 |
+
+The seal offset was 11 days. Sigma and weights come from the offset-7 history (20 past issues).
+
+**Disk-rule breach.** The pre-write check measured 5.07 GB in decimal units (= 4.72 GiB). `df -h` showed 4.8G, so
+under the lead's reading (df, < 5) this write should have been queued. The write was a single small JSON artifact plus
+5 evaluation rows. The check now uses GiB (`shutil.disk_usage / 2**30`), as `df -h` does. Nothing was deleted: the
+registry is append-only.
+
+The git-timestamped record of 2026-10-17 22:10 UTC is kept (`docs/dev/v7_beat_energy_prospective_2026-10.json`:
+Brent 129.11 / 117.45 vs 111.0; WTI 97.98 / 99.22 vs 100.0).
+
+Next seals: within the window after each January/April/July/October STEO is loaded into `atlas.vintage_steo` (the
+table holds quarterly issues only).
 
 ## 6. Connector added: `atlas.eia_wpsr` 1.0.0
 
@@ -241,11 +265,14 @@ series; past weekly values are assumed unrevised (stated).
 
 ## 7. Owner decisions / limits
 
-* EIA daily spot prices are Refinitiv (LSEG) data: redistribution of the derived forecasts needs the licence review
-  PRED-HF flagged.
-* Monthly STEO issues (not only quarterly) would allow a seal every month and ~3× more W1 origins (V6's raw cap).
-* A registry h0 ("current month") question family for STEO prices would let the winners be sealed every quarter-month
-  (today the issue month is never asked; X10 nowcast rules apply).
+* EIA daily spot prices are Refinitiv (LSEG) data. The licence review is an owner decision. Forecasts are sealed for
+  internal use only, flagged "redistribution pending licence review".
+* Loading monthly STEO issues is **queued for the bigger machine** (~155 MB raw). It would allow a seal every month
+  and about 3× more W1 origins. Command: in `src/reva/adapters/connectors/atlas_vintage_steo.py` set
+  `ISSUE_MONTHS = tuple(range(1, 13))` and bump `VERSION` to 1.1.0. Raise `eia.steo_archive` to 200/day in
+  `registry/atlas/budget_requests/pred_energy.yaml`, then run `uv run python -m reva.atlas.budget_merge --write`
+  and re-pin the budgets digest in `src/reva/autonomy/policy.py`. Then run, with `df -h /` showing ≥ 5 GB:
+  `flock /tmp/reva-devdb.lock uv run reva seed && flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.vintage_steo`.
 * W2 OPEC/non-OPEC: any future evaluation must score on first-release or membership-consistent outcomes.
 
 ## 8. Commands

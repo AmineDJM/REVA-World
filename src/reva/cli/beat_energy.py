@@ -68,7 +68,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     pinned = check_protocol(Path.cwd())
     eng = make_engine("api", get_settings())
     if a.seal:
-        out = seal(eng, get_store(), origin=a.origin)
+        out = seal(make_engine("worker", get_settings()), get_store(), origin=a.origin)  # writer role
         with open(a.out, "w", encoding="utf-8") as fh:
             json.dump(out, fh, indent=1, default=str)
         print(json.dumps(out, default=str)[:3000])
@@ -305,7 +305,7 @@ def seal(engine: Any, store: Any, *, origin: str = "live", actor: str = "agent:b
                           specs={"version": specs.version, "sha256": specs.sha256, "interval_level": specs.interval_level},
                           tables=tables, code_digest=_code_digest())  # fmt: skip
     qids = sorted(q["question_id"] for q in batch["questions"])
-    free_gb = shutil.disk_usage("/").free / 1e9
+    free_gb = shutil.disk_usage("/").free / 2**30  # GiB, as `df -h` reports
     if free_gb < 5.0:
         return {"status": "queued_low_disk", "free_gb": round(free_gb, 2), "question_ids": qids, "nowcast": nowcast}
     with engine.begin() as conn:
