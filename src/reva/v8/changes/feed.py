@@ -165,15 +165,17 @@ def ingests(conn: Connection, since: datetime, until: datetime, origin: str | No
     rows = conn.execute(
         text(
             f"""
-            WITH d AS (
+            WITH f AS (
+              SELECT dataset_key, subject_key, origin, min(recorded_at) AS first_at FROM evidence.dataset
+              GROUP BY 1, 2, 3
+            ), d AS (
               SELECT d0.dataset_key, d0.concept_id, d0.subject_key, d0.row_count, d0.origin, d0.recorded_at,
                      CASE WHEN d0.concept_id = 'atlas.table' THEN split_part(d0.subject_key, '.', 1)
                           ELSE split_part(d0.dataset_key, '.', 1) END AS source,
                      CASE WHEN d0.concept_id = 'atlas.table' THEN d0.subject_key ELSE d0.dataset_key END AS tbl,
-                     EXISTS (SELECT 1 FROM evidence.dataset p
-                              WHERE p.dataset_key = d0.dataset_key AND p.subject_key = d0.subject_key
-                                AND p.origin = d0.origin AND p.recorded_at < d0.recorded_at) AS revision
+                     d0.recorded_at > f.first_at AS revision
               FROM evidence.dataset d0
+              JOIN f ON f.dataset_key = d0.dataset_key AND f.subject_key = d0.subject_key AND f.origin = d0.origin
               WHERE d0.recorded_at > :since AND d0.recorded_at <= :until{_oc(origin, "d0.origin")}
             )
             SELECT source, origin,
@@ -262,30 +264,34 @@ def kg_batches(
         text(
             f"""WITH l AS (
                   SELECT id, source_key, origin, recorded_at, loader_version, parameters,
-                         cardinality(raw_sha256s) AS n_raw
+                         cardinality(raw_sha256s) AS n_raw,
+                         to_timestamp(floor(extract(epoch FROM recorded_at) / 600) * 600) AS bucket
                   FROM kg.load WHERE recorded_at > :since AND recorded_at <= :until{_oc(origin)}
                   ORDER BY recorded_at DESC LIMIT :lim),
                 r AS (SELECT load_id, count(*) AS n FROM kg.statement_retraction
                       WHERE load_id IN (SELECT id FROM l) GROUP BY load_id)
-                SELECT l.*, COALESCE(r.n, 0) AS retracted,
-                       to_timestamp(floor(extract(epoch FROM l.recorded_at) / 600) * 600) AS bucket
-                FROM l LEFT JOIN r ON r.load_id = l.id ORDER BY l.recorded_at DESC"""
+                SELECT l.source_key, l.origin, l.bucket, max(l.recorded_at) AS at,
+                       array_agg(l.id ORDER BY l.id) AS ids, sum(l.n_raw) AS n_raw,
+                       sum(COALESCE(r.n, 0)) AS retracted,
+                       array_agg(DISTINCT l.loader_version) AS versions,
+                       (array_agg(l.parameters ORDER BY l.id DESC))[1] AS parameters
+                FROM l LEFT JOIN r ON r.load_id = l.id
+                GROUP BY 1, 2, 3 ORDER BY 4 DESC"""
         ),
         {"since": since, "until": until, "origin": origin, "lim": PER_KIND_MAX * 10},
     ).mappings()
     kgc = counts.get("kg") or {}
-    groups: dict[tuple[str, str, datetime], list[Any]] = {}
-    for r in rows:
-        groups.setdefault((r["source_key"], r["origin"], r["bucket"]), []).append(r)
+    kg_max = int(counts.get("kg_max_load_id") or 0)
     out = []
-    for (src, org, bucket), rs in groups.items():
-        ids = sorted(int(r["id"]) for r in rs)
-        known = [kgc[str(i)] for i in ids if str(i) in kgc]
+    for g in rows:
+        src, org, bucket = g["source_key"], g["origin"], g["bucket"]
+        ids = [int(x) for x in g["ids"]]
+        known = [kgc.get(str(i), {"entities": 0, "statements": 0}) for i in ids if str(i) in kgc or i <= kg_max]
         complete = len(known) == len(ids)
         ent = sum(c.get("entities", 0) for c in known) if complete else None
         stm = sum(c.get("statements", 0) for c in known) if complete else None
-        retracted = sum(int(r["retracted"]) for r in rs)
-        p = rs[0]["parameters"] or {}
+        retracted = int(g["retracted"] or 0)
+        p = g["parameters"] or {}
         bits = []
         if complete:
             bits.append(f"{_fr_int(ent)} entités, {_fr_int(stm)} énoncés")
@@ -296,7 +302,7 @@ def kg_batches(
             item(
                 "kg_batch",
                 f"kg_batch:{src}:{org}:{ids[0]}-{ids[-1]}",
-                max(r["recorded_at"] for r in rs),
+                g["at"],
                 f"Graphe : {n} lot{'s' if n > 1 else ''} {src}" + (f" — {', '.join(bits)}" if bits else ""),
                 summary=str(p.get("why") or p.get("revision") or p.get("kg_revision") or "") or None,
                 source=src,
@@ -306,8 +312,8 @@ def kg_batches(
                 origin=org,
                 detail={
                     "load_ids": ids[:200],
-                    "loader_versions": sorted({str(r["loader_version"]) for r in rs}),
-                    "raw_artifacts": sum(int(r["n_raw"]) for r in rs),
+                    "loader_versions": sorted(str(v) for v in g["versions"] or []),
+                    "raw_artifacts": int(g["n_raw"] or 0),
                     "counts": "load_counts"
                     if complete
                     else "not computed yet for every load (run `uv run reva v8 index build`)",
@@ -346,7 +352,7 @@ def causal_loads(
     out = []
     for r in rows:
         p = r["parameters"] or {}
-        added = cc.get(str(r["id"]))
+        added = cc.get(str(r["id"]), 0 if int(r["id"]) <= int(counts.get("causal_max_load_id") or 0) else None)
         graded = p.get("claims") if r["kind"] == "grading" else None
         bits = []
         if added is not None:
@@ -374,22 +380,29 @@ def causal_loads(
 
 
 def effect_changes(conn: Connection, since: datetime, until: datetime, origin: str | None) -> list[dict[str, Any]]:
-    loads = conn.execute(
-        text(
-            f"""SELECT l.id, l.kind, l.source_key, l.dataset, l.origin, l.recorded_at,
+    loads: list[Any] = list(
+        conn.execute(
+            text(
+                f"""SELECT l.id, l.kind, l.source_key, l.dataset, l.origin, l.recorded_at,
                        array_agg(e.estimate_key ORDER BY e.estimate_key) FILTER (WHERE e.id IS NOT NULL) AS keys
                 FROM kg.effect_load l LEFT JOIN kg.effect_estimate e ON e.load_id = l.id
                 WHERE l.recorded_at > :since AND l.recorded_at <= :until{_oc(origin, "l.origin")}
                 GROUP BY l.id ORDER BY l.recorded_at DESC LIMIT :lim"""
-        ),
-        {"since": since, "until": until, "origin": origin, "lim": PER_KIND_MAX},
-    ).mappings()
+            ),
+            {"since": since, "until": until, "origin": origin, "lim": PER_KIND_MAX},
+        ).mappings()
+    )
+    ret: dict[int, list[tuple[str, str]]] = {}
+    if loads:
+        for lid, k, why in conn.execute(
+            text("SELECT load_id, estimate_key, reason FROM kg.effect_estimate_retraction WHERE load_id = ANY(:l)"),
+            {"l": [int(r["id"]) for r in loads]},
+        ):
+            ret.setdefault(int(lid), []).append((k, why))
     out = []
     for r in loads:
         keys = list(r["keys"] or [])
-        retired = conn.execute(
-            text("SELECT estimate_key, reason FROM kg.effect_estimate_retraction WHERE load_id = :l"), {"l": r["id"]}
-        ).all()
+        retired = ret.get(int(r["id"]), [])
         bits = []
         if keys:
             bits.append(f"{len(keys)} ajoutée{'s' if len(keys) > 1 else ''}")

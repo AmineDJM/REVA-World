@@ -880,7 +880,16 @@ def write_load_counts(conn: Connection, directory: Path) -> dict[str, Any]:
         str(lid): int(n)
         for lid, n in conn.execute(text("SELECT load_id, count(*) FROM kg.causal_claim GROUP BY load_id"))
     }
-    doc = {"computed_at": datetime.now(UTC).isoformat(), "kg": kg, "causal": causal}
+    max_kg = conn.execute(text("SELECT max(id) FROM kg.load")).scalar_one()
+    max_causal = conn.execute(text("SELECT max(id) FROM kg.causal_load")).scalar_one()
+    # loads up to these ids are complete here: a load absent from the maps wrote 0 rows
+    doc = {
+        "computed_at": datetime.now(UTC).isoformat(),
+        "kg_max_load_id": max_kg,
+        "causal_max_load_id": max_causal,
+        "kg": kg,
+        "causal": causal,
+    }
     directory.mkdir(parents=True, exist_ok=True)
     tmp = directory / f"load_counts.json.tmp{os.getpid()}"
     tmp.write_text(json.dumps(doc), encoding="utf-8")
