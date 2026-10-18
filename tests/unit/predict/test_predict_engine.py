@@ -380,7 +380,9 @@ def test_retirement_plugin_runs_once_and_reports_failures_as_gaps() -> None:
         }
 
     r = predict(d, StaticEffectSource([]), NoClaims(), NoBaseline(), PluginData(retirement_runner=ok), draws=200)
-    assert seen[0]["intervention"]["target_age_months"] == 780 and seen[0]["intervention"]["first_birth_year"] == 1962
+    assert (
+        seen[0]["intervention"]["target_age_months"] == 780 and seen[0]["intervention"]["first_birth_year"] == 1965
+    )  # derived from 2027Q1 (V6 FIXPOP)
     v = var(r, "plugin_output:social.retirement_age.employment_change_55_69@FRA")
     assert [(p["period"], p["p50"]) for p in v["periods"]] == [("2027", 1000.0), ("2028", 2500.0)]
     # a target level is never fed to estimates of a *change*

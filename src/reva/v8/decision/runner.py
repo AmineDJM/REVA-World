@@ -27,6 +27,7 @@ import time
 from collections import OrderedDict
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -49,8 +50,37 @@ def _canon(o: Any) -> str:
     return json.dumps(o, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=str)
 
 
+#: Code and registry files whose content decides a run's result besides the data (V6 FIXPOP: a fix of the engine
+#: or of a plugin must not be hidden by a cached bundle computed by the previous code).
+_SRC = Path(__file__).resolve().parents[2]  # src/reva
+_REPO = _SRC.parents[1]
+CODE_FILES_GLOBS: tuple[tuple[Path, str], ...] = (
+    (_SRC / "predict", "*.py"),
+    (_SRC / "models" / "social", "*.py"),
+    (_SRC / "v8" / "decision", "*.py"),
+    (_REPO / "registry" / "predict", "*.yaml"),
+    (_REPO / "registry" / "rules" / "retirement_age", "*.yaml"),
+    (_REPO / "registry" / "assumptions", "retirement_*.yaml"),
+)
+_CODE_FP: dict[tuple[tuple[str, int, int], ...], str] = {}
+
+
+def code_fingerprint() -> str:
+    """Content digest of :data:`CODE_FILES_GLOBS` (re-hashed only when a file's size or mtime changes)."""
+    files = sorted(f for d, g in CODE_FILES_GLOBS if d.is_dir() for f in d.glob(g) if f.is_file())
+    sig = tuple((str(f), f.stat().st_mtime_ns, f.stat().st_size) for f in files)
+    if sig not in _CODE_FP:
+        h = hashlib.sha256()
+        for f in files:
+            h.update(str(f.relative_to(_REPO)).encode() + b"\0" + hashlib.sha256(f.read_bytes()).digest())
+        _CODE_FP.clear()
+        _CODE_FP[sig] = h.hexdigest()[:16]
+    return _CODE_FP[sig]
+
+
 def scenario_hash(decision: Decision, *, draws: int, seed: int, as_of_max: str | None, origin: str) -> str:
-    """Hash of the scenario's inputs only (decision + run settings); stable across data loads."""
+    """Hash of the scenario's inputs (decision + run settings) and of the engine/plugin code that computes it
+    (:func:`code_fingerprint`); stable across data loads (the data fingerprint is keyed separately)."""
     doc = {
         "decision": decision.model_dump(mode="json"),
         "draws": draws,
@@ -58,6 +88,7 @@ def scenario_hash(decision: Decision, *, draws: int, seed: int, as_of_max: str |
         "as_of_max": as_of_max,
         "origin": origin,
         "engine": pe.ENGINE_ID,
+        "code": code_fingerprint(),
     }
     return hashlib.sha256(_canon(doc).encode()).hexdigest()
 

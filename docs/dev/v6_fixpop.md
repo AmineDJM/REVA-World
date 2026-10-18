@@ -158,3 +158,107 @@ PL, 22:21 UTC) were not reported missing. After the two runs above, expect attri
 unvalidated FRA outputs, labelled "scénario non validé — pas une probabilité", because the chain
 has no back-test record in `registry/predict/validated_chains.yaml`. Nothing is zero-filled: if
 any FR window is quarantined, the dataset stays unregistered and the gap stays typed.
+
+## 3b. Live load done by the lead (2026-10-18)
+
+The lead ran the two ingests once the disk allowed it. Run 2 went from FI to MT, so FR is loaded.
+The lead then published the beliefs (release `ff1b49fe-70c2-4a2e-bddc-baf8be4b87e4`).
+`france_retirement_65_2027` then produced outputs (`predict_run4.json`), and those outputs exposed the bug below.
+
+## 4. The decision start is binding for the retirement plugin (France 65 coherence fix)
+
+**Bug.** The decision starts 2027Q1, and the engine horizon runs 2027Q1-2028Q4. The plugin
+options in `registry/predict/reference_decisions.yaml` set `first_birth_year: 1962`
+("2027 - 65"). The engine's own fallback (`engine._retirement`) used the same arithmetic:
+`start_year - target_years`. Under the reference path `law_in_force_2026`, the cohorts
+1962-1964 reach their legal age (62y6m-62y9m) in 2024-2026. Moving them to 65 therefore changed
+eligibility **before** the decision starts. The plugin ran 8 calendar years (2025-2032), and the
+engine reported all of them on a quarterly horizon. predict_run4 showed:
+
+| output | 2025 | 2026 |
+|---|---|---|
+| employment 55-69 | +191,209 | +366,994 |
+| pension spending | −8.33 bn € | −15.99 bn € |
+| pension recipients | −437,550 | −839,803 |
+
+**Fix** (`src/reva/predict/propagators.py`, `src/reva/predict/engine.py`, reference decision YAML):
+
+* `retirement_first_cohort(iso3, reference_path, target_months, start_year, start_quarter)`
+  derives the earliest birth year whose members, and all later cohorts, first reach the
+  eligibility age on or after the decision's first month. The eligibility age is the reference
+  legal age, or the decided level if that is lower.
+  * The arithmetic is the model's own: a person born in month m of year c reaches age A during
+    month 12c + m − 1 + A.
+  * For FRA 65 from 2027Q1 the result is **1965**: it first reaches 62y9m-63y in 2027-10.
+    Cohort 1964 is excluded because it reaches 62y9m from 2026-10.
+  * Cohorts are whole birth years, so a cohort partly eligible before the start keeps the
+    reference path; the derivation states this.
+  * For a lowering (target 60), the decided level binds instead: 1967.
+  * An unknown table, path or claim-year basis is a typed problem. The engine then reports gap
+    `first_cohort_underivable` and does not run the model.
+* An explicit `first_birth_year` earlier than the derived cohort is refused with gap
+  `decision_start_conflict`: the model is not run and nothing is reported, never zeroed. A later
+  explicit cohort is accepted.
+* The model horizon is set to cover the decision horizon exactly:
+  `periods = last horizon year − reference_year`, so 4 years (2025-2028). Only the calendar
+  years of the horizon (2027, 2028) are reported.
+* Every output carries the note "annual calendar-year values 2027-2028 (not quarterly)", and
+  the provenance has `reported_years`.
+* A non-zero value before the start year is refused with gap `effect_before_start` and the output
+  is dropped. This is a guard; with the derived cohort the model's pre-start values are exactly 0,
+  which the tests check.
+* The provenance records `first_birth_year_derivation`: the rule, the first cohort, the excluded
+  cohort and the rule-table digest.
+* `registry/predict/reference_decisions.yaml` no longer states `first_birth_year`/`periods`
+  for France 65. They are derived, and a comment explains why.
+
+**V8DECISION cache** (`docs/dev/v8_v8decision.md`). The bundle cache key is
+`scenario_hash:data_fingerprint`. The data fingerprint covers the effect layer and the latest
+release, but not the code. A run cached before this fix would therefore keep serving the old numbers
+for up to 30 minutes in a running process. `src/reva/v8/decision/runner.py`:
+* `scenario_hash` now includes `code_fingerprint()`;
+* `code_fingerprint()` is a content digest of `src/reva/{predict,models/social,v8/decision}/*.py`,
+  `registry/predict/*.yaml`, `registry/rules/retirement_age/*.yaml` and
+  `registry/assumptions/retirement_*.yaml`;
+* it is re-hashed only when a file's size or mtime changes.
+
+A code or registry change now makes a new scenario hash, so the cache misses and recomputes.
+The UI shows `scenario_hash[:12]` as "entrées", so that value changes once.
+
+**Tests**
+* `tests/unit/social/test_fixpop_predict_retirement_start.py` (4 tests). The real
+  `social.retirement_age` plugin runs on the captured Eurostat fixtures:
+  * the derivation gives 1965, 1967 for a lowering to 60, and a typed problem for an unknown country;
+  * the reference decision runs the model with `first_birth_year` 1965 and 4 periods, and reports
+    only 2027 and 2028, annual, labelled unvalidated;
+  * the model's pre-start rows are exactly 0;
+  * a stated 1962 gives `decision_start_conflict` and no output, while 1966 is accepted;
+  * a non-zero pre-start value gives `effect_before_start`, and 2029 is dropped.
+* `tests/unit/predict/test_predict_engine.py`: the expected cohort is updated from 1962 to 1965.
+  35 passed in `tests/unit/predict`, together with the new test file.
+* `tests/unit/v8/test_fixpop_decision_cache_key.py` (2 tests) and
+  `tests/unit/v8/test_v8_decision_studio.py`: 18 passed.
+
+**Re-run** (read-only): `uv run python -m reva.predict.run --reference all --draws 2000 --seed 0`
+writes `predict_run5.json`, on release `ff1b49fe…`. The other 4 reference decisions are
+identical to run4 (variables and gaps).
+
+France 65 (`france_retirement_65_2027`):
+* label: **« scénario non validé — pas une probabilité »** (`unvalidated`; no back-test record in
+  `validated_chains.yaml`);
+* deterministic model output, so no sampled uncertainty and degenerate quantiles;
+* **L1** fidelity; model label "conditional projection under stated assumptions, not a forecast";
+  model status "experimental model, not yet reviewed";
+* results "qualified": early-retirement routes (long careers, disability) are not modelled;
+* employment response taken from the cited literature
+  (`registry/assumptions/retirement_employment_response.yaml`);
+* first affected cohort 1965 (derived); no gaps.
+
+| annual value (calendar year) | 2027 | 2028 |
+|---|---|---|
+| employment 55-69, scenario − reference (persons) | **+8,834** | **+118,437** |
+| old-age pension recipients, scenario − reference (persons) | **−20,215** | **−271,023** |
+| pension spending, approx. (nominal € of the average's year, not indexed) | **−0.385 bn €** | **−5.159 bn €** |
+
+The 2027 values are small because cohort 1965 reaches its reference age only from October 2027.
+No year before 2027 is reported, and the model computes exactly 0 for 2025 and 2026.
