@@ -4,8 +4,13 @@
  */
 import { lazy } from 'react';
 import type { PaletteHit, V8Feature } from '../../contract';
-import { getDecisions, getMatrix, getPending } from './api';
-import { matchItem } from './model';
+
+// No static import of ./api or ./model here: they pull zod and the shell primitives into the shell's first-load
+// bundle (ui/src/v8/shell/README.md). The palette provider loads them on first use.
+function matchItem(q: string, hay: string[]): boolean {
+  const h = hay.join(' ').toLowerCase();
+  return q.trim().toLowerCase().split(/\s+/).every((w) => h.includes(w));
+}
 
 const base = '/v8/couverture';
 const q = (p: Record<string, string>) => `${base}?${new URLSearchParams(p).toString()}`;
@@ -37,6 +42,7 @@ export const feature: V8Feature = {
   search: async (query: string, signal: AbortSignal): Promise<PaletteHit[]> => {
     const needle = query.trim();
     if (needle.length < 2) return [];
+    const { getDecisions, getMatrix, getPending } = await import('./api');
     const [m, dec, pend] = await Promise.allSettled([getMatrix('region'), getDecisions(), getPending()]);
     if (signal.aborted) return [];
     const hits: PaletteHit[] = [];

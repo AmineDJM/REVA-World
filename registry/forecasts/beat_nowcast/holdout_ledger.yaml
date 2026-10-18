@@ -1,0 +1,12 @@
+schema: reva-beat-nowcast-holdout-ledger/1
+statement: 'Append-only: one entry per opening of the BEAT-NOWCAST holdout.'
+openings:
+- hypotheses_sha256: 0a77db1c14d03c4611a99020d2d46d7b49d2bf3ee72585f6c1fa8afd2dc15ad9
+  opened_at: '2026-10-17T23:10:26.525613+00:00'
+  code_sha256: 11ad0b60acd40b41f79e8537183ba34d8fe578ae69286a5c3b98280a69536896
+  status: opening
+- hypotheses_sha256: 0a77db1c14d03c4611a99020d2d46d7b49d2bf3ee72585f6c1fa8afd2dc15ad9
+  opened_at: '2026-10-17T23:10:26.525613+00:00'
+  holdout_json_sha256: 2c28b5e1f1b7e3e534893d1c194fc3a636b06af04f1a331facf5c43867d4a79d
+  confirmed: []
+  status: scored

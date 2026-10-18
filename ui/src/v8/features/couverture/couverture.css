@@ -57,6 +57,10 @@
     overflow-y: auto;
   }
 }
+.cv-page .v8-panel {
+  min-width: 0;
+  max-width: 100%;
+}
 .cv-main,
 .cv-side {
   min-width: 0;
