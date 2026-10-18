@@ -104,10 +104,21 @@ then reused).
 * Integration test runs the whole CRUD + rules + alerts cycle through the routes inside a rolled-back transaction
   (dev DB keeps 0 boards).
 
+### Strict startup (schema contract)
+
+`migrations/schema_contract.json` was regenerated the documented way (`uv run python scripts/update_schema_contract.py`
+on a throwaway `reva_contract_*` database; `--check` → « up to date (6be5d85c323ec63f, head 0020_v8_boards) »). Agents
+that saw drift had started their API between the migration being applied and the contract regeneration. Verified on
+2026-10-18: `REVA_SCHEMA_CONTRACT=enforce uv run reva api` logs « schema contract verified (6be5d85c323ec63f) » and
+`/health/ready` is 200 (migrations 0020_v8_boards); `reva db verify-schema` → match. Test
+`tests/integration/v8/test_v8api_schema_contract.py`: the committed contract's head is the latest migration and holds
+the `ops.v8_board*` objects; the dev DB passes `assert_schema_contract(mode="enforce")` as `reva_api` (the check the
+API runs at startup). Agents can drop `REVA_SCHEMA_CONTRACT=warn`.
+
 ## Checks
 
 ruff + mypy clean on my files; `pytest tests/unit/v8/test_v8api_*.py tests/integration/v8/test_v8api_devdb.py` →
-19 passed; `pytest tests/invariants` → 191 passed, 1 skipped.
+19 passed (+2 schema-contract tests); `pytest tests/invariants` → 191 passed, 1 skipped.
 
 ## Not done / for the lead
 
