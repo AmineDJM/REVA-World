@@ -55,7 +55,20 @@ KIND_FR = {
 }
 
 
+def _prob(f: Mapping[str, Any]) -> str | None:
+    """Probability of a binary question (``prob_above`` in the sealed record; ensembles may nest it)."""
+    for src in (f, f.get("ensemble") or {}):
+        for k in ("probability", "prob_above", "p"):
+            v = src.get(k) if isinstance(src, Mapping) else None
+            if v is not None and not isinstance(v, (dict, list)):
+                return str(v)
+    return None
+
+
 def _qband(f: Mapping[str, Any]) -> tuple[str | None, str | None, str | None]:
+    iv = f.get("interval")
+    if isinstance(iv, list) and len(iv) == 2 and not f.get("quantiles"):
+        return str(iv[0]), str(iv[1]), None
     q = f.get("quantiles") or {}
     lo = q.get("0.05") or q.get("0.1")
     hi = q.get("0.95") or q.get("0.9")
@@ -105,7 +118,7 @@ def _compact_batch(store: Any, sha: str, issued_at: Any) -> dict[str, Any]:
                 "model": str(f.get("model")),
                 "status": f.get("status"),
                 "point": None if f.get("point") is None else str(f["point"]),
-                "probability": None if f.get("probability") is None else str(f["probability"]),
+                "probability": _prob(f),
                 "lo": lo,
                 "hi": hi,
                 "level": lev,

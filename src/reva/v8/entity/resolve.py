@@ -65,6 +65,24 @@ def _iso3_of(conn: Connection, qid: str) -> str | None:
     return str(row) if row and ISO3_RE.match(str(row)) else None
 
 
+GENERIC_KINDS = ("unclassified", "wikidata_item")
+
+
+def best_kind(conn: Connection, qid: str) -> str | None:
+    """The record's kind: a specific kind when any loaded snapshot gives one (a generic 'unclassified' Wikidata
+    snapshot does not hide the 'country' kind another source gives the same id)."""
+    kinds = [
+        str(k)
+        for k in conn.execute(
+            text("""SELECT kind FROM kg.entity_current WHERE qid = :q AND kind IS NOT NULL
+                     ORDER BY (origin = 'live') DESC, id DESC"""),
+            {"q": qid},
+        ).scalars()
+    ]
+    specific = [k for k in kinds if k not in GENERIC_KINDS]
+    return (specific or kinds or [None])[0]
+
+
 def resolve(conn: Connection, kind: str, ident: str) -> Resolved:
     kind_l = kind.strip().lower()
     ident = ident.strip()
@@ -92,7 +110,7 @@ def resolve(conn: Connection, kind: str, ident: str) -> Resolved:
         if res.get("ambiguous"):
             raise NotResolved("several KG records hold this ISO code; none is chosen", iso3=iso, candidates=qids[:10])
         qid = qids[0] if qids else None
-        kg_kind = kq.kinds_for(conn, [qid]).get(qid) if qid else None
+        kg_kind = best_kind(conn, qid) if qid else None
         r = Resolved(kind="country", id=iso, via="iso3", qid=qid, kg_kind=kg_kind or "country", iso3=iso)
         if qid is None:
             r.notes.append("Aucun enregistrement du graphe de connaissances ne porte ce code ISO : fiche atlas seule.")
@@ -102,9 +120,9 @@ def resolve(conn: Connection, kind: str, ident: str) -> Resolved:
     if not found:
         raise NotResolved("no KG record for this id", kind=kind_l, id=ident, tried=cands[:8])
     qid = found[0]
-    kg_kind = kq.kinds_for(conn, [qid]).get(qid)
+    kg_kind = best_kind(conn, qid)
     canon_kind: str = P.profile_key(kg_kind or "") or kg_kind or pkey or kind_l
-    if canon_kind == "country" or kg_kind == "country":
+    if canon_kind == "country" or kg_kind == "country" or qid in {v: k for k, v in kq.country_qid_registry().items()}:
         iso_of = _iso3_of(conn, qid)
         if iso_of:
             return Resolved(

@@ -519,6 +519,11 @@ export function Forecasts({ b }: { b: Bundle }) {
   );
 }
 
+function pct(p: string): string {
+  const n = Number(p);
+  return Number.isFinite(n) ? `${(n * 100).toLocaleString('fr-FR', { maximumFractionDigits: n < 0.01 ? 2 : 1 })} %` : p;
+}
+
 function QuestionCard({ q }: { q: Question }) {
   return (
     <article className="fiche-q" data-testid="fiche-question">
@@ -541,7 +546,7 @@ function QuestionCard({ q }: { q: Question }) {
           <thead>
             <tr>
               <th scope="col">Prévisionniste</th>
-              <th scope="col">Valeur</th>
+              <th scope="col">{q.type === 'binary' ? 'Probabilité' : 'Valeur'}</th>
               <th scope="col">Intervalle</th>
               {q.status === 'resolved' && <th scope="col">Score</th>}
             </tr>
@@ -553,7 +558,17 @@ function QuestionCard({ q }: { q: Question }) {
                   <span className={`fiche-mkind fiche-mkind-${r.kind}`}>{r.kind_fr}</span> {r.label}
                 </th>
                 <td className="v8-num">
-                  {r.point !== null ? frValue(r.point, q.unit) : r.probability !== null ? `p = ${r.probability}` : r.status === 'issued' ? <MissingValue reason="point non publié" compact /> : <span className="v8-subtle">{r.status}</span>}
+                  {q.type === 'binary' && r.probability !== null ? (
+                    <span title="probabilité scellée que l’événement se produise">p = {pct(r.probability)}</span>
+                  ) : r.point !== null ? (
+                    frValue(r.point, q.unit)
+                  ) : r.probability !== null ? (
+                    `p = ${pct(r.probability)}`
+                  ) : r.status === 'issued' ? (
+                    <MissingValue reason={q.type === 'binary' ? 'probabilité non publiée' : 'point non publié'} compact />
+                  ) : (
+                    <span className="v8-subtle">{r.status}</span>
+                  )}
                 </td>
                 <td className="v8-num v8-subtle">{r.lo !== null && r.hi !== null ? `${frValue(r.lo, q.unit)} – ${frValue(r.hi, q.unit)}${r.level ? ` (${r.level})` : ''}` : '—'}</td>
                 {q.status === 'resolved' && <td className="v8-num">{r.score ? Object.entries(r.score).map(([k, v]) => `${k} ${v ?? '—'}`).join(' · ') : '—'}</td>}

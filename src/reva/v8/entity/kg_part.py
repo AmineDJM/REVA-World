@@ -20,6 +20,7 @@ PER_FAMILY = 12
 DEGREE_CAP = 2_000
 MAX_FACT_PROPS = 40
 MAX_POINTS = 400
+PER_PROPERTY_EVENTS = 4
 #: Properties whose literal value is the entity's own name or a long text: shown in the header, not as a fact row.
 HEADER_PROPS = {"chebi:definition", "mondo:definition"}
 #: Families never shown as plain relations (identity is shown in the header).
@@ -463,7 +464,15 @@ def dated_statements(
             }
         )
     out.sort(key=lambda r: r["x"] if r["x"] is not None else -1e9)
-    return out[-limit:]
+    # at most a few events per property (a country casts thousands of UN votes): the latest of each kind
+    per: dict[str, int] = defaultdict(int)
+    kept = []
+    for r in reversed(out):
+        per[r["property"]] += 1
+        if per[r["property"]] <= PER_PROPERTY_EVENTS:
+            kept.append(r)
+    kept.reverse()
+    return kept[-limit:]
 
 
 # ------------------------------------------------------------------------------------------------ relation pages
