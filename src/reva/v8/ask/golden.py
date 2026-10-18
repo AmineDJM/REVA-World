@@ -87,6 +87,8 @@ UNSOURCED_EVIDENCE = frozenset({"absence", "entity_identification", "registry_te
 #: absence ``what`` → cause class (what is missing), in French for the report and the UI.
 CAUSES: dict[str, str] = {
     "entity": "entité absente de l'index des libellés (fr/en) du graphe",
+    "exact_entity": "aucune entité au libellé ou alias exact (fr/en) dans le graphe : seulement des noms approchés",
+    "reference_decision": "aucune décision de référence du moteur ne correspond",
     "entity_approximate": "seulement des correspondances approchées du nom",
     "kg_families": "relation non chargée pour cette entité",
     "kg_cross": "aucune entité chargée au croisement des deux",
@@ -125,6 +127,8 @@ def classify(ans: Mapping[str, Any]) -> dict[str, Any]:
             if e.get("kind") != "absence":
                 continue
             what = str(e.get("what") or "")
+            if what in ("answer", ""):  # the generic "no sourced answer" record is not a cause
+                continue
             key = "entity_approximate" if what == "kg_families" and "candidates" in e else what
             causes.append(key)
         for s in sentences:

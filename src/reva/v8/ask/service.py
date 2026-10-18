@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import dataclasses
 import hashlib
+import json
 import threading
 import time
 from collections import OrderedDict
@@ -119,7 +120,7 @@ class MemoForecasts:
     16-manifest LRU): ~20–35 s per call under load. Sealed content never changes, so the V8 page memoises the
     answers per (family, geo) and per question for ``ttl`` (outcomes and scores can only appear later)."""
 
-    def __init__(self, inner: Any, ttl: float = 900.0) -> None:
+    def __init__(self, inner: Any, ttl: float = 3600.0) -> None:
         self.inner = inner
         self.name = getattr(inner, "name", "forecasts")
         self.ttl = ttl
@@ -152,6 +153,26 @@ class MemoForecasts:
         return self._memo(("models",), self.inner.models)
 
 
+class MemoDecisions:
+    """Memo of decision-engine runs: a run is seeded (same decision, draws and seed → same output), so a repeated
+    question reuses it for ``ttl`` seconds (the engine takes ~1.5 s warm on a quiet machine, ~100 s under load)."""
+
+    def __init__(self, inner: Any, ttl: float = 3600.0) -> None:
+        self.inner = inner
+        self.name = getattr(inner, "name", "decisions")
+        self._m = MemoForecasts(inner, ttl=ttl)
+
+    def references(self) -> Any:
+        return self._m._memo(("refs",), self.inner.references)
+
+    def instruments(self) -> Any:
+        return self._m._memo(("instr",), self.inner.instruments)
+
+    def run(self, decision: Mapping[str, Any], *, draws: int, seed: int) -> Any:
+        key = ("run", json.dumps(decision, sort_keys=True, default=str), draws, seed)
+        return self._m._memo(key, lambda: self.inner.run(decision, draws=draws, seed=seed))
+
+
 class AskService:
     def __init__(
         self, backends: Any, catalog: Any, *, drafters: Any = None, ledger: Any = None, budget: Any = None
@@ -160,6 +181,11 @@ class AskService:
             try:
                 backends = dataclasses.replace(backends, forecasts=MemoForecasts(backends.forecasts))
             except TypeError:  # not a dataclass (test double): used as is
+                pass
+        if getattr(backends, "decisions", None) is not None and not isinstance(backends.decisions, MemoDecisions):
+            try:
+                backends = dataclasses.replace(backends, decisions=MemoDecisions(backends.decisions))
+            except TypeError:
                 pass
         self.backends = backends
         self.catalog = catalog

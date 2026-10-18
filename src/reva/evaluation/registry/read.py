@@ -12,7 +12,7 @@ from sqlalchemy import text
 
 from reva.evaluation.ledger import load_frozen_manifest
 from reva.evaluation.registry.forecasts import all_models
-from reva.evaluation.registry.question_index import INDEX
+from reva.evaluation.registry.manifest_index import INDEX
 from reva.evaluation.registry.scores import aggregate, calibration, relative_to
 from reva.evaluation.registry.service import (
     BACKTEST_KIND,
@@ -173,12 +173,9 @@ def questions(
     for b in batches(conn, origin):
         if cycle and b["cycle"] != cycle:
             continue
-        m = CACHE.get(store, b["batch_sha256"])
-        n_fc: dict[str, int] = defaultdict(int)
-        for f in m["forecasts"]:
-            if f["status"] == "issued":
-                n_fc[f["question_id"]] += 1
-        for q in m["questions"]:
+        ix = INDEX.get(store, b["batch_sha256"])  # verified once per sha (V8 PERFQ)
+        n_fc = ix.n_issued
+        for q in ix.questions():
             if family and q["family"] != family:
                 continue
             if geo and q["geo"] != geo:
@@ -188,7 +185,7 @@ def questions(
             if q["question_id"] in listed:
                 continue
             listed.add(q["question_id"])
-            s = _summary(q, b, n_fc[q["question_id"]], oc_all.get(q["question_id"]))
+            s = _summary(q, b, n_fc.get(q["question_id"], 0), oc_all.get(q["question_id"]))
             if status and s["status"] != status:
                 continue
             out.append(s)
@@ -204,7 +201,7 @@ def _display(f: dict[str, Any]) -> dict[str, Any]:
 
 def question(conn: Any, store: Any, question_id: str) -> dict[str, Any] | None:
     """One sealed question. Batches, outcomes and scores are read from the database on every call; the batch
-    manifests through ``question_index.INDEX`` (verified once per sha256, then a per-question slice: V8 PERFQ)."""
+    manifests through ``manifest_index.INDEX`` (verified once per sha256, then a per-question slice: V8 PERFQ)."""
     bs = batches(conn, None)
     rows_of: dict[Any, list[dict[str, Any]]] = defaultdict(list)  # score rows per task_scope batch_sha256
     for r in _score_rows(conn, None):
