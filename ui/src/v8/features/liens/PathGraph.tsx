@@ -117,7 +117,7 @@ export default function PathGraph({ model, selectedPath, selectedNode, onTapNode
     if (!el.current) return;
     let cy: cytoscape.Core;
     try {
-      cy = cytoscape({ container: el.current, style: stylesheet(), minZoom: 0.15, maxZoom: 2.5, wheelSensitivity: 0.25, boxSelectionEnabled: false, autoungrabify: false });
+      cy = cytoscape({ container: el.current, style: stylesheet(), minZoom: 0.15, maxZoom: 2.5, boxSelectionEnabled: false, autoungrabify: false });
     } catch {
       return; // no canvas (jsdom): the textual chains remain the primary view
     }
