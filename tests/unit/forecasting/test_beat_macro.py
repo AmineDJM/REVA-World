@@ -171,7 +171,10 @@ def test_issue_job_runs_beat_macro_before_the_ensemble(monkeypatch: pytest.Monke
     monkeypatch.setattr(PI, "issue_supplements", lambda *a, **k: calls.append("pred_models") or {})
     monkeypatch.setattr(SE, "issue_monthly", lambda *a, **k: calls.append("beat_macro") or {})
     monkeypatch.setattr(EN, "issue_ensemble", lambda *a, **k: calls.append("ensemble") or {})
+    from reva.evaluation.beat_agri import registry as BA
+
+    monkeypatch.setattr(BA, "issue_release", lambda *a, **k: calls.append("beat_agri") or {})
     ctx = SimpleNamespace(worker_engine=None, store=None)
     res = RS.handle_forecast_registry({"action": "issue", "origin": "live"}, ctx)
-    assert calls == ["cycle", "pred_models", "beat_macro", "ensemble"]
+    assert calls == ["cycle", "pred_models", "beat_macro", "beat_agri", "ensemble"]
     assert set(res) >= {"pred_models", "beat_macro", "ensemble"}

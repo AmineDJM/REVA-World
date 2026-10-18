@@ -170,6 +170,14 @@ def beat_conflict_models() -> dict[str, tuple[str, str]]:
     return {k: v for k, v in MODELS.items() if k in ("forecast.cm_hurdle", "forecast.cm_stack_views")}
 
 
+def beat_agri_models() -> dict[str, tuple[str, str]]:
+    """V7 BEAT-AGRI forecasters vs USDA WASDE (``reva.evaluation.beat_agri.registry``): WASDE reference, fair fan,
+    bc / rev / wx corrections."""
+    from reva.evaluation.beat_agri.seal import MODELS
+
+    return {k: (v, f"BEAT-AGRI {m}") for k, (v, m) in MODELS.items()}
+
+
 def all_models() -> dict[str, tuple[str, str]]:
     return {
         **BASELINES,
@@ -180,6 +188,7 @@ def all_models() -> dict[str, tuple[str, str]]:
         **pred_models(),
         **ensemble_models(),
         **beat_conflict_models(),
+        **beat_agri_models(),
     }
 
 
@@ -190,6 +199,7 @@ __all__ = [
     "REFERENCE_WEO",
     "abstention",
     "all_models",
+    "beat_agri_models",
     "conflict_models",
     "ensemble_models",
     "finance_models",

@@ -1,0 +1,19 @@
+# BEAT-AGRI code amendments after the protocol commit (append-only). The CLI's dev/holdout commands accept only the
+# protocol's code_sha256 or a digest listed here. Amendment 1 is AFTER the holdout opening: it changes no evaluated
+# number (proof below) and opens nothing; the holdout is not re-scored.
+schema: reva-beat-agri-amendments/1
+amendments:
+  - n: 1
+    written_at: '2026-10-18T19:00:00+00:00'
+    code_sha256: f3bcf032d200fe4aa9a47611152e74fc1ef737c4c6ab6ed6471ab2aacb271cdd
+    previous_code_sha256: 60b0257e79a85deb6dc853a783c30a5cecfa97aa9925259033f28d04c97a2f2d
+    after_holdout_opening: true
+    change: >-
+      cases._wx_point keyed on the crop only and therefore also computed a weather-adjusted point for U.S. ending
+      stocks and World corn/soybeans; it now returns no forecast outside WX_SERIES (U.S. corn/soybeans yield and
+      production), the protocol's definition of wx (lead decision: fix at the source, not only at sealing).
+    effect_on_results: >-
+      none. Equivalence check on the live inputs (atlas.usda_wasde_esmis.headline a853d4df..., atlas.ncei_cag
+      b00838e2...), all 5,378 cases of MY 1998-2024, old vs new code: 1,194 wx points/densities on out-of-scope
+      series became 'no forecast'; 0 other point or density changed. Every pre-registered wx cell is
+      us_cornsoy_yield / us_cornsoy_production, so development.json and holdout.json are unchanged.

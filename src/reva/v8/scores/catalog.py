@@ -72,7 +72,7 @@ FORECASTERS: list[dict[str, Any]] = [
      "org": "Federal Reserve Bank of Cleveland", "product": "nowcast de l'inflation américaine", "domain": "nowcast",
      "status": "planned"},
     {"id": "usda_wasde", "label_fr": "USDA — WASDE", "short": "WASDE", "org": "US Department of Agriculture",
-     "product": "World Agricultural Supply and Demand Estimates (mensuel)", "domain": "agri", "status": "planned"},
+     "product": "World Agricultural Supply and Demand Estimates (mensuel)", "domain": "agri", "status": "active"},
     {"id": "ecdc_respicast", "label_fr": "ECDC — RespiCast (ensemble)", "short": "RespiCast", "org": "ECDC",
      "product": "European Respiratory Diseases Forecasting Hub", "domain": "health", "status": "planned"},
 ]  # fmt: skip
@@ -119,6 +119,11 @@ TARGETS: dict[str, dict[str, str]] = {
     "conflict.cm_deaths": {"domain": "conflict", "label_fr": "Décès de conflit étatique — pays-mois"},
     "conflict.registry_views": {"domain": "conflict", "label_fr": "Questions conflit du registre"},
     "agri.wasde": {"domain": "agri", "label_fr": "Bilans offre/demande agricoles (blé, maïs, soja…)"},
+    "agri.us_yield": {"domain": "agri", "label_fr": "Rendements US (maïs, soja, blé, riz) — campagne en cours"},
+    "agri.us_production": {"domain": "agri", "label_fr": "Production US (maïs, soja, blé, riz) — campagne en cours"},
+    "agri.us_ending_stocks": {"domain": "agri", "label_fr": "Stocks de fin US (maïs, soja, blé, riz)"},
+    "agri.world_production": {"domain": "agri", "label_fr": "Production mondiale (maïs, soja, blé, riz)"},
+    "agri.world_ending_stocks": {"domain": "agri", "label_fr": "Stocks de fin mondiaux (maïs, soja, blé, riz)"},
     "finance.rates_fx": {"domain": "finance", "label_fr": "Taux, changes, décisions de banques centrales"},
 }
 
@@ -189,6 +194,13 @@ TRACKS: list[dict[str, Any]] = [
                "registry/forecasts/beat_nowcast/holdout.json"],
      "summary_fr": "À la date de chaque mise à jour des nowcasts officiels américains (PIB : GDPNow, NY Fed ; inflation : "
      "Cleveland Fed) ; 5 hypothèses figées en développement, holdout ouvert une fois, une famille Holm."},
+    {"id": "beat_agri", "label_fr": "BEAT-AGRI — production, rendements, stocks vs USDA WASDE", "agent": "BEAT-AGRI",
+     "version": "V7", "report": "docs/dev/v7_beat_agri.md", "protocol": "registry/forecasts/beat_agri/protocol.yaml",
+     "files": ["registry/forecasts/beat_agri/hypotheses.yaml", "registry/forecasts/beat_agri/holdout_ledger.yaml",
+               "registry/forecasts/beat_agri/holdout.json", "docs/dev/v7_beat_agri_result.json"],
+     "summary_fr": "À chaque publication du WASDE (même date), corrections REVA du chiffre USDA (biais, lissage des "
+     "révisions, météo) ; vérité = estimation USDA ultérieure déclarée d'avance ; 12 hypothèses figées en "
+     "développement 2005-2016, holdout 2017-2024 ouvert une fois, une famille Holm."},
     {"id": "pred_models", "label_fr": "PRED-MODELS — tournoi en holdout verrouillé (V6)", "agent": "PRED-MODELS",
      "version": "V6", "report": "docs/dev/v6_pred_models.md", "protocol": "registry/forecasts/pred_models/protocol.yaml",
      "files": ["registry/forecasts/pred_models/holdout.json", "registry/forecasts/pred_models/holdout_ledger.yaml",
@@ -215,10 +227,6 @@ TRACKS: list[dict[str, Any]] = [
 
 # Domains/forecasters with no attempt yet: shown as "pas encore de piste", each with the reason quoted from a doc.
 NO_TRACK: list[dict[str, Any]] = [
-    {"target": "agri.wasde", "forecaster": "usda_wasde",
-     "reason_fr": "BEAT-AGRI : protocole pré-enregistré (développement 2005-2016, holdout 2017-2024 intact) ; aucune "
-     "fenêtre encore ouverte, rien n'est jugé.",
-     "quote": {"file": "registry/forecasts/beat_agri/protocol.yaml", "text": "holdout: marketing years 2017-2024 (untouched; opened once, ledger)"}},
     {"target": "health.eu_resp", "forecaster": "ecdc_respicast",
      "reason_fr": "Sorties RespiCast non listables sans l'API GitHub (bloquée) et disque < 5 Go : aucun test possible.",
      "quote": {"file": "docs/dev/v7_beat_health.md", "text": "The RespiCast ensemble is the official benchmark for ERVISS"}},

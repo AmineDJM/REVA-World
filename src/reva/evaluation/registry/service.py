@@ -757,6 +757,11 @@ def resolve_due(
         manifest = load_frozen_manifest(store, b["sha"])
         if manifest.get("schema") != BATCH_SCHEMA:
             raise IntegrityFailure("not a forecast registry batch", sha256=b["sha"])
+        if manifest.get("resolver") == "beat_agri":  # V7 BEAT-AGRI: pre-registered WASDE truth rule
+            from reva.evaluation.beat_agri.registry import resolve_batch_db
+
+            out.append(resolve_batch_db(engine, store, b, manifest, now, mv, origin, actor))
+            continue
         issued_at = datetime.fromisoformat(manifest["issued_at"])
         with engine.connect() as conn:
             handled = handled_questions(conn, b["sha"])
@@ -1145,6 +1150,10 @@ def handle_forecast_registry(payload: dict[str, Any], ctx: Any) -> dict[str, Any
             from reva.evaluation.beat_macro.seal import issue_monthly
 
             res["beat_macro"] = issue_monthly(ctx.worker_engine, ctx.store, origin=origin)
+        if not fams:  # V7 BEAT-AGRI: 2026/27 batch on each new WASDE release (idempotent per release)
+            from reva.evaluation.beat_agri.registry import issue_release
+
+            res["beat_agri"] = issue_release(ctx.worker_engine, ctx.store, origin=origin)
         # V7 BEAT-ENSEMBLE: the REVA ensemble on every recently sealed open question, after all its components -
         # must stay the LAST step (one ensemble forecast per question and version)
         from reva.evaluation.registry.ensemble import issue_ensemble

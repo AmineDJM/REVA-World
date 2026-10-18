@@ -203,3 +203,130 @@ def test_wx_issued_only_on_us_corn_soybeans_yield_production() -> None:
     )
     wx = next(f for f in b["forecasts"] if f["model"] == "forecast.beat_agri_wx")
     assert wx["status"] == "abstained"
+
+
+def _weather() -> C.Weather:
+    import random as _r
+
+    rng = _r.Random(3)
+    vals = {reg: {(y, m): (70 + rng.gauss(0, 2), 3 + rng.gauss(0, 1)) for y in range(1990, 2027) for m in range(1, 13)}
+            for reg in (261, 262)}  # fmt: skip
+    return C.Weather(vals)
+
+
+def test_wx_has_no_forecast_outside_its_scope_at_the_source() -> None:
+    cs, _ = S.all_cases(_synthetic(), _weather())
+    got = {c.series for c in cs if c.points.get("wx") is not None}
+    assert got and got <= set(C.WX_SERIES)
+    assert all(c.sds.get("wx") is None for c in cs if c.series not in C.WX_SERIES)
+
+
+def _registry_batch(now: datetime) -> dict:
+    from reva.evaluation.beat_agri import registry as BR
+
+    v = _synthetic(last=date(2026, 10, 10))
+    prosp = S.prospective_records(v, _weather(), now)
+    pin = {"dataset_key": BR.WASDE_TABLE, "artifact_sha256": "a" * 64, "recorded_at": "2026-10-17T00:00:00+00:00"}
+    return BR.build_registry_batch(prosp, now=now, confirmed=[], pins={BR.WASDE_TABLE: pin}, origin="live")
+
+
+def test_registry_batch_format() -> None:
+    from reva.evaluation.registry.forecasts import predictive_from_record
+    from reva.evaluation.registry.service import BATCH_SCHEMA
+
+    b = _registry_batch(datetime(2026, 10, 18, tzinfo=UTC))
+    assert b["schema"] == BATCH_SCHEMA and b["resolver"] == "beat_agri" and b["cycle"] == "beat_agri:2026-10-10"
+    q = next(x for x in b["questions"] if x["family"] == "beat_agri.us.corn.yield")
+    assert (
+        q["reference_period"] == "2026"
+        and q["period_end"] == "2027-01-01"
+        and q["resolution"]["truth_date"] == "2027-01-01"
+    )
+    for k in (
+        "question_key",
+        "cycle",
+        "label_fr",
+        "label_en",
+        "geo",
+        "geo_label_fr",
+        "geo_label_en",
+        "unit",
+        "text_fr",
+        "text_en",
+    ):
+        assert q[k]
+    qw = next(x for x in b["questions"] if x["family"] == "beat_agri.world.corn.production")
+    assert qw["resolution"]["truth_date"] == "2027-11-01"
+    fan = next(
+        f for f in b["forecasts"] if f["question_id"] == q["question_id"] and f["model"] == "forecast.wasde_fair_fan"
+    )
+    assert fan["predictive"]["family"] == "normal" and predictive_from_record(fan["point"], fan["predictive"]).sigma
+    ref = next(
+        f
+        for f in b["forecasts"]
+        if f["question_id"] == q["question_id"] and f["model"] == "forecast.reference_usda_wasde"
+    )
+    assert ref["predictive"] == {"family": "point"} and "USDA" in ref["attribution"]
+    wxw = next(
+        f for f in b["forecasts"] if f["question_id"] == qw["question_id"] and f["model"] == "forecast.beat_agri_wx"
+    )
+    assert wxw["status"] == "abstained"
+
+
+def test_resolution_refuses_before_the_truth_date_and_reads_the_first_release_on_or_after() -> None:
+    from reva.evaluation.beat_agri import registry as BR
+
+    b = _registry_batch(datetime(2026, 10, 18, tzinfo=UTC))
+    v = _synthetic(last=date(2028, 3, 1))  # the table already holds later releases
+    pin = {"dataset_key": BR.WASDE_TABLE, "artifact_sha256": "b" * 64}
+    before = BR.resolve_manifest(b, set(), v, pin, today=date(2026, 12, 31))
+    assert before == {"outcomes": [], "scores": []}
+    jan = BR.resolve_manifest(b, set(), v, pin, today=date(2027, 1, 20))
+    res = {o["question_id"]: o for o in jan["outcomes"]}
+    q = next(x for x in b["questions"] if x["family"] == "beat_agri.us.corn.yield")
+    qw = next(x for x in b["questions"] if x["family"] == "beat_agri.world.corn.production")
+    assert res[q["question_id"]]["status"] == "resolved" and qw["question_id"] not in res
+    truth = v.truth("us.corn.yield", 2026)
+    assert truth is not None and truth[2] == date(2027, 1, 10)
+    assert float(res[q["question_id"]]["value"]) == pytest.approx(truth[0])
+    assert res[q["question_id"]]["source"]["cells"][0]["indicator"] == "wasde_esmis:us.corn.yield|v=2027-01-10"
+    sc = [s for s in jan["scores"] if s["question_id"] == q["question_id"]]
+    assert {s["model"] for s in sc} >= {
+        "forecast.reference_usda_wasde",
+        "forecast.wasde_fair_fan",
+        "forecast.beat_agri_bc",
+    }
+    fan = next(s for s in sc if s["model"] == "forecast.wasde_fair_fan")
+    assert fan["crps"] is not None and fan["abs_error"] is not None
+    # already handled questions are not scored twice; a missing truth after void_after -> void
+    again = BR.resolve_manifest(b, set(res), v, pin, today=date(2027, 1, 20))
+    assert not again["outcomes"]
+    empty = C.Vintages([r for r in v.releases if r.release < date(2027, 1, 1)])
+    void = BR.resolve_manifest(b, set(), empty, pin, today=date(2028, 2, 10))
+    assert {o["status"] for o in void["outcomes"] if o["question_id"] == q["question_id"]} == {"void"}
+
+
+def test_issue_job_runs_beat_agri_before_the_ensemble(monkeypatch: pytest.MonkeyPatch) -> None:
+    from types import SimpleNamespace
+
+    from reva.evaluation.beat_agri import registry as BA
+    from reva.evaluation.beat_macro import seal as SEM
+    from reva.evaluation.pred_models import issue as PI
+    from reva.evaluation.registry import ensemble as EN
+    from reva.evaluation.registry import service as RS
+
+    calls: list[str] = []
+    monkeypatch.setattr(RS, "issue_cycle", lambda *a, **k: calls.append("cycle") or {})
+    monkeypatch.setattr(PI, "issue_supplements", lambda *a, **k: calls.append("pred_models") or {})
+    monkeypatch.setattr(SEM, "issue_monthly", lambda *a, **k: calls.append("beat_macro") or {})
+    monkeypatch.setattr(BA, "issue_release", lambda *a, **k: calls.append("beat_agri") or {})
+    monkeypatch.setattr(EN, "issue_ensemble", lambda *a, **k: calls.append("ensemble") or {})
+    RS.handle_forecast_registry({"action": "issue", "origin": "live"}, SimpleNamespace(worker_engine=None, store=None))
+    assert calls[-1] == "ensemble" and calls.index("beat_agri") < calls.index("ensemble")
+
+
+def test_beat_agri_models_are_registry_models() -> None:
+    from reva.evaluation.beat_agri import seal as SE
+    from reva.evaluation.registry.forecasts import all_models
+
+    assert set(SE.MODELS) <= set(all_models())

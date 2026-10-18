@@ -1,5 +1,12 @@
 {
  "agent": "BEAT-AGRI",
+ "amendments": [
+  {
+   "code_sha256": "f3bcf032d200fe4aa9a47611152e74fc1ef737c4c6ab6ed6471ab2aacb271cdd",
+   "effect": "wx no longer computed outside U.S. corn/soybeans yield/production; 0 in-scope changes over 5,378 cases",
+   "n": 1
+  }
+ ],
  "benchmark": "USDA WASDE in the same release (AE % of truth); fair fan N(WASDE, RMS of WASDE own past relative errors) (CRPS % of truth)",
  "code_sha256": "60b0257e79a85deb6dc853a783c30a5cecfa97aa9925259033f28d04c97a2f2d",
  "development": {
@@ -3716,6 +3723,7 @@
   "batch_sha256": "5d903078a6e98e5e3cf34667bb27a128e2031b27a80bce9f6f6187538490c857",
   "forecasts": 90,
   "issued_at": "2026-10-18T17:58:22.229654+00:00",
+  "legacy_batch_note": "batch_sha256 = first seal (task scope beat_agri, own format), kept unchanged; the registry-format batch re-issues the same 90 points (checked equal) and is the only one resolved",
   "questions": 18,
   "records": [
    {
@@ -3881,6 +3889,8 @@
     "wx": null
    }
   ],
+  "registry_batch_issued_at": "2026-10-18T18:08:32.055028+00:00",
+  "registry_batch_sha256": "a4995ecdd9cff76f4f611f1dc3944d72e828e2d0076ad92796111bffef310aa5",
   "release_in_force": "2026-10-09"
  },
  "protocol": "registry/forecasts/beat_agri/protocol.yaml",

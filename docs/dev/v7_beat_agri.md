@@ -16,7 +16,8 @@ best holdout results — revision-smoothing correction of WASDE's World producti
 and CRPS ×0.92–0.93, one-sided p 0.12–0.20: direction right, not significant. U.S. corrections lose (×1.02–1.11),
 World ending-stocks corrections lose badly on points (×1.36–1.59), the weather-adjusted U.S. corn/soybean candidate
 loses (AE ×1.05–1.20), and REVA's pure trend model is 18–119 % worse than WASDE on U.S. yields. The 2026/27 marketing
-year is sealed in the forecast registry (batch `5d903078…`, 18 questions, 90 forecasts) for prospective scoring.
+year is sealed in the forecast registry (registry batch `a4995ecd…`, 18 questions, 90 forecasts; re-sealed on each
+new WASDE release by the weekly job, resolved by the pre-registered truth rule from January 2027).
 
 ## Sources (new connectors, loaded live)
 
@@ -125,47 +126,74 @@ Honest wording: "On the pre-registered 2017–2024 holdout, no REVA correction o
 the same release date; a revision-smoothing correction of WASDE's World production projections points the right
 way (−7 to −10 %) but is not significant with 8 marketing years."
 
-## Prospective (2026/27, sealed)
+## Prospective (2026/27, sealed in the forecast registry)
 
-Batch `5d903078a6e98e5e3cf34667bb27a128e2031b27a80bce9f6f6187538490c857` (2026-10-18 17:58:22 UTC, dev DB, origin
-`live`; `model.evaluation` rows with `metrics.kind = registry_issue`, `task_scope.kind = beat_agri`): 18 quantity
-questions on the WASDE of 2026-10-09 (k = 5; U.S. wheat yield/production are outside their May–Sep window and not
-asked), each with its truth rule; 90 forecasts: `forecast.reference_usda_wasde` (attributed), `forecast.wasde_fair_fan`
-(benchmark), `forecast.beat_agri_bc`, `forecast.beat_agri_rev`, `forecast.beat_agri_wx` (U.S. corn/soybeans yield and
-production only), each labelled "NOT confirmed on the holdout". Examples: U.S. corn yield WASDE 181.2 bu/acre (fan σ
-3.16) vs bc 181.03, rev 180.94, wx 180.67; World corn production 1,293.75 Mt (σ 32.95) vs bc 1,312.44, rev 1,312.89;
-U.S. soybean ending stocks 315 mbu (σ 100.8) vs bc 288.2. Truths: January 2027 (U.S. production/yield), November
-2027 (stocks, World). The generic registry resolver does not handle this scope; scoring is by the same losses with
-`reva.evaluation.beat_agri` (resolver command still to write, see below). Prospective claims need ≥ 6 resolved MYs.
+* **Registry batch** `a4995ecdd9cff76f4f611f1dc3944d72e828e2d0076ad92796111bffef310aa5` (2026-10-18 18:08:32 UTC,
+  dev DB, origin `live`; `BATCH_SCHEMA`, task scope kind `forecast_registry`, cycle `beat_agri:2026-10-09`,
+  `resolver = beat_agri`): 18 quantity questions on the WASDE of 2026-10-09 (k = 5; U.S. wheat yield/production are
+  outside their May–Sep window and not asked), each with its declared truth rule and `period_end` = the truth date;
+  90 registry forecast records: `forecast.reference_usda_wasde` (attributed point), `forecast.wasde_fair_fan`
+  (benchmark, normal), `forecast.beat_agri_bc`, `_rev`, `_wx` (normal; wx only on U.S. corn/soybeans yield and
+  production), each labelled "NOT confirmed on the holdout". Visible to the V8 scores live view and to the
+  ensemble (same task scope as every registry batch).
+* The first seal of the same release (batch `5d903078…`, 2026-10-18 17:58 UTC, task scope `beat_agri`, BEAT-AGRI's
+  own record format) is kept unchanged; the registry-format batch re-issues it once — all 90 points checked equal
+  before sealing — and only the registry-format batch is resolved (nothing is scored twice).
+* **Re-seal on each new WASDE release**: `reva.evaluation.beat_agri.registry.issue_release`, idempotent per release
+  (cycle `beat_agri:<release date>`, checked under the registry issue lock), wired into the weekly
+  `forecast_registry` `issue` job after BEAT-MACRO and BEFORE the ensemble (the ensemble stays last; order test in
+  `tests/unit/forecasting/test_beat_macro.py` and `tests/unit/test_beat_agri.py`). Second call on the same release:
+  `already_sealed`.
+* **Resolution** (`python -m reva.cli.beat_agri resolve`; the daily `forecast_registry` `resolve` job reaches the
+  same code: `registry.service.resolve_due` delegates batches declaring `resolver = beat_agri`): truth = the value in
+  the first WASDE released on or after the declared date (2027-01-01 for U.S. production/yield, 2027-11-01 for stocks
+  and World), read from the latest `atlas.usda_wasde_esmis.headline` version; nothing is resolved before that date
+  whatever the table holds (live run 2026-10-18: `refused_before_truth_date`, earliest 2027-01-01, exit 1); a truth
+  release dated on/before the seal day → `not_prospective`; no truth 400 days after the truth date → void. Scores =
+  `registry.scores.score_forecast` (AE, CRPS, log score, PIT), written by `registry.service._record_resolution`
+  (append-only `registry_score` rows, scope `forecast_registry`) — the rows V8 scores and the ensemble read. The
+  five models are in `registry.forecasts.all_models()` (`beat_agri_models`).
+* Examples (WASDE 2026-10-09): U.S. corn yield 181.2 bu/acre (fan σ 3.16) vs bc 181.03, rev 180.94, wx 180.67; World
+  corn production 1,293.75 Mt (σ 32.95) vs bc 1,312.44, rev 1,312.89; U.S. soybean ending stocks 315 mbu (σ 100.8)
+  vs bc 288.2. Prospective claims need ≥ 6 resolved marketing years.
+* **Scoreboard**: `uv run python -m reva.v8.scores.build` → `registry/scoreboard/tracks.yaml` now has track
+  `beat_agri` (12 holdout rows, all "ne bat pas", Holm-adjusted p computed over the family of 12; 1 pending
+  prospective row, resolution from 2027-01-01); USDA WASDE is an active forecaster; 0 validation problems.
 
 ## Defects found, and their effect
 
-* `cases.compute_candidates` fills a `wx` point for any corn/soybean series (it keys on the crop), including U.S.
-  ending stocks and World corn/soybeans. Those are outside every pre-registered wx cell: never scored, and not issued
-  (`seal.WX_SERIES`, test). The evaluated code was not changed (digest = protocol's).
+* `cases._wx_point` keyed on the crop only and so also computed a wx point for U.S. ending stocks and World
+  corn/soybeans. Fixed at the source (lead decision): it now returns no forecast outside `WX_SERIES`. This is a
+  post-holdout code amendment, logged in `registry/forecasts/beat_agri/amendments.yaml` (new code sha256 `f3bcf032…`):
+  an old-vs-new run on all 5,378 cases of MY 1998–2024 (live inputs) changed 1,194 out-of-scope wx points/densities
+  to "no forecast" and **nothing else**; every wx cell is U.S. corn/soybeans yield/production, so development.json
+  and holdout.json are unchanged and the holdout was not re-scored.
 * Connector 1.0.0/1.0.1 skipped the 2018-10..2021-07 archive names and two XMLs with a default namespace; 1.0.2
   (before any window was opened) reads them; the evaluation used only the 1.0.2 table.
 
 ## Owner decisions / not done
 
-1. **NASS QuickStats** (crop condition, objective yield) needs an api.data.gov key — the most plausible information
-   edge between WASDE releases; not used. **Futures** (CBOT) are licensed — not used (owner decision).
+1. **NASS QuickStats key (owner decision)**: crop condition and objective-yield data need an api.data.gov key —
+   the most plausible information edge between WASDE releases; not used. **Futures** (CBOT) are licensed — not used (owner decision).
 2. **Between-release nowcasts** (e.g. late-July weather / condition before the August WASDE) were not in the
    owner's same-date family; a new protocol could test them on the prospective registry.
 3. **Price outlooks** (FAO FFPI subindices, World Bank Pink Sheet): no official numeric forecast vintages in REVA
    (World Bank CMO forecast tables not loaded; FAO/AMIS outlooks are narrative) — not tested.
-4. **Resolver**: a `reva.cli.beat_agri resolve` command (truth by the declared rule from the WASDE table version
-   published after the seal) is still to be written before January 2027; monthly re-sealing on each later 2026/27
-   WASDE release (`seal --seal` is idempotent per release) should be scheduled.
+4. **Monthly WASDE refresh**: the weekly re-seal uses the latest `atlas.usda_wasde_esmis` table version, so the
+   connector must be re-run after each WASDE release (≈ 2nd week of each month; a full run, ~437 MB fetched, ~0 MB
+   new on disk except the new report) — to be scheduled by the owner/lead.
 
 ## Files and commands
 
 Code: `src/reva/adapters/connectors/atlas_usda_wasde_esmis.py`, `atlas_ncei_cag.py`; `src/reva/evaluation/beat_agri/`
-(`cases.py`, `service.py` — protocol digest; `seal.py`); CLI `src/reva/cli/beat_agri.py`. Registry:
+(`cases.py`, `service.py` — protocol digest + amendment 1; `seal.py`, `registry.py` — registry issue/resolve);
+CLI `src/reva/cli/beat_agri.py` (`describe`, `dev`, `holdout`, `seal`, `resolve`); registry wiring in
+`src/reva/evaluation/registry/{forecasts.py,service.py}`; scoreboard `src/reva/v8/scores/{build.py,catalog.py}`. Registry:
 `registry/forecasts/beat_agri/{protocol.yaml, development.json, hypotheses.yaml, holdout.json, holdout_ledger.yaml}`,
 `registry/models/methods.yaml` (5 models). Result: `docs/dev/v7_beat_agri_result.json`. Tests:
-`tests/unit/test_beat_agri_connectors.py` (8), `tests/unit/test_beat_agri.py` (10, synthetic: no look-ahead, truth
-rule, fair fan, selection, single opening, sealing), `tests/integration/test_beat_agri_ingest.py` (2, fixture mode);
+`tests/unit/test_beat_agri_connectors.py` (8), `tests/unit/test_beat_agri.py` (16, synthetic: no look-ahead, truth
+rule, fair fan, selection, single opening, sealing, wx scope at source, registry batch format, resolution refused
+before the truth date / first release on or after / not scored twice / void, job order before the ensemble), `tests/integration/test_beat_agri_ingest.py` (2, fixture mode);
 fixtures `tests/fixtures/source/atlas.{usda_wasde_esmis,ncei_cag}` (live captures; XML = sub-report excerpts).
 
 ```bash
@@ -174,5 +202,7 @@ flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.usda_wasde_esmis   # f
 flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.ncei_cag
 uv run python -m reva.cli.beat_agri describe
 uv run python -m reva.cli.beat_agri seal                                   # dry run on the WASDE in force
-flock /tmp/reva-devdb.lock uv run python -m reva.cli.beat_agri seal --seal # once per new 2026/27 release
+flock /tmp/reva-devdb.lock uv run python -m reva.cli.beat_agri seal --seal # once per new 2026/27 release (also the weekly job)
+flock /tmp/reva-devdb.lock uv run python -m reva.cli.beat_agri resolve     # from 2027-01-01 (refuses before)
+uv run python -m reva.v8.scores.build
 ```

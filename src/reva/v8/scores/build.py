@@ -593,6 +593,86 @@ def beat_nowcast(src: Sources) -> list[Row]:
     return rows
 
 
+# --------------------------------------------------------------------------------------------- BEAT-AGRI
+AGRI_TARGET = {
+    "us_yield": "agri.us_yield",
+    "us_production": "agri.us_production",
+    "us_ending_stocks": "agri.us_ending_stocks",
+    "world_production": "agri.world_production",
+    "world_ending_stocks": "agri.world_ending_stocks",
+}
+AGRI_WINDOW = {"early": "mai-juillet", "mid": "août-octobre", "late": "novembre-avril"}
+AGRI_CAND = {
+    "bc": "WASDE corrigé du biais (erreurs passées)",
+    "rev": "WASDE corrigé du lissage des révisions",
+    "wx": "WASDE ajusté par la météo (ceintures maïs/soja)",
+}
+
+
+def beat_agri(src: Sources) -> list[Row]:
+    rel = "registry/forecasts/beat_agri/holdout.json"
+    if not src.has(rel):
+        return []
+    d = src.load(rel)
+    res = d["results"]
+    fam = int(d.get("family_size") or len(res))
+    adj = holm_adjust([r.get("p_better") for r in res])
+    rows: list[Row] = []
+    for i, (r, a) in enumerate(zip(res, adj, strict=True)):
+        ok = bool(r["confirmed"])
+        crps = r["loss"] == "crps"
+        if ok:
+            basis = f"confirmé : Holm ✓ (famille {fam}), ratio < 1"
+        elif r.get("holm_rejected"):
+            basis = "Holm ✓ mais non confirmé (règle de couverture 80 % des densités)"
+        else:
+            basis = f"non confirmé : Holm ✗ (p brut {r['p_better']:.3g}, famille {fam})"
+        cav = ["uses_official_forecast"] + (["small_n"] if (r.get("n_years") or 0) < 20 else [])
+        rows.append({
+            "id": f"beat_agri.holdout.{r['group']}.{r['window']}.{r['candidate']}.{r['loss']}",
+            "track": "beat_agri", "window": "holdout", "target": AGRI_TARGET[r["group"]],
+            "horizon": r["window"], "horizon_label_fr": f"publications WASDE {AGRI_WINDOW[r['window']]}",
+            "forecaster": "usda_wasde",
+            "benchmark": "wasde_fair_fan" if crps else "wasde_point",
+            "benchmark_label_fr": "densité équitable autour du WASDE" if crps else "point WASDE de la même publication",
+            "benchmark_kind": "official_fair_density" if crps else "official_point",
+            "candidate": f"forecast.beat_agri_{r['candidate']}",
+            "candidate_label_fr": AGRI_CAND[r["candidate"]], "candidate_kind": "post_processed_official",
+            "evaluation": "preregistered_holdout", "metric": r["loss"],
+            "sample": {"n_marketing_years": r.get("n_years"), "n_pairs": r.get("n_cases")},
+            "ratio": r["relative"], "p_raw": r["p_better"], "p_holm": r6(a), "p_holm_basis": "computed",
+            "holm_family_size": fam, "holm_rejected": bool(r["holm_rejected"]),
+            "coverage": {"0.8": r["coverage80"]} if r.get("coverage80") is not None else None,
+            "verdict": "bat" if ok else "ne_bat_pas", "verdict_basis_fr": basis,
+            "caveats": base_caveats(src, "beat_agri", cav),
+            "source": source(src, rel, f"/results/{i}", ratio="relative", p="p_better", win="confirmed"),
+            "report": report_of(src, "beat_agri"),
+            "protocol": protocol(src, C.track("beat_agri")["protocol"]),
+        })  # fmt: skip
+    pro = "docs/dev/v7_beat_agri_result.json"
+    if src.has(pro):
+        rows.append({
+            "id": "beat_agri.prospective.2026_27", "track": "beat_agri", "window": "prospective",
+            "target": "agri.wasde", "horizon": "campagne 2026/27",
+            "horizon_label_fr": "campagne 2026/27, scellée à chaque publication WASDE", "forecaster": "usda_wasde",
+            "benchmark": "wasde_fair_fan", "benchmark_label_fr": "point WASDE et densité équitable autour du WASDE",
+            "benchmark_kind": "official_fair_density", "candidate": "forecast.beat_agri_bc / rev / wx",
+            "candidate_label_fr": "corrections REVA du WASDE (non confirmées au holdout)",
+            "candidate_kind": "post_processed_official", "evaluation": "prospective", "metric": "mixed",
+            "verdict": "en_attente",
+            "verdict_basis_fr": "prévisions scellées au registre (une publication WASDE = un lot) ; jugées quand "
+            "l'estimation USDA déclarée d'avance paraît",
+            "caveats": base_caveats(src, "beat_agri", ["uses_official_forecast"]),
+            "source": source(src, pro, "/prospective"),
+            "resolution": {"date": "2027-01-01", "note_fr": "production/rendements US : premier WASDE publié à partir "
+                           "du 1er janvier 2027 ; stocks et monde : à partir du 1er novembre 2027",
+                           "quote": quote(C.track("beat_agri")["protocol"], "the series' value for marketing year Y in the FIRST")},
+            "report": report_of(src, "beat_agri"),
+            "protocol": protocol(src, C.track("beat_agri")["protocol"]),
+        })  # fmt: skip
+    return rows
+
+
 # --------------------------------------------------------------------------------------------- PRED-MODELS (V6)
 PM_TARGET = {("weo", "real_gdp_growth"): "macro.weo_gdp", ("weo", "cpi_inflation"): "macro.weo_cpi",
              ("weo", "unemployment_rate"): "macro.weo_unemployment", ("us", "real_gdp_growth"): "macro.us_gdp",
@@ -800,6 +880,7 @@ GENERATORS: tuple[Callable[[Sources], list[Row]], ...] = (
     beat_health,
     beat_conflict,
     beat_nowcast,
+    beat_agri,
     pred_models,
     fix7_fair,
     pred_energy_v6,

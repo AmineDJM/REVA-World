@@ -57,6 +57,10 @@ CELLS: dict[str, tuple[tuple[str, str], ...]] = {
     "wx": tuple((g, w) for g in ("us_cornsoy_yield", "us_cornsoy_production") for w in ("mid", "late")),
 }
 WX_REGION = {"corn": 261, "soybeans": 262}
+#: the only series the weather candidate is defined for (protocol: U.S. corn / soybeans yield and production);
+#: amendment 1 (registry/forecasts/beat_agri/amendments.yaml): before it, a wx point was also computed for the other
+#: corn/soybean series (never in a tested cell, never scored)
+WX_SERIES = ("us.corn.yield", "us.corn.production", "us.soybeans.yield", "us.soybeans.production")
 WX_MONTHS = (6, 7, 8)
 WEATHER_DAY = 12
 WEATHER_FIRST_YEAR = 1990
@@ -315,7 +319,7 @@ def _rev_point(c: Case, by_gw: Mapping[tuple[str, str], Sequence[Case]], past: S
 
 
 def _wx_point(c: Case, past: Sequence[Case], weather: Weather) -> float | None:
-    if c.crop not in WX_REGION:
+    if c.series not in WX_SERIES:
         return None
     months = [m for m in WX_MONTHS if Weather.usable(c.my, m, c.t)]
     if not months or len(past) < MIN_WX_ROWS:
