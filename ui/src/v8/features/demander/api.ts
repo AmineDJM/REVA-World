@@ -133,6 +133,8 @@ const SeriesStatus = z.looseObject({
   source: nstr,
   n: z.number().nullish(),
   stale: z.boolean().nullish(),
+  projections_to: nstr,
+  outside_snapshot: z.boolean().nullish(),
 });
 export type SeriesStatus = z.output<typeof SeriesStatus>;
 

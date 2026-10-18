@@ -142,12 +142,12 @@ function ForecastView({ viz }: { viz: Rec }) {
               </Badge>
             </figcaption>
             <ul className="v8d-fc-rows">
-              {models.map((m) => {
+              {models.map((m, mi) => {
                 const p = num(m.point);
                 const l = num(m.lo);
                 const h = num(m.hi);
                 return (
-                  <li key={s(m.model) ?? ''} className="v8d-fc-row">
+                  <li key={`${s(m.model) ?? ''}-${mi}`} className="v8d-fc-row">
                     <span className="v8d-fc-model" title={s(m.method) ?? ''}>
                       {(s(m.model) ?? '').replace(/^forecast\./, '')}
                     </span>
@@ -188,11 +188,11 @@ function GraphView({ viz }: { viz: Rec }) {
   const edges = arr(viz.edges);
   const nodes = new Map(arr(viz.nodes).map((n) => [s(n.id) ?? '', s(n.label) ?? s(n.id) ?? '']));
   const others = edges.map((e) => (s(e.from) === s(center.id) ? s(e.to) : s(e.from)) ?? '');
-  const W = 560;
+  const W = 680;
   const H = 260;
   const cx = W / 2;
   const cy = H / 2;
-  const R = Math.min(W, H) / 2 - 30;
+  const R = H / 2 - 24;
   return (
     <figure className="v8d-fig">
       <figcaption className="v8d-figcap">
@@ -202,14 +202,14 @@ function GraphView({ viz }: { viz: Rec }) {
       <svg className="v8d-graph" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Graphe des relations de ${s(center.label)}`}>
         {others.map((o, i) => {
           const a = (i / Math.max(1, others.length)) * Math.PI * 2 - Math.PI / 2;
-          const x = cx + Math.cos(a) * R;
-          const y = cy + Math.sin(a) * R * 0.82;
+          const x2 = cx + Math.cos(a) * R * 1.6;
+          const y = cy + Math.sin(a) * R;
           return (
             <g key={`${o}-${i}`}>
-              <line x1={cx} y1={cy} x2={x} y2={y} className="v8d-g-edge" />
-              <circle cx={x} cy={y} r={4} className="v8d-g-node" />
-              <text x={x} y={y + (y < cy ? -8 : 14)} textAnchor="middle" className="v8d-g-label">
-                {(nodes.get(o) ?? o).slice(0, 26)}
+              <line x1={cx} y1={cy} x2={x2} y2={y} className="v8d-g-edge" />
+              <circle cx={x2} cy={y} r={4} className="v8d-g-node" />
+              <text x={x2 + (Math.abs(x2 - cx) < 8 ? 0 : x2 > cx ? 8 : -8)} y={y + (Math.abs(x2 - cx) < 8 ? (y < cy ? -8 : 14) : 4)} textAnchor={Math.abs(x2 - cx) < 8 ? 'middle' : x2 > cx ? 'start' : 'end'} className="v8d-g-label">
+                {(nodes.get(o) ?? o).slice(0, 24)}
               </text>
             </g>
           );

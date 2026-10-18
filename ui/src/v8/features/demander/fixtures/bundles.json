@@ -90,7 +90,7 @@
     "kg_retrieved": null
    },
    "evidence_count": 2,
-   "latency_ms": 133.4,
+   "latency_ms": 56.2,
    "warnings": []
   },
   "sources": [
@@ -237,7 +237,7 @@
   ],
   "answer_text": "Part des décès dus aux maladies cardiovasculaires — France, 2021 : 23,26 % of total deaths (source : fixture_who/gho, indicateur CVD).\n\nPart des décès dus aux traumatismes — France, 2021 : 6,42 % of total deaths (source : fixture_who/gho, indicateur INJ).\n\nSources et licences : fixture_who/gho (CC-BY-4.0).",
   "warnings": [],
-  "latency_ms": 133.8,
+  "latency_ms": 56.6,
   "cached": false
  },
  "series": {
@@ -343,7 +343,7 @@
     "kg_retrieved": null
    },
    "evidence_count": 4,
-   "latency_ms": 393.1,
+   "latency_ms": 107.0,
    "warnings": []
   },
   "sources": [
@@ -527,7 +527,7 @@
   ],
   "answer_text": "Prix spot du pétrole brut Brent (quotidien), 2020 — 4 valeur(s) publiée(s) par fixture_eia.spot_d.RBRTE : première (2020-01-02) : 67,05 Dollars per Barrel ; dernière (2020-12-31) : 51,22 Dollars per Barrel ; plus basse (2020-04-21) : 9,12 Dollars per Barrel ; plus haute (2020-01-06) : 70,25 Dollars per Barrel (valeurs publiées sélectionnées, aucune moyenne calculée).\n\nSources et licences : fixture_eia/spot_d (CC0-1.0).",
   "warnings": [],
-  "latency_ms": 393.5,
+  "latency_ms": 107.3,
   "cached": false
  },
  "forecast": {
@@ -541,6 +541,7 @@
    "period": "2026",
    "iso3": "FRA",
    "honesty": "forecast",
+   "concept_label": "Inflation (IPC, moyenne annuelle)",
    "status": "pending",
    "model": "forecast.registry_persistence",
    "band": [
@@ -570,6 +571,7 @@
      "models": [
       {
        "model": "forecast.registry_persistence",
+       "model_version": null,
        "method": "random walk / persistence with Gaussian h-step spread",
        "status": "issued",
        "reason": null,
@@ -580,6 +582,7 @@
       },
       {
        "model": "forecast.registry_ar",
+       "model_version": null,
        "method": "AR(p) on levels, OLS fitted as of issue, p by AIC",
        "status": "issued",
        "reason": null,
@@ -590,6 +593,7 @@
       },
       {
        "model": "forecast.reference_imf_weo",
+       "model_version": null,
        "method": "IMF World Economic Outlook projection, attributed to the IMF; point only",
        "status": "abstained",
        "reason": "no WEO projection for this year",
@@ -617,6 +621,7 @@
      "models": [
       {
        "model": "forecast.registry_persistence",
+       "model_version": null,
        "method": "random walk / persistence with Gaussian h-step spread",
        "status": "issued",
        "reason": null,
@@ -631,6 +636,7 @@
       },
       {
        "model": "forecast.registry_ar",
+       "model_version": null,
        "method": "AR(p) on levels, OLS fitted as of issue, p by AIC",
        "status": "issued",
        "reason": null,
@@ -645,6 +651,7 @@
       },
       {
        "model": "forecast.reference_imf_weo",
+       "model_version": null,
        "method": "IMF World Economic Outlook projection, attributed to the IMF; point only",
        "status": "abstained",
        "reason": "no WEO projection for this year",
@@ -687,7 +694,7 @@
     "kg_retrieved": null
    },
    "evidence_count": 3,
-   "latency_ms": 193.2,
+   "latency_ms": 57.1,
    "warnings": []
   },
   "sources": [
@@ -929,7 +936,7 @@
   ],
   "answer_text": "Familles de questions retenues pour « inflation » (libellés du registre de prévisions) : Inflation (IPC, moyenne annuelle) (weo.cpi_inflation). Prévisions scellées du registre REVA — Inflation (IPC, moyenne annuelle) (weo.cpi_inflation), France, 2026 (unité : % change (CPI, period average)) : forecast.registry_persistence : 1,9 [5 %–95 % : -0,4 à 4,2] (méthode : random walk / persistence with Gaussian h-step spread) ; forecast.registry_ar : 2,1 [5 %–95 % : 0,2 à 4] (méthode : AR(p) on levels, OLS fitted as of issue, p by AIC) ; forecast.reference_imf_weo : abstention (no WEO projection for this year). Statut : en attente de résolution (attendue vers 2027-04-30) — aucun score encore. Scellées le 2026-10-17T10:00:00+00:00 (lot 111111111111, sceau vérifié à la lecture) ; ce sont des prévisions statistiques de référence, pas un conseil. Prévisions scellées du registre REVA — Inflation (IPC, moyenne annuelle) (weo.cpi_inflation), France, 2024 (unité : % change (CPI, period average)) : forecast.registry_persistence : 1,9 [5 %–95 % : -0,4 à 4,2] (méthode : random walk / persistence with Gaussian h-step spread) ; forecast.registry_ar : 2,1 [5 %–95 % : 0,2 à 4] (méthode : AR(p) on levels, OLS fitted as of issue, p by AIC) ; forecast.reference_imf_weo : abstention (no WEO projection for this year). Statut : résolue — valeur publiée 2,3 (atlas.imf.weo (WEO 2025-04)) ; scores : forecast.registry_persistence : abs_error 0,4, crps 0,31 ; forecast.registry_ar : abs_error 0,2, crps 0,22. Scellées le 2026-10-17T10:00:00+00:00 (lot 111111111111, sceau vérifié à la lecture) ; ce sont des prévisions statistiques de référence, pas un conseil.\n\nSources et licences : reva.forecast_registry (REVA (calcul sur tables atlas déclarées)).",
   "warnings": [],
-  "latency_ms": 193.4,
+  "latency_ms": 57.3,
   "cached": false
  },
  "unknown": {
@@ -941,7 +948,6 @@
    "text": "REVA ne sait pas",
    "detail": "Aucune entité ne correspond à « tigre » (consulté : REVA KG (fake-kg (test fixture))).",
    "missing": [
-    "answer",
     "entité absente de l'index des libellés (fr/en) du graphe",
     "unresolved_entity"
    ],
@@ -950,7 +956,6 @@
    ]
   },
   "missing": [
-   "answer",
    "entité absente de l'index des libellés (fr/en) du graphe",
    "unresolved_entity"
   ],
@@ -988,7 +993,7 @@
     "kg_retrieved": null
    },
    "evidence_count": 3,
-   "latency_ms": 174.6,
+   "latency_ms": 61.6,
    "warnings": []
   },
   "sources": [],
@@ -1070,7 +1075,7 @@
   ],
   "answer_text": "Aucune entité ne correspond à « tigre » (consulté : REVA KG (fake-kg (test fixture))).\n\nL'opération kg_families n'a pas été exécutée : une entité ou un pays de la question n'a pas été identifié.\n\nAucune réponse sourcée n'a pu être construite à partir des données consultées.",
   "warnings": [],
-  "latency_ms": 174.7,
+  "latency_ms": 61.7,
   "cached": false
  },
  "graph": {
@@ -1170,7 +1175,7 @@
     }
    },
    "evidence_count": 3,
-   "latency_ms": 184.8,
+   "latency_ms": 58.0,
    "warnings": []
   },
   "sources": [
@@ -1380,7 +1385,7 @@
   ],
   "answer_text": "Entité retenue pour « loup » : loup (fixture:wolf ; graphe REVA ; libellé exact).\n\nloup — « mange » : cerf (fixture:deer ; « mange (interaction enregistrée) ») ; lapin (fixture:rabbit ; « mange (interaction enregistrée) ») (source : fixture.globi).\n\nSources et licences : fixture.globi (licence_unclear (fixture)).",
   "warnings": [],
-  "latency_ms": 185.2,
+  "latency_ms": 58.5,
   "cached": false
  },
  "scenario": {
@@ -1462,7 +1467,7 @@
     "kg_retrieved": null
    },
    "evidence_count": 4,
-   "latency_ms": 835.5,
+   "latency_ms": 215.2,
    "warnings": []
   },
   "sources": [
@@ -1713,7 +1718,7 @@
   ],
   "answer_text": "Scénario non validé — pas une probabilité : moteur de décision REVA, décision de référence « La BCE relève ses taux directeurs de 50 points de base au 1er trimestre 2027 » (ecb_plus_50bp_2027q1). Validation : unvalidated (no back-test and calibration record for this model chain). PIB réel (niveau) — FRA : variation -0,14 % en 2027Q1 (5 %–95 % : -0,28 à -0,07 ; estimations : pub:fixture:rate_gdp). 1 lien(s) causal(aux) sourcé(s) sans estimation chiffrée : listé(s) dans les preuves, sans nombre. Scénario conditionnel à la décision et aux hypothèses énoncées : ni une prévision, ni une probabilité, tant que la chaîne de modèles n'a pas passé le juge (rétro-test en millésimes + calibration). Les intervalles ne reflètent que l'incertitude publiée par les estimations utilisées : ni l'incertitude de modèle, ni celle de la transposition à un autre pays ou à une autre époque, ni celle de la chaîne. REVA n'établit aucun effet : chaque nombre vient d'une estimation attribuée (publication citée, calcul REVA ou identité comptable) ou d'un modèle REVA sous hypothèses énoncées ; un lien causal sans estimation chiffrée reste sans nombre. Une seule estimation par lien et un seul chemin par variable : rien n'est additionné ni moyenné. Recherche, pas un conseil financier ni une recommandation.\n\nSources et licences : fixture.effects_literature (all rights reserved (fixture)) ; reva.predict (REVA (calcul)).",
   "warnings": [],
-  "latency_ms": 836.3,
+  "latency_ms": 215.8,
   "cached": false
  },
  "brainstorm": {
@@ -1812,16 +1817,6 @@
        "file": "docs/dev/v5_pred_effect.md",
        "line": 87,
        "text": "`variable:oil_price.global` +10 % → `atlas_concept:imf.inflation_cpi_avg` +0.4 pp on impact (no SE: `basis: null`) — curated and validated, **not loaded live** (IMF HTTP 403)."
-      },
-      {
-       "file": "docs/dev/v6_digital.md",
-       "line": 13,
-       "text": "| ITU DataHub (ICT indicators, prices) | `datahub.itu.int` and `api.datahub.itu.int` answer **HTTP 403** (CloudFront) to a non-browser client. The www.itu.int statistics page offers only `ITU_regional_global_Key_ICT_indicator_aggregates_Nov_2025.xlsx` (regional/global aggregates, 110 kB). | ITU website terms: use is allowed \"for personal, educational, or non-commercial purposes\". \"You may not modi"
-      },
-      {
-       "file": "docs/dev/review_v3b.md",
-       "line": 180,
-       "text": "| 10 | OECD total tax revenue % GDP, DNK 2024 | not in the dev snapshot (`oecd.rs_global` not loaded); live response through `atlas_oecd_fiscal.oecd_build` → 45.177061 \"Percentage of GDP\" (2021-2023: 47.470033, 42.054919, 43.991573) | 45.177061 | parser faithful; n/a in DB | https://sdmx.oecd.org/public/rest/data/OECD.CTP.TPS,DSD_REV_COMP_GLOBAL@DF_RSGLOBAL,/DNK.TAX_REV.S13._T._T.PT_B1GQ.A?format="
       }
      ]
     }
@@ -1861,26 +1856,6 @@
   ],
   "verdicts": [
    {
-    "target": "macro.us_inflation",
-    "label": "Inflation — États-Unis",
-    "verdicts": {
-     "ne bat pas": 1
-    },
-    "n_rows": 1,
-    "examples": [
-     {
-      "id": "pred_models.holdout_points.us_spf.macro.us_inflation",
-      "verdict": "ne bat pas",
-      "candidate": "Modèles REVA (AR direct, BVAR, DFM, combinaisons) — inflation",
-      "benchmark": "point officiel (WEO / médiane SPF)",
-      "evaluation": "preregistered_holdout",
-      "ratio": null,
-      "basis": "QA-PRED : aucun ratio significativement < 1 sur le holdout verrouillé",
-      "track": "pred_models"
-     }
-    ]
-   },
-   {
     "target": "macro.ea_hicp",
     "label": "Inflation IPCH — zone euro",
     "verdicts": {
@@ -1917,26 +1892,6 @@
       "ratio": 0.835014,
       "basis": "aucune hypothèse retenue pour cette cellule (Holm ✗ en développement, famille 32)",
       "track": "beat_macro"
-     }
-    ]
-   },
-   {
-    "target": "nowcast.us_inflation",
-    "label": "Inflation américaine — mois en cours",
-    "verdicts": {
-     "ne bat pas": 1
-    },
-    "n_rows": 1,
-    "examples": [
-     {
-      "id": "beat_nowcast.holdout.cpi_clev.nc_biascorr.clev_nowcast.ae",
-      "verdict": "ne bat pas",
-      "candidate": "Nowcast officiel corrigé de son biais passé",
-      "benchmark": "nowcast IPC de la Fed de Cleveland, même date",
-      "evaluation": "preregistered_holdout",
-      "ratio": 1.132499,
-      "basis": "non confirmé : Holm ✗ (p brut 0.896, famille 5)",
-      "track": "beat_nowcast"
      }
     ]
    },
@@ -1981,6 +1936,26 @@
     ]
    },
    {
+    "target": "nowcast.us_inflation",
+    "label": "Inflation américaine — mois en cours",
+    "verdicts": {
+     "ne bat pas": 1
+    },
+    "n_rows": 1,
+    "examples": [
+     {
+      "id": "beat_nowcast.holdout.cpi_clev.nc_biascorr.clev_nowcast.ae",
+      "verdict": "ne bat pas",
+      "candidate": "Nowcast officiel corrigé de son biais passé",
+      "benchmark": "nowcast IPC de la Fed de Cleveland, même date",
+      "evaluation": "preregistered_holdout",
+      "ratio": 1.132499,
+      "basis": "non confirmé : Holm ✗ (p brut 0.896, famille 5)",
+      "track": "beat_nowcast"
+     }
+    ]
+   },
+   {
     "target": "macro.g7_cpi",
     "label": "Inflation — G7",
     "verdicts": {
@@ -2019,6 +1994,26 @@
       "track": "beat_macro"
      }
     ]
+   },
+   {
+    "target": "macro.us_inflation",
+    "label": "Inflation — États-Unis",
+    "verdicts": {
+     "ne bat pas": 1
+    },
+    "n_rows": 1,
+    "examples": [
+     {
+      "id": "pred_models.holdout_points.us_spf.macro.us_inflation",
+      "verdict": "ne bat pas",
+      "candidate": "Modèles REVA (AR direct, BVAR, DFM, combinaisons) — inflation",
+      "benchmark": "point officiel (WEO / médiane SPF)",
+      "evaluation": "preregistered_holdout",
+      "ratio": null,
+      "basis": "QA-PRED : aucun ratio significativement < 1 sur le holdout verrouillé",
+      "track": "pred_models"
+     }
+    ]
    }
   ],
   "next_steps": [
@@ -2030,6 +2025,6 @@
    }
   ],
   "method": "Recherche dans les registres de REVA (familles de prévisions, catalogue atlas, couche d'effets, tableau des scores, affirmations causales) et règles explicites ; aucun modèle de langage, aucune donnée inventée. Les pilotes sont attribués à leurs sources ; les estimations ne sont jamais moyennées.",
-  "as_of": "2026-10-18T16:53:43+00:00"
+  "as_of": "2026-10-18T17:22:42+00:00"
  }
 }

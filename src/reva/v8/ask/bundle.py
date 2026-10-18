@@ -132,10 +132,13 @@ def headline(ans: Mapping[str, Any], status: str, missing: Sequence[str]) -> dic
     direct = [s for s in sentences if s.get("kind") in SUBSTANTIVE]
     if status == "partial" or not direct:
         rel = next((s for s in sentences if s.get("kind") in ("missing",)), None)
+        fr = ans.get("language", "fr") == "fr"
         return {
             "kind": "partial",
-            "text": rel["text"] if rel else "Réponse partielle",
-            "detail": "Seules des données voisines, non équivalentes, sont chargées.",
+            "text": "Aucune donnée chargée ne répond directement ; seules des données voisines, non équivalentes, existent."
+            if fr
+            else "No loaded data answers directly; only neighbouring, non-equivalent data exist.",
+            "detail": rel["text"] if rel else None,
             "missing": list(missing),
             "citations": rel["citations"] if rel else [],
         }
@@ -163,7 +166,22 @@ def headline(ans: Mapping[str, Any], status: str, missing: Sequence[str]) -> dic
     if s0["kind"] == "forecast" and fc:
         q = fc[0]
         issued = [f for f in q.get("forecasts") or [] if f.get("status") == "issued" and f.get("point") is not None]
-        f = issued[0] if issued else None
+        # the REVA ensemble leads when sealed, else the official reference, else the first model (all are listed)
+        pref = sorted(
+            issued,
+            key=lambda f: (
+                0 if str(f.get("model")).startswith("reva.ensemble") else 1 if "reference" in str(f.get("model")) else 2
+            ),
+        )
+        f = pref[0] if pref else None
+        fam_label = next(
+            (
+                (e.get("labels") or {}).get(ans.get("language") or "fr")
+                for e in ev.values()
+                if e.get("kind") == "registry_term" and e.get("term_id") == q.get("family")
+            ),
+            None,
+        )
         qs = (f or {}).get("quantiles") or {}
         return {
             "kind": "number",
@@ -172,6 +190,7 @@ def headline(ans: Mapping[str, Any], status: str, missing: Sequence[str]) -> dic
             "period": q.get("reference_period"),
             "iso3": q.get("geo"),
             "honesty": "forecast",
+            "concept_label": fam_label or q.get("family"),
             "status": q.get("status"),
             "model": f.get("model") if f else None,
             "band": [qs.get("0.05"), qs.get("0.95")] if qs.get("0.05") is not None else None,
@@ -186,17 +205,38 @@ def headline(ans: Mapping[str, Any], status: str, missing: Sequence[str]) -> dic
         "path": "path",
         "forecast": "forecast",
     }
+    short = _short_relations(cited, s0["text"])
     count = None
     m = re.search(r"\((\d+) montrée\(s\) sur (\d+)\)|(\d+) trouvée\(s\)|(\d+) found|shown of (\d+)", s0["text"])
     if m:
         count = next(int(g) for g in (m.group(2), m.group(3), m.group(4), m.group(5)) if g)
     return {
         "kind": "sentence",
-        "text": s0["text"],
+        "text": short or s0["text"],
         "honesty": kinds.get(s0["kind"], "community" if _community(cited) else "observed"),
         "count": count,
         "citations": s0.get("citations") or [],
     }
+
+
+def _short_relations(cited: Sequence[Mapping[str, Any]], text: str) -> str | None:
+    """A one-line headline for a list of relations: « heart — « comprend » : cardiac chamber, …  (27) »."""
+    sts = [c for c in cited if c.get("kind") == "kg_statement" and (c.get("object") or {}).get("qid")]
+    if len(sts) < 3 or len(text) < 200:
+        return None
+    head = text.split(" : ", 1)[0] if " : " in text else text.split(": ", 1)[0]
+    head = re.sub(r"\s*\(\d+ (?:montrée\(s\) sur|shown of) \d+\+?\)", "", head)
+    deg = Counter(q for c in sts for q in ((c.get("subject") or {}).get("qid"), (c.get("object") or {}).get("qid")))
+    center = deg.most_common(1)[0][0]
+    names: list[str] = []
+    for c in sts:
+        sub, obj = c.get("subject") or {}, c.get("object") or {}
+        n = _lab(obj) if sub.get("qid") == center else _lab(sub)
+        if n and n not in names:
+            names.append(n)
+    if len(head) > 120:
+        return None
+    return f"{head} : {', '.join(names[:5])}{' …' if len(names) > 5 else ''}"
 
 
 def _community(items: Sequence[Mapping[str, Any]]) -> bool:
@@ -315,6 +355,7 @@ def _forecast_viz(ev: Mapping[str, Mapping[str, Any]]) -> dict[str, Any]:
             models.append(
                 {
                     "model": f.get("model"),
+                    "model_version": f.get("model_version"),
                     "method": f.get("method"),
                     "status": f.get("status"),
                     "reason": f.get("reason"),

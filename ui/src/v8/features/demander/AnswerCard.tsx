@@ -71,7 +71,18 @@ export function AnswerCard({ bundle, onAsk, onPin }: AnswerCardProps) {
   };
   const headSource = h.citations[0] ? ev.get(h.citations[0]) : undefined;
   const hon = h.honesty ? HONESTY[h.honesty] : undefined;
-  const body = bundle.sentences.filter((s) => s.kind !== 'sources');
+  // the scenario view lists every variable: only the scenario's first (label) sentence stays in the text
+  const scenarioShown = bundle.viz?.type === 'scenario';
+  let firstScenario = true;
+  const body = bundle.sentences.filter((s) => {
+    if (s.kind === 'sources') return false;
+    if (scenarioShown && s.kind === 'scenario') {
+      const keep = firstScenario;
+      firstScenario = false;
+      return keep;
+    }
+    return true;
+  });
   const sourcesSentence = bundle.sentences.find((s) => s.kind === 'sources');
 
   return (
@@ -111,9 +122,9 @@ export function AnswerCard({ bundle, onAsk, onPin }: AnswerCardProps) {
             )}
             {(h.more ?? 0) > 0 && <div className="v8d-big-sub v8-subtle">+ {h.more} autre(s) valeur(s) ci-dessous</div>}
           </div>
-        ) : h.kind === 'unknown' ? (
+        ) : h.kind === 'unknown' || h.kind === 'partial' ? (
           <div className="v8d-unknown">
-            <p className="v8d-unknown-title">REVA ne sait pas.</p>
+            <p className={`v8d-unknown-title${h.kind === 'partial' ? ' is-partial' : ''}`}>{h.kind === 'partial' ? h.text : 'REVA ne sait pas.'}</p>
             {h.detail && <p className="v8d-unknown-detail">{h.detail}</p>}
             {bundle.missing.length > 0 && (
               <ul className="v8d-missing" aria-label="Ce qui manque">
@@ -252,12 +263,23 @@ export function AnswerCard({ bundle, onAsk, onPin }: AnswerCardProps) {
   );
 }
 
+const LONG = 420;
+
 function SentenceRow({ s, i, onCite }: { s: Sentence; i: number; onCite: (id: string) => void }) {
   const tag = SENTENCE_KIND[s.kind];
+  const [open, setOpen] = useState(false);
+  const long = s.text.length > LONG;
   return (
     <li className={`v8d-s v8d-s-${s.kind} v8d-reveal`} style={{ ['--i' as string]: Math.min(i, 12) }}>
       {tag && <span className={`v8d-s-tag v8d-s-tag-${s.kind}`}>{tag}</span>}
-      <span className="v8d-s-text">{s.text}</span>
+      <span className="v8d-s-text">
+        {long && !open ? `${s.text.slice(0, LONG).replace(/\s+\S*$/, '')} …` : s.text}
+        {long && (
+          <button type="button" className="v8d-s-more" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+            {open ? 'réduire' : 'lire la suite'}
+          </button>
+        )}
+      </span>
       {s.citations.length > 0 && (
         <span className="v8d-s-cites">
           {s.citations.slice(0, 8).map((c, k) => (

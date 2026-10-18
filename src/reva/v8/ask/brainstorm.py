@@ -150,7 +150,7 @@ def _queued_lines() -> tuple[tuple[str, int, str], ...]:
 
 
 def queued_mentions(keywords: Sequence[str], limit: int = 3) -> list[dict[str, Any]]:
-    kws = [fold(k) for k in keywords if len(k) >= 4]
+    kws = [fold(k) for k in keywords if len(k) >= 6 and "." in k]
     if not kws:
         return []
     hits = []
@@ -195,7 +195,13 @@ class Brainstormer:
             return []
         terms = {t.id: t for t in port.terms()}
         labels = {tid: t.labels for tid, t in terms.items()}
-        direct = match_terms(text, labels, limit=8)
+        words = list(dict.fromkeys(content_words(text)))
+        direct = [
+            tid
+            for tid in match_terms(text, labels, limit=8)
+            # every word of the target must be in the term's labels ("prix du Brent" is not every price)
+            if all(_overlap({w}, set().union(*(_words(str(v)) for v in labels[tid].values()))) for w in words)
+        ]
         out = [{"id": i, "kind": terms[i].kind, "labels": dict(terms[i].labels), "match": "libellé"} for i in direct]
         if not out and anchor_labels:
             anchor = set().union(*(_words(a) for a in anchor_labels))
@@ -318,16 +324,35 @@ class Brainstormer:
             out["status"] = "atlas indisponible"
             return out
         cells = [x for x in (res.cells if res else ()) if x.value is not None]
+        tables = getattr(self.b, "tables", None)
+        if not cells and tables is not None and not iso3:
+            series = [tuple(str(k).split(".", 2)) for k in c.source_order if str(k).count(".") >= 2]
+            try:
+                got, _pins = tables.period_cells(concept_id, series, None, None)
+            except Exception:  # no registered version: the snapshot absence stands
+                got = []
+            cells = [x for x in got if x.value is not None]
+            if cells:
+                out["outside_snapshot"] = True
         if not cells:
             out["status"] = "manquant"
             out["consulted"] = list(res.sources_consulted) if res else []
             return out
-        last = max(cells, key=lambda x: (str(x.period_end), str(x.period_start)))
+        from reva.nlqa.ports import cell_is_projection
+
+        observed = [x for x in cells if not cell_is_projection(x)]
+        projected = [x for x in cells if cell_is_projection(x)]
+        if projected:
+            out["projections_to"] = str(max(projected, key=lambda x: str(x.period_start)).period_start)[:10]
+        if not observed:
+            out["status"] = "projections seulement"
+            return out
+        last = max(observed, key=lambda x: (str(x.period_end), str(x.period_start)))
         out.update(
             status="chargé",
             last_period=str(last.period_start)[:10],
             source=f"{last.source}/{last.dataset}",
-            n=len(cells),
+            n=len(observed),
         )
         y = last.year
         out["stale"] = bool(y is not None and datetime.now(UTC).year - y > STALE_YEARS)
@@ -358,7 +383,8 @@ class Brainstormer:
                 {"concept": cid, "label": self.catalog.concepts[cid].label("fr"), "curated": False}
                 for _, _, cid in sorted(cands)[:3]
             ]
-            out["queued"] = queued_mentions([*lw, str(d["id"]).split(".")[-1]])
+            # queued loads quoted only when a report names the variable or a candidate concept by its id
+            out["queued"] = queued_mentions([str(d["id"]), *(c["concept"] for c in out["candidates"])])
         return out
 
     # ------------------------------------------------------------------ forecasts

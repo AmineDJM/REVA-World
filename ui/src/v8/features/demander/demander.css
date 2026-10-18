@@ -167,3 +167,6 @@ summary.v8d-h3 { cursor: pointer; }
 .v8b-target-series { margin-top: 8px; display: grid; gap: 4px; font-size: var(--v8-text-sm, 12.5px); }
 .v8d-others { margin: 6px 0 0; padding-left: 1.1em; font-size: var(--v8-text-xs, 11.5px); overflow-wrap: anywhere; }
 .v8d-more { margin: -4px 0 8px; }
+.v8d-unknown-title.is-partial { font-size: var(--v8-text-lg, 17px); color: var(--v8-warn, #9a6700); }
+.v8d-s-more { font: inherit; font-size: var(--v8-text-xs, 11.5px); border: 0; background: none; color: var(--v8-accent, #3653d3); cursor: pointer; padding: 0 4px; }
+.v8b-model { margin-right: 6px; }

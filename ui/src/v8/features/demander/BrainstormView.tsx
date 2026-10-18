@@ -9,6 +9,16 @@ function SeriesLine({ s }: { s: SeriesStatus }) {
       <span className="v8b-series">
         <span className="v8b-ok" aria-hidden="true" />
         <code>{s.concept}</code> · dernière période <strong>{s.last_period}</strong> · {s.source}
+        {s.outside_snapshot ? (
+          <Badge kind="info" title="Table enregistrée après l’instantané atlas : dernière version enregistrée.">
+            hors instantané
+          </Badge>
+        ) : null}
+        {s.projections_to ? (
+          <Badge kind="projection" title="Des projections existent aussi ; elles ne sont pas comptées comme observations.">
+            projections jusqu’à {s.projections_to.slice(0, 4)}
+          </Badge>
+        ) : null}
         {s.stale ? (
           <Badge kind="neutral" title="Dernière valeur chargée de plus de deux ans.">
             ancienne
@@ -189,7 +199,12 @@ export function BrainstormView({ b }: { b: BrainstormBundle }) {
                 )}
                 {f.models.length > 0 && (
                   <div className="v8-subtle v8b-models">
-                    Modèles : {f.models.map((m) => `${m.model.replace(/^forecast\./, '')}${m.method ? ` (${m.method})` : ''}`).join(' ; ')}
+                    Modèles :{' '}
+                    {f.models.map((m, i) => (
+                      <code key={`${m.model}-${i}`} title={m.method ?? undefined} className="v8b-model">
+                        {m.model.replace(/^forecast\./, '')}
+                      </code>
+                    ))}
                   </div>
                 )}
               </li>
