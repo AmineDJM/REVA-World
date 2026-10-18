@@ -32,7 +32,12 @@ CAT = D.catalog()
 def ask(q: str, backends: Any = None) -> dict[str, Any]:
     r = asyncio.run(
         answer_question(
-            AskInput(q, "a" * 64), catalog=CAT, backends=backends or D.backends(), drafters=None, ledger=None, budget=None
+            AskInput(q, "a" * 64),
+            catalog=CAT,
+            backends=backends or D.backends(),
+            drafters=None,
+            ledger=None,
+            budget=None,
         )
     )
     return r.as_json()
@@ -63,7 +68,10 @@ def test_classifier() -> None:
     ev = [{"id": "E1", "kind": "atlas_cell"}, {"id": "E2", "kind": "absence", "what": "effect_estimates"}]
     yes = {"sentences": [{"kind": "fact", "citations": ["E1"]}], "evidence": ev}
     assert G.classify(yes)["status"] == "answered"
-    part = {"sentences": [{"kind": "missing", "citations": ["E2"]}, {"kind": "related", "citations": ["E1"]}], "evidence": ev}
+    part = {
+        "sentences": [{"kind": "missing", "citations": ["E2"]}, {"kind": "related", "citations": ["E1"]}],
+        "evidence": ev,
+    }
     c = G.classify(part)
     assert c["status"] == "partial" and c["causes"] == ["effect_estimates"]
     no = {"sentences": [{"kind": "missing", "citations": ["E2"]}], "evidence": ev[1:]}
@@ -119,11 +127,31 @@ class FakeTables:
         prov = {"rights": D.CC0, "outside_snapshot": True, "dataset_key": "atlas.fixture_eia.spot_d",
                 "table_artifact_sha256": "a" * 64, "dataset_registered_at": "2026-10-17T15:42:35+00:00"}  # fmt: skip
         cells = [
-            AtlasCell("fixture_eia", "spot_d", "RBRTE", "", d, d, v, None, "Dollars per Barrel",
-                      concept_id, None, {}, D.SHA, None, None, prov)  # fmt: skip
+            AtlasCell(
+                "fixture_eia",
+                "spot_d",
+                "RBRTE",
+                "",
+                d,
+                d,
+                v,
+                None,
+                "Dollars per Barrel",
+                concept_id,
+                None,
+                {},
+                D.SHA,
+                None,
+                None,
+                prov,
+            )
             for d, v in (("2019-01-02", "54.06"), ("2019-06-03", "61.00"), ("2019-12-31", "67.77"))
         ]
-        pin = {"dataset_key": "atlas.fixture_eia.spot_d", "artifact_sha256": "a" * 64, "recorded_at": "2026-10-17T15:42:35+00:00"}
+        pin = {
+            "dataset_key": "atlas.fixture_eia.spot_d",
+            "artifact_sha256": "a" * 64,
+            "recorded_at": "2026-10-17T15:42:35+00:00",
+        }
         return cells, [pin]
 
 
