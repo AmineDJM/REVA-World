@@ -36,7 +36,7 @@ vi.mock('../../../api/http', () => ({
 }));
 vi.mock('../tableaux/pin', () => ({ pinItem: vi.fn(async () => ({ boardId: 'b1', boardTitle: 'Mes épingles', added: true, origin: 'local', href: '/v8/tableaux/b1' })) }));
 vi.mock('cytoscape', () => {
-  const cy = { on: vi.fn(), destroy: vi.fn(), $id: () => ({ addClass: vi.fn() }), $: () => ({ removeClass: vi.fn() }) };
+  const cy = { on: vi.fn(), destroy: vi.fn(), zoom: () => 1, pan: vi.fn(), $id: () => ({ addClass: vi.fn(), position: () => ({ x: 0, y: 0 }) }), $: () => ({ removeClass: vi.fn() }) };
   return { default: vi.fn(() => cy) };
 });
 

@@ -73,6 +73,25 @@ def _near(result: dict[str, Any], ctx: rn.Contexts) -> dict[str, list[dict[str, 
     return out
 
 
+def _direct_labels(result: dict[str, Any]) -> dict[str, str]:
+    """French labels of the decision's direct-change variables that no estimate names (atlas catalogue)."""
+    out: dict[str, str] = {}
+    for dc in result.get("direct_changes") or []:
+        var = dc.get("variable") or {}
+        if var.get("kind") != "atlas_concept":
+            continue
+        try:
+            from reva.atlas.catalog import cached_catalog
+
+            c = cached_catalog().concepts.get(str(var.get("id")))
+            lab = (c.labels.get("fr") or c.labels.get("en")) if c is not None else None
+        except Exception:
+            lab = None
+        if lab:
+            out[f"atlas_concept:{var['id']}"] = str(lab)
+    return out
+
+
 def run(sc: Scenario, fingerprint: str, make_ctx: ContextFactory) -> tuple[dict[str, Any], rn.Computed, bool]:
     """The page bundle of one scenario (cached by input hash + data fingerprint). Returns (bundle, computed, hit)."""
     key = f"{sc.hash}:{fingerprint}"
@@ -84,7 +103,11 @@ def run(sc: Scenario, fingerprint: str, make_ctx: ContextFactory) -> tuple[dict[
     comp = rn.compute(sc.decision, ctx, draws=sc.draws, seed=sc.seed, as_of_max=sc.as_of_max)
     lookup = ctx.lookup(estimate_keys(comp.result))
     bundle = make_bundle(
-        comp.result, lookup, _near(comp.result, ctx), market=sc.decision.instrument in MARKET_INSTRUMENTS
+        comp.result,
+        lookup,
+        _near(comp.result, ctx),
+        market=sc.decision.instrument in MARKET_INSTRUMENTS,
+        extra_labels=_direct_labels(comp.result),
     )
     # the hops' full provenance is in bundle["evidence"] (one entry per estimate): keep only the key on each hop
     result = dict(comp.result)

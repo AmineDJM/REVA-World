@@ -183,3 +183,8 @@
 .v8d-brief { display: grid; gap: var(--v8-space-3); min-width: 0; }
 .v8d-md { margin: 0; max-height: 560px; overflow: auto; padding: var(--v8-space-4); border: 1px solid var(--v8-border); border-radius: var(--v8-radius); background: var(--v8-bg); font-family: var(--v8-font-mono); font-size: var(--v8-text-xs); white-space: pre-wrap; overflow-wrap: anywhere; }
 .v8d-why-h { margin: 0; font-size: var(--v8-text-md); }
+@media (max-width: 600px) {
+  .v8d-template-s { display: none; }
+  .v8d-templates { grid-template-columns: minmax(0, 1fr); gap: var(--v8-space-2, 4px); }
+  .v8d-result { padding: var(--v8-space-4, 12px); }
+}

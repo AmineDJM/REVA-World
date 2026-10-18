@@ -84,6 +84,14 @@ function GraphCanvas({ nodes, edges, selected, onSelect }: { nodes: GraphNode[];
           const into = edges.find((e) => e.to === id);
           if (into) onSelect(into.id);
         });
+        // readability over fitting: never smaller than 0.72; start at the decision (pan / pinch for the rest)
+        const MINZ = 0.72;
+        if (cy.zoom() < MINZ && box.current) {
+          const root = cy.$id('decision');
+          const pos = root.position();
+          cy.zoom(MINZ);
+          cy.pan({ x: 16 - (pos.x - 84) * MINZ, y: box.current.clientHeight / 2 - pos.y * MINZ });
+        }
         cyRef.current = cy;
         if (selected) cy.$id(`e:${selected}`).addClass('sel');
       })

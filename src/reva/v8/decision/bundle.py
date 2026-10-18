@@ -187,10 +187,12 @@ def fmt_num(x: Any) -> str:
         return str(x)
     if v != v:
         return "?"
-    s = f"{v:.3g}"
-    if "e" in s:
-        mant, ex = s.split("e")
-        s = f"{mant}e{int(ex)}"
+    if abs(v) >= 1000:
+        s = f"{v:,.0f}".replace(",", "\u202f")  # thin no-break space as thousands separator
+    else:
+        s = f"{v:.3g}"
+        if "e" in s:
+            s = f"{v:.3f}".rstrip("0").rstrip(".") if abs(v) >= 1e-3 else f"{v:.2e}"
     sign = "+" if v > 0 else ""
     return (sign + s).replace(".", ",").replace("-", "−")
 
@@ -613,7 +615,7 @@ def graph(
                     if p.startswith(f"plugin:{model.split('@')[0]}") and p.endswith(f"@{split_node(base)[2]}")
                 ]
                 pid = hit[0] if hit else pid
-            p = node(pid, "plugin", label=model, depth=None, model=model, blocked=True)
+            p = node(pid, "plugin", label=_plugin_label(model), depth=None, model=model, blocked=True)
             p["blocked"] = True
             p.setdefault("reasons", []).append(gap_fr(g))
             if not any(e["to"] == pid for e in edges):
@@ -962,15 +964,26 @@ def honesty(result: Mapping[str, Any], market: bool) -> dict[str, Any]:
     }
 
 
+def _plugin_label(model: str) -> str:
+    try:
+        from reva.predict.context import engine_variables
+
+        w = engine_variables().plugins.get(model.split("@")[0])
+        return w.label_fr if w else model
+    except Exception:
+        return model
+
+
 def make_bundle(
     result: Mapping[str, Any],
     lookup: Mapping[str, Mapping[str, Any] | None],
     near: Mapping[str, Sequence[Mapping[str, Any]]] | None = None,
     *,
     market: bool = False,
+    extra_labels: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
     ev = evidence_map(result, lookup)
-    labels = _labels(result, ev)
+    labels = {**dict(extra_labels or {}), **_labels(result, ev)}
     return {
         "headline": headline(result, ev),
         "graph": graph(result, ev, labels=labels),
