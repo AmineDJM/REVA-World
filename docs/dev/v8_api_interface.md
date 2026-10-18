@@ -1,6 +1,6 @@
 # V8 API interface (agent V8API) — search, change feed, boards & watchlists
 
-Status: **interface published first (2026-10-17), implementation follows in the same modules**. Shapes below are
+Status: **implemented (2026-10-18)** — report and measurements in `docs/dev/v8_v8api.md`. Shapes below are
 the contract for V8SHELL (palette), V8BOARDS (Tableaux + Accueil), V8FICHE, V8COUVERTURE and the other feature
 agents. Additive changes only (new optional fields, new kinds); anything breaking goes through this file.
 
@@ -11,7 +11,8 @@ per-principal user state, not science). Responses are the usual REVA envelope (`
 RFC 9457 problems (`code`, `title`, `detail`). Times are ISO 8601 UTC strings. Decimal values are strings.
 
 Module ownership: `src/reva/api/routes/v8_search.py`, `v8_changes.py`, `v8_boards.py`; logic in
-`src/reva/v8/{search,changes,boards}/`; CLI `reva v8 …` in `src/reva/cli/v8.py`.
+`src/reva/v8/{search,changes,boards}/`; CLI `reva v8 index …` / `reva v8 changes …` in `src/reva/cli/v8_index.py`,
+`src/reva/cli/v8_changes.py` (discovered by `reva.cli.main`).
 
 ---------------------------------------------------------------------------------------------------------------
 
@@ -47,8 +48,7 @@ name are two hits (e.g. « France » the country and « France » a power plant 
   "normalized": "petrole brut",
   "hits": [SearchHit, ...],          // ranked, best first, at most `limit`
   "groups": [{"group": "Indicateurs", "count": 7}, ...],   // counts among returned hits, in display order
-  "index": {"built_at": "2026-10-17T23:10:00Z", "version": "v8s-1", "documents": 1234567,
-            "sources": {"kg": 586991, "atlas_concept": 9250, ...}},
+  "index": {"built_at": "2026-10-18T16:51:23Z", "version": "v8s-1", "documents": 604776},
   "truncated": true                    // more matches existed than `limit`
 }
 ```
@@ -68,6 +68,7 @@ name are two hits (e.g. « France » the country and « France » a power plant 
   "matched": "France",          // the label / alias / code that matched (may differ from label)
   "entity_kind": "country",     // KG kind for kg entities (drug, gene, taxon, nuts_region, …), else null
   "source": "wikidata",         // source key of the record (kg load source, atlas source, registry …) or null
+  "origin": "live",             // live | test_fixture (production serves live only)
   "extra": {"iso3": "FRA", "qid": "Q142"}   // small kind-specific facts (codes, unit, status); optional
 }
 ```
@@ -99,7 +100,8 @@ Performance target: p95 < 150 ms warm (measured numbers in `docs/dev/v8_v8api.md
 
 Prebuilt SQLite file `var/v8/search_index/search.sqlite` (FTS5 trigram, `remove_diacritics`), built by
 `uv run reva v8 index build` from the dev DB (read-only) + registries; ≤ 300 MB. The API opens it read-only.
-`GET /v1/v8/search/status` → `data: {built: bool, built_at, version, documents, sources, path_bytes}`.
+`GET /v1/v8/search/status` → `data: {built, built_at, version, documents, names, codes, kinds, errors, origin,
+path_bytes, popular_names_in_memory}`.
 
 ---------------------------------------------------------------------------------------------------------------
 
@@ -149,7 +151,7 @@ Response `data`:
 |---|---|---|---|
 | `ingest` | `evidence.dataset` rows (atlas tables + other datasets) grouped per source per minute | table, source | info |
 | `atlas_snapshot` | `meta.activity` kind `atlas.snapshot` | – | notable |
-| `kg_batch` | `kg.load` (+ entities/statements added, retractions) | source | info |
+| `kg_batch` | `kg.load` grouped per source per 10 min (entities/statements from `load_counts.json`, retractions) | source, kg_load | info |
 | `causal_claims` | `kg.causal_load` (claims added / retracted in the load) | source, claim_load | info |
 | `effects` | `kg.effect_load` + `kg.effect_estimate_retraction` (added / retired) | estimate, source | notable |
 | `forecast_batch` | sealed issue batches of the forecast registry | batch, family, question | notable |
@@ -203,7 +205,7 @@ forecast; new_data on series/entity; revision on series) → `422` with the reas
 | `DELETE /v1/v8/boards/{id}` | – | `204` |
 | `POST /v1/v8/boards/{id}/rules` | `{kind, item_uid, op?, value?}` | `201`, `data: Board` |
 | `DELETE /v1/v8/boards/{id}/rules/{rule_id}` | – | `data: Board` |
-| `GET /v1/v8/boards/{id}/alerts?since=` | – | `data: {since, alerts: [Alert], evaluated_at}` |
+| `GET /v1/v8/boards/{id}/alerts?since=` | – | `data: {since, evaluated_at, n_rules, alerts: [Alert]}` |
 
 (POST is used for updates because the API's CORS policy allows GET/POST/DELETE only.)
 
@@ -216,8 +218,9 @@ forecast; new_data on series/entity; revision on series) → `422` with the reas
   "message": "Nouvelle donnée : imf.weo (France)",   // French
   "change": ChangeItem | null,                // the change-feed item that fired it
   "observed": {"value": "2.31", "period": "2025", "source": "imf.weo", "unit": "%"} | null,  // threshold only
-  "status": "fired" | "not_evaluable",        // not_evaluable: e.g. series has no observed value — with reason
-  "reason": null
+  "status": "fired" | "not_fired" | "not_evaluable",  // not_fired: threshold evaluated and not crossed
+  "reason": null,                             // not_evaluable reasons: no_observed_value, atlas_query_not_ready, item_missing
+  "item_label": "Inflation FR"
 }
 ```
 
@@ -234,8 +237,8 @@ observed value returns `status: "not_evaluable"` with the reason (never treated 
 ## 4. CLI
 
 ```
-uv run reva v8 index build [--out var/v8/search_index] [--origin live|any]   # (re)build the search index
+uv run reva v8 index build [--out var/v8/search_index] [--origin live|any]   # (re)build index + load_counts.json
 uv run reva v8 index status
-uv run reva v8 search "<q>" [--kinds …]                                       # same ranking as the API
+uv run reva v8 index query "<q>" [--kinds …] [--limit 10]                     # same ranking as the API
 uv run reva v8 changes tail [--since 2026-10-16T00:00Z] [--kinds …] [--follow]
 ```

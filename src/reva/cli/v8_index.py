@@ -88,4 +88,5 @@ def search(
         typer.echo(
             f"{h['score']:.3f} {h['match']:<7} {h['kind']:<9} {h['id']:<28} {h['label'][:60]} | {h['sublabel'][:70]}"
         )
-    typer.echo(f"-- {len(res['hits'])} hits of {res['matches']} in {ms:.1f} ms")
+    more = " (more matches exist)" if res["truncated"] else ""
+    typer.echo(f"-- {len(res['hits'])} hits{more} in {ms:.1f} ms")
