@@ -15,6 +15,7 @@ from reva.v8.entity import profiles as P
 
 QID_RE = re.compile(r"^(Q[1-9][0-9]{0,11}|[a-z][a-z0-9_]{1,31}:[A-Za-z0-9_.:-]{1,128})$")
 ISO3_RE = re.compile(r"^[A-Za-z]{3}$")
+ISO2_RE = re.compile(r"^[A-Za-z]{2}$")
 SPECIAL_KINDS = ("question", "effect", "source")
 
 
@@ -76,8 +77,15 @@ def resolve(conn: Connection, kind: str, ident: str) -> Resolved:
         akind, aid, spec = anc
         return Resolved(kind=akind, id=aid, via="anchor", anchor={"id": aid, **spec})
     pkey = P.profile_key(kind_l)
-    # countries: ISO3 first (the atlas key), then any KG id
-    if (pkey == "country" or kind_l in ("country", "pays")) and ISO3_RE.match(ident):
+    # countries: ISO3 first (the atlas key; any case), ISO alpha-2 mapped to alpha-3, then any KG id
+    is_country = pkey == "country" or kind_l in ("country", "pays")
+    if is_country and ISO2_RE.match(ident):
+        from reva.kg import spacetime as stime
+
+        iso3 = stime.iso2_to_iso3().get(ident.upper())
+        if iso3:
+            ident = iso3
+    if is_country and ISO3_RE.match(ident):
         iso = ident.upper()
         res = kq.iso3_lookup(conn, iso)
         qids = [r["qid"] for r in res["results"]]
