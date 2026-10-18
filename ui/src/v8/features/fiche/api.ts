@@ -3,11 +3,14 @@
  * Schemas mirror src/reva/api/routes/v8_entity.py; tolerant on extra fields, strict where honesty depends on it:
  * values are exact decimal strings or null (never a JSON number that could hide a filled zero).
  */
-import { z } from 'zod';
-import { DecimalString, envelopeOf, v3get } from '../../../v3/api/common';
+import { z } from "zod";
+import { DecimalString, envelopeOf, v3get } from "../../../v3/api/common";
 
 const S = z.string();
-const Sn = z.string().nullish().transform((v) => v ?? null);
+const Sn = z
+  .string()
+  .nullish()
+  .transform((v) => v ?? null);
 const Dn = DecimalString.nullish().transform((v) => v ?? null);
 
 export const Licence = z.looseObject({
@@ -39,18 +42,31 @@ export const Source = z.looseObject({
 });
 export type Source = z.output<typeof Source>;
 
-export const Ref = z.looseObject({ kind: S, id: S, label: S, loaded: z.boolean().default(true) });
+export const Ref = z.looseObject({
+  kind: S,
+  id: S,
+  label: S,
+  loaded: z.boolean().default(true),
+});
 export type Ref = z.output<typeof Ref>;
 
 export const MissingInfo = z.looseObject({ code: S, reason_fr: S });
 export type MissingInfo = z.output<typeof MissingInfo>;
 
-export const Point = z.looseObject({ t: S, x: z.number(), v: Dn, projection: z.boolean().default(false) });
+export const Point = z.looseObject({
+  t: S,
+  x: z.number(),
+  v: Dn,
+  projection: z.boolean().default(false),
+});
 export type Point = z.output<typeof Point>;
 
 export const Link = z.looseObject({
   table: Sn,
-  params: z.record(z.string(), z.string()).nullish().transform((v) => v ?? null),
+  params: z
+    .record(z.string(), z.string())
+    .nullish()
+    .transform((v) => v ?? null),
   url: Sn,
   section: Sn,
   family: Sn,
@@ -64,7 +80,16 @@ export const Stat = z.looseObject({
   value_text: Sn,
   unit: Sn,
   period: Sn,
-  kind: z.enum(['observed', 'projection', 'estimate', 'derived', 'literal', 'count', 'relation', 'judged']),
+  kind: z.enum([
+    "observed",
+    "projection",
+    "estimate",
+    "derived",
+    "literal",
+    "count",
+    "relation",
+    "judged",
+  ]),
   ref: Ref.nullish().transform((v) => v ?? null),
   source: Source.nullish().transform((v) => v ?? null),
   missing: MissingInfo.nullish().transform((v) => v ?? null),
@@ -101,10 +126,17 @@ export const Identity = z.looseObject({
   anchor: z.boolean(),
   anchor_note: Sn,
   source: Source.nullish().transform((v) => v ?? null),
-  sitelinks: z.number().nullish().transform((v) => v ?? null),
+  sitelinks: z
+    .number()
+    .nullish()
+    .transform((v) => v ?? null),
   snapshot_loaded: z.boolean(),
   community_edited: z.boolean(),
-  degree: z.looseObject({ statements_out: z.number(), statements_in: z.number(), capped_at: z.number() }),
+  degree: z.looseObject({
+    statements_out: z.number(),
+    statements_in: z.number(),
+    capped_at: z.number(),
+  }),
   iso3: Sn,
 });
 export type Identity = z.output<typeof Identity>;
@@ -151,7 +183,9 @@ export const RelGroup = z.looseObject({
   items: z.array(RelItem),
   more: z.boolean(),
   via: Ref.nullish().transform((v) => v ?? null),
-  properties: z.array(z.looseObject({ pid: S, label: S, count: z.number() })).default([]),
+  properties: z
+    .array(z.looseObject({ pid: S, label: S, count: z.number() }))
+    .default([]),
 });
 export type RelGroup = z.output<typeof RelGroup>;
 
@@ -183,8 +217,14 @@ export const Top = z.looseObject({
   key: S,
   label_fr: S,
   concept: S,
-  year: z.number().nullish().transform((v) => v ?? null),
-  n_countries: z.number().nullish().transform((v) => v ?? null),
+  year: z
+    .number()
+    .nullish()
+    .transform((v) => v ?? null),
+  n_countries: z
+    .number()
+    .nullish()
+    .transform((v) => v ?? null),
   unit: Sn,
   items: z.array(z.looseObject({ iso3: S, value: Dn, source: Source })),
 });
@@ -194,19 +234,35 @@ export const Space = z.looseObject({
   chain: z.array(
     z.looseObject({
       ref: Ref,
-      level: z.number().nullish().transform((v) => v ?? null),
+      level: z
+        .number()
+        .nullish()
+        .transform((v) => v ?? null),
       level_fr: Sn,
       iso3: Sn,
       via: Sn,
       basis: S,
-      lat: z.number().nullish().transform((v) => v ?? null),
-      lon: z.number().nullish().transform((v) => v ?? null),
+      lat: z
+        .number()
+        .nullish()
+        .transform((v) => v ?? null),
+      lon: z
+        .number()
+        .nullish()
+        .transform((v) => v ?? null),
     }),
   ),
   country_iso3: Sn,
-  point: z.looseObject({ lat: z.number(), lon: z.number(), source_key: Sn }).nullish().transform((v) => v ?? null),
+  point: z
+    .looseObject({ lat: z.number(), lon: z.number(), source_key: Sn })
+    .nullish()
+    .transform((v) => v ?? null),
   geometry: z
-    .looseObject({ geojson: z.looseObject({ type: S, coordinates: z.unknown() }), feature_key: S, note_fr: S })
+    .looseObject({
+      geojson: z.looseObject({ type: S, coordinates: z.unknown() }),
+      feature_key: S,
+      note_fr: S,
+    })
     .nullish()
     .transform((v) => v ?? null),
 });
@@ -214,7 +270,10 @@ export type Space = z.output<typeof Space>;
 
 export const Event = z.looseObject({
   date: Sn,
-  x: z.number().nullish().transform((v) => v ?? null),
+  x: z
+    .number()
+    .nullish()
+    .transform((v) => v ?? null),
   label_fr: S,
   property: S,
   ref: Ref.nullish().transform((v) => v ?? null),
@@ -265,7 +324,7 @@ export type Effect = z.output<typeof Effect>;
 export const ForecastRow = z.looseObject({
   model: S,
   label: S,
-  kind: z.enum(['official', 'ensemble', 'candidate', 'baseline']),
+  kind: z.enum(["official", "ensemble", "candidate", "baseline"]),
   kind_fr: S,
   description: Sn,
   status: Sn,
@@ -276,7 +335,10 @@ export const ForecastRow = z.looseObject({
   level: Sn,
   issued_at: Sn,
   batch_sha256: Sn,
-  score: z.record(z.string(), z.string().nullable()).nullish().transform((v) => v ?? null),
+  score: z
+    .record(z.string(), z.string().nullable())
+    .nullish()
+    .transform((v) => v ?? null),
 });
 export type ForecastRow = z.output<typeof ForecastRow>;
 
@@ -301,7 +363,12 @@ export const Question = z.looseObject({
 });
 export type Question = z.output<typeof Question>;
 
-export const MissingItem = z.looseObject({ section: S, what_fr: S, reason_code: S, reason_fr: S });
+export const MissingItem = z.looseObject({
+  section: S,
+  what_fr: S,
+  reason_code: S,
+  reason_fr: S,
+});
 export type MissingItem = z.output<typeof MissingItem>;
 
 export const SourceSummary = z.looseObject({
@@ -322,14 +389,43 @@ export const Bundle = z.looseObject({
   headline: z.array(Stat),
   facts: z.array(Fact),
   relations: z.array(RelGroup),
-  related_forms: z.array(z.looseObject({ ref: Ref, relation_fr: Sn, relations: z.array(RelGroup) })).default([]),
+  related_forms: z
+    .array(
+      z.looseObject({
+        ref: Ref,
+        relation_fr: Sn,
+        relations: z.array(RelGroup),
+      }),
+    )
+    .default([]),
   series: z.array(Series),
   tops: z.array(Top).default([]),
   space: Space,
   time: z.array(Event),
-  claims: z.looseObject({ incoming: z.array(Claim), outgoing: z.array(Claim), n_in: z.number(), n_out: z.number(), note_fr: S }),
-  effects: z.looseObject({ items: z.array(Effect), n: z.number(), n_country_scope: z.number().nullish().transform((v) => v ?? null), note_fr: S }),
-  forecasts: z.looseObject({ questions: z.array(Question), n_total: z.number(), n_pending: z.number(), n_resolved: z.number(), families: z.array(S), note_fr: S }),
+  claims: z.looseObject({
+    incoming: z.array(Claim),
+    outgoing: z.array(Claim),
+    n_in: z.number(),
+    n_out: z.number(),
+    note_fr: S,
+  }),
+  effects: z.looseObject({
+    items: z.array(Effect),
+    n: z.number(),
+    n_country_scope: z
+      .number()
+      .nullish()
+      .transform((v) => v ?? null),
+    note_fr: S,
+  }),
+  forecasts: z.looseObject({
+    questions: z.array(Question),
+    n_total: z.number(),
+    n_pending: z.number(),
+    n_resolved: z.number(),
+    families: z.array(S),
+    note_fr: S,
+  }),
   missing: z.array(MissingItem),
   sources: z.array(SourceSummary),
   notes: z.array(S).default([]),
@@ -350,15 +446,37 @@ export type BundleResponse = z.output<typeof BundleEnvelope>;
 
 const enc = encodeURIComponent;
 
-export function getBundle(kind: string, id: string, signal?: AbortSignal): Promise<BundleResponse> {
-  return v3get(`/v1/v8/entity/${enc(kind)}/${enc(id)}`, BundleEnvelope, undefined, signal);
+export function getBundle(
+  kind: string,
+  id: string,
+  signal?: AbortSignal,
+): Promise<BundleResponse> {
+  return v3get(
+    `/v1/v8/entity/${enc(kind)}/${enc(id)}`,
+    BundleEnvelope,
+    undefined,
+    signal,
+  );
 }
 
-const RelPage = envelopeOf(z.looseObject({ family: S, label_fr: S, items: z.array(RelItem) }));
+const RelPage = envelopeOf(
+  z.looseObject({ family: S, label_fr: S, items: z.array(RelItem) }),
+);
 export type RelPage = z.output<typeof RelPage>;
 
-export function getRelations(kind: string, id: string, family: string, cursor?: string | null, signal?: AbortSignal): Promise<RelPage> {
-  const q: Record<string, string> = { family, limit: '100' };
+export function getRelations(
+  kind: string,
+  id: string,
+  family: string,
+  cursor?: string | null,
+  signal?: AbortSignal,
+): Promise<RelPage> {
+  const q: Record<string, string> = { family, limit: "100" };
   if (cursor) q.cursor = cursor;
-  return v3get(`/v1/v8/entity/${enc(kind)}/${enc(id)}/relations`, RelPage, q, signal);
+  return v3get(
+    `/v1/v8/entity/${enc(kind)}/${enc(id)}/relations`,
+    RelPage,
+    q,
+    signal,
+  );
 }
