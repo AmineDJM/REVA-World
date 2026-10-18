@@ -1,0 +1,13 @@
+schema: reva-beat-agri-holdout-ledger/1
+statement: 'Append-only: one entry per opening of the BEAT-AGRI holdout. Never edit
+  past entries.'
+openings:
+- hypotheses_sha256: d0e1b0949b88781a1b96babb733a7760e117827a6314953e3f12800bab4edcc5
+  opened_at: '2026-10-18T17:57:20.134751+00:00'
+  code_sha256: 60b0257e79a85deb6dc853a783c30a5cecfa97aa9925259033f28d04c97a2f2d
+  status: opening
+- hypotheses_sha256: d0e1b0949b88781a1b96babb733a7760e117827a6314953e3f12800bab4edcc5
+  opened_at: '2026-10-18T17:57:20.134751+00:00'
+  holdout_json_sha256: ca0ce04d90cfcff5c4edde7f85ada03e8a44b98fdfa3706b9b9aaaa8d1b483aa
+  confirmed: []
+  status: scored
