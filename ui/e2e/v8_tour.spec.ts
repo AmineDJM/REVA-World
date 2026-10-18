@@ -174,6 +174,21 @@ test('keyboard only: palette, go-keys, nav and tabs', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+test('/ opens the V8 console; old screens stay reachable (/world, « Anciens écrans »)', async ({ page }) => {
+  const errors = watch(page);
+  await page.goto('/');
+  await expect(page).toHaveURL(/\/v8$/);
+  await expect(page.locator('main.v8-main')).toContainText(/Le pouls du monde/, { timeout: 30_000 });
+  const old = page.getByRole('link', { name: /Anciens écrans/ }).first();
+  await expect(old).toHaveAttribute('href', '/world');
+  await page.goto('/world');
+  await expect(page.locator('header.app-header')).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByRole('link', { name: /Nouvelle console V8/ })).toBeVisible();
+  await page.goto('/v3/');
+  await expect(page).toHaveURL(/\/v3\//);
+  expect(errors).toEqual([]);
+});
+
 test.afterAll(() => {
   console.log(`V8_TOUR_TIMINGS ${JSON.stringify(timings)}`);
 });
