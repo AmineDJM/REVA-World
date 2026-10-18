@@ -129,6 +129,7 @@
   border-radius: var(--v8-radius-sm, 4px);
   padding: 2px 5px;
   color: var(--v8-fg-muted, #565d6a);
+  background: var(--v8-surface-2);
 }
 .v8m-picker-pop {
   position: absolute;

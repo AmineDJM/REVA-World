@@ -325,6 +325,20 @@ html.v8-active body {
   color: var(--v8-fg-muted) !important;
   text-decoration: none;
 }
+/* long crumbs shrink with an ellipsis instead of overlapping (V8QA: phone Fiche of a conflict) */
+.v8-crumbs li > a,
+.v8-crumbs li > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.v8-crumbs li > span:not([aria-current]) {
+  color: var(--v8-fg-muted);
+}
+.v8-crumbs li:not(:last-child) {
+  flex-shrink: 0;
+  max-width: 40%;
+}
 .v8-crumbs a:hover {
   color: var(--v8-fg) !important;
 }
@@ -858,6 +872,10 @@ main.v8-main {
   }
   .v8-crumbs li:not(.v8-crumb-far) + li::before {
     margin: 0 6px;
+  }
+  /* the first crumb shown on a phone has no leading separator */
+  .v8-crumbs li.v8-crumb-far + li:not(.v8-crumb-far)::before {
+    content: none;
   }
   main.v8-main {
     padding: 16px var(--v8-gutter) 48px;

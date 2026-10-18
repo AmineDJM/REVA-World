@@ -1,4 +1,4 @@
-"""V8QA: BEAT verdicts in the Dossier say what the win is (h0 timeliness), with the scoreboard's caveats."""
+"""V8QA honesty fixes: BEAT verdict wording (h0 timeliness, combinations) and Fiche text facts in French first."""
 
 from __future__ import annotations
 
@@ -54,3 +54,21 @@ def test_every_scoreboard_win_on_an_official_forecast_carries_its_reading() -> N
             continue
         if r.get("candidate_kind") in ("combination_with_official", "post_processed_official"):
             assert "uses_official_forecast" in (r.get("caveats") or []), r["id"]
+
+
+def test_fiche_fact_prefers_french_then_english_text() -> None:
+    """V8QA: France's « gentilé » led with a Russian label; undated text facts now lead with fr, then en."""
+    from reva.v8.entity.kg_part import facts
+
+    def st(text: str, lang: str) -> dict[str, Any]:
+        return {
+            "property": {"pid": "P1549", "label_fr": "gentilé"},
+            "value": {"type": "monolingualtext", "text": text, "language": lang},
+            "provenance": {"rank": "normal", "source_key": "wikidata"},
+        }
+
+    fam = {"literals": [st("французы", "ru"), st("French", "en"), st("Français", "fr")]}
+    out, _ids, _coords = facts(fam)
+    assert out[0]["value_text"] == "Français"
+    fam = {"literals": [st("французы", "ru"), st("French", "en")]}
+    assert facts(fam)[0][0]["value_text"] == "French"

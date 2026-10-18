@@ -17,7 +17,7 @@
   --v8-border-strong: #c8ccd3;
   --v8-fg: #15171c;
   --v8-fg-muted: #565d6a;
-  --v8-fg-subtle: #858b96;
+  --v8-fg-subtle: #686e79; /* V8QA: ≥ 4.5:1 on bg, surface and surface-2 (was 3.1–3.4) */
   --v8-fg-on-accent: #ffffff;
   --v8-accent: #3653d3;
   --v8-accent-hover: #2a43b5;
@@ -32,7 +32,7 @@
   --v8-projection-bg: #f2eafb;
   --v8-estimate: #0b7a70;
   --v8-estimate-bg: #e2f4f1;
-  --v8-scenario: #b35400;
+  --v8-scenario: #a64e00; /* V8QA: 5.0:1 on scenario-bg (was 4.48) */
   --v8-scenario-bg: #fdf0e1;
   --v8-judged: #5546b8;
   --v8-judged-bg: #ecebfa;
@@ -135,7 +135,7 @@
     --v8-border-strong: #363c46;
     --v8-fg: #e7e9ec;
     --v8-fg-muted: #a1a8b3;
-    --v8-fg-subtle: #737a86;
+    --v8-fg-subtle: #848b97; /* V8QA: ≥ 4.5:1 on dark surfaces */
     --v8-fg-on-accent: #ffffff;
     --v8-accent: #7d95ff;
     --v8-accent-hover: #9aadff;
@@ -193,7 +193,7 @@
   --v8-border-strong: #363c46;
   --v8-fg: #e7e9ec;
   --v8-fg-muted: #a1a8b3;
-  --v8-fg-subtle: #737a86;
+  --v8-fg-subtle: #848b97;
   --v8-fg-on-accent: #ffffff;
   --v8-accent: #7d95ff;
   --v8-accent-hover: #9aadff;

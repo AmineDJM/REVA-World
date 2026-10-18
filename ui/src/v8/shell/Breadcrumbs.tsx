@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router';
+import { Link, matchPath, useLocation } from 'react-router';
 import { featureForPath, type DiscoveredFeature } from './discovery';
 
 export const TITLE_SUFFIX = 'REVA V8';
@@ -14,6 +14,19 @@ export function setShellTitle(t: string): void {
 export interface Crumb {
   label: string;
   to: string | null;
+}
+
+/** French labels of the record-kind segments used in V8 URLs (/v8/fiche/<kind>/…, /v8/dossier/<kind>/…). */
+const SEGMENT_FR: Record<string, string> = {
+  country: 'pays', commodity: 'matière première', drug: 'médicament', disease: 'maladie', armed_conflict: 'conflit',
+  conflict: 'conflit', compound: 'composé', gene: 'gène', protein: 'protéine', taxon: 'taxon', facility: 'installation',
+  legal_entity: 'entreprise', question: 'question', effect: 'effet', source: 'source', entity: 'entité', decision: 'décision',
+  event: 'événement', region: 'région',
+};
+
+/** True when some feature route answers this absolute /v8 URL (an intermediate crumb is a link only then). */
+function routable(features: readonly DiscoveredFeature[], url: string): boolean {
+  return features.some((f) => (f.route !== '' && matchPath({ path: `/v8/${f.route.includes('*') ? f.route : `${f.route}/*`}`.replace(/\/+/g, '/'), end: true }, url) !== null) || f.navTo === url);
 }
 
 /** Crumbs from a /v8 URL: Console › <feature> › <segments…>; the last raw segment may be replaced by `pageLabel`. */
@@ -33,7 +46,9 @@ export function crumbsFor(pathname: string, features: readonly DiscoveredFeature
       label = s;
     }
     if (i === 0 && f) label = f.title;
-    crumbs.push({ label, to: i === 0 && f ? (f.navTo ?? acc) : acc });
+    else if (i < segs.length - 1 && SEGMENT_FR[label]) label = SEGMENT_FR[label]!;
+    const to = i === 0 && f ? f.navTo : routable(features, acc) ? acc : null;
+    crumbs.push({ label, to });
   });
   const last = crumbs[crumbs.length - 1]!;
   if (pageLabel && segs.length > 1 && pageLabel !== last.label && pageLabel !== f?.title) last.label = pageLabel;
@@ -66,7 +81,7 @@ export function Breadcrumbs({ features }: { features: readonly DiscoveredFeature
       <ol>
         {crumbs.map((c, i) => (
           <li key={`${i}-${c.label}`} className={i < crumbs.length - 2 ? 'v8-crumb-far' : undefined}>
-            {c.to ? <Link to={c.to}>{c.label}</Link> : <span aria-current="page">{c.label}</span>}
+            {c.to ? <Link to={c.to}>{c.label}</Link> : i === crumbs.length - 1 ? <span aria-current="page">{c.label}</span> : <span>{c.label}</span>}
           </li>
         ))}
       </ol>

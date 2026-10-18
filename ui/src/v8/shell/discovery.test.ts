@@ -64,3 +64,20 @@ describe('feature discovery', () => {
     expect(routes).toEqual(['fiche:fiche']);
   });
 });
+
+describe('breadcrumbs', () => {
+  it('names record kinds in French and links only routable crumbs', async () => {
+    const { crumbsFor } = await import('./Breadcrumbs');
+    const { features } = collectFeatures({
+      '../features/accueil/index.ts': mod({ id: 'accueil', title: 'Accueil', path: '', order: 1 }),
+      '../features/fiche/index.tsx': mod({ id: 'fiche', title: 'Fiche', path: 'fiche/:kind/:id', navHidden: true, order: 20 }),
+      '../features/dossier/index.tsx': mod({ id: 'dossier', title: 'Dossier', path: 'dossier', order: 30 }),
+    });
+    const c = crumbsFor('/v8/fiche/country/FRA', features, 'France');
+    expect(c.map((x) => x.label)).toEqual(['Console', 'Fiche', 'pays', 'France']);
+    expect(c.map((x) => x.to)).toEqual(['/v8', null, null, null]);
+    const d = crumbsFor('/v8/dossier/commodity/crude_oil', features);
+    expect(d.map((x) => x.label)).toEqual(['Console', 'Dossier', 'matière première', 'crude_oil']);
+    expect(d[2]!.to).toBe('/v8/dossier/commodity');
+  });
+});

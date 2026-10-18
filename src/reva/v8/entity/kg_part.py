@@ -265,6 +265,13 @@ def first_neighbour(conn: Connection, qid: str, pid: str, direction: str, origin
 
 
 # ------------------------------------------------------------------------------------------------ facts
+_LANG_RANK = {"fr": 0, "en": 1}
+
+
+def _lang(v: Any) -> str | None:
+    return str(v.get("language") or v.get("lang") or "") or None if isinstance(v, dict) else None
+
+
 def facts(fam: Mapping[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any] | None]:
     """Literal statements grouped by property: ``(facts, external ids, coordinates)``. A property with several
     dated numeric values gives a series (points), its latest value leading."""
@@ -308,8 +315,14 @@ def facts(fam: Mapping[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, 
         has_dates = sum(1 for x, _, _ in dated if x is not None)
         # latest dated value leads; undated: the first (preferred rank first)
         ordered = sorted(dated, key=lambda t: (t[0] is not None, t[0] or 0.0), reverse=True)
-        if not has_dates:
-            ordered = sorted(dated, key=lambda t: (t[1].get("provenance") or {}).get("rank") != "preferred")
+        if not has_dates:  # preferred rank first, then French, then English text (V8QA: « gentilé » read Russian)
+            ordered = sorted(
+                dated,
+                key=lambda t: (
+                    (t[1].get("provenance") or {}).get("rank") != "preferred",
+                    _LANG_RANK.get(_lang(t[1].get("value")) or "", 2),
+                ),
+            )
         _x, st, lv = ordered[0]
         points = []
         if len(numeric) >= 2 and has_dates >= 2:
