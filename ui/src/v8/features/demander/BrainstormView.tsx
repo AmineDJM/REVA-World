@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import { v8Links } from '../../contract';
-import { Badge, MissingValue } from '../../shell/ui';
+import { Badge, frNumber, MissingValue } from '../../shell/ui';
 import type { BrainstormBundle, Driver, SeriesStatus } from './api';
 
 function SeriesLine({ s }: { s: SeriesStatus }) {
@@ -226,7 +226,7 @@ export function BrainstormView({ b }: { b: BrainstormBundle }) {
               {v.examples.map((e, i) => (
                 <li key={i} className="v8-subtle">
                   {String(e.candidate ?? '')} vs {String(e.benchmark ?? '')} : {String(e.verdict ?? '')}
-                  {e.ratio !== null && e.ratio !== undefined ? ` (ratio ${String(e.ratio)})` : ''} — {String(e.basis ?? '')}
+                  {e.ratio !== null && e.ratio !== undefined ? ` (ratio ${frNumber(Number(e.ratio), 3)})` : ''} — {String(e.basis ?? '')}
                 </li>
               ))}
             </ul>
