@@ -103,7 +103,7 @@ export function HeatMatrix({
           {data.rows.map((row, ri) => (
             <tr key={row.id} className={row.id === selectedDomain ? 'is-sel' : undefined}>
               <th scope="row" className="cv-rowhead">
-                <button type="button" data-r={ri} data-c={-1} tabIndex={ri === 0 ? 0 : -1} onClick={() => onDomain(row.id)} className="cv-rowbtn" title={`${row.label} — détail du domaine`}>
+                <button type="button" data-r={ri} data-c={-1} tabIndex={ri === 0 ? 0 : -1} onClick={() => onDomain(row.id)} className="cv-rowbtn" title={`${row.label} — détail du domaine`} aria-label={`${row.label} — détail du domaine`}>
                   <span className="cv-rowlabel">{row.label}</span>
                   <span className="cv-rowmeta v8-num">
                     {row.summary.tables > 0 ? `${row.summary.tables} t · ${shortRows(row.summary.rows)}` : 'aucune table'}

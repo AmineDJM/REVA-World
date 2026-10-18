@@ -512,8 +512,84 @@ def beat_conflict(src: Sources) -> list[Row]:
             "caveats": base_caveats(src, "beat_conflict", ["final_vintage_inputs", "final_vintage_outcome"]),
             "source": source(src, rel, f"/family/{esc(key)}", ratio="ratio", p="p_one_sided_t", win="win"),
         })  # fmt: skip
+    vq = "REVA's point losses are lower than VIEWS' on every metric, but **no difference is significant**"
+    if rep and vq in " ".join(src.text(rep).split()):
+        rows.append({
+            "id": "beat_conflict.V.cm_hurdle.reference_views.informational", "track": "beat_conflict", "window": "V",
+            "target": "conflict.cm_deaths", "horizon": "1-12", "horizon_label_fr": "1 à 12 mois", "forecaster": "views",
+            "benchmark": "forecast.reference_views", "benchmark_label_fr": "ViEWS, runs chargés en V6 (attribué)",
+            "benchmark_kind": "official_point", "candidate": "forecast.cm_hurdle",
+            "candidate_label_fr": "Modèle REVA pays-mois (hurdle)", "candidate_kind": "pure_reva",
+            "evaluation": "development", "metric": "msle", "verdict": "ne_bat_pas",
+            "verdict_basis_fr": "fenêtre informative déjà vue (hors famille Holm) : aucune différence significative",
+            "verdict_quote": quote(rep, vq),
+            "caveats": base_caveats(src, "beat_conflict", ["development_only", "information_tilt", "final_vintage_inputs"]),
+            "source": {"file": rep, "quote": vq, "sha256": src.sha(rep)},
+        })  # fmt: skip
     for r in rows:
         r["report"], r["protocol"] = rep, protocol(src, prel)
+    return rows
+
+
+# --------------------------------------------------------------------------------------------- BEAT-NOWCAST
+NOWCAST_CELL = {"gdp_gdpnow": "nowcast.us_gdp", "gdp_nyfed": "nowcast.us_gdp", "cpi_clev": "nowcast.us_inflation"}
+NOWCAST_BENCH = {
+    "benchmark.atl_gdpnow": ("atlanta_gdpnow", "official_point", "GDPNow publié à la même date"),
+    "benchmark.atl_gdpnow_errfan": ("atlanta_gdpnow", "official_fair_density", "densité équitable autour de GDPNow"),
+    "benchmark.nyfed_nowcast": ("nyfed_nowcast", "official_point", "NY Fed Staff Nowcast à la même date"),
+    "benchmark.nyfed_nowcast_errfan": ("nyfed_nowcast", "official_fair_density", "densité équitable autour du NY Fed"),
+    "benchmark.clev_nowcast": ("cleveland_nowcast", "official_point", "nowcast IPC de la Fed de Cleveland, même date"),
+}
+NOWCAST_CAND = {
+    "forecast.nc_stack_reva": "Combinaison nowcast officiel + nowcast REVA",
+    "forecast.nc_stack_all": "Combinaison des nowcasts officiels + REVA",
+    "forecast.nc_biascorr": "Nowcast officiel corrigé de son biais passé",
+}
+
+
+def beat_nowcast(src: Sources) -> list[Row]:
+    rel = "registry/forecasts/beat_nowcast/holdout.json"
+    if not src.has(rel):
+        return []
+    d = src.load(rel)
+    res = d["results"]
+    fam = int(d.get("family_size") or len(res))
+    adj = holm_adjust([r["p_better"] for r in res])
+    rows: list[Row] = []
+    for i, (r, a) in enumerate(zip(res, adj, strict=True)):
+        fid, bkind, blabel = NOWCAST_BENCH[r["benchmark"]]
+        uses = bool(r.get("uses_official_forecast"))
+        ckind = "combination_with_official" if uses else "pure_reva"
+        if "biascorr" in r["candidate"]:
+            ckind = "post_processed_official"
+        ok = bool(r["confirmed"])
+        if ok:
+            basis = f"confirmé : Holm ✓ (famille {fam}), ratio < 1"
+        elif r["holm_rejected"]:
+            basis = "Holm ✓ mais non confirmé (règle de couverture 80 % des densités)"
+        else:
+            basis = f"non confirmé : Holm ✗ (p brut {r['p_better']:.3g}, famille {fam})"
+        cav = (["uses_official_forecast"] if uses else []) + ["timeliness_edge"]
+        if (r.get("n_origins") or 0) < 20:
+            cav.append("small_n")
+        cov = r.get("cov80_candidate")
+        rows.append({
+            "id": f"beat_nowcast.holdout.{r['cell']}.{r['candidate'].split('.')[-1]}.{r['benchmark'].split('.')[-1]}.{r['loss']}",
+            "track": "beat_nowcast", "window": "holdout", "target": NOWCAST_CELL[r["cell"]],
+            "horizon": "nowcast", "horizon_label_fr": "trimestre / mois en cours", "forecaster": fid,
+            "benchmark": r["benchmark"], "benchmark_label_fr": blabel, "benchmark_kind": bkind,
+            "candidate": r["candidate"], "candidate_label_fr": NOWCAST_CAND.get(r["candidate"], r["candidate"]),
+            "candidate_kind": ckind, "evaluation": "preregistered_holdout", "metric": r["loss"],
+            "sample": {"n_origins": r.get("n_origins"), "n_pairs": r.get("n_pairs")},
+            "ratio": r["relative"], "p_raw": r["p_better"], "p_holm": r6(a), "p_holm_basis": "computed",
+            "holm_family_size": fam, "holm_rejected": bool(r["holm_rejected"]),
+            "coverage": {"0.8": cov} if cov is not None else None,
+            "verdict": "bat" if ok else "ne_bat_pas", "verdict_basis_fr": basis,
+            "caveats": base_caveats(src, "beat_nowcast", cav),
+            "source": source(src, rel, f"/results/{i}", ratio="relative", p="p_better", win="confirmed"),
+            "report": report_of(src, "beat_nowcast"),
+            "protocol": protocol(src, C.track("beat_nowcast")["protocol"]),
+        })  # fmt: skip
     return rows
 
 
@@ -723,6 +799,7 @@ GENERATORS: tuple[Callable[[Sources], list[Row]], ...] = (
     beat_energy,
     beat_health,
     beat_conflict,
+    beat_nowcast,
     pred_models,
     fix7_fair,
     pred_energy_v6,

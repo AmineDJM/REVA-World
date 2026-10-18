@@ -429,6 +429,41 @@ items:
     status: queued
     disk_mb: 9000
     source_docs: [docs/dev/HANDOFF_V3.md, lead:final4_todo]
+  - id: load.beatconflict.views_candidate
+    type: load
+    kind: disk
+    title: "Conflits — nouvelles exécutions ViEWS et mois Candidate UCDP après 2026-08 (BEAT-CONFLICT)"
+    unlocks:
+      domains: [conflict]
+      atlas_sources: [views, ucdp_ged]
+      tracks: [beat-conflict:W3]
+      text: Les prévisions scellées (lot 3f9e9bf2…, 9 216 prévisions) se résolvent sur les sorties Candidate ; ViEWS reste la référence à battre (aujourd’hui REVA ne la bat pas).
+    action: Ajouter les nouveaux identifiants d’exécution ViEWS à l’option runs, puis réingérer ViEWS et UCDP GED (Candidate) à chaque publication.
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.views
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.ucdp_ged
+    who: lead
+    status: queued
+    disk_mb: null
+    source_docs: [docs/dev/v7_beat_conflict.md, lead:final4_todo]
+  - id: load.beatenergy.steo_monthly
+    type: load
+    kind: disk
+    title: "Énergie — numéros mensuels du STEO (BEAT-ENERGY) et WPSR hebdomadaire"
+    unlocks:
+      domains: [energy]
+      atlas_sources: [vintage_steo, eia]
+      tracks: [beat-energy:h0]
+      text: Un scellement par mois au lieu d’un par trimestre (≈3× plus d’origines) ; la prévision prospective d’octobre se résout avec le STEO de novembre.
+    action: Charger chaque nouveau numéro STEO et le WPSR hebdomadaire ; sceller 7 jours après chaque STEO.
+    commands:
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.vintage_steo
+      - flock /tmp/reva-devdb.lock uv run reva atlas ingest atlas.eia_wpsr
+      - flock /tmp/reva-devdb.lock uv run python -m reva.cli.beat_energy --seal --out /tmp/seal.json
+    who: lead
+    status: queued
+    disk_mb: null
+    source_docs: [docs/dev/v7_beat_energy.md, lead:final4_todo]
   # ------------------------------------------------------------------------------------------- bigger machine
   - id: load.bigmachine.fullres
     type: load
@@ -1242,6 +1277,41 @@ items:
     who: owner
     status: open
     source_docs: [docs/dev/v6_culture.md]
+  - id: perm.weo_update_vintages
+    type: decision
+    kind: permission
+    title: "Archive des millésimes WEO Update (janvier / juillet)"
+    unlocks:
+      domains: [macro]
+      tracks: [beat-macro:gdp]
+      text: Comparaisons équitables du PIB à tous les mois (les WEO Update ne sont pas dans les millésimes de REVA ; aujourd’hui 1 victoire sur 7, chômage G7).
+    action: Capturer les fichiers WEO Update dans l’archive (le site du FMI refuse les clients non navigateurs) ou obtenir un accès.
+    who: owner
+    status: open
+    source_docs: [docs/dev/v7_beat_macro.md, lead:final4_todo]
+  - id: policy.weo_density_resolution
+    type: decision
+    kind: policy_choice
+    title: "Densités WEO : résolution sur les valeurs d’avril ou d’octobre"
+    unlocks:
+      domains: [macro]
+      tracks: [pred-registry:weo]
+      text: Règle de résolution de la famille de densités WEO (aujourd’hui en probation).
+    action: Choisir la règle (nouvelle version de la famille si elle change).
+    who: owner
+    status: open
+    source_docs: [docs/dev/v6_fix6.md, lead:final4_todo]
+  - id: policy.kg_targets_family
+    type: decision
+    kind: policy_choice
+    title: "Famille KG « cible / est la cible de » et ponts d’identité MeSH↔Mondo, ICD-11↔Mondo"
+    unlocks:
+      domains: [drugs, health]
+      text: Médicament → cible lisible dans Neurones et Liens ; indications ChEMBL et essais reliés aux maladies Mondo par identifiant.
+    action: V4CORE ajoute la famille targets ; V4LINK ajoute les règles d’identité (renvois publiés seulement).
+    who: lead
+    status: open
+    source_docs: [docs/dev/v6_drugs.md, lead:final4_todo]
   - id: policy.xls_reader
     type: decision
     kind: policy_choice

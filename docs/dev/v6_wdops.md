@@ -1,6 +1,7 @@
 # V6 — Wikidata harvest manager (agent WDOPS)
 
-Status: running (started 2026-10-17 16:20 UTC). Single agent talking to Wikidata (WDQS + Wikibase API) for the
+Status: stopped 2026-10-18 (session limit; free disk below the 5 GB ingest floor). Ran 2026-10-17 16:20 UTC →
+2026-10-18 ~18:40 UTC. Single agent talking to Wikidata (WDQS + Wikibase API) for the
 queued work, in priority order: (1) causal harvester queue → `reva kg import-harvest --from-db reva_kg_causwd` →
 `reva causal refresh --origin live`; (2) pending property requests; (3) V4 domain specs; (4) WDRUN groups.
 
@@ -89,8 +90,56 @@ next run).
 
 ## Conditions (throttling, budget, disk)
 
-CONDITIONS
+* **Wikibase API / EntityData** (`wikidata.wbapi`, 4,000/day): the binding limit. With the action API mostly
+  answering 429, the clients fall back to `Special:EntityData` (1 request per entity, ~15–30 entities/min at the 2 s
+  machine-wide pacing). 2026-10-17: the shared ledger reached 4,000 at 18:25 UTC (CAUSWD 1,196 + 1,090, spec runs,
+  property merge, other agents earlier). 2026-10-18: 1,342 by 00:06 (causal 692, spec run 650 — 650 label snapshots
+  of `science.chemical_elements` objects, `expand_hops: 1`) before the container restart.
+* **WDQS** (`wikidata.wdqs`, 1,500/day): almost unused (≤ 20/day): one answer per ~13–17 min ban window
+  (`429 Retry-After ≈ 1,000 s` renewed by global traffic on the shared egress); `science.chem_petroleum_composition`
+  timed out (60 s) on the one answer it got.
+* **QLever** (`qlever.wikidata`, 60/day, shared with V4LINK/V4BIO): 6 pack runs succeeded on 2026-10-17
+  (V4LINK companies/health/anatomy/…, WDOPS `eco_food`), then `HTTP 429 from qlever.dev` at 22:10 UTC. A V4LINK run
+  reserves 43 requests (all packs), so at most one V4LINK run fits a day next to the WDOPS/V4BIO runs.
+* **Disk**: free space oscillated between 4.3 and 5.7 GB (other agents' loads, Postgres temp files); every dev-DB
+  step waited for ≥ 5,120 MiB, harvests into throwaway DBs stopped below 4,800 MiB. The two container restarts
+  (2026-10-17 ~20:20 and 2026-10-18 ~00:10 UTC) killed the background runs; state files made every run resumable.
+* **Other Wikidata traffic seen**: V4BIO's `atlas.bio_wikidata` (WDQS, through the machine-wide lock) ran on
+  2026-10-17 ~20:20 UTC from another session; the lead later handed it to WDOPS.
 
 ## Not done, and how to finish
 
-TODO
+Everything is resumable; nothing is lost when a run stops (harvest state per spec / per causal entity, archive
+reuse, idempotent loads and imports).
+
+1. **Causal queue** (9,510 left at tiers 4–8: discovery hits and WDQS listing items): one session per UTC day,
+   `uv run python -m reva.causal_harvest run --share 0.6 --mode auto --min-free-mb 4800`, then
+   `flock /tmp/reva-devdb.lock uv run reva kg import-harvest --from-db reva_kg_causwd` and
+   `flock /tmp/reva-devdb.lock uv run reva causal refresh --origin live`. The six WDQS causal listings (22 requests)
+   still wait for a WDQS answer window (`--cap-wdqs 30` tries once an hour).
+2. **QLever loads** (dev DB, need ≥ 5 GB free; run right after 00:00 UTC for the fresh `qlever.wikidata` budget, in
+   this order): `atlas.v4link_qlever --option packs=chemistry,genes,taxa` (V4LINK's last 3 packs),
+   `atlas.wdops_qlever --option packs=chem_petroleum,chem_elements,eco_host,chem_materials,health_treat`,
+   `atlas.bio_qlever --option max_queries=40` (V4BIO bridges, ~33 queries of 3,000 VALUES; then capture its fixture
+   from the archived raw and drop `PENDING_LIVE_FIXTURE` in `tests/unit/test_bio_v4.py`),
+   `atlas.wdops_qlever --option packs=eco_iucn,eco_endemic,eco_range` (largest: ~100k statements, ~150 MB in `reva`).
+   Script: `<scratch>/wdops/qlever_day.sh`. On `429 from qlever.dev` retry the next day; do not raise the budget
+   (QLever publishes no usage policy).
+3. **Seed specs** (need entity snapshots; ≥ 7 GB free for the large ones): `python <scratch>/wdops/specs_driver.py
+   <scratch>/wdops/groups_all.json` (V4: chemical elements/discovery/compound ids, energy sources, mind ×3 incl.
+   ISCO-08 P8283, WHO EML, industry companies/factories, energy companies/sites/mines/power stations; then WDRUN:
+   treaties/wars/colonies, `core.historical_states --force`, geopolitics, events, people, history). Load DB
+   `reva_kg_wdops`, ledger `reva_kg_wdharvest`; import with
+   `flock /tmp/reva-devdb.lock uv run reva kg import-harvest --from-db reva_kg_wdops`, verify, then drop
+   `reva_kg_wdops`. At ~3,000 entities/day this is weeks of budget: a bigger egress quota or a Wikidata dump
+   (owner decision) is the real fix.
+4. **Not retried**: `atlas.ourairports`, `atlas.rcs_dem` (free disk 4.9 GB < 5 GB on 2026-10-18).
+
+## Owner decisions
+
+* **Throughput**: the Wikidata budgets are not the limit, the shared egress is (WDQS bans, action-API 429). Options:
+  a dedicated egress IP, or a local Wikidata dump subset (JSON dump, ~130 GB compressed — a bigger machine).
+* **QLever** as a regular path: in use since V4LINK (owner note of 2026-10-17); it has no published usage policy —
+  keep 60/day unless the operators confirm more.
+* **V4MIND P952**: was ISCO-88; fixed to P8283 (ISCO-08). The connector docstring in `atlas_mind_occupations.py`
+  still mentions P952 (V4MIND to update with a version bump).

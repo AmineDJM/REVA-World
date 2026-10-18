@@ -151,6 +151,7 @@ CAVEATS: dict[str, str] = {
     "not_sealed_yet": "Portée confirmée mais pas encore de lot scellé au registre.",
     "near_nowcast": "Questions de l'année en cours (≈ 80 % écoulés au scellement) : quasi-nowcasts.",
     "small_n": "Petit échantillon : puissance statistique faible.",
+    "information_tilt": "Fenêtre déjà vue (V6) et informations que l'officiel n'avait pas à sa publication : favorise REVA.",
     "mixed_vintage_outcome": "Issue sur UCDP Candidate (préliminaire), version finale indicative.",
 }
 
@@ -181,6 +182,13 @@ TRACKS: list[dict[str, Any]] = [
      "summary_fr": "Une famille Holm de 21 tests : W1 backtest en vintage final 2012–2021 contre la persistance, "
      "W3 prospectif contre ViEWS (mois cibles 2026-11 … 2027-04). Estimations de risque agrégées, jamais la "
      "prédiction d'une attaque."},
+    {"id": "beat_nowcast", "label_fr": "BEAT-NOWCAST — nowcasts US vs GDPNow, NY Fed, Cleveland Fed",
+     "agent": "BEAT-NOWCAST", "version": "V7", "report": "docs/dev/v7_beat_nowcast.md",
+     "protocol": "registry/forecasts/beat_nowcast/protocol.yaml",
+     "files": ["registry/forecasts/beat_nowcast/hypotheses.yaml", "registry/forecasts/beat_nowcast/holdout_ledger.yaml",
+               "registry/forecasts/beat_nowcast/holdout.json"],
+     "summary_fr": "À la date de chaque mise à jour des nowcasts officiels américains (PIB : GDPNow, NY Fed ; inflation : "
+     "Cleveland Fed) ; 5 hypothèses figées en développement, holdout ouvert une fois, une famille Holm."},
     {"id": "pred_models", "label_fr": "PRED-MODELS — tournoi en holdout verrouillé (V6)", "agent": "PRED-MODELS",
      "version": "V6", "report": "docs/dev/v6_pred_models.md", "protocol": "registry/forecasts/pred_models/protocol.yaml",
      "files": ["registry/forecasts/pred_models/holdout.json", "registry/forecasts/pred_models/holdout_ledger.yaml",
@@ -207,15 +215,10 @@ TRACKS: list[dict[str, Any]] = [
 
 # Domains/forecasters with no attempt yet: shown as "pas encore de piste", each with the reason quoted from a doc.
 NO_TRACK: list[dict[str, Any]] = [
-    {"target": "nowcast.us_gdp", "forecaster": "atlanta_gdpnow", "reason_fr": "Piste BEAT-NOWCAST annoncée, pas commencée.",
-     "quote": {"file": "docs/roadmap/v8_console.md", "text": "BEAT-NOWCAST vs GDPNow/NY Fed/Cleveland Fed"}},
-    {"target": "nowcast.us_gdp", "forecaster": "nyfed_nowcast", "reason_fr": "Piste BEAT-NOWCAST annoncée, pas commencée.",
-     "quote": {"file": "docs/roadmap/v8_console.md", "text": "BEAT-NOWCAST vs GDPNow/NY Fed/Cleveland Fed"}},
-    {"target": "nowcast.us_inflation", "forecaster": "cleveland_nowcast",
-     "reason_fr": "Piste BEAT-NOWCAST annoncée, pas commencée.",
-     "quote": {"file": "docs/roadmap/v8_console.md", "text": "BEAT-NOWCAST vs GDPNow/NY Fed/Cleveland Fed"}},
-    {"target": "agri.wasde", "forecaster": "usda_wasde", "reason_fr": "Piste BEAT-AGRI annoncée, pas commencée.",
-     "quote": {"file": "docs/roadmap/v8_console.md", "text": "BEAT-AGRI vs USDA WASDE"}},
+    {"target": "agri.wasde", "forecaster": "usda_wasde",
+     "reason_fr": "BEAT-AGRI : protocole pré-enregistré (développement 2005-2016, holdout 2017-2024 intact) ; aucune "
+     "fenêtre encore ouverte, rien n'est jugé.",
+     "quote": {"file": "registry/forecasts/beat_agri/protocol.yaml", "text": "holdout: marketing years 2017-2024 (untouched; opened once, ledger)"}},
     {"target": "health.eu_resp", "forecaster": "ecdc_respicast",
      "reason_fr": "Sorties RespiCast non listables sans l'API GitHub (bloquée) et disque < 5 Go : aucun test possible.",
      "quote": {"file": "docs/dev/v7_beat_health.md", "text": "The RespiCast ensemble is the official benchmark for ERVISS"}},

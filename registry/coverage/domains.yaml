@@ -28,6 +28,7 @@ domains:
     themes: [economy, labour]
     sources: [maddison, vintage_weo, vintage_us, vintage_ea, vintage_oecd, wid, ilostat, gapminder]
     tables: [atlas.eurostat.nuts_gdp, atlas.eurostat.nuts_une, atlas.oecd.reg_gdp, atlas.oecd.reg_une]
+    connectors: [atlas.fed_nowcasts]
     kg_kinds: [occupation, isic_code, crisis_trigger, crisis_outcome, crisis_response]
   - id: prices
     fr: Prix et matières premières
@@ -40,7 +41,7 @@ domains:
     en: Finance, money and public budgets
     themes: [finance]
     sources: [bis, ecb, boe, nyfed, ust, kfrench, cbcal, jst, laeven_valencia, reinhart_rogoff, esrb, frb]
-    connectors: [atlas.imf_fin, atlas.oecd.fiscal]
+    connectors: [atlas.imf_fin, atlas.oecd.fiscal, atlas.oecd_cit_changes]
     kg_kinds: [fund]
     kg_kind_sources: {event: [reinhart_rogoff.*, laeven_valencia.*, esrb.*, jst.*]}
   - id: trade
@@ -74,12 +75,14 @@ domains:
     en: Agriculture, fisheries and food
     themes: []
     sources: [fao, fishstat, usda, ifpri_er, usda_psd, usda_wasde, fao_tm]
+    connectors: [atlas.usda_wasde_esmis]
     kg_kinds: []
   - id: climate
     fr: Climat et météo
     en: Weather and climate
     themes: [climate]
     sources: [cckp, cckp_ts, climind, ghcnm, attribution_cb]
+    connectors: [atlas.ncei_cag]
     kg_kinds: [weather_station, climate_trend, climate_index, climate_driver, extreme_event]
   - id: environment
     fr: Environnement et écologie

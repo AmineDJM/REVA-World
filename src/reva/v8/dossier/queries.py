@@ -1044,14 +1044,15 @@ def forecasts_family(
     limit: int = 6,
 ) -> Result:
     """Pending / resolved sealed questions of one family: REVA's forecast, the official reference, the outcome."""
-    from reva.evaluation.registry import read as R
+    from reva.v8.dossier.registry_index import build_index
 
     out = Result()
-    qs, _total = R.questions(ctx.conn, ctx.store, ctx.origin, family=family, geo=geo, limit=200)
+    idx = build_index(ctx.conn, ctx.store, ctx.origin)
+    qs = [q for q in idx["questions"].values() if q["family"] == family and (geo is None or q["geo"] == geo)]
     if not qs:
         out.empty_reason = f"aucune question scellée dans la famille {family}"
         return out
-    qs.sort(key=lambda q: q["reference_period"])
+    qs.sort(key=lambda q: (q["reference_period"], q["question_id"]))
     n_res = sum(1 for q in qs if q["status"] == "resolved")
     n_pend = sum(1 for q in qs if q["status"] == "pending")
     want = list(models)
@@ -1060,66 +1061,43 @@ def forecasts_family(
     out.values["n_pending"] = num_val(n_pend, fsrc, kind="derived", digits=0)
     out.values["n_resolved"] = num_val(n_res, fsrc, kind="derived", digits=0)
     out.values["label"] = label_val(first["label_fr"], fsrc)
-    last_obs = None
-    for q in qs[:limit]:
-        d = R.question(ctx.conn, ctx.store, q["question_id"])
-        if d is None:
-            continue
-        qq = d["question"]
-        last_obs = last_obs or qq.get("last_observed")
+    shown = [q for q in qs if q["status"] == "pending"][:limit] or qs[:limit]
+    for q in shown:
         per = q["reference_period"]
         src = _registry_src(q["question_id"], f"Registre prospectif REVA — {q['label_fr']}", per)
         row: dict[str, Item] = {
             "period": period_val(per, src),
-            "status": label_val(
-                {"pending": "en attente", "resolved": "résolue", "void": "annulée"}.get(q["status"], q["status"]), src
-            ),
+            "status": label_val({"pending": "en attente", "resolved": "résolue", "void": "annulée"}.get(q["status"], q["status"]), src),
         }
-        by = {f["model"]: f for f in d["forecasts"]}
+        by = {f["model"]: f for f in idx["forecasts"].get(q["question_id"], [])}
         for i, m in enumerate(want):
             f = by.get(m)
             key = "reva" if i == 0 else f"m{i}"
             if f is None:
                 row[key] = Miss(MODEL_FR.get(m, m), "pas de prévision de ce modèle")
+                row[f"{key}_lo"] = row[f"{key}_hi"] = Miss("intervalle", "pas de prévision de ce modèle")
                 continue
-            qs_ = f.get("quantiles") or {}
-            row[key] = num_val(f.get("point"), src, unit=qq.get("unit"), kind="forecast")
-            row[f"{key}_lo"] = (
-                num_val(qs_.get("0.05"), src, unit=qq.get("unit"), kind="forecast")
-                if qs_.get("0.05")
-                else Miss("intervalle", "non publié")
-            )
-            row[f"{key}_hi"] = (
-                num_val(qs_.get("0.95"), src, unit=qq.get("unit"), kind="forecast")
-                if qs_.get("0.95")
-                else Miss("intervalle", "non publié")
-            )
+            row[key] = num_val(f.get("point"), src, unit=q.get("unit"), kind="forecast")
+            row[f"{key}_lo"] = num_val(f["q05"], src, unit=q.get("unit"), kind="forecast") if f.get("q05") else Miss("intervalle", "non publié")
+            row[f"{key}_hi"] = num_val(f["q95"], src, unit=q.get("unit"), kind="forecast") if f.get("q95") else Miss("intervalle", "non publié")
         if reference:
             f = by.get(reference)
             row["ref"] = (
-                num_val(f.get("point"), src, unit=qq.get("unit"), kind="projection")
+                num_val(f.get("point"), src, unit=q.get("unit"), kind="projection")
                 if f
-                else Miss(MODEL_FR.get(reference, reference), "pas de prévision de référence")
+                else Miss(MODEL_FR.get(reference, reference), "pas de prévision de référence pour ce mois")
             )
-        oc = d.get("outcome")
         row["outcome"] = (
-            num_val(oc.get("value"), src, unit=qq.get("unit"))
-            if isinstance(oc, dict) and oc.get("value") is not None
-            else Miss("résultat", "question non encore résolue")
+            num_val(q["outcome"], src, unit=q.get("unit")) if q.get("outcome") is not None else Miss("résultat", "question non encore résolue")
         )
         out.rows.append(row)
+    last_obs = next((q.get("last_observed") for q in qs if q.get("last_observed")), None)
     if last_obs:
-        lsrc = _registry_src(
-            first["question_id"],
-            f"Registre prospectif REVA — dernière observation ({first['label_fr']})",
-            last_obs.get("period"),
-        )
+        lsrc = _registry_src(first["question_id"], f"Registre prospectif REVA — dernière observation ({first['label_fr']})", last_obs.get("period"))
         out.values["last_value"] = num_val(last_obs.get("value"), lsrc, unit=first.get("unit"))
         out.values["last_period"] = period_val(last_obs.get("period"), lsrc)
     out.values["judged"] = label_val(
-        "non jugée (aucune question résolue)" if n_res == 0 else f"{n_res} question(s) résolue(s)",
-        fsrc,
-        kind="forecast",
+        "non jugée (aucune question résolue)" if n_res == 0 else f"jugée sur {n_res} question(s) résolue(s)", fsrc, kind="forecast"
     )
     return out
 
@@ -1127,10 +1105,11 @@ def forecasts_family(
 @query("forecasts.geo")
 def forecasts_geo(ctx: Ctx, *, geo: str, limit: int = 8) -> Result:
     """Families with sealed questions about one geography (counts by status) and REVA's next forecasts."""
-    from reva.evaluation.registry import read as R
+    from reva.v8.dossier.registry_index import build_index
 
     out = Result()
-    qs, _total = R.questions(ctx.conn, ctx.store, ctx.origin, geo=geo, limit=1000)
+    idx = build_index(ctx.conn, ctx.store, ctx.origin)
+    qs = [q for q in idx["questions"].values() if q["geo"] == geo]
     if not qs:
         out.empty_reason = f"aucune question scellée sur {geo}"
         return out
@@ -1142,30 +1121,24 @@ def forecasts_geo(ctx: Ctx, *, geo: str, limit: int = 8) -> Result:
     out.values["n_families"] = num_val(len(fams), src0, kind="derived", digits=0)
     out.values["n_resolved"] = num_val(sum(1 for q in qs if q["status"] == "resolved"), src0, kind="derived", digits=0)
     rows = []
-    for _fam, lst in sorted(fams.items(), key=lambda t: -len(t[1])):
-        lst.sort(key=lambda q: q["reference_period"])
+    for _fam, lst in sorted(fams.items(), key=lambda t: (-len(t[1]), t[0])):
+        lst.sort(key=lambda q: (q["reference_period"], q["question_id"]))
         nxt = next((q for q in lst if q["status"] == "pending"), lst[0])
-        src = _registry_src(
-            nxt["question_id"], f"Registre prospectif REVA — {nxt['label_fr']}", nxt["reference_period"]
-        )
+        src = _registry_src(nxt["question_id"], f"Registre prospectif REVA — {nxt['label_fr']}", nxt["reference_period"])
         row: dict[str, Item] = {
             "family": label_val(nxt["label_fr"], src),
             "n": num_val(len(lst), src, kind="derived", digits=0),
             "next_period": period_val(nxt["reference_period"], src),
-            "resolution": label_val(
-                fr_period(nxt.get("expected_resolution")) or str(nxt.get("expected_resolution")), src
-            ),
+            "resolution": label_val(fr_period(nxt.get("expected_resolution")) or str(nxt.get("expected_resolution")), src),
         }
-        d = R.question(ctx.conn, ctx.store, nxt["question_id"])
-        f = next((x for x in (d or {}).get("forecasts", []) if x["model"] == "reva.ensemble"), None) or next(
-            (x for x in (d or {}).get("forecasts", []) if x["model"] == "forecast.registry_persistence"), None
-        )
+        fcs = {f["model"]: f for f in idx["forecasts"].get(nxt["question_id"], [])}
+        f = fcs.get("reva.ensemble") or fcs.get("forecast.registry_persistence")
         if f is not None and f.get("point") is not None:
             row["forecast"] = num_val(f["point"], src, unit=nxt.get("unit"), kind="forecast")
             row["model"] = label_val(MODEL_FR.get(f["model"], f["model"]), src)
         else:
             row["forecast"] = Miss("prévision", "question binaire ou sans prévision ponctuelle")
-            row["model"] = Miss("modèle", "—")
+            row["model"] = Miss("modèle", "aucune prévision ponctuelle")
         rows.append(row)
     out.rows = rows[:limit]
     out.more = max(0, len(rows) - limit)
@@ -1302,6 +1275,7 @@ def predict_decision(ctx: Ctx, *, reference_id: str, limit: int = 8) -> Result:
                     "p50": Miss(lab, str(reason)),
                     "p05": Miss(lab, str(reason)),
                     "p95": Miss(lab, str(reason)),
+                    "n_missing": num_val(len(v["periods"]), vsrc, kind="derived", digits=0),
                 }
             )
         else:

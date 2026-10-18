@@ -267,3 +267,36 @@ def test_routes(client: Any) -> None:
     assert r.status_code == 200 and r.json()["anchors"]["families"]
     r = client.get("/v1/v8/ask/examples")
     assert r.status_code == 200 and len(r.json()["questions"]) >= 8
+
+
+# --------------------------------------------------------------------------- fixes found on the live data
+def test_statement_read_against_its_direction_names_the_right_subject() -> None:
+    """water ← « part of » — hydrogen, read as water « comprend » hydrogen: the subject is water, not hydrogen."""
+    has_part = {"fr": "comprend", "en": "has part"}
+    edge = (950, "fixture:hydrogen", "fixture:part_of", "fixture:water", "part_of", has_part, "has_part", has_part,
+            False, "fixture.wikidata", D.CC0, None)  # fmt: skip
+    fams = D.FakeFamilies(edges=[*D.EDGES, edge])
+    j = ask("Composition chimique de l'eau ?", D.backends(families=fams))
+    t = " ".join(s["text"] for s in j["sentences"])
+    assert "eau — « comprend »" in t and "hydrogène — « comprend »" not in t
+
+
+class CoalKg(D.FakeKgDomains):
+    """« charbon » resolves to a record without plants; its English label "coal" is carried by the GPPD fuel."""
+
+    WD = D.ent("fixture:coal_wd", "charbon", "coal", "wikidata_item")
+
+    def search_entities(self, text: str, *, kind, lang, limit):  # type: ignore[no-untyped-def]
+        if text.strip().lower() == "charbon":
+            return [EntityMatch(self.WD, "label_exact", "charbon")]
+        return super().search_entities(text, kind=kind, lang=lang, limit=limit)
+
+    def label_bridges(self, qid: str, exclude: Any = ()) -> list[tuple[Any, str, str]]:
+        return [(D.E["fixture:coal"], "en", "coal")] if qid == "fixture:coal_wd" else []
+
+
+def test_cross_list_reads_the_bridged_record_and_says_so() -> None:
+    j = ask("Quelles centrales au charbon en Inde ?", D.backends(kg=CoalKg()))
+    t = " ".join(s["text"] for s in j["sentences"])
+    assert "CENTRALE UN" in t and "CENTRALE GAZ" not in t
+    assert "fiche distincte portant le libellé anglais « coal »" in t

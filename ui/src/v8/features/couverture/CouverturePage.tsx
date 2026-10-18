@@ -115,7 +115,13 @@ export default function CouverturePage() {
                 <Seg label="Niveau" value={niveau} options={LEVELS} onChange={(v) => set({ niveau: v === 'region' ? '' : v, zone: '' }, false)} />
                 <Seg label="Mesure" value={metrique} options={METRICS} onChange={(v) => set({ metrique: v === 'pays' ? '' : v }, false)} />
               </div>
-              {m.status === 'error' && !matrix && <ErrorState error={m.error} what="la matrice de couverture" onRetry={m.reload} />}
+              {m.status === 'error' && !matrix && (
+                <ErrorState error={m.error} what="la matrice de couverture" onRetry={m.reload}>
+                  <p className="cv-note">
+                    Les agrégats sont calculés hors requête ; s’ils n’existent pas encore : <code>uv run reva v8 coverage refresh</code> (lecture seule, ~2 min).
+                  </p>
+                </ErrorState>
+              )}
               {!matrix && m.status !== 'error' && <Skeleton height={640} label="Chargement de la matrice…" />}
               {matrix && (
                 <>
