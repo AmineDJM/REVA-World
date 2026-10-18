@@ -754,6 +754,7 @@ def start_warmup(engine_getter: Callable[[], Any], store: Any) -> bool:
                 conn.execute(text("SET TRANSACTION READ ONLY"))
                 pdb.atlas_baseline(conn, store, None)
                 SharedRegistryBaseline(conn, store, None, None)._paths()
+                _io_for(conn, store)
             _WARM.update(state="warm", detail=None, seconds=round(time.perf_counter() - t0, 1))
         except Exception as e:  # never fatal: the first run will pay the cost instead
             _WARM.update(state="failed", detail=f"{type(e).__name__}: {str(e)[:200]}")

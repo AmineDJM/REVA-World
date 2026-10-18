@@ -86,7 +86,13 @@ def run(sc: Scenario, fingerprint: str, make_ctx: ContextFactory) -> tuple[dict[
     bundle = make_bundle(
         comp.result, lookup, _near(comp.result, ctx), market=sc.decision.instrument in MARKET_INSTRUMENTS
     )
-    bundle["result"] = comp.result
+    # the hops' full provenance is in bundle["evidence"] (one entry per estimate): keep only the key on each hop
+    result = dict(comp.result)
+    result["hops"] = [
+        {**h, "source": {"estimate_key": h["estimate_key"], "see": "evidence"}} if h.get("kind") == "estimate" else h
+        for h in comp.result.get("hops") or []
+    ]
+    bundle["result"] = result
     bundle["scenario_hash"] = sc.hash
     bundle["cache_key"] = key
     bundle["compute_ms"] = round((time.perf_counter() - t0) * 1000, 1)

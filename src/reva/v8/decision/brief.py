@@ -13,6 +13,15 @@ from collections.abc import Mapping
 from typing import Any
 
 from reva.v8.decision.bundle import fmt_num, geo_fr, node_label, unit_fr
+from reva.v8.decision.templates import UNIT_LABEL_FR
+
+APPLIC_FR = {
+    "exact": "portée exacte (ce pays)",
+    "panel_member": "panel groupé (le pays est dans l'échantillon)",
+    "world_panel": "panel mondial transposé",
+    "group_unverified": "groupe de pays (appartenance non vérifiée)",
+    "scope_unstated": "portée non précisée",
+}
 
 
 def _md(s: Any) -> str:
@@ -45,7 +54,7 @@ def brief_markdown(
     w("")
     w(
         f"**{hon.get('label') or r.get('label')}**"
-        + ("" if hon.get("validated") else " — ni une prévision, ni une probabilité.")
+        + ("" if hon.get("validated") else " — un scénario conditionnel, pas une prévision.")
     )
     w(f"*{hon.get('not_advice_fr') or 'Recherche, pas un conseil financier ni une recommandation.'}*")
     w("")
@@ -61,7 +70,9 @@ def brief_markdown(
         f"- Acteur : {d.get('actor', {}).get('label_fr')}"
         + (f" ({d['actor']['geo']})" if (d.get("actor") or {}).get("geo") else "")
     )
-    w(f"- Instrument : `{d.get('instrument')}` — grandeur {mag.get('value')} {mag.get('unit')}")
+    w(
+        f"- Instrument : `{d.get('instrument')}` — grandeur {mag.get('value')} {UNIT_LABEL_FR.get(str(mag.get('unit')), mag.get('unit'))}"
+    )
     w(f"- Cible : {(d.get('target') or {}).get('label_fr')}")
     dur = (
         "maintenue sur tout l'horizon"
@@ -106,6 +117,11 @@ def brief_markdown(
     edges = [e for e in (bundle.get("graph") or {}).get("edges") or [] if e.get("kind") == "estimate"]
     seen: set[str] = set()
     labels = bundle.get("labels") or {}
+    if not edges:
+        w(
+            "Aucun lien chiffré : la décision ne rejoint aucune estimation attribuée (voir plus bas où la chaîne s'arrête)."
+        )
+        w("")
     for e in edges:
         k = e["estimate_key"]
         x = ev.get(k) or {}
@@ -114,7 +130,7 @@ def brief_markdown(
         w(f"### {frm} → {to}")
         w("")
         eff = e.get("effect") or {}
-        w(f"- Estimation : {x.get('published_fr') or '—'} ; {x.get('published_uncertainty_fr') or ''}")
+        w(f"- Estimation publiée : {x.get('published_size_fr') or '—'} ; {x.get('published_uncertainty_fr') or ''}")
         w(
             f"- Coefficient appliqué : {eff.get('beta_label_fr')}"
             + (
@@ -125,7 +141,7 @@ def brief_markdown(
         )
         if e.get("applicability_notes_fr"):
             w(
-                f"- Applicabilité : {(e.get('applicability') or {}).get('status')} — "
+                f"- Applicabilité : {APPLIC_FR.get(str((e.get('applicability') or {}).get('status')), (e.get('applicability') or {}).get('status'))} — "
                 + " ; ".join(e["applicability_notes_fr"])
             )
         if k not in seen:
@@ -193,7 +209,7 @@ def brief_markdown(
         )
     w("")
 
-    if sensitivity:
+    if sensitivity and any(v.get("bars") or v.get("no_uncertainty") for v in sensitivity.get("variables") or []):
         w("## Sensibilité (un à la fois)")
         w("")
         w(sensitivity.get("method_fr") or "")
