@@ -1,4 +1,4 @@
-import { collectFeatures, featureForPath, navFeatures } from './discovery';
+import { collectFeatures, navTargetRoutes, featureForPath, navFeatures } from './discovery';
 
 const El = () => null;
 const mod = (f: Record<string, unknown>) => ({ feature: { element: El, ...f } });
@@ -48,5 +48,19 @@ describe('feature discovery', () => {
     expect(featureForPath(features, '/v8/scores')?.id).toBe('scores');
     expect(featureForPath(features, '/v8/nope')).toBeNull();
     expect(featureForPath(features, '/world')).toBeNull();
+  });
+
+  it('nav-target routes: only for visible param features whose target no route already answers', () => {
+    const { features } = collectFeatures({
+      '../features/fiche/index.tsx': mod({ id: 'fiche', title: 'Fiche', path: 'fiche/:kind/:id', navPath: 'fiche', order: 20 }),
+      '../features/deep/index.tsx': mod({ id: 'deep', title: 'Deep', path: 'deep/:kind/:id', navPath: '/v8/deep/country/FRA', order: 21 }),
+      '../features/hidden/index.tsx': mod({ id: 'hidden', title: 'Hidden', path: 'hidden/:id', navPath: 'hidden', navHidden: true, order: 22 }),
+      '../features/board/index.tsx': mod({ id: 'board', title: 'Board', path: 'board/:id', navPath: 'boards', order: 23 }),
+      '../features/boards/index.tsx': mod({ id: 'boards', title: 'Boards', path: 'boards', order: 24 }),
+    });
+    const routes = navTargetRoutes(features).map((r) => `${r.feature.id}:${r.path}`);
+    // fiche gets /v8/fiche; deep's target is matched by its own param route (no shadowing static copy);
+    // hidden is navHidden; board's target is another feature's route.
+    expect(routes).toEqual(['fiche:fiche']);
   });
 });

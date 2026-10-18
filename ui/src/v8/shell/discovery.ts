@@ -2,6 +2,7 @@
  * Feature discovery (pure): turns the modules found by import.meta.glob('../features/*\/index.{ts,tsx}')
  * into a validated, ordered list. Nothing is hard-coded: the nav lists what exists.
  */
+import { matchPath } from 'react-router';
 import type { V8Feature } from '../contract';
 
 export interface DiscoveredFeature extends V8Feature {
@@ -89,4 +90,24 @@ export function featureForPath(features: readonly DiscoveredFeature[], pathname:
 /** Nav entries: features with a link target, not hidden. */
 export function navFeatures(features: readonly DiscoveredFeature[]): DiscoveredFeature[] {
   return features.filter((f) => !f.navHidden && f.navTo !== null);
+}
+
+/**
+ * Extra static routes so a parameterised feature (fiche/:kind/:id) also answers its nav target (/v8/fiche).
+ * Skipped when the feature is navHidden, when the target is the /v8 index, and whenever the target is already
+ * answered by a feature route (its own param route included: a navPath like /v8/fiche/country/FRA must reach the
+ * param route with its params, not a static copy that shadows it).
+ */
+export function navTargetRoutes(features: readonly DiscoveredFeature[]): { feature: DiscoveredFeature; path: string }[] {
+  const out: { feature: DiscoveredFeature; path: string }[] = [];
+  for (const f of features) {
+    if (f.navHidden || !f.navTo || f.navTo === '/v8' || !f.route.includes(':')) continue;
+    const target = f.navTo.slice(4);
+    const collides = features.some((g) => {
+      const pattern = g.route.includes('*') ? g.route : `${g.route}/*`;
+      return g.route === target || (g.route !== '' && matchPath({ path: `/${pattern}`, end: true }, `/${target}`) !== null);
+    });
+    if (!collides) out.push({ feature: f, path: target });
+  }
+  return out;
 }

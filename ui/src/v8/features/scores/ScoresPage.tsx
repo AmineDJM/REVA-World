@@ -13,6 +13,7 @@ import { Badge, EmptyState, ErrorState, KeyHint, Panel, Skeleton, Stat, useUrlPa
 import { getCell, getLive, getScores, getTrack, type CalendarItem, type CellDetail, type Counts, type LiveState, type ScoresPage as Page, type TrackDetail, type Vocab, type Win } from './api';
 import { ChartView } from './Charts';
 import { DocViewer } from './DocViewer';
+import { linkNote, PinButton } from '../tableaux/PinButton';
 import { Matrix } from './Matrix';
 import { RowsTable } from './RowsTable';
 import { EVALUATION_SHORT, METRIC_SHORT, VERDICT_FR, dayLabel, daysUntil, fmtP, fmtRange, fmtRatio, forecasterLabel, total, whenLabel } from './model';
@@ -379,6 +380,10 @@ function TrackView({ id, vocab, onBack, onOpenDoc, highlight }: { id: string; vo
             <span className="sc-unsealed">rapport attendu ({d.track.report_expected}) pas encore publié</span>
           )}
         </p>
+        <PinButton
+          title="Épingler cette piste sur un tableau (référence ; les verdicts sont relus en direct)"
+          item={() => linkNote(`Piste : ${d.track.label_fr}`, v8Links.scoreboard(id), [`Contre les officiels au moment de l’épinglage : ${d.counts.bat} bat · ${d.counts.ne_bat_pas} ne bat pas · ${d.counts.egalite} égalité · ${d.counts.en_attente} en attente.`])}
+        />
         <CountsBar c={d.counts} label="Répartition des verdicts contre les officiels sur cette piste" />
         <p className="sc-track-counts v8-num">
           Contre les officiels : {d.counts.bat} bat · {d.counts.ne_bat_pas} ne bat pas · {d.counts.egalite} égalité · {d.counts.en_attente} en attente
@@ -452,9 +457,12 @@ function CellDrawer({ k, title, vocab, onClose, onOpenDoc, onOpenTrack }: { k: s
           <p className="sc-drawer-kicker">{forecaster === 'naive' ? 'référence naïve (comptée à part)' : forecasterLabel(forecaster)}</p>
           <h2 className="sc-drawer-title">{title}</h2>
         </div>
-        <button type="button" className="v8-btn v8-btn-sm v8-btn-ghost" onClick={onClose} aria-label="Fermer (Échap)">
-          Fermer <KeyHint keys="Esc" />
-        </button>
+        <div className="sc-drawer-actions">
+          <PinButton title="Épingler cette cellule sur un tableau (référence)" item={() => linkNote(`Scores : ${title} — ${forecaster === 'naive' ? 'référence naïve' : forecasterLabel(forecaster)}`, `/v8/scores?${new URLSearchParams({ cell: k }).toString()}`)} />
+          <button type="button" className="v8-btn v8-btn-sm v8-btn-ghost" onClick={onClose} aria-label="Fermer (Échap)">
+            Fermer <KeyHint keys="Esc" />
+          </button>
+        </div>
       </header>
       {state.status === 'loading' && <Skeleton lines={6} />}
       {state.status === 'error' && <ErrorState error={state.error} what="la cellule" />}

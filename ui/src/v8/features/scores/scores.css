@@ -979,3 +979,10 @@
   padding: var(--v8-space-3) var(--v8-space-4);
   border-bottom: 1px solid var(--v8-border);
 }
+.sc-drawer-actions {
+  display: flex;
+  gap: var(--v8-space-2);
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}

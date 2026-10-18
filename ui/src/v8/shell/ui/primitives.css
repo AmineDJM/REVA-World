@@ -814,3 +814,19 @@
   color: var(--v8-fg-muted);
   max-width: 80ch;
 }
+
+/* « Épingler » (features/tableaux/PinButton.tsx): button + polite status next to it */
+.v8-pin {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--v8-space-2);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.v8-pin-msg {
+  font-size: var(--v8-text-xs);
+  color: var(--v8-fg-muted);
+}
+.v8-pin-msg:empty {
+  display: none;
+}

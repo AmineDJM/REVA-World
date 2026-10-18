@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { lazy } from 'react';
-import { MemoryRouter, Route, Routes, useLocation } from 'react-router';
+import { MemoryRouter, Route, Routes, useLocation, useParams } from 'react-router';
 import { collectFeatures } from './discovery';
 import { V8App } from './V8App';
 
@@ -66,6 +66,25 @@ describe('V8App shell', () => {
     renderAt('/v8/fiche/country/FRA');
     expect(screen.getByRole('heading', { name: 'Page Fiche' })).toBeInTheDocument();
     expect(screen.getByRole('navigation', { name: 'Fil d’Ariane' })).toHaveTextContent('FRA');
+  });
+
+  it('a deep navPath (/v8/x/country/FRA) does not shadow the param route: the feature gets its params', () => {
+    const Params = () => {
+      const p = useParams();
+      return <h1>{`params ${p.kind ?? '∅'}/${p.id ?? '∅'}`}</h1>;
+    };
+    const d = collectFeatures({
+      '../features/deep/index.tsx': { feature: { id: 'deep', title: 'Deep', path: 'deep/:kind/:id', navPath: '/v8/deep/country/FRA', order: 10, element: Params } },
+    });
+    globalThis.fetch = vi.fn(async () => new Response('{}', { status: 200 })) as typeof fetch;
+    render(
+      <MemoryRouter initialEntries={['/v8/deep/country/FRA']}>
+        <Routes>
+          <Route path="/v8/*" element={<V8App features={d.features} problems={d.problems} username="admin" defaultProvider={null} />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole('heading', { name: 'params country/FRA' })).toBeInTheDocument();
   });
 
   it('a crashing feature keeps the frame and names the failure', () => {

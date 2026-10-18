@@ -3,7 +3,7 @@ import { Route, Routes, useLocation, useNavigate } from 'react-router';
 import type { PaletteProvider } from '../contract';
 import { Breadcrumbs, setShellTitle, TITLE_SUFFIX } from './Breadcrumbs';
 import { FeatureBoundary } from './Boundary';
-import { featureForPath, navFeatures, type DiscoveredFeature } from './discovery';
+import { featureForPath, navFeatures, navTargetRoutes, type DiscoveredFeature } from './discovery';
 import { HealthIndicator } from './Health';
 import { createKeyHandler } from './keys';
 import { NavSheet, Rail } from './Nav';
@@ -208,11 +208,9 @@ export function V8App({ features, problems = [], username, onLogout, defaultProv
                 <Route key={f.id} path={f.route.includes('*') ? f.route : `${f.route}/*`} element={<FeatureRoute f={f} />} />
               ))}
             {/* A parameterised feature (fiche/:kind/:id) also answers its nav target (/v8/fiche). */}
-            {features
-              .filter((f) => f.route.includes(':') && f.navTo && f.navTo !== '/v8' && !features.some((g) => g.route === f.navTo!.slice(4)))
-              .map((f) => (
-                <Route key={`${f.id}-nav`} path={f.navTo!.slice(4)} element={<FeatureRoute f={f} />} />
-              ))}
+            {navTargetRoutes(features).map(({ feature: f, path }) => (
+              <Route key={`${f.id}-nav`} path={path} element={<FeatureRoute f={f} />} />
+            ))}
             <Route path="*" element={<NotFound features={nav} pathname={pathname} />} />
           </Routes>
         </main>

@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router';
 import { EmptyState, ErrorState, Skeleton } from '../../shell/ui';
 import { dossierHref, exportUrl, getDossier, getSubjects, KIND_LABEL, type DossierDoc, type SubjectHit } from './api';
 import { Reader } from './Reader';
+import { linkNote, PinButton } from '../tableaux/PinButton';
 import { useLoad } from './useLoad';
 import './dossier.css';
 
@@ -162,6 +163,12 @@ function Brief({ kind, id }: { kind: string; id: string }) {
           <a className="v8-btn v8-btn-sm" href={exportUrl(kind, id, 'json')} download={`dossier-${kind}-${id.replace(/:/g, '_')}.json`}>
             JSON
           </a>
+          {doc.data && (
+            <PinButton
+              title="Épingler ce dossier sur un tableau (référence ; le dossier est recalculé à l’ouverture)"
+              item={() => (doc.data ? linkNote(`Dossier : ${doc.data.title}`, dossierHref(kind, id), doc.data.subtitle ? [doc.data.subtitle] : []) : null)}
+            />
+          )}
           {doc.data && (
             <button type="button" className="v8-btn v8-btn-sm v8-btn-ghost" onClick={() => setRefresh((r) => r + 1)} title="Recalculer même si une version en cache existe">
               Recalculer

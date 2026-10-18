@@ -100,7 +100,7 @@ export function PlacePanel({ sel, geo, name, precision, onClose }: { sel: Select
           </div>
           <nav className="v8m-panel-links" aria-label="Aller plus loin">
             {isCountry && <Link to={v8Links.entity('country', geo)}>Fiche {name} →</Link>}
-            {isCountry && <Link to={`/v8/comparer?${new URLSearchParams({ s: d.meta.series, g: geo }).toString()}`}>Comparer →</Link>}
+            {isCountry && <Link to={v8Links.compare([d.meta.series], [geo])}>Comparer →</Link>}
           </nav>
         </>
       )}

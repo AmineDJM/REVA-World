@@ -6,6 +6,7 @@ import { fetchFamilies, fetchNeighbourhood, fetchPaths, type EgoData, type Famil
 import { EXAMPLES } from './examples';
 import { HOP_CHOICES, answerSentence, buildGraph, parseState, plural, stateQuery, warningsFr, type LiensState } from './model';
 import { NodePicker, type PickedNode } from './NodePicker';
+import { linkNote, PinButton } from '../tableaux/PinButton';
 import { EgoList, NodeCard, PathCard } from './parts';
 import './liens.css';
 
@@ -266,6 +267,12 @@ export default function LiensPage() {
                 <p className="lien-answer" data-testid="lien-answer">
                   {answerSentence(data)}
                 </p>
+                {data.found && (
+                  <PinButton
+                    title="Épingler ce chemin sur un tableau (référence ; un chemin n’est pas une explication causale)"
+                    item={() => linkNote(`Chemin : ${answerSentence(data).slice(0, 300)}`, `/v8/liens?${params.toString()}`, ['Un chemin relie des déclarations de sources ; ce n’est pas une explication causale.'])}
+                  />
+                )}
                 {paths.status === 'ok' && paths.warnings.length > 0 && (
                   <ul className="lien-warn">
                     {paths.warnings.map((w) => (

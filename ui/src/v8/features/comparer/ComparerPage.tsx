@@ -11,6 +11,7 @@ import { mondeHref } from '../monde/url';
 import { dataOf, useAsync } from '../monde/useAsync';
 import { CompareChart, type ChartPlace } from './Chart';
 import { buildCsv, downloadCsv } from './csv';
+import { linkNote, PinButton } from '../tableaux/PinButton';
 import { parseCompareQuery } from './parse';
 import { allowed, commonBase, popScale, shownUnit, transformPlace, TRANSFORM_LABEL, type Shown, type TransformId } from './transforms';
 import '../monde/monde.css';
@@ -305,6 +306,10 @@ export default function ComparerPage() {
             <button type="button" className="v8-btn v8-btn-sm" onClick={exportCsv} title="Exporter exactement ce qui est affiché, avec les colonnes de source">
               ⤓ CSV
             </button>
+            <PinButton
+              title="Épingler cette comparaison sur un tableau (référence à la vue, les valeurs sont relues en direct)"
+              item={() => (r ? linkNote(`Comparaison : ${r.data.series.map(seriesLabel).join(', ')} · ${r.data.geos.map(nameOf).join(', ')}`, `/v8/comparer?${params.toString()}`, [`Séries : ${r.data.series.map((x) => x.meta.series).join(', ')}.`]) : null)}
+            />
           </div>
 
           {t === 'percap' && r.data.population && (

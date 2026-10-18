@@ -8,6 +8,8 @@ import { getMap, type MapData, type MapResponse, type Point, type Rights, type S
 import { FilterBar, IndicatorPicker } from './IndicatorPicker';
 import type { Fill } from './MondeMap';
 import { PeriodBar } from './PeriodBar';
+import { linkNote, PinButton } from '../tableaux/PinButton';
+import type { PinItem } from '../tableaux/pin';
 import { PlacePanel } from './PlacePanel';
 import { usePlaceNames } from './places';
 import { classColors, classify, colorOf, effectiveMode, legendRows, SCALE_LABEL } from './scale';
@@ -169,6 +171,17 @@ export default function MondePage() {
     return out;
   }, [xd, yd, nameOf]);
 
+  const pinMap = useCallback((): PinItem[] | null => {
+    if (!xd) return null;
+    const label = `Carte : ${indicatorLabel(xd.meta)}${xd.period_label ? ` · ${xd.period_label}` : ''}`;
+    const items: PinItem[] = [linkNote(label, `/v8/monde?${params.toString()}`, [`Série ${xd.meta.series} (${xd.meta.source}).`])];
+    const geo = st.sel && /^[A-Z]{3}$/.test(st.sel) ? st.sel : null;
+    if (geo && xd.meta.concept) {
+      items.push({ kind: 'series', concept: xd.meta.concept.id, geo, label: `${indicatorLabel(xd.meta)}, ${nameOf(geo)}`.slice(0, 400), table: xd.meta.table, unit: xd.meta.unit ?? undefined });
+    }
+    return items;
+  }, [xd, params, st.sel, nameOf]);
+
   const settled = xa.status === 'ok' && (!yKey || ya.status === 'ok');
   const hasProj = (xd?.periods ?? []).some((p) => p.proj > 0);
 
@@ -278,6 +291,7 @@ export default function MondePage() {
                   </select>
                 </label>
               )}
+              <PinButton item={pinMap} title="Épingler cette carte (et la série du pays sélectionné) sur un tableau" />
               {biv && (
                 <>
                   <label className="v8m-check">
