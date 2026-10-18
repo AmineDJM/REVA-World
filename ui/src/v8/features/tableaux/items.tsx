@@ -265,7 +265,9 @@ export function ForecastBody({ item, visible, compact = false }: { item: Extract
         <thead>
           <tr>
             <th scope="col">Prévisionniste</th>
-            <th scope="col">Prévision</th>
+            <th scope="col" title="Valeur ponctuelle puis [quantile 5 % ; quantile 95 %] de la distribution scellée">
+              Prévision [5 % ; 95 %]
+            </th>
             {d.status === 'resolved' && <th scope="col">Score</th>}
           </tr>
         </thead>
@@ -301,7 +303,9 @@ export function ForecastBody({ item, visible, compact = false }: { item: Extract
           ))}
         </tbody>
       </table>
-      {compact && issued.length > shown.length && <p className="v8b-meta muted">+ {issued.length - shown.length} autres prévisions</p>}
+      {compact && issued.length > shown.length && <p className="v8b-meta muted">
+          + {issued.length - shown.length} autre{issued.length - shown.length > 1 ? 's' : ''} prévision{issued.length - shown.length > 1 ? 's' : ''} (voir la question)
+        </p>}
       <p className="v8b-meta muted">
         {d.status === 'resolved'
           ? 'Une seule question ne fait pas un verdict : le jugement contre le prévisionniste officiel est sur le tableau des scores.'
